@@ -24,8 +24,8 @@ class DuplicateChecker(metomi.rose.macro.MacroBase):
 
     """Returns settings whose duplicate status does not match their name."""
 
-    WARNING_DUPL_SECT_NO_NUM = ('incorrect "duplicate=true" metadata')
-    WARNING_NUM_SECT_NO_DUPL = ('{0} requires "duplicate=true" metadata')
+    WARNING_DUPL_SECT_NO_NUM = 'incorrect "duplicate=true" metadata'
+    WARNING_NUM_SECT_NO_DUPL = '{0} requires "duplicate=true" metadata'
 
     def validate(self, config, meta_config=None):
         """Return a list of errors, if any."""
@@ -44,20 +44,24 @@ class DuplicateChecker(metomi.rose.macro.MacroBase):
             basic_section = metomi.rose.macro.REC_ID_STRIP.sub("", section)
             if is_duplicate:
                 if basic_section == section:
-                    self.add_report(section, None, None,
-                                    self.WARNING_DUPL_SECT_NO_NUM)
+                    self.add_report(
+                        section, None, None, self.WARNING_DUPL_SECT_NO_NUM
+                    )
             elif section != basic_section:
                 if basic_section not in sect_error_no_dupl:
                     sect_error_no_dupl.update({basic_section: 1})
                     no_index_section = metomi.rose.macro.REC_ID_STRIP_DUPL.sub(
-                        "", section)
+                        "", section
+                    )
                     if no_index_section != section:
                         basic_section = no_index_section
                     warning = self.WARNING_NUM_SECT_NO_DUPL
-                    if self._get_has_metadata(metadata, basic_section,
-                                              meta_config):
-                        self.add_report(section, None, None,
-                                        warning.format(basic_section))
+                    if self._get_has_metadata(
+                        metadata, basic_section, meta_config
+                    ):
+                        self.add_report(
+                            section, None, None, warning.format(basic_section)
+                        )
         return self.reports
 
     def _get_has_metadata(self, metadata, basic_section, meta_config):
@@ -67,9 +71,11 @@ class DuplicateChecker(metomi.rose.macro.MacroBase):
             meta_section = meta_keys[0]
             if len(meta_keys) > 1:
                 continue
-            if ((meta_section == basic_section or
-                    meta_section.startswith(
-                    basic_section + metomi.rose.CONFIG_DELIMITER)) and
-                    isinstance(meta_node.value, dict)):
+            if (
+                meta_section == basic_section
+                or meta_section.startswith(
+                    basic_section + metomi.rose.CONFIG_DELIMITER
+                )
+            ) and isinstance(meta_node.value, dict):
                 return True
         return False

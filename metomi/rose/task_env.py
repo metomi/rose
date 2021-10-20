@@ -32,8 +32,9 @@ PATH_GLOBS = {
 }
 
 
-def get_prepend_paths(event_handler=None, path_root=None, path_glob_args=None,
-                      full_mode=False):
+def get_prepend_paths(
+    event_handler=None, path_root=None, path_glob_args=None, full_mode=False
+):
     """Return map of PATH-like env-var names to path lists to prepend to them.
 
     event_handler -- An instance of metomi.rose.reporter.Reporter or an object
@@ -66,7 +67,7 @@ def get_prepend_paths(event_handler=None, path_root=None, path_glob_args=None,
                     continue
                 env_key = "PATH"
                 if key != "path-prepend":
-                    env_key = key[len("path-prepend."):]
+                    env_key = key[len("path-prepend.") :]
                 values = []
                 for value in node.value.split():
                     if os.path.exists(value):
@@ -120,12 +121,14 @@ def get_prepend_paths(event_handler=None, path_root=None, path_glob_args=None,
 def main():
     """rose task-env."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("cycle", "cycle_offsets", "path_globs",
-                              "prefix_delim", "suffix_delim")
+    opt_parser.add_my_options(
+        "cycle", "cycle_offsets", "path_globs", "prefix_delim", "suffix_delim"
+    )
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness - 1)
     suite_engine_proc = SuiteEngineProcessor.get_processor(
-        event_handler=report)
+        event_handler=report
+    )
     kwargs = dict(vars(opts))
     try:
         task_props = suite_engine_proc.get_task_props(*args, **kwargs)
@@ -134,10 +137,9 @@ def main():
         path_globs = opts.path_globs
         if path_globs is None:
             path_globs = []
-        prepend_paths_map = get_prepend_paths(report,
-                                              task_props.suite_dir,
-                                              path_globs,
-                                              full_mode=True)
+        prepend_paths_map = get_prepend_paths(
+            report, task_props.suite_dir, path_globs, full_mode=True
+        )
         for key, prepend_paths in prepend_paths_map.items():
             orig_paths = []
             orig_v = os.getenv(key, "")

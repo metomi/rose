@@ -110,7 +110,10 @@ class PollEvent(Event):
         if is_ok:
             ok_str = "OK"
         return "[POLL %s] %s %s" % (
-            ok_str, strftime("%Y-%m-%dT%H:%M:%S", localtime(sec)), test)
+            ok_str,
+            strftime("%Y-%m-%dT%H:%M:%S", localtime(sec)),
+            test,
+        )
 
 
 class Poller:
@@ -133,25 +136,32 @@ class Poller:
         if poll_all_files_value:
             try:
                 poll_all_files = shlex.split(
-                    env_var_process(poll_all_files_value))
+                    env_var_process(poll_all_files_value)
+                )
             except UnboundEnvironmentVariableError as exc:
-                raise ConfigValueError(["poll", "all-files"],
-                                       poll_all_files_value, exc)
+                raise ConfigValueError(
+                    ["poll", "all-files"], poll_all_files_value, exc
+                )
         poll_any_files_value = conf_tree.node.get_value(["poll", "any-files"])
         poll_any_files = []
         if poll_any_files_value:
             try:
                 poll_any_files = shlex.split(
-                    env_var_process(poll_any_files_value))
+                    env_var_process(poll_any_files_value)
+                )
             except UnboundEnvironmentVariableError as exc:
-                raise ConfigValueError(["poll", "any-files"],
-                                       poll_any_files_value, exc)
+                raise ConfigValueError(
+                    ["poll", "any-files"], poll_any_files_value, exc
+                )
         poll_file_test = None
         if poll_all_files or poll_any_files:
             poll_file_test = conf_tree.node.get_value(["poll", "file-test"])
             if poll_file_test and "{}" not in poll_file_test:
-                raise ConfigValueError(["poll", "file-test"], poll_file_test,
-                                       ConfigValueError.SYNTAX)
+                raise ConfigValueError(
+                    ["poll", "file-test"],
+                    poll_file_test,
+                    ConfigValueError.SYNTAX,
+                )
 
         return poll_test, poll_file_test, poll_all_files, poll_any_files
 
@@ -161,7 +171,8 @@ class Poller:
         # R*DURATION: repeat the value R times
         conf_keys = ["poll", "delays"]
         poll_delays_value = conf_tree.node.get_value(
-            conf_keys, default="").strip()
+            conf_keys, default=""
+        ).strip()
         if not poll_delays_value:
             return [0]  # poll once without a delay
 
@@ -175,12 +186,13 @@ class Poller:
                 try:
                     repeat = int(repeat)
                 except ValueError:
-                    raise ConfigValueError(conf_keys,
-                                           poll_delays_value,
-                                           ConfigValueError.SYNTAX)
+                    raise ConfigValueError(
+                        conf_keys, poll_delays_value, ConfigValueError.SYNTAX
+                    )
             try:
                 value = self.date_time_oper.duration_parser.parse(
-                    value).get_seconds()
+                    value
+                ).get_seconds()
                 is_legacy = False
             except ISO8601SyntaxError:
                 # Legacy mode: nnnU
@@ -195,9 +207,9 @@ class Poller:
                 try:
                     value = float(value)
                 except ValueError:
-                    raise ConfigValueError(conf_keys,
-                                           poll_delays_value,
-                                           ConfigValueError.SYNTAX)
+                    raise ConfigValueError(
+                        conf_keys, poll_delays_value, ConfigValueError.SYNTAX
+                    )
                 if unit:
                     value *= unit
                 is_legacy = True
@@ -207,25 +219,32 @@ class Poller:
                 raise ConfigValueError(
                     conf_keys,
                     poll_delays_value,
-                    ConfigValueError.DURATION_LEGACY_MIX)
+                    ConfigValueError.DURATION_LEGACY_MIX,
+                )
             poll_delays += [value] * repeat
         return poll_delays
 
     def poll(self, conf_tree):
         """Poll for prerequisites of applications."""
         # Get the poll configuration.
-        poll_test, poll_file_test, poll_all_files, poll_any_files = (
-            self._get_tests(conf_tree))
+        (
+            poll_test,
+            poll_file_test,
+            poll_all_files,
+            poll_any_files,
+        ) = self._get_tests(conf_tree)
         poll_delays = []
         if poll_test or poll_all_files or poll_any_files:
             poll_delays = self._get_delays(conf_tree)
 
         # Launch the polling.
         t_init = get_timepoint_for_now()
-        poll_test, poll_any_files, poll_all_files = (
-            self._run_poll(poll_test, poll_all_files,
-                           poll_any_files, poll_delays,
-                           poll_file_test=poll_file_test)
+        poll_test, poll_any_files, poll_all_files = self._run_poll(
+            poll_test,
+            poll_all_files,
+            poll_any_files,
+            poll_delays,
+            poll_file_test=poll_file_test,
         )
         t_finish = get_timepoint_for_now()
 
@@ -236,14 +255,21 @@ class Poller:
         if poll_any_files:
             failed_items.append("any-files")
         if poll_all_files:
-            failed_items.append("all-files:" +
-                                self.popen.list_to_shell_str(poll_all_files))
+            failed_items.append(
+                "all-files:" + self.popen.list_to_shell_str(poll_all_files)
+            )
         if failed_items:
             now = get_timepoint_for_now()
             raise PollTimeoutError(now, t_finish - t_init, failed_items)
 
-    def _run_poll(self, poll_test, poll_all_files, poll_any_files, poll_delays,
-                  poll_file_test=None):
+    def _run_poll(
+        self,
+        poll_test,
+        poll_all_files,
+        poll_any_files,
+        poll_delays,
+        poll_file_test=None,
+    ):
         """Poll, including waiting for delays."""
         while poll_delays and (poll_test or poll_any_files or poll_all_files):
             poll_delay = poll_delays.pop(0)
@@ -251,8 +277,8 @@ class Poller:
                 sleep(poll_delay)
             if poll_test:
                 ret_code = self.popen.run(
-                    poll_test, shell=True,
-                    stdout=sys.stdout, stderr=sys.stderr)[0]
+                    poll_test, shell=True, stdout=sys.stdout, stderr=sys.stderr
+                )[0]
                 self.handle_event(PollEvent(time(), poll_test, ret_code == 0))
                 if ret_code == 0:
                     poll_test = None
@@ -276,9 +302,14 @@ class Poller:
         is_done = False
         if poll_file_test:
             test = poll_file_test.replace(
-                "{}", self.popen.list_to_shell_str([file_]))
-            is_done = self.popen.run(
-                test, shell=True, stdout=sys.stdout, stderr=sys.stderr)[0] == 0
+                "{}", self.popen.list_to_shell_str([file_])
+            )
+            is_done = (
+                self.popen.run(
+                    test, shell=True, stdout=sys.stdout, stderr=sys.stderr
+                )[0]
+                == 0
+            )
         else:
             is_done = bool(glob(file_))
         self.handle_event(PollEvent(time(), "file:" + file_, is_done))
@@ -324,16 +355,25 @@ class AppRunner(Runner):
     """Invoke a Rose application."""
 
     NAME = "app"
-    OPTIONS = ["app_mode", "command_key", "conf_dir", "defines",
-               "install_only_mode", "new_mode", "no_overwrite_mode",
-               "opt_conf_keys"]
+    OPTIONS = [
+        "app_mode",
+        "command_key",
+        "conf_dir",
+        "defines",
+        "install_only_mode",
+        "new_mode",
+        "no_overwrite_mode",
+        "opt_conf_keys",
+    ]
 
     def __init__(self, *args, **kwargs):
         Runner.__init__(self, *args, **kwargs)
         path = os.path.dirname(
-            os.path.dirname(sys.modules["metomi.rose"].__file__))
+            os.path.dirname(sys.modules["metomi.rose"].__file__)
+        )
         self.builtins_manager = SchemeHandlersManager(
-            [path], "rose.apps", ["run"], None, *args, **kwargs)
+            [path], "rose.apps", ["run"], None, *args, **kwargs
+        )
         self.date_time_oper = RoseDateTimeOperator()
 
     def run_impl(self, opts, args, uuid, work_files):
@@ -356,15 +396,20 @@ class AppRunner(Runner):
             builtin_app = self.builtins_manager.get_handler(app_mode)
             if builtin_app is None:
                 raise UnknownBuiltinAppError(app_mode)
-            return builtin_app.run(self, conf_tree, opts, args, uuid,
-                                   work_files)
+            return builtin_app.run(
+                self, conf_tree, opts, args, uuid, work_files
+            )
 
     def get_command(self, conf_tree, opts, args):
         """Get command to run."""
         command = self.popen.list_to_shell_str(args)
         if not command:
-            names = [opts.command_key, os.getenv("ROSE_APP_COMMAND_KEY"),
-                     os.getenv("ROSE_TASK_NAME"), "default"]
+            names = [
+                opts.command_key,
+                os.getenv("ROSE_APP_COMMAND_KEY"),
+                os.getenv("ROSE_TASK_NAME"),
+                "default",
+            ]
             for name in names:
                 if not name:
                     continue
@@ -390,7 +435,7 @@ class AppRunner(Runner):
         for rel_path, conf_dir in conf_tree.files.items():
             if not rel_path.startswith("file" + os.sep):
                 continue
-            name = rel_path[len("file" + os.sep):]
+            name = rel_path[len("file" + os.sep) :]
             # No sub-directories, very slow otherwise
             if os.sep in name:
                 name = name.split(os.sep, 1)[0]
@@ -403,8 +448,9 @@ class AppRunner(Runner):
                 continue
             source_node = target_node.get(["source"])
             if source_node is None:
-                target_node.set(["source"],
-                                os.path.join(conf_dir, "file", name))
+                target_node.set(
+                    ["source"], os.path.join(conf_dir, "file", name)
+                )
             elif source_node.is_ignored():
                 continue
 
@@ -412,8 +458,9 @@ class AppRunner(Runner):
         self.config_pm(conf_tree, "env")
 
         # Process Files
-        self.config_pm(conf_tree, "file",
-                       no_overwrite_mode=opts.no_overwrite_mode)
+        self.config_pm(
+            conf_tree, "file", no_overwrite_mode=opts.no_overwrite_mode
+        )
 
     def _prep_new(self, opts):
         """Clear out run directory on a --new option if possible."""
@@ -454,8 +501,12 @@ class AppRunner(Runner):
         if opts.install_only_mode:
             return
         self.popen(
-            command, shell=True, stdout=sys.stdout, stderr=sys.stderr,
-            stdin=sys.stdin)
+            command,
+            shell=True,
+            stdout=sys.stdout,
+            stderr=sys.stderr,
+            stdin=sys.stdin,
+        )
 
 
 def main():

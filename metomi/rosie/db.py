@@ -49,7 +49,8 @@ class RosieDatabaseConnectError(al.exc.OperationalError):
         self.bad_db_url = bad_db_url
         self.message = message
         super(RosieDatabaseConnectError, self).__init__(
-            self.message, "None", self.bad_db_url)
+            self.message, "None", self.bad_db_url
+        )
 
     def __str__(self):
         return "Failed to connect to DB '%s'." % self.bad_db_url
@@ -64,12 +65,29 @@ class DAO:
 
     """
 
-    QUERY_OP_ALIASES = {"eq": "__eq__", "ge": "__ge__", "gt": "__gt__",
-                        "le": "__le__", "lt": "__lt__", "ne": "__ne__"}
+    QUERY_OP_ALIASES = {
+        "eq": "__eq__",
+        "ge": "__ge__",
+        "gt": "__gt__",
+        "le": "__le__",
+        "lt": "__lt__",
+        "ne": "__ne__",
+    }
 
-    QUERY_OPERATORS = ["eq", "ge", "gt", "le", "lt", "ne",
-                       "contains", "endswith", "ilike", "like",
-                       "match", "startswith"]
+    QUERY_OPERATORS = [
+        "eq",
+        "ge",
+        "gt",
+        "le",
+        "lt",
+        "ne",
+        "contains",
+        "endswith",
+        "ilike",
+        "like",
+        "match",
+        "startswith",
+    ]
     TEXT_ST_DELETED = "D "
 
     def __init__(self, db_url):
@@ -92,8 +110,12 @@ class DAO:
             raise RosieDatabaseConnectError(self.db_url, exc)
 
         self.tables = {}
-        for name in [LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME,
-                     OPTIONAL_TABLE_NAME]:
+        for name in [
+            LATEST_TABLE_NAME,
+            MAIN_TABLE_NAME,
+            META_TABLE_NAME,
+            OPTIONAL_TABLE_NAME,
+        ]:
             self.tables[name] = al.Table(name, self.db_metadata, autoload=True)
 
     def _execute(self, query):
@@ -116,14 +138,15 @@ class DAO:
         join_main_clause = latest_table.c.idx == main_table.c.idx
         join_main_clause &= latest_table.c.branch == main_table.c.branch
         join_main_clause &= latest_table.c.revision == main_table.c.revision
-        from_obj = latest_table.join(main_table,
-                                     onclause=join_main_clause)
+        from_obj = latest_table.join(main_table, onclause=join_main_clause)
         join_optional_clause = main_table.c.idx == optional_table.c.idx
         join_optional_clause &= main_table.c.branch == optional_table.c.branch
         join_optional_clause &= (
-            main_table.c.revision == optional_table.c.revision)
-        from_obj = from_obj.outerjoin(optional_table,
-                                      onclause=join_optional_clause)
+            main_table.c.revision == optional_table.c.revision
+        )
+        from_obj = from_obj.outerjoin(
+            optional_table, onclause=join_optional_clause
+        )
         return_cols = []
         for key in joined_column_keys:
             for col in from_obj.c:
@@ -145,9 +168,11 @@ class DAO:
         join_optional_clause = main_table.c.idx == optional_table.c.idx
         join_optional_clause &= main_table.c.branch == optional_table.c.branch
         join_optional_clause &= (
-            main_table.c.revision == optional_table.c.revision)
-        from_obj = main_table.outerjoin(optional_table,
-                                        onclause=join_optional_clause)
+            main_table.c.revision == optional_table.c.revision
+        )
+        from_obj = main_table.outerjoin(
+            optional_table, onclause=join_optional_clause
+        )
         return_cols = []
         for key in joined_column_keys:
             for col in from_obj.c:
@@ -167,9 +192,8 @@ class DAO:
         common_keys = self.get_common_keys()
         meta_table = self.tables[META_TABLE_NAME]
         self._connect()
-        where = (meta_table.c.name == "known_keys")
-        select = al.sql.select([meta_table.c.value],
-                               whereclause=where)
+        where = meta_table.c.name == "known_keys"
+        select = al.sql.select([meta_table.c.value], whereclause=where)
         self.results = [r[0] for r in self._execute(select)]  # De-proxy.
         if any(self.results):
             self.results = self.results[0].split()  # shlex.split garbles it.
@@ -246,10 +270,14 @@ class DAO:
         current_expr = []
         for filter_tuple in filters:
             for i, entry in enumerate(filter_tuple):
-                if ((entry in ["and", "or"] and i == 0) or
-                        entry and (
-                            all([e == "(" for e in entry]) or
-                            all([e == ")" for e in entry]))):
+                if (
+                    (entry in ["and", "or"] and i == 0)
+                    or entry
+                    and (
+                        all([e == "(" for e in entry])
+                        or all([e == ")" for e in entry])
+                    )
+                ):
                     if current_expr:
                         item_list.append(current_expr)
                         current_expr = []
@@ -296,8 +324,8 @@ class DAO:
                             ind = -1
                             for _ in range(down_items.count(items[1])):
                                 ind = down_items.index(items[1], ind + 1) - 1
-                                if down_items[ind: ind + len(items)] == items:
-                                    del down_items[ind: ind + len(items)]
+                                if down_items[ind : ind + len(items)] == items:
+                                    del down_items[ind : ind + len(items)]
                                     down_items.insert(ind, expr)
                                     substituted = True
                                     break
@@ -336,12 +364,12 @@ class DAO:
         while "and" in items:
             i = items.index("and")
             expr = al.and_(items[i - 1], items[i + 1])
-            del items[i - 1: i + 2]
+            del items[i - 1 : i + 2]
             items.insert(i - 1, expr)
         while "or" in items:
             i = items.index("or")
             expr = al.or_(items[i - 1], items[i + 1])
-            del items[i - 1: i + 2]
+            del items[i - 1 : i + 2]
             items.insert(i - 1, expr)
         return items.pop()
 

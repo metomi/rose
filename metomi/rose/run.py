@@ -37,8 +37,13 @@ class RunConfigLoadEvent(Event):
     LEVEL = Event.V
 
     def __str__(self):
-        (conf_dir, conf_name, opt_conf_keys, opt_defines,
-            opt_defines_suite) = self.args
+        (
+            conf_dir,
+            conf_name,
+            opt_conf_keys,
+            opt_defines,
+            opt_defines_suite,
+        ) = self.args
         ret = "Configuration: %s/\n" % (conf_dir)
         ret += "    file: %s\n" % (conf_name)
         for opt_conf_key in opt_conf_keys:
@@ -99,8 +104,14 @@ class Runner:
     NAME: Optional[str] = None
     OPTIONS: List[str] = []
 
-    def __init__(self, event_handler=None, popen=None, config_pm=None,
-                 fs_util=None, suite_engine_proc=None):
+    def __init__(
+        self,
+        event_handler=None,
+        popen=None,
+        config_pm=None,
+        fs_util=None,
+        suite_engine_proc=None,
+    ):
         if not self.CONF_NAME:
             self.CONF_NAME = self.NAME
         self.event_handler = event_handler
@@ -115,7 +126,8 @@ class Runner:
         self.config_pm = config_pm
         if suite_engine_proc is None:
             suite_engine_proc = SuiteEngineProcessor.get_processor(
-                event_handler=event_handler, popen=popen, fs_util=fs_util)
+                event_handler=event_handler, popen=popen, fs_util=fs_util
+            )
         self.suite_engine_proc = suite_engine_proc
         self.conf_tree_loader = ConfigTreeLoader()
 
@@ -138,28 +150,36 @@ class Runner:
             conf_dir = os.getcwd()
         conf_dir_orig = conf_dir
         conf_name = "rose-" + self.CONF_NAME + ".conf"
-        while not os.access(os.path.join(conf_dir, conf_name),
-                            os.F_OK | os.R_OK):
+        while not os.access(
+            os.path.join(conf_dir, conf_name), os.F_OK | os.R_OK
+        ):
             conf_dir = self.fs_util.dirname(conf_dir)
             if conf_dir == self.fs_util.dirname(conf_dir):  # is root
                 raise ConfigNotFoundError(conf_dir_orig, conf_name)
 
         # Optional configuration files
         opt_conf_keys = []
-        opt_conf_keys_env = os.getenv("ROSE_%s_OPT_CONF_KEYS" %
-                                      self.CONF_NAME.upper())
+        opt_conf_keys_env = os.getenv(
+            "ROSE_%s_OPT_CONF_KEYS" % self.CONF_NAME.upper()
+        )
         if opt_conf_keys_env:
             opt_conf_keys += shlex.split(opt_conf_keys_env)
         if opts.opt_conf_keys:
             opt_conf_keys += opts.opt_conf_keys
 
-        self.handle_event(RunConfigLoadEvent(
-            conf_dir, conf_name, opt_conf_keys, opts.defines,
-            getattr(opts, 'defines_suite', [])))
+        self.handle_event(
+            RunConfigLoadEvent(
+                conf_dir,
+                conf_name,
+                opt_conf_keys,
+                opts.defines,
+                getattr(opts, 'defines_suite', []),
+            )
+        )
 
-        conf_tree = self.conf_tree_loader.load(conf_dir, conf_name,
-                                               opt_keys=opt_conf_keys,
-                                               defines=opts.defines)
+        conf_tree = self.conf_tree_loader.load(
+            conf_dir, conf_name, opt_keys=opt_conf_keys, defines=opts.defines
+        )
         return conf_tree
 
     def run(self, opts, args):

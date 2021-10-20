@@ -47,7 +47,8 @@ def main():
                 break
             try:
                 out_handle.write(
-                    env_var_process(line, opts.unbound, opts.match_mode))
+                    env_var_process(line, opts.unbound, opts.match_mode)
+                )
             except UnboundEnvironmentVariableError as exc:
                 name = arg
                 if arg == "-":

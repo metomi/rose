@@ -33,8 +33,9 @@ class OutputGrepper:
         if task.subextract in REGEXPS:
             regexp = REGEXPS[task.subextract]
         else:
-            if (task.subextract.startswith("'") and
-                    task.subextract.endswith("'")):
+            if task.subextract.startswith("'") and task.subextract.endswith(
+                "'"
+            ):
                 regexp = task.subextract[1:-1]
         numbers = data_from_regexp(regexp, filename)
         datavar = variable + "data"

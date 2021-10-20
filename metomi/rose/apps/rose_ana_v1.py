@@ -50,6 +50,7 @@ class KGODatabase:
     """
     KGO Database object, stores comparison information for rose_ana apps.
     """
+
     # Stores retries of database creation and the maximum allowed number
     # of retries before an exception is raised
     RETRIES = 0
@@ -58,7 +59,8 @@ class KGODatabase:
     def __init__(self):
         "Initialise the object."
         self.file_name = os.path.join(
-            os.getenv("ROSE_SUITE_DIR"), "log", "rose-ana-comparisons.db")
+            os.getenv("ROSE_SUITE_DIR"), "log", "rose-ana-comparisons.db"
+        )
         self.conn = None
         self.create()
 
@@ -116,13 +118,15 @@ class KGODatabase:
         raise
 
     def enter_comparison(
-            self, app_task, kgo_file, suite_file, status, comparison):
+        self, app_task, kgo_file, suite_file, status, comparison
+    ):
         "Insert a new comparison entry to the database."
         conn = self.get_conn()
         # This SQL command indicates that a single "row" is to be entered into
         # the "comparisons" table
         sql_statement = (
-            "INSERT OR REPLACE INTO comparisons VALUES (?, ?, ?, ?, ?)")
+            "INSERT OR REPLACE INTO comparisons VALUES (?, ?, ?, ?, ?)"
+        )
         sql_args = [app_task, kgo_file, suite_file, status, comparison]
         self.execute_sql_retry(conn, (sql_statement, sql_args))
 
@@ -149,8 +153,9 @@ class RoseAnaV1App(BuiltinApp):
     def run(self, app_runner, conf_tree, opts, args, uuid, work_files):
         """Implement the "rose ana" command"""
         # Get config file option for user-specified method paths
-        method_paths = [os.path.join(os.path.dirname(__file__),
-                        USRCOMPARISON_DIRNAME)]
+        method_paths = [
+            os.path.join(os.path.dirname(__file__), USRCOMPARISON_DIRNAME)
+        ]
         conf = ResourceLocator.default().get_conf()
 
         my_conf = conf.get_value(["rose-ana", "method-path"])
@@ -159,9 +164,14 @@ class RoseAnaV1App(BuiltinApp):
                 method_paths.append(item)
 
         # Initialise the analysis engine
-        engine = Analyse(conf_tree.node, opts, args, method_paths,
-                         reporter=app_runner.event_handler,
-                         popen=app_runner.popen)
+        engine = Analyse(
+            conf_tree.node,
+            opts,
+            args,
+            method_paths,
+            reporter=app_runner.event_handler,
+            popen=app_runner.popen,
+        )
 
         # Initialise a database session
         rose_ana_task_name = os.getenv("ROSE_TASK_NAME")
@@ -183,9 +193,15 @@ class RoseAnaV1App(BuiltinApp):
             app_task = "{0} ({1})".format(rose_ana_task_name, task.name)
             # Include an indication of what extract/comparison was performed
             comparison = "{0} : {1} : {2}".format(
-                task.comparison, task.extract, getattr(task, "subextract", ""))
-            kgo_db.enter_comparison(app_task, task.kgo1file, task.resultfile,
-                                    task.userstatus, comparison)
+                task.comparison, task.extract, getattr(task, "subextract", "")
+            )
+            kgo_db.enter_comparison(
+                app_task,
+                task.kgo1file,
+                task.resultfile,
+                task.userstatus,
+                comparison,
+            )
 
         if num_failed != 0:
             raise TestsFailedException(num_failed)
@@ -202,7 +218,10 @@ class DataLengthError(Exception):
 
     def __repr__(self):
         return "Mismatch in data lengths in %s (%s and %s)" % (
-            self.taskname, self.resultlen, self.kgolen)
+            self.taskname,
+            self.resultlen,
+            self.kgolen,
+        )
 
     __str__ = __repr__
 
@@ -240,8 +259,9 @@ class Analyse:
 
     """A comparison engine for Rose."""
 
-    def __init__(self, config, opts, args, method_paths, reporter=None,
-                 popen=None):
+    def __init__(
+        self, config, opts, args, method_paths, reporter=None, popen=None
+    ):
         if reporter is None:
             self.reporter = Reporter(opts.verbosity - opts.quietness)
         else:
@@ -287,8 +307,9 @@ class Analyse:
                 # the KGO and the result files
                 if result:
                     # Replace $file token with resultfile or kgofile
-                    resultcommand = self._expand_tokens(command, task,
-                                                        "result")
+                    resultcommand = self._expand_tokens(
+                        command, task, "result"
+                    )
                     kgocommand = self._expand_tokens(command, task, "kgo1")
 
                     # Run the command on the resultfile
@@ -307,8 +328,9 @@ class Analyse:
                 # Run the comparison
                 task = self.do_comparison(task)
 
-            self.reporter(TaskCompletionEvent(task),
-                          prefix="[%s]" % (task.userstatus))
+            self.reporter(
+                TaskCompletionEvent(task), prefix="[%s]" % (task.userstatus)
+            )
             if task.numericstatus != PASS:
                 ret_code += 1
         return ret_code, self.tasks
@@ -409,10 +431,12 @@ class Analyse:
                 newtask.subextract = ":".join(newtask.extract.split(":")[1:])
                 newtask.extract = newtask.extract.split(":")[0]
             newtask.comparison = self.config.get_value([task, "comparison"])
-            newtask.tolerance = env_var_process(self.config.get_value(
-                                                [task, "tolerance"]))
-            newtask.warnonfail = (
-                self.config.get_value([task, "warnonfail"]) in ["yes", "true"])
+            newtask.tolerance = env_var_process(
+                self.config.get_value([task, "tolerance"])
+            )
+            newtask.warnonfail = self.config.get_value(
+                [task, "warnonfail"]
+            ) in ["yes", "true"]
 
             # Allow for multiple KGO, e.g. kgo1file, kgo2file, for
             # statistical comparisons of results
@@ -424,8 +448,10 @@ class Analyse:
                     value = self.config.get([task, kgofilevar])[:]
                     if "{}" in value:
                         setattr(
-                            newtask, kgofilevar,
-                            value.replace("{}", self.args[0]))
+                            newtask,
+                            kgofilevar,
+                            value.replace("{}", self.args[0]),
+                        )
                     else:
                         setattr(newtask, kgofilevar, value)
                     newtask.numkgofiles += 1
@@ -440,11 +466,13 @@ class Analyse:
         modules = []
         for filename in files:
             directory = os.path.dirname(filename)
-            if (not directory.endswith(USRCOMPARISON_DIRNAME) or
-                    not filename.endswith(USRCOMPARISON_EXT)):
+            if not directory.endswith(
+                USRCOMPARISON_DIRNAME
+            ) or not filename.endswith(USRCOMPARISON_EXT):
                 continue
             comparison_name = os.path.basename(filename).rpartition(
-                USRCOMPARISON_EXT)[0]
+                USRCOMPARISON_EXT
+            )[0]
             sys.path.insert(0, os.path.abspath(directory))
             try:
                 modules.append(__import__(comparison_name))
@@ -462,8 +490,9 @@ class Analyse:
                 att_name = "run"
                 if hasattr(obj, att_name) and callable(getattr(obj, att_name)):
                     doc_string = obj.__doc__
-                    user_methods.append((comparison_name, obj_name, att_name,
-                                        doc_string))
+                    user_methods.append(
+                        (comparison_name, obj_name, att_name, doc_string)
+                    )
         self.user_methods = user_methods
         return user_methods
 
@@ -483,8 +512,10 @@ class Analyse:
             if task.extract:
                 config.set([sectionname, "extract"], task.extract)
             if task.subextract:
-                config.set([sectionname, "extract"],
-                           task.extract + ":" + task.subextract)
+                config.set(
+                    [sectionname, "extract"],
+                    task.extract + ":" + task.subextract,
+                )
             if task.comparison:
                 config.set([sectionname, "comparison"], task.comparison)
             if task.tolerance:
@@ -528,25 +559,25 @@ class AnalysisTask:
         self.warnonfail = False
         self.numkgofiles = 0
 
-# Variables to save settings before environment variable expansion (for
-# writing back to config file, rerunning, etc)
+        # Variables to save settings before environment variable expansion (for
+        # writing back to config file, rerunning, etc)
         self.resultfileconfig = self.resultfile
         self.kgofileconfig = self.kgo1file
 
-# Data variables filled by extract methods
+        # Data variables filled by extract methods
         self.resultdata = []
         self.kgo1data = []
 
-# Variables set by comparison methods
+        # Variables set by comparison methods
         self.good = False
 
         self.message = None
         self.userstatus = "UNTESTED"
         self.numericstatus = WARN
 
-# Methods for setting pass/fail/warn; all take an object of one of the
-# success/ failure/warning classes as an argument, which all have a sensible
-# user message as the string representation of them.
+    # Methods for setting pass/fail/warn; all take an object of one of the
+    # success/ failure/warning classes as an argument, which all have a
+    # sensible user message as the string representation of them.
     def set_failure(self, message):
         """Sets the status of the task to "FAIL"."""
 

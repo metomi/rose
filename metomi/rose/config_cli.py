@@ -23,7 +23,7 @@ from metomi.rose.config import (
     ConfigDumper,
     ConfigLoader,
     ConfigNode,
-    ConfigSyntaxError
+    ConfigSyntaxError,
 )
 from metomi.rose.env import env_var_process
 import metomi.rose.macro
@@ -51,8 +51,8 @@ def get_meta_path(root_node, rel_path=None, meta_key=False):
     else:
         dir_path = os.getcwd()
     meta_dir = metomi.rose.macro.load_meta_path(
-        config=root_node,
-        directory=dir_path)[0]
+        config=root_node, directory=dir_path
+    )[0]
     if meta_dir is None:
         return None
     else:
@@ -62,9 +62,17 @@ def get_meta_path(root_node, rel_path=None, meta_key=False):
 def main():
     """Implement the "rose config" command."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("default", "env_var_process_mode", "files",
-                              "keys", "meta", "meta_key", "no_ignore",
-                              "no_opts", "print_conf_mode")
+    opt_parser.add_my_options(
+        "default",
+        "env_var_process_mode",
+        "files",
+        "keys",
+        "meta",
+        "meta_key",
+        "no_ignore",
+        "no_opts",
+        "print_conf_mode",
+    )
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
 
@@ -104,8 +112,7 @@ def main():
         if opts.meta_key:
             root_node.set(["meta"], opts.meta_key)
         else:
-            fname = os.path.join(
-                os.getcwd(), metomi.rose.SUB_CONFIG_NAME)
+            fname = os.path.join(os.getcwd(), metomi.rose.SUB_CONFIG_NAME)
             try:
                 root_node = config_loader.load(fname)
             except ConfigSyntaxError as exc:

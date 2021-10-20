@@ -30,5 +30,6 @@ class ArgumentTransformer(MacroBase):
             if value != myvalue:
                 config.set(keys, myvalue)
                 self.add_report(
-                    "env", "MY_VALUE", value, '%s -> %s' % (value, myvalue))
+                    "env", "MY_VALUE", value, '%s -> %s' % (value, myvalue)
+                )
         return config, self.reports

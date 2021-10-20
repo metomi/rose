@@ -86,9 +86,14 @@ class SuiteInfo(Event):
                 if value and isinstance(value, list):
                     value = " ".join(value)
                 if key == "date" and isinstance(value, int):
-                    out = (out + "\t" + key + ": " +
-                           time.strftime(DATE_TIME_FORMAT,
-                                         time.gmtime(value)) + "\n")
+                    out = (
+                        out
+                        + "\t"
+                        + key
+                        + ": "
+                        + time.strftime(DATE_TIME_FORMAT, time.gmtime(value))
+                        + "\n"
+                    )
                 else:
                     out = out + "\t" + key + ": " + str(value) + "\n"
         return out
@@ -107,7 +112,8 @@ def hello(argv):
 def list_local_suites(argv):
     """CLI command to list all the locally checked out suites"""
     opt_parser = RoseOptionParser().add_my_options(
-        "no_headers", "prefixes", "print_format", "reverse", "sort", "user")
+        "no_headers", "prefixes", "print_format", "reverse", "sort", "user"
+    )
     opts = opt_parser.parse_args(argv)[0]
     report = Reporter(opts.verbosity - opts.quietness)
 
@@ -120,15 +126,26 @@ def list_local_suites(argv):
         bad_prefix_string = " ".join(ws_client.unreachable_prefixes)
         report(
             RosieWSClientError(
-                ERR_PREFIX_UNREACHABLE.format(bad_prefix_string)))
+                ERR_PREFIX_UNREACHABLE.format(bad_prefix_string)
+            )
+        )
     _display_maps(opts, ws_client, ws_client.query_local_copies(opts.user))
 
 
 def lookup(argv):
     """CLI command to run the various search types"""
     opt_parser = RoseOptionParser().add_my_options(
-        "address_mode", "all_revs", "lookup_mode", "no_headers", "prefixes",
-        "print_format", "query_mode", "reverse", "search_mode", "sort")
+        "address_mode",
+        "all_revs",
+        "lookup_mode",
+        "no_headers",
+        "prefixes",
+        "print_format",
+        "query_mode",
+        "reverse",
+        "search_mode",
+        "sort",
+    )
     opts, args = opt_parser.parse_args(argv)
     if not args:
         sys.exit(opt_parser.print_usage())
@@ -139,7 +156,8 @@ def lookup(argv):
             opts.lookup_mode = "search"
     ws_client = RosieWSClient(
         prefixes=opts.prefixes,
-        event_handler=Reporter(opts.verbosity - opts.quietness))
+        event_handler=Reporter(opts.verbosity - opts.quietness),
+    )
     try:
         if opts.lookup_mode == "address":
             data_and_url_list = ws_client.address_lookup(url=args[0])
@@ -148,10 +166,12 @@ def lookup(argv):
             for i, q_item in enumerate(q_items):
                 q_items[i] = " ".join(q_item)
             data_and_url_list = ws_client.query(
-                q_items, all_revs=int(opts.all_revs))
+                q_items, all_revs=int(opts.all_revs)
+            )
         else:  # if opts.lookup_mode == "search":
             data_and_url_list = ws_client.search(
-                args, all_revs=int(opts.all_revs))
+                args, all_revs=int(opts.all_revs)
+            )
     except RosieWSClientError as exc:
         if opts.debug_mode:
             traceback.print_exc()
@@ -169,17 +189,22 @@ def _align(rows, keys):
             for row in rows:
                 try:
                     row[key] = time.strftime(
-                        DATE_TIME_FORMAT, time.gmtime(row.get(key)))
+                        DATE_TIME_FORMAT, time.gmtime(row.get(key))
+                    )
                 except (TypeError):
                     pass
         else:
             try:
-                max_len = max([len(rows[i].get(key, "%" + key))
-                               for i in range(len(rows))])
+                max_len = max(
+                    [
+                        len(rows[i].get(key, "%" + key))
+                        for i in range(len(rows))
+                    ]
+                )
                 for row in rows:
-                    row[key] = (
-                        row.get(key, "%" + key) +
-                        " " * (max_len - len(row.get(key, "%" + key))))
+                    row[key] = row.get(key, "%" + key) + " " * (
+                        max_len - len(row.get(key, "%" + key))
+                    )
             except (TypeError, KeyError):
                 pass
     return rows
@@ -206,13 +231,13 @@ def _display_maps(opts, ws_client, dict_rows, url=None):
 
     for dict_row in dict_rows:
         suite_id = SuiteId.from_idx_branch_revision(
-            dict_row["idx"],
-            dict_row["branch"],
-            dict_row["revision"])
+            dict_row["idx"], dict_row["branch"], dict_row["revision"]
+        )
         dict_row["suite"] = suite_id.to_string_with_version()
         if "%local" in opts.print_format:
             dict_row["local"] = suite_id.get_status(
-                getattr(opts, "user", None))
+                getattr(opts, "user", None)
+            )
     all_keys += ["suite"]
     if "%local" in opts.print_format:
         all_keys += ["local"]
@@ -246,12 +271,12 @@ def _display_maps(opts, ws_client, dict_rows, url=None):
         out = opts.print_format
         for key, value in dict_row.items():
             if "%" + key in out:
-                out = str(out).replace(
-                    "%" + str(key), str(value), 1)
+                out = str(out).replace("%" + str(key), str(value), 1)
         out = str(out.replace("%%", "%").expandtabs().rstrip())
 
-        report(SuiteEvent(out.expandtabs() + "\n"), prefix="",
-               clip=terminal_cols)
+        report(
+            SuiteEvent(out.expandtabs() + "\n"), prefix="", clip=terminal_cols
+        )
         report(SuiteInfo(dict_row), prefix="")
     if url is not None:
         report(URLEvent(url + "\n"), prefix="")
@@ -270,8 +295,11 @@ def main():
         sys.exit(func(argv[1:]))
     except KeyboardInterrupt:
         pass
-    except (RosieWSClientError, RosieWSClientConfError,
-            UndefinedRosiePrefixWS) as exc:
+    except (
+        RosieWSClientError,
+        RosieWSClientConfError,
+        UndefinedRosiePrefixWS,
+    ) as exc:
         sys.exit(str(exc))
 
 

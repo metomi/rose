@@ -43,8 +43,13 @@ class TaskRunner(Runner):
 
     NAME = "task"
     OPTIONS = AppRunner.OPTIONS + [
-        "app_key", "cycle", "cycle_offsets", "path_globs", "prefix_delim",
-        "suffix_delim"]
+        "app_key",
+        "cycle",
+        "cycle_offsets",
+        "path_globs",
+        "prefix_delim",
+        "suffix_delim",
+    ]
 
     def __init__(self, *args, **kwargs):
         Runner.__init__(self, *args, **kwargs)
@@ -53,7 +58,8 @@ class TaskRunner(Runner):
             popen=self.popen,
             config_pm=self.config_pm,
             fs_util=self.fs_util,
-            suite_engine_proc=self.suite_engine_proc)
+            suite_engine_proc=self.suite_engine_proc,
+        )
 
     def run_impl(self, opts, args, uuid, work_files):
         """Run application configuration as a suite task."""
@@ -62,7 +68,8 @@ class TaskRunner(Runner):
             cycle=opts.cycle,
             cycle_offsets=opts.cycle_offsets,
             prefix_delim=opts.prefix_delim,
-            suffix_delim=opts.suffix_delim)
+            suffix_delim=opts.suffix_delim,
+        )
         is_changed = False
         for key, value in t_prop:
             if os.getenv(key) != value:
@@ -72,10 +79,12 @@ class TaskRunner(Runner):
         path_globs = opts.path_globs
         if path_globs is None:
             path_globs = []
-        prepend_paths_map = get_prepend_paths(self.event_handler,
-                                              t_prop.suite_dir,
-                                              path_globs,
-                                              full_mode=is_changed)
+        prepend_paths_map = get_prepend_paths(
+            self.event_handler,
+            t_prop.suite_dir,
+            path_globs,
+            full_mode=is_changed,
+        )
         for key, prepend_paths in prepend_paths_map.items():
             orig_paths = []
             orig_v = os.getenv(key, "")
@@ -103,10 +112,13 @@ class TaskRunner(Runner):
             else:
                 app_key = t_prop.task_name
                 conf_dir = os.path.join(
-                    t_prop.suite_dir, "app", t_prop.task_name)
-                if (not os.path.isdir(conf_dir) and
-                        builtin_app is not None and
-                        builtin_app.get_app_key(t_prop.task_name)):
+                    t_prop.suite_dir, "app", t_prop.task_name
+                )
+                if (
+                    not os.path.isdir(conf_dir)
+                    and builtin_app is not None
+                    and builtin_app.get_app_key(t_prop.task_name)
+                ):
                     # A builtin application may select a different app_key
                     # based on the task name.
                     app_key = builtin_app.get_app_key(t_prop.task_name)

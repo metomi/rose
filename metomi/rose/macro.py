@@ -56,28 +56,38 @@ import metomi.rose.reporter
 import metomi.rose.resource
 import metomi.rose.variable
 
-ALLOWED_MACRO_CLASS_METHODS = ["transform", "validate", "downgrade", "upgrade",
-                               "report"]
+ALLOWED_MACRO_CLASS_METHODS = [
+    "transform",
+    "validate",
+    "downgrade",
+    "upgrade",
+    "report",
+]
 ERROR_LOAD_CONFIG_DIR = "{0}: not an application or suite directory.\n"
 ERROR_LOAD_MACRO = "Could not load macro {0}: {1}"
 ERROR_LOAD_METADATA = "Could not load metadata {0}\n"
 ERROR_LOAD_CHOSEN_META_PATH = (
     "Could not find metadata for {0}, using {1}\n"
-    "To suppress these warnings run 'rose edit --no-warn version'")
+    "To suppress these warnings run 'rose edit --no-warn version'"
+)
 ERROR_LOAD_META_PATH = "Could not find metadata for {0}"
 ERROR_LOAD_CONF_META_NODE = "Error: could not find meta flag"
-ERROR_MACRO_CASE_MISMATCH = ("Error: case mismatch; \n {0} does not match {1},"
-                             " please only use lowercase.")
+ERROR_MACRO_CASE_MISMATCH = (
+    "Error: case mismatch; \n {0} does not match {1},"
+    " please only use lowercase."
+)
 ERROR_MACRO_NOT_FOUND = "Error: could not find macro {0}\n"
 ERROR_NO_MACRO_HELP = "No help docstring provided, macro \"{0}\"."
 ERROR_NO_MACROS = "Please specify a macro name.\n"
 ERROR_RETURN_TYPE = "{0}: {1}: invalid returned type: {2}, expect {3}"
 ERROR_RETURN_VALUE = "{0}: incorrect return value"
 ERROR_RETURN_VALUE_STATE = "{0}: node.state: invalid returned value"
-MACRO_DIRNAME = os.path.join(os.path.join("lib", "python"),
-                             metomi.rose.META_DIR_MACRO)
-ERROR_OUT_DIR_MULTIPLE_APPS = ("Cannot specify an output dir when running"
-                               " macro over multiple apps.")
+MACRO_DIRNAME = os.path.join(
+    os.path.join("lib", "python"), metomi.rose.META_DIR_MACRO
+)
+ERROR_OUT_DIR_MULTIPLE_APPS = (
+    "Cannot specify an output dir when running" " macro over multiple apps."
+)
 MACRO_EXT = ".py"
 MACRO_OUTPUT_HELP = "    # {0}\n"
 MACRO_OUTPUT_ID = "[{0}] {1}"
@@ -239,8 +249,9 @@ class MacroBase:
             return (rep1.value > rep2.value) - (rep1.value < rep2.value)
         return metomi.rose.config.sort_settings(id1, id2)
 
-    def _load_meta_config(self, config, meta=None, directory=None,
-                          config_type=None):
+    def _load_meta_config(
+        self, config, meta=None, directory=None, config_type=None
+    ):
         """Return a metadata configuration object."""
         if isinstance(meta, metomi.rose.config.ConfigNode):
             return meta
@@ -388,8 +399,10 @@ class MacroBaseRoseEdit(MacroBase):
             if "" not in sections:
                 sections.append("")
         else:
-            for key in set(config_data["sections"].keys() +
-                           config_data["variables"].keys()):
+            for key in set(
+                config_data["sections"].keys()
+                + config_data["variables"].keys()
+            ):
                 sections.append(key)
         return sections
 
@@ -407,11 +420,12 @@ class MacroBaseRoseEdit(MacroBase):
         """Return whether the config_data contains the id_."""
         section, option = self._get_section_option_from_id(id_)
         if isinstance(config_data, metomi.rose.config.ConfigNode):
-            return (config_data.get([section, option]) is not None)
+            return config_data.get([section, option]) is not None
         if option is None:
             return section in config_data["sections"]
-        return option in [v.name for v in
-                          config_data["variables"].get(section, [])]
+        return option in [
+            v.name for v in config_data["variables"].get(section, [])
+        ]
 
     def _get_config_id_state(self, config_data, id_):
         """Return the ConfigNode.STATE_* that applies to id_ or None."""
@@ -424,8 +438,9 @@ class MacroBaseRoseEdit(MacroBase):
         ignored_reason = None
         if option is None:
             if section in config_data["sections"]:
-                ignored_reason = (
-                    config_data["sections"][section].ignored_reason)
+                ignored_reason = config_data["sections"][
+                    section
+                ].ignored_reason
         else:
             for variable in config_data["variables"].get(section, []):
                 if variable.name == option:
@@ -513,8 +528,14 @@ class MacroReport:
 
     """
 
-    def __init__(self, section=None, option=None, value=None,
-                 info=None, is_warning=False):
+    def __init__(
+        self,
+        section=None,
+        option=None,
+        value=None,
+        info=None,
+        is_warning=False,
+    ):
         self.section = section
         self.option = option
         self.value = value
@@ -522,17 +543,18 @@ class MacroReport:
         self.is_warning = is_warning
 
     def __repr__(self):
-        return (("<MacroReport section=%s option=%s value=%s info=%s " +
-                 "is_warning=%s>") % (
-                self.section, self.option, self.value, self.info,
-                self.is_warning))
+        return (
+            "<MacroReport section=%s option=%s value=%s info=%s "
+            + "is_warning=%s>"
+        ) % (self.section, self.option, self.value, self.info, self.is_warning)
 
     def __eq__(self, other):
-        return (self.__hash__() == other.__hash__())
+        return self.__hash__() == other.__hash__()
 
     def __hash__(self):
-        return hash((
-            self.section, self.option, self.value, self.info, self.is_warning))
+        return hash(
+            (self.section, self.option, self.value, self.info, self.is_warning)
+        )
 
 
 def add_meta_paths():
@@ -545,7 +567,8 @@ def add_site_meta_paths():
     """Load any metadata paths specified in a user or site configuration."""
     conf = metomi.rose.resource.ResourceLocator.default().get_conf()
     path = conf.get_value(
-        [metomi.rose.CONFIG_SECT_TOP, metomi.rose.CONFIG_OPT_META_PATH])
+        [metomi.rose.CONFIG_SECT_TOP, metomi.rose.CONFIG_OPT_META_PATH]
+    )
     if path is not None:
         for path in path.split(os.pathsep):
             path = os.path.expanduser(os.path.expandvars(path))
@@ -590,8 +613,14 @@ def get_id_from_section_option(section, option):
     return section + metomi.rose.CONFIG_DELIMITER + option
 
 
-def load_meta_path(config=None, directory=None, is_upgrade=False,
-                   locator=None, opt_meta_paths=None, no_warn=None):
+def load_meta_path(
+    config=None,
+    directory=None,
+    is_upgrade=False,
+    locator=None,
+    opt_meta_paths=None,
+    no_warn=None,
+):
     """Retrieve the path to the configuration metadata directory.
 
     Arguments:
@@ -619,12 +648,16 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
         else:
             paths = sys.path
         locator = metomi.rose.resource.ResourceLocator(paths=paths)
-    opt_node = config.get([metomi.rose.CONFIG_SECT_TOP,
-                           metomi.rose.CONFIG_OPT_META_TYPE], no_ignore=True)
+    opt_node = config.get(
+        [metomi.rose.CONFIG_SECT_TOP, metomi.rose.CONFIG_OPT_META_TYPE],
+        no_ignore=True,
+    )
     ignore_meta_error = opt_node is None
     if opt_node is None:
-        opt_node = config.get([metomi.rose.CONFIG_SECT_TOP,
-                               metomi.rose.CONFIG_OPT_PROJECT], no_ignore=True)
+        opt_node = config.get(
+            [metomi.rose.CONFIG_SECT_TOP, metomi.rose.CONFIG_OPT_PROJECT],
+            no_ignore=True,
+        )
     if opt_node is None or not opt_node.value:
         meta_keys = ["rose-all"]
     else:
@@ -638,7 +671,8 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
             meta_keys = ['/'.join(split_key)]
         else:
             default_key = '/'.join(
-                split_key + [metomi.rose.META_DEFAULT_VN_DIR])
+                split_key + [metomi.rose.META_DEFAULT_VN_DIR]
+            )
             if default_key != key:
                 meta_keys.append(default_key)
     for i, meta_key in enumerate(meta_keys):
@@ -651,8 +685,9 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
             continue
         else:
             if not (ignore_meta_error or 'version' in no_warn) and i > 0:
-                warning = ERROR_LOAD_CHOSEN_META_PATH.format(meta_keys[0],
-                                                             meta_keys[i])
+                warning = ERROR_LOAD_CHOSEN_META_PATH.format(
+                    meta_keys[0], meta_keys[i]
+                )
             if is_upgrade:
                 return meta_path, warning
             return os.path.dirname(meta_path), warning
@@ -661,9 +696,15 @@ def load_meta_path(config=None, directory=None, is_upgrade=False,
     return None, warning
 
 
-def load_meta_config_tree(config, directory=None, config_type=None,
-                          error_handler=None, ignore_meta_error=False,
-                          opt_meta_paths=None, no_warn=None):
+def load_meta_config_tree(
+    config,
+    directory=None,
+    config_type=None,
+    error_handler=None,
+    ignore_meta_error=False,
+    opt_meta_paths=None,
+    no_warn=None,
+):
     """Return the metadata config tree for a configuration."""
     if opt_meta_paths:
         paths = opt_meta_paths + sys.path
@@ -676,13 +717,15 @@ def load_meta_config_tree(config, directory=None, config_type=None,
         default_meta_dir = config_type.replace(".", "-")
         meta_list.append(default_meta_dir + "/" + metomi.rose.META_CONFIG_NAME)
     config_meta_path, warning = load_meta_path(
-        config, directory, opt_meta_paths=opt_meta_paths,
-        no_warn=no_warn)
+        config, directory, opt_meta_paths=opt_meta_paths, no_warn=no_warn
+    )
     if warning is not None and not ignore_meta_error:
         error_handler(text=warning)
     locator = metomi.rose.resource.ResourceLocator(paths=paths)
-    opt_node = config.get([metomi.rose.CONFIG_SECT_TOP,
-                           metomi.rose.CONFIG_OPT_META_TYPE], no_ignore=True)
+    opt_node = config.get(
+        [metomi.rose.CONFIG_SECT_TOP, metomi.rose.CONFIG_OPT_META_TYPE],
+        no_ignore=True,
+    )
     ignore_meta_error = ignore_meta_error or opt_node is None
     meta_config_tree = None
     meta_config = metomi.rose.config.ConfigNode()
@@ -698,7 +741,7 @@ def load_meta_config_tree(config, directory=None, config_type=None,
                 os.path.dirname(meta_path),
                 metomi.rose.META_CONFIG_NAME,
                 conf_dir_paths=list(paths),
-                conf_node=meta_config
+                conf_node=meta_config,
             )
         except metomi.rose.config.ConfigSyntaxError as exc:
             error_handler(text=str(exc))
@@ -711,7 +754,7 @@ def load_meta_config_tree(config, directory=None, config_type=None,
         meta_config_tree = metomi.rose.config_tree.ConfigTreeLoader().load(
             config_meta_path,
             metomi.rose.META_CONFIG_NAME,
-            conf_dir_paths=list(paths)
+            conf_dir_paths=list(paths),
         )
     except metomi.rose.resource.ResourceError:
         if not ignore_meta_error:
@@ -724,12 +767,21 @@ def load_meta_config_tree(config, directory=None, config_type=None,
     return meta_config_tree
 
 
-def load_meta_config(config, directory=None, config_type=None,
-                     error_handler=None, ignore_meta_error=False):
+def load_meta_config(
+    config,
+    directory=None,
+    config_type=None,
+    error_handler=None,
+    ignore_meta_error=False,
+):
     """Return the metadata config for a configuration."""
     config_tree = load_meta_config_tree(
-        config, directory=directory, config_type=config_type,
-        error_handler=error_handler, ignore_meta_error=ignore_meta_error)
+        config,
+        directory=directory,
+        config_type=config_type,
+        error_handler=error_handler,
+        ignore_meta_error=ignore_meta_error,
+    )
     return config_tree.node
 
 
@@ -738,8 +790,9 @@ def load_meta_macro_modules(meta_files, module_prefix=None):
     modules = []
     for meta_file in meta_files:
         meta_dir = os.path.dirname(meta_file)
-        if (not meta_dir.endswith(MACRO_DIRNAME) or
-                not meta_file.endswith(MACRO_EXT)):
+        if not meta_dir.endswith(MACRO_DIRNAME) or not meta_file.endswith(
+            MACRO_EXT
+        ):
             continue
         sys.path.insert(0, meta_dir)
         macro_name = os.path.basename(meta_file).rpartition(MACRO_EXT)[0]
@@ -751,7 +804,8 @@ def load_meta_macro_modules(meta_files, module_prefix=None):
             modules.append(SourceFileLoader(as_name, meta_file).load_module())
         except Exception:
             metomi.rose.reporter.Reporter()(
-                MacroLoadError(meta_file, traceback.format_exc()))
+                MacroLoadError(meta_file, traceback.format_exc())
+            )
         sys.path.pop(0)
     modules.sort(key=str)
     return modules
@@ -767,25 +821,28 @@ def get_macro_class_methods(macro_modules):
             if not inspect.isclass(obj):
                 continue
             for att_name in ALLOWED_MACRO_CLASS_METHODS:
-                if (hasattr(obj, att_name) and
-                        callable(getattr(obj, att_name))):
+                if hasattr(obj, att_name) and callable(getattr(obj, att_name)):
                     doc_string = obj.__doc__
-                    macro_methods.append((macro_name, obj_name, att_name,
-                                          doc_string))
+                    macro_methods.append(
+                        (macro_name, obj_name, att_name, doc_string)
+                    )
     macro_methods.sort(key=lambda x: x[1])
     macro_methods.sort(key=lambda x: x[1])
     # This logic replicates output of the deprecated Python2 `cmp` builtin
     macro_methods.sort(
-        key=cmp_to_key(lambda x, y: (y[2] > x[2]) - (y[2] < x[2])))
+        key=cmp_to_key(lambda x, y: (y[2] > x[2]) - (y[2] < x[2]))
+    )
     return macro_methods
 
 
-def get_macros_for_config(config=None,
-                          config_directory=None,
-                          return_modules=False,
-                          include_system=False,
-                          include_custom=True,
-                          no_warn=False):
+def get_macros_for_config(
+    config=None,
+    config_directory=None,
+    return_modules=False,
+    include_system=False,
+    include_custom=True,
+    no_warn=False,
+):
     """Driver function to return macro names for a config object.
 
     kwargs:
@@ -800,16 +857,19 @@ def get_macros_for_config(config=None,
     if config is None:
         config = ConfigNode()
     meta_config_tree = load_meta_config_tree(
-        config, directory=config_directory, no_warn=no_warn)
+        config, directory=config_directory, no_warn=no_warn
+    )
     if meta_config_tree is None:
         return []
     modules = []
     if include_custom:  # Suite specified macros.
         meta_filepaths = [
-            os.path.join(v, k) for k, v in meta_config_tree.files.items()]
+            os.path.join(v, k) for k, v in meta_config_tree.files.items()
+        ]
         modules.extend(load_meta_macro_modules(meta_filepaths))
     if include_system:  # Default macros.
         import metomi.rose.macros  # Done to avoid cyclic top-level imports.
+
         modules.append(metomi.rose.macros)
     if return_modules:
         return get_macro_class_methods(modules), modules
@@ -825,45 +885,69 @@ def check_config_integrity(app_config):
     keys_and_nodes.insert(0, ([], app_config))
     for keys, node in keys_and_nodes:
         if not isinstance(node, metomi.rose.config.ConfigNode):
-            return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
-                node, "node", type(node), "rose.config.ConfigNode"))
-        if (not isinstance(node.value, dict) and
-                not isinstance(node.value, str)):
-            return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
-                node.value, "node.value", type(node.value),
-                "dict, basestring"
-            ))
+            return MacroReturnedCorruptConfigError(
+                ERROR_RETURN_TYPE.format(
+                    node, "node", type(node), "rose.config.ConfigNode"
+                )
+            )
+        if not isinstance(node.value, dict) and not isinstance(
+            node.value, str
+        ):
+            return MacroReturnedCorruptConfigError(
+                ERROR_RETURN_TYPE.format(
+                    node.value,
+                    "node.value",
+                    type(node.value),
+                    "dict, basestring",
+                )
+            )
         if not isinstance(node.state, str):
-            return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
-                node.state, "node.state", type(node.state), "basestring"))
+            return MacroReturnedCorruptConfigError(
+                ERROR_RETURN_TYPE.format(
+                    node.state, "node.state", type(node.state), "basestring"
+                )
+            )
         if node.state not in [
             metomi.rose.config.ConfigNode.STATE_NORMAL,
             metomi.rose.config.ConfigNode.STATE_SYST_IGNORED,
-            metomi.rose.config.ConfigNode.STATE_USER_IGNORED
+            metomi.rose.config.ConfigNode.STATE_USER_IGNORED,
         ]:
             return MacroReturnedCorruptConfigError(
-                ERROR_RETURN_VALUE_STATE.format(node.state))
+                ERROR_RETURN_VALUE_STATE.format(node.state)
+            )
         if not isinstance(node.comments, list):
-            return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
-                node.comments, "node.comments", type(node.comments),
-                "list"
-            ))
+            return MacroReturnedCorruptConfigError(
+                ERROR_RETURN_TYPE.format(
+                    node.comments, "node.comments", type(node.comments), "list"
+                )
+            )
         for comment in node.comments:
             if not isinstance(comment, str):
                 return MacroReturnedCorruptConfigError(
                     ERROR_RETURN_TYPE.format(
-                        comment, "comment", type(comment), "basestring"))
+                        comment, "comment", type(comment), "basestring"
+                    )
+                )
         for key in keys:
             if not isinstance(key, str):
                 return MacroReturnedCorruptConfigError(
                     ERROR_RETURN_TYPE.format(
-                        key, "key", type(key), "basestring"))
+                        key, "key", type(key), "basestring"
+                    )
+                )
 
 
-def report_config(app_config, meta_config, run_macro_list, modules,
-                  macro_info_tuples, opt_non_interactive=False,
-                  optional_config_name=None, optional_values=None,
-                  validate_mode=True):
+def report_config(
+    app_config,
+    meta_config,
+    run_macro_list,
+    modules,
+    macro_info_tuples,
+    opt_non_interactive=False,
+    optional_config_name=None,
+    optional_values=None,
+    validate_mode=True,
+):
     """Run report/validator custom macros on the config and return problems
     (in the case of validator macros)."""
     if optional_values is None:
@@ -894,8 +978,9 @@ def report_config(app_config, meta_config, run_macro_list, modules,
                     else:
                         break
                 if optionals:
-                    update_optional_values(res, optionals, optional_values,
-                                           optional_config_name)
+                    update_optional_values(
+                        res, optionals, optional_values, optional_config_name
+                    )
             if validate_mode:
                 problem_list = macro_meth(app_config, meta_config, **res)
                 if not isinstance(problem_list, list):
@@ -908,8 +993,9 @@ def report_config(app_config, meta_config, run_macro_list, modules,
         return macro_problem_map
 
 
-def update_optional_values(res, optionals, optional_values,
-                           optional_config_name):
+def update_optional_values(
+    res, optionals, optional_values, optional_config_name
+):
     """Copy any relevant parameters into the 'res' dict."""
     if "optional_config_name" in optionals:
         res["optional_config_name"] = optional_config_name
@@ -921,9 +1007,16 @@ def update_optional_values(res, optionals, optional_values,
     optional_values.update(res)
 
 
-def transform_config(config, meta_config, transformer_macro, modules,
-                     macro_info_tuples, opt_non_interactive=False,
-                     optional_config_name=None, optional_values=None):
+def transform_config(
+    config,
+    meta_config,
+    transformer_macro,
+    modules,
+    macro_info_tuples,
+    opt_non_interactive=False,
+    optional_config_name=None,
+    optional_values=None,
+):
     """Run transformer custom macros on the config and return problems."""
     if optional_values is None:
         optional_values = {}
@@ -951,8 +1044,9 @@ def transform_config(config, meta_config, transformer_macro, modules,
                 else:
                     break
             if optionals:
-                update_optional_values(res, optionals, optional_values,
-                                       optional_config_name)
+                update_optional_values(
+                    res, optionals, optional_values, optional_config_name
+                )
         return macro_method(config, meta_config, **res)
     return config, []
 
@@ -983,16 +1077,19 @@ def pretty_format_config(config, ignore_error=False):
                 s_node.unset(keylist)
                 s_node.set(new_keylist, node.value, node.state, node.comments)
                 if ignore_error is False:
-                    _report_error(text=ERROR_MACRO_CASE_MISMATCH.format(
-                                  keylist[1], new_keylist[1]))
+                    _report_error(
+                        text=ERROR_MACRO_CASE_MISMATCH.format(
+                            keylist[1], new_keylist[1]
+                        )
+                    )
                     sys.exit(0)
 
 
 def standard_format_config(config):
     """Standardise any degenerate representations e.g. namelist repeats.
 
-        Args:
-            config (metomi.rose.config.ConfigNode): The config node to convert.
+    Args:
+        config (metomi.rose.config.ConfigNode): The config node to convert.
 
     """
     for keylist, node in config.walk():
@@ -1068,8 +1165,10 @@ def get_metadata_for_config_id(setting_id, meta_config):
                 # Handle section modifier titles
                 modifier = search_id.replace(no_modifier_id, "")
                 metadata[metomi.rose.META_PROP_TITLE] += " " + modifier
-            if (setting_id != search_id and
-                    metomi.rose.META_PROP_DUPLICATE in metadata):
+            if (
+                setting_id != search_id
+                and metomi.rose.META_PROP_DUPLICATE in metadata
+            ):
                 # foo{bar}(1) cannot inherit duplicate from foo.
                 metadata.pop(metomi.rose.META_PROP_DUPLICATE)
     node = meta_config.get([search_id], no_ignore=True)
@@ -1088,30 +1187,44 @@ def get_metadata_for_config_id(setting_id, meta_config):
             # Handle duplicate options titles
             index = option.replace(search_option, "")
             metadata[metomi.rose.META_PROP_TITLE] += " " + index
-    if (metomi.rose.META_PROP_LENGTH in metadata and
-            option is not None and search_option != option and
-            REC_ID_SINGLE_ELEMENT.search(option)):
+    if (
+        metomi.rose.META_PROP_LENGTH in metadata
+        and option is not None
+        and search_option != option
+        and REC_ID_SINGLE_ELEMENT.search(option)
+    ):
         # Option is a single element in an array, not a slice.
         metadata.pop(metomi.rose.META_PROP_LENGTH)
     metadata.update({'id': setting_id})
     return metadata
 
 
-def run_macros(config_map, meta_config, config_name, macro_names,
-               opt_conf_dir=None, opt_fix=False,
-               opt_non_interactive=False, opt_output_dir=None,
-               opt_validate_all=False, opt_transform_all=False, verbosity=None,
-               no_warn=False, default_only=False):
+def run_macros(
+    config_map,
+    meta_config,
+    config_name,
+    macro_names,
+    opt_conf_dir=None,
+    opt_fix=False,
+    opt_non_interactive=False,
+    opt_output_dir=None,
+    opt_validate_all=False,
+    opt_transform_all=False,
+    verbosity=None,
+    no_warn=False,
+    default_only=False,
+):
     """Run standard or custom macros for a configuration."""
 
     reporter = metomi.rose.reporter.Reporter(verbosity)
 
     macro_tuples, modules = get_macros_for_config(
-        config_map[None], opt_conf_dir,
+        config_map[None],
+        opt_conf_dir,
         return_modules=True,
         include_system=True,
         include_custom=not default_only,
-        no_warn=no_warn
+        no_warn=no_warn,
     )
 
     # Add all macros to the run list as specified.
@@ -1136,20 +1249,27 @@ def run_macros(config_map, meta_config, config_name, macro_names,
             return True
 
     # List all macros if none are given.
-    if not macro_names and not [macros_by_type[method] for method in
-                                macros_by_type]:
+    if not macro_names and not [
+        macros_by_type[method] for method in macros_by_type
+    ]:
         for module_name, class_name, method, help_ in macro_tuples:
             macro_name = ".".join([module_name, class_name])
             macro_id = MACRO_OUTPUT_ID.format(method.upper()[0], macro_name)
             if help_:
                 reporter(macro_id + "\n", prefix="")
                 for help_line in help_.split("\n"):
-                    reporter(MACRO_OUTPUT_HELP.format(help_line),
-                             level=reporter.V, prefix="")
+                    reporter(
+                        MACRO_OUTPUT_HELP.format(help_line),
+                        level=reporter.V,
+                        prefix="",
+                    )
             else:
                 # No "help" docstring provided in macro.
-                reporter(ERROR_NO_MACRO_HELP.format(macro_name),
-                         level=reporter.FAIL, prefix=reporter.PREFIX_FAIL)
+                reporter(
+                    ERROR_NO_MACRO_HELP.format(macro_name),
+                    level=reporter.FAIL,
+                    prefix=reporter.PREFIX_FAIL,
+                )
                 return False
         return True
 
@@ -1182,10 +1302,15 @@ def run_macros(config_map, meta_config, config_name, macro_names,
         optional_values = {}
         for conf_key, config in new_combined_config_map.items():
             config_problems_map = report_config(
-                config, meta_config, macros_by_type[VALIDATE_METHOD], modules,
-                macro_tuples, opt_non_interactive,
-                optional_config_name=conf_key, optional_values=optional_values,
-                validate_mode=True
+                config,
+                meta_config,
+                macros_by_type[VALIDATE_METHOD],
+                modules,
+                macro_tuples,
+                opt_non_interactive,
+                optional_config_name=conf_key,
+                optional_values=optional_values,
+                validate_mode=True,
             )
             if config_problems_map:
                 ret_code = 1
@@ -1201,8 +1326,11 @@ def run_macros(config_map, meta_config, config_name, macro_names,
             macro_id = MACRO_OUTPUT_ID.format(method_id, macro_name)
             reporter(
                 get_reports_as_text(
-                    config_problems_map, macro_id, is_from_transform=False),
-                level=reporter.V, kind=reporter.KIND_ERR, prefix=""
+                    config_problems_map, macro_id, is_from_transform=False
+                ),
+                level=reporter.V,
+                kind=reporter.KIND_ERR,
+                prefix="",
             )
 
     # Run any report macros.
@@ -1211,10 +1339,15 @@ def run_macros(config_map, meta_config, config_name, macro_names,
         optional_values = {}
         for conf_key, config in new_combined_config_map.items():
             report_config(
-                config, meta_config, macros_by_type[REPORT_METHOD], modules,
-                macro_tuples, opt_non_interactive,
-                optional_config_name=conf_key, optional_values=optional_values,
-                validate_mode=False
+                config,
+                meta_config,
+                macros_by_type[REPORT_METHOD],
+                modules,
+                macro_tuples,
+                opt_non_interactive,
+                optional_config_name=conf_key,
+                optional_values=optional_values,
+                validate_mode=False,
             )
 
     # Run any transform macros.
@@ -1222,12 +1355,16 @@ def run_macros(config_map, meta_config, config_name, macro_names,
     if TRANSFORM_METHOD in macros_by_type:
         no_changes = no_changes and _run_transform_macros(
             macros_by_type[TRANSFORM_METHOD],
-            config_name, config_map, meta_config, modules,
+            config_name,
+            config_map,
+            meta_config,
+            modules,
             macro_tuples,
             opt_non_interactive=opt_non_interactive,
             opt_conf_dir=opt_conf_dir,
             opt_output_dir=opt_output_dir,
-            reporter=reporter)
+            reporter=reporter,
+        )
 
     if not ret_code and no_changes:
         reporter(MacroFinishNothingEvent())
@@ -1249,8 +1386,7 @@ def report_sort(report1, report2):
     return metomi.rose.config.sort_settings(sect1, sect2)
 
 
-def get_reports_as_text(config_reports_map, macro_id,
-                        is_from_transform=False):
+def get_reports_as_text(config_reports_map, macro_id, is_from_transform=False):
     """Translate reports into nicely formatted text."""
     text = ""
 
@@ -1281,7 +1417,8 @@ def get_reports_as_text(config_reports_map, macro_id,
     for origin, rep in config_issues_list:
         origin_label = get_config_label(origin)
         out = PROBLEM_ENTRY.format(
-            origin_label, rep.section, rep.option, rep.value, rep.info)
+            origin_label, rep.section, rep.option, rep.value, rep.info
+        )
         text += out
 
     if config_warnings_list:
@@ -1292,7 +1429,8 @@ def get_reports_as_text(config_reports_map, macro_id,
     for origin, rep in config_warnings_list:
         origin_label = get_config_label(origin)
         out = PROBLEM_ENTRY.format(
-            origin_label, rep.section, rep.option, rep.value, rep.info)
+            origin_label, rep.section, rep.option, rep.value, rep.info
+        )
         text += out
     return text
 
@@ -1304,9 +1442,16 @@ def get_config_label(config_key):
     return OPT_CONFIG_REPORT.format(config_key)
 
 
-def handle_transform(config_map, new_config_map, change_map, macro_id,
-                     opt_conf_dir, opt_output_dir, opt_non_interactive,
-                     reporter):
+def handle_transform(
+    config_map,
+    new_config_map,
+    change_map,
+    macro_id,
+    opt_conf_dir,
+    opt_output_dir,
+    opt_non_interactive,
+    reporter,
+):
     """Prompt the user to go ahead with macro changes and dump the output."""
     has_changes = False
     for change_list in change_map.values():
@@ -1316,17 +1461,21 @@ def handle_transform(config_map, new_config_map, change_map, macro_id,
                 break
         if has_changes:
             break
-    reporter(get_reports_as_text(change_map, macro_id,
-                                 is_from_transform=True),
-             level=reporter.V, prefix="")
+    reporter(
+        get_reports_as_text(change_map, macro_id, is_from_transform=True),
+        level=reporter.V,
+        prefix="",
+    )
     if has_changes and (opt_non_interactive or _get_user_accept()):
         for conf_key, config in new_config_map.items():
-            dump_config(config, opt_conf_dir, opt_output_dir,
-                        conf_key=conf_key)
+            dump_config(
+                config, opt_conf_dir, opt_output_dir, conf_key=conf_key
+            )
         if reporter is not None:
-            reporter(MacroTransformDumpEvent(opt_conf_dir,
-                                             opt_output_dir),
-                     level=reporter.VV)
+            reporter(
+                MacroTransformDumpEvent(opt_conf_dir, opt_output_dir),
+                level=reporter.VV,
+            )
         return True
     return False
 
@@ -1342,50 +1491,76 @@ def combine_opt_config_map(config_map):
         new_config = copy.deepcopy(main_config)
         for keylist, subnode in config.walk():
             old_subnode = new_config.get(keylist)
-            if (isinstance(subnode.value, dict) and
-                    old_subnode is not None and
-                    isinstance(old_subnode.value, dict)):
+            if (
+                isinstance(subnode.value, dict)
+                and old_subnode is not None
+                and isinstance(old_subnode.value, dict)
+            ):
                 old_subnode.state = subnode.state
                 old_subnode.comments = subnode.comments
             else:
                 new_config.set(
-                    keylist, value=copy.deepcopy(subnode.value),
-                    state=subnode.state, comments=subnode.comments
+                    keylist,
+                    value=copy.deepcopy(subnode.value),
+                    state=subnode.state,
+                    comments=subnode.comments,
                 )
         new_combined_config_map[conf_key] = new_config
     return new_combined_config_map
 
 
-def _run_transform_macros(macros, config_name, config_map, meta_config,
-                          modules, macro_tuples, opt_non_interactive=False,
-                          opt_conf_dir=None, opt_output_dir=None,
-                          reporter=None):
+def _run_transform_macros(
+    macros,
+    config_name,
+    config_map,
+    meta_config,
+    modules,
+    macro_tuples,
+    opt_non_interactive=False,
+    opt_conf_dir=None,
+    opt_output_dir=None,
+    reporter=None,
+):
     no_changes = True
     combined_config_map = combine_opt_config_map(config_map)
     optional_values = {}
     for transformer_macro in macros:
-        macro_function = (
-            lambda conf, meta, opt: transform_config(
-                conf, meta, transformer_macro, modules, macro_tuples,
-                opt_non_interactive, optional_config_name=opt,
-                optional_values=optional_values)
+        macro_function = lambda conf, meta, opt: transform_config(
+            conf,
+            meta,
+            transformer_macro,
+            modules,
+            macro_tuples,
+            opt_non_interactive,
+            optional_config_name=opt,
+            optional_values=optional_values,
         )
         new_config_map, changes_map = apply_macro_to_config_map(
-            combined_config_map, meta_config, macro_function,
-            macro_name=transformer_macro
+            combined_config_map,
+            meta_config,
+            macro_function,
+            macro_name=transformer_macro,
         )
         method_id = TRANSFORM_METHOD.upper()[0]
         macro_id = MACRO_OUTPUT_ID.format(method_id, transformer_macro)
-        if handle_transform(config_map, new_config_map, changes_map, macro_id,
-                            opt_conf_dir, opt_output_dir,
-                            opt_non_interactive, reporter):
+        if handle_transform(
+            config_map,
+            new_config_map,
+            changes_map,
+            macro_id,
+            opt_conf_dir,
+            opt_output_dir,
+            opt_non_interactive,
+            reporter,
+        ):
             combined_config_map = new_config_map
             no_changes = False
     return no_changes
 
 
-def apply_macro_to_config_map(config_map, meta_config, macro_function,
-                              macro_name=None):
+def apply_macro_to_config_map(
+    config_map, meta_config, macro_function, macro_name=None
+):
     """Apply a transform macro function to a config_map."""
     new_config_map = {}
     changes_map = {}
@@ -1396,12 +1571,12 @@ def apply_macro_to_config_map(config_map, meta_config, macro_function,
         macro_config = copy.deepcopy(config)
         return_value = macro_function(macro_config, meta_config, conf_key)
         err_bad_return_value = ERROR_RETURN_VALUE.format(macro_name)
-        if (not isinstance(return_value, tuple) or
-                len(return_value) != 2):
+        if not isinstance(return_value, tuple) or len(return_value) != 2:
             raise ValueError(err_bad_return_value)
         new_config, change_list = return_value
-        if (not isinstance(new_config, metomi.rose.config.ConfigNode) or
-                not isinstance(change_list, list)):
+        if not isinstance(
+            new_config, metomi.rose.config.ConfigNode
+        ) or not isinstance(change_list, list):
             raise ValueError(err_bad_return_value)
         exception = check_config_integrity(new_config)
         if exception is not None:
@@ -1411,7 +1586,7 @@ def apply_macro_to_config_map(config_map, meta_config, macro_function,
             # Always the first item.
             new_config_map[conf_key] = new_config
         else:
-            diff = (new_config - new_config_map[None])
+            diff = new_config - new_config_map[None]
             new_opt_config = diff.get_as_opt_config()
             new_config_map[conf_key] = new_opt_config
     return new_config_map, changes_map
@@ -1423,7 +1598,7 @@ def _get_user_accept():
     except EOFError:
         user_allowed_changes = False
     else:
-        user_allowed_changes = (user_input == PROMPT_OK)
+        user_allowed_changes = user_input == PROMPT_OK
     return user_allowed_changes
 
 
@@ -1436,8 +1611,9 @@ def get_user_values(options, ignore=None):
         entered = False
         while not entered:
             try:
-                user_input = input("Value for " + str(key) + " (default " +
-                                   str(val) + "): ")
+                user_input = input(
+                    "Value for " + str(key) + " (default " + str(val) + "): "
+                )
             except EOFError:
                 user_input = ""
                 entered = True
@@ -1451,15 +1627,20 @@ def get_user_values(options, ignore=None):
                         "value.\nNote that strings should be quoted. "
                         "Please try again:\n",
                         kind=metomi.rose.reporter.Reporter.KIND_ERR,
-                        level=metomi.rose.reporter.Reporter.FAIL
+                        level=metomi.rose.reporter.Reporter.FAIL,
                     )
             else:
                 entered = True
     return options
 
 
-def dump_config(config, opt_conf_dir, opt_output_dir=None,
-                conf_key=None, name=metomi.rose.SUB_CONFIG_NAME):
+def dump_config(
+    config,
+    opt_conf_dir,
+    opt_output_dir=None,
+    conf_key=None,
+    name=metomi.rose.SUB_CONFIG_NAME,
+):
     """Dump the config in a standard form."""
     config = copy.deepcopy(config)
     pretty_format_config(config)
@@ -1473,18 +1654,21 @@ def dump_config(config, opt_conf_dir, opt_output_dir=None,
         source_root, source_ext = os.path.splitext(name)
         base = source_root + "-" + conf_key + source_ext
         target_path = os.path.join(
-            directory, metomi.rose.config.OPT_CONFIG_DIR, base)
+            directory, metomi.rose.config.OPT_CONFIG_DIR, base
+        )
     metomi.rose.config.dump(config, target_path)
 
 
 def load_conf_from_file(conf_dir, config_file_path, mode="macro"):
     """Loads config data from the file config_file_path."""
-    is_info_config = (os.path.basename(config_file_path) ==
-                      metomi.rose.INFO_CONFIG_NAME)
+    is_info_config = (
+        os.path.basename(config_file_path) == metomi.rose.INFO_CONFIG_NAME
+    )
     optional_keys = []
     optional_dir = os.path.join(conf_dir, metomi.rose.config.OPT_CONFIG_DIR)
     optional_glob = os.path.join(
-        optional_dir, metomi.rose.GLOB_OPT_CONFIG_FILE)
+        optional_dir, metomi.rose.GLOB_OPT_CONFIG_FILE
+    )
     for path in glob.glob(optional_glob):
         filename = os.path.basename(path)
         # filename is a null string if path is to a directory.
@@ -1498,8 +1682,8 @@ def load_conf_from_file(conf_dir, config_file_path, mode="macro"):
     if is_info_config:
         optional_keys = None
     app_config, config_map = config_loader.load_with_opts(
-        config_file_path, more_keys=optional_keys,
-        return_config_map=True)
+        config_file_path, more_keys=optional_keys, return_config_map=True
+    )
     standard_format_config(app_config)
     for _, config in config_map.items():
         standard_format_config(config)
@@ -1516,22 +1700,33 @@ def load_conf_from_file(conf_dir, config_file_path, mode="macro"):
             metomi.rose.reporter.Reporter()(
                 text,
                 kind=metomi.rose.reporter.Reporter.KIND_ERR,
-                level=metomi.rose.reporter.Reporter.FAIL)
+                level=metomi.rose.reporter.Reporter.FAIL,
+            )
             return None
     else:
-        meta_config = load_meta_config(app_config,
-                                       directory=conf_dir,
-                                       config_type=os.path.basename(
-                                           config_file_path),
-                                       ignore_meta_error=True)
+        meta_config = load_meta_config(
+            app_config,
+            directory=conf_dir,
+            config_type=os.path.basename(config_file_path),
+            ignore_meta_error=True,
+        )
     return app_config, config_map, meta_config
 
 
 def parse_macro_args(argv=None):
     """Parse options/arguments for rose macro and upgrade."""
     opt_parser = RoseOptionParser()
-    options = ["conf_dir", "meta_path", "non_interactive", "output_dir",
-               "fix", "validate_all", "no_warn", "suite_only", "transform_all"]
+    options = [
+        "conf_dir",
+        "meta_path",
+        "non_interactive",
+        "output_dir",
+        "fix",
+        "validate_all",
+        "no_warn",
+        "suite_only",
+        "transform_all",
+    ]
     opt_parser.add_my_options(*options)
     if argv is None:
         opts, args = opt_parser.parse_args()
@@ -1558,7 +1753,7 @@ def _report_error(exception=None, text=""):
     metomi.rose.reporter.Reporter()(
         text + "\n",
         kind=metomi.rose.reporter.Reporter.KIND_ERR,
-        level=metomi.rose.reporter.Reporter.FAIL
+        level=metomi.rose.reporter.Reporter.FAIL,
     )
 
 
@@ -1585,11 +1780,16 @@ def scan_rose_directory(conf_dir, suite_only=False):
             confs = []
             if not suite_only:
                 # Add app/*/rose-app.conf files.
-                confs = sorted(glob.glob(
-                    os.path.join(
-                        path, metomi.rose.SUB_CONFIGS_DIR,
-                        '*',
-                        metomi.rose.SUB_CONFIG_NAME)))
+                confs = sorted(
+                    glob.glob(
+                        os.path.join(
+                            path,
+                            metomi.rose.SUB_CONFIGS_DIR,
+                            '*',
+                            metomi.rose.SUB_CONFIG_NAME,
+                        )
+                    )
+                )
             # Add metomi.rose-suite.conf file.
             confs.append(os.path.join(path, metomi.rose.TOP_CONFIG_NAME))
             # Add metomi.rose-suite.info file.
@@ -1618,16 +1818,20 @@ def main():
 
     # Fail if no config files could be found.
     if not confs:
-        reporter(ERROR_LOAD_CONFIG_DIR.format(opts.conf_dir),
-                 kind=metomi.rose.reporter.Reporter.KIND_ERR,
-                 level=metomi.rose.reporter.Reporter.FAIL)
+        reporter(
+            ERROR_LOAD_CONFIG_DIR.format(opts.conf_dir),
+            kind=metomi.rose.reporter.Reporter.KIND_ERR,
+            level=metomi.rose.reporter.Reporter.FAIL,
+        )
         sys.exit(1)
 
     # Fail if --output-dir specified and multiple config files found.
     if len(confs) > 1 and opts.output_dir:
-        reporter(ERROR_OUT_DIR_MULTIPLE_APPS,
-                 kind=metomi.rose.reporter.Reporter.KIND_ERR,
-                 level=metomi.rose.reporter.Reporter.FAIL)
+        reporter(
+            ERROR_OUT_DIR_MULTIPLE_APPS,
+            kind=metomi.rose.reporter.Reporter.KIND_ERR,
+            level=metomi.rose.reporter.Reporter.FAIL,
+        )
         sys.exit(1)
 
     # Path manipulation.
@@ -1646,27 +1850,41 @@ def main():
         # Load config.
         try:
             _, config_map, meta_config = load_conf_from_file(
-                conf_dir, config_file_path)
+                conf_dir, config_file_path
+            )
         except TypeError:
             sys.exit(1)
 
         # Report which config we are currently working on.
         if len(confs) > 1:
             if cur_conf_type == metomi.rose.SUB_CONFIG_NAME:
-                reporter(os.path.join(
-                    metomi.rose.SUB_CONFIGS_DIR, config_name, cur_conf_type))
+                reporter(
+                    os.path.join(
+                        metomi.rose.SUB_CONFIGS_DIR, config_name, cur_conf_type
+                    )
+                )
             else:
                 reporter(cur_conf_type)
             sys.stdout.flush()
 
         # Run macros.
-        ret.append(run_macros(
-            config_map, meta_config, config_name, list(args), conf_dir,
-            opts.fix, opts.non_interactive, opts.output_dir,
-            opts.validate_all, opts.transform_all, verbosity,
-            no_warn=opts.no_warn,
-            default_only=cur_conf_type == metomi.rose.INFO_CONFIG_NAME
-        ))
+        ret.append(
+            run_macros(
+                config_map,
+                meta_config,
+                config_name,
+                list(args),
+                conf_dir,
+                opts.fix,
+                opts.non_interactive,
+                opts.output_dir,
+                opts.validate_all,
+                opts.transform_all,
+                verbosity,
+                no_warn=opts.no_warn,
+                default_only=cur_conf_type == metomi.rose.INFO_CONFIG_NAME,
+            )
+        )
 
     # Fail if any macro failed.
     sys.exit(0 if all(ret) else 1)

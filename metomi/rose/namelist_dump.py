@@ -53,8 +53,9 @@ def _sort_config_key(key_1, key_2):
         name_1, index_1 = match_1.groups()
         name_2, index_2 = match_2.groups()
         if name_1.lower() == name_2.lower():
-            return (int(index_1) > int(index_2)) -\
-                   (int(index_1) < int(index_2))
+            return (int(index_1) > int(index_2)) - (
+                int(index_1) < int(index_2)
+            )
     # This logic replicates output of the deprecated Python2 `cmp` builtin
     return (key_1.lower() > key_2.lower()) - (key_1.lower() < key_2.lower())
 
@@ -123,10 +124,12 @@ def namelist_dump(args=None, output_file=None, case_mode=None):
 
     # Config: write results
     metomi.rose.config.dump(
-        config, output_file,
+        config,
+        output_file,
         sort_sections=_sort_config_key,
         sort_option_items=_sort_config_key,
-        env_escape_ok=True)
+        env_escape_ok=True,
+    )
     output_file.close()
 
 

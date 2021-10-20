@@ -32,6 +32,7 @@ from metomi.rose.reporter import Event, Reporter
 
 class ConfigDumpEvent(Event):
     """Event raised on dumping to a config file."""
+
     def __str__(self):
         return "M %s" % self.args[0]
 
@@ -57,8 +58,10 @@ def main():
     for file_name in file_names:
         handle = NamedTemporaryFile()
         node = ConfigLoader()(file_name)
-        if (not opts.no_pretty_mode and
-                os.path.basename(file_name) != META_CONFIG_NAME):
+        if (
+            not opts.no_pretty_mode
+            and os.path.basename(file_name) != META_CONFIG_NAME
+        ):
             pretty_format_config(node, ignore_error=True)
         ConfigDumper()(node, handle)
         handle.seek(0)

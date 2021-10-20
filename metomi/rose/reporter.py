@@ -63,10 +63,12 @@ class Reporter:
             verbosity = 0
         if contexts is not None:
             self.contexts.update(contexts)
-        self.contexts.setdefault("stderr",
-                                 ReporterContext(self.KIND_ERR, verbosity))
-        self.contexts.setdefault("stdout",
-                                 ReporterContext(self.KIND_OUT, verbosity))
+        self.contexts.setdefault(
+            "stderr", ReporterContext(self.KIND_ERR, verbosity)
+        )
+        self.contexts.setdefault(
+            "stdout", ReporterContext(self.KIND_OUT, verbosity)
+        )
         self.event_handler = None
         self.raise_on_exc = raise_on_exc
 
@@ -199,11 +201,9 @@ class ReporterContext:
     TTY_COLOUR_ERR = "\033[1;31m"
     TTY_COLOUR_NORM = "\033[0m"
 
-    def __init__(self,
-                 kind=None,
-                 verbosity=Reporter.DEFAULT,
-                 handle=None,
-                 prefix=None):
+    def __init__(
+        self, kind=None, verbosity=Reporter.DEFAULT, handle=None, prefix=None
+    ):
         if kind == Reporter.KIND_ERR:
             if handle is None:
                 handle = sys.stderr
@@ -252,7 +252,10 @@ class ReporterContext:
         try:
             if self.handle.isatty():
                 return "%s%s%s" % (
-                    self.TTY_COLOUR_ERR, str_, self.TTY_COLOUR_NORM)
+                    self.TTY_COLOUR_ERR,
+                    str_,
+                    self.TTY_COLOUR_NORM,
+                )
         except AttributeError:
             pass
         return str_

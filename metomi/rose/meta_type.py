@@ -50,8 +50,10 @@ class BooleanMetaType(MetaType):
     WARNING = "Not true/false: {0}"
 
     def is_valid(self, value):
-        if value in [metomi.rose.TYPE_BOOLEAN_VALUE_TRUE,
-                     metomi.rose.TYPE_BOOLEAN_VALUE_FALSE]:
+        if value in [
+            metomi.rose.TYPE_BOOLEAN_VALUE_TRUE,
+            metomi.rose.TYPE_BOOLEAN_VALUE_FALSE,
+        ]:
             return [True, None]
         else:
             return [False, self.WARNING.format(repr(value))]
@@ -105,8 +107,10 @@ class PythonBooleanMetaType(MetaType):
     WARNING = "Not a valid Python boolean format (True/False): {0}"
 
     def is_valid(self, value):
-        if value not in [metomi.rose.TYPE_PYTHON_BOOLEAN_VALUE_TRUE,
-                         metomi.rose.TYPE_PYTHON_BOOLEAN_VALUE_FALSE]:
+        if value not in [
+            metomi.rose.TYPE_PYTHON_BOOLEAN_VALUE_TRUE,
+            metomi.rose.TYPE_PYTHON_BOOLEAN_VALUE_FALSE,
+        ]:
             return [False, self.WARNING.format(repr(value))]
         return [True, None]
 
@@ -147,17 +151,23 @@ class LogicalMetaType(MetaType):
     WARNING = "Not Fortran true/false: {0}"
 
     def is_valid(self, value):
-        if value not in [metomi.rose.TYPE_LOGICAL_VALUE_TRUE,
-                         metomi.rose.TYPE_LOGICAL_VALUE_FALSE]:
+        if value not in [
+            metomi.rose.TYPE_LOGICAL_VALUE_TRUE,
+            metomi.rose.TYPE_LOGICAL_VALUE_FALSE,
+        ]:
             return [False, self.WARNING.format(repr(value))]
         return [True, None]
 
     def transform(self, value):
-        if (value.upper() == '.F.' or
-                value.upper() == metomi.rose.TYPE_LOGICAL_VALUE_FALSE.upper()):
+        if (
+            value.upper() == '.F.'
+            or value.upper() == metomi.rose.TYPE_LOGICAL_VALUE_FALSE.upper()
+        ):
             return metomi.rose.TYPE_LOGICAL_VALUE_FALSE
-        if (value.upper() == '.T.' or
-                value.upper() == metomi.rose.TYPE_LOGICAL_VALUE_TRUE.upper()):
+        if (
+            value.upper() == '.T.'
+            or value.upper() == metomi.rose.TYPE_LOGICAL_VALUE_TRUE.upper()
+        ):
             return metomi.rose.TYPE_LOGICAL_VALUE_TRUE
         return value
 
@@ -187,14 +197,19 @@ class QuotedMetaType(MetaType):
         for i, seg in enumerate(quote_segs):
             num_end_esc = len(seg) - len(seg.rstrip("\\"))
             odd_num_end_esc = num_end_esc % 2 == 1
-            if ((i == len(quote_segs) - 2 and odd_num_end_esc) or
-                    (0 < i < len(quote_segs) - 2 and not odd_num_end_esc)):
+            if (i == len(quote_segs) - 2 and odd_num_end_esc) or (
+                0 < i < len(quote_segs) - 2 and not odd_num_end_esc
+            ):
                 return [False, self.WARNING.format(repr(value))]
         return [True, None]
 
     def transform(self, value):
-        if (value.startswith('"') and value.endswith('"') and
-                '"' not in value[1:-1] and "\\" not in value[1:-1]):
+        if (
+            value.startswith('"')
+            and value.endswith('"')
+            and '"' not in value[1:-1]
+            and "\\" not in value[1:-1]
+        ):
             value = '"' + value[1:-1] + '"'
         else:
             if not value.endswith('"'):

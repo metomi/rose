@@ -37,10 +37,10 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
     ERROR_MISSING_METADATA = 'No metadata entry found'
     WARNING_STATE_CHANGED = '{0} -> {1}'
     IGNORED_STATUS_PARENT = 'from state of parent: {0}'
-    IGNORED_STATUS_VALUE = ('from parent value: {0} '
-                            'is not {2} ({1})')
-    IGNORED_STATUS_VALUES = ('from parent value: {0} with {1} '
-                             'is not in the allowed values: {2}')
+    IGNORED_STATUS_VALUE = 'from parent value: {0} ' 'is not {2} ({1})'
+    IGNORED_STATUS_VALUES = (
+        'from parent value: {0} with {1} ' 'is not in the allowed values: {2}'
+    )
     PARENT_VALUE = 'value {0}'
     _EVALUATED_RULE_CHECKS: Dict[tuple, Any] = {}
     MAX_STORED_RULE_CHECKS = 10000
@@ -54,8 +54,9 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
         for setting_id, sect_node in meta_config.value.items():
             if sect_node.is_ignored():
                 continue
-            opt_node = sect_node.get([metomi.rose.META_PROP_TRIGGER],
-                                     no_ignore=True)
+            opt_node = sect_node.get(
+                [metomi.rose.META_PROP_TRIGGER], no_ignore=True
+            )
             if opt_node is not None:
                 expr = opt_node.value
                 id_value_dict = metomi.rose.variable.parse_trigger_expression(
@@ -77,9 +78,11 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
         enabled = metomi.rose.config.ConfigNode.STATE_NORMAL
         trig_ignored = metomi.rose.config.ConfigNode.STATE_SYST_IGNORED
         user_ignored = metomi.rose.config.ConfigNode.STATE_USER_IGNORED
-        state_map = {enabled: 'enabled     ',
-                     trig_ignored: 'trig-ignored',
-                     user_ignored: 'user-ignored'}
+        state_map = {
+            enabled: 'enabled     ',
+            trig_ignored: 'trig-ignored',
+            user_ignored: 'user-ignored',
+        }
         id_list = []
         prev_ignoreds = {trig_ignored: [], user_ignored: []}
         for keylist, node in config.walk():
@@ -107,8 +110,10 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
             elif var_id in prev_ignoreds[trig_ignored]:
                 node.state = enabled
                 old, new = state_map[trig_ignored], state_map[enabled]
-            elif (var_id in prev_ignoreds[user_ignored] and
-                  var_id in self._trigger_involved_ids):
+            elif (
+                var_id in prev_ignoreds[user_ignored]
+                and var_id in self._trigger_involved_ids
+            ):
                 node.state = enabled
                 old, new = state_map[user_ignored], state_map[enabled]
             if old != new:
@@ -142,11 +147,14 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
         """
         config_sections = self._get_config_sections(config_data)
         config_sections_duplicate_map = self._get_duplicate_config_sections(
-            config_data, config_sections=config_sections)
+            config_data, config_sections=config_sections
+        )
         start_ids = [var_id]
         alt_ids = self._get_id_duplicates(
-            var_id, config_data, meta_config,
-            config_sections_duplicate_map=config_sections_duplicate_map
+            var_id,
+            config_data,
+            meta_config,
+            config_sections_duplicate_map=config_sections_duplicate_map,
         )
         if alt_ids:
             start_ids = alt_ids
@@ -155,12 +163,15 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
         id_stack = []
         for start_id in start_ids:
             is_ignored = True
-            if (start_id in self.enabled_dict and
-                    start_id not in self.ignored_dict):
+            if (
+                start_id in self.enabled_dict
+                and start_id not in self.ignored_dict
+            ):
                 # Definitely enabled.
                 is_ignored = False
-            if not sum([var_id in v for v in
-                        self.trigger_family_lookup.values()]):
+            if not sum(
+                [var_id in v for v in self.trigger_family_lookup.values()]
+            ):
                 # Not triggered by anything, so must be enabled.
                 is_ignored = False
             section, option = self._get_section_option_from_id(start_id)
@@ -176,8 +187,10 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
             this_id, has_ignored_parent = id_stack[0]
             # For each id, examine its duplicates (if any) and all children.
             alt_ids = self._get_id_duplicates(
-                this_id, config_data, meta_config,
-                config_sections_duplicate_map=config_sections_duplicate_map
+                this_id,
+                config_data,
+                meta_config,
+                config_sections_duplicate_map=config_sections_duplicate_map,
             )
             if alt_ids:
                 this_id = alt_ids.pop(0)
@@ -186,10 +199,10 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
             self._check_is_id_dupl(this_id, meta_config)
             # Triggered sections need their options to trigger sub children.
             if this_id in config_sections:
-                for option in self._get_config_section_options(config_data,
-                                                               this_id):
-                    skip_id = self._get_id_from_section_option(
-                        this_id, option)
+                for option in self._get_config_section_options(
+                    config_data, this_id
+                ):
+                    skip_id = self._get_id_from_section_option(this_id, option)
                     if skip_id in self.trigger_family_lookup:
                         id_stack.insert(1, (skip_id, has_ignored_parent))
             update_id_list.append(this_id)
@@ -198,15 +211,14 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
                 continue
             if not has_ignored_parent:
                 section, option = self._get_section_option_from_id(this_id)
-                is_node_present = self._get_config_has_id(
-                    config_data, this_id)
-                value = self._get_config_id_value(
-                    config_data, this_id)
+                is_node_present = self._get_config_has_id(config_data, this_id)
+                value = self._get_config_id_value(config_data, this_id)
                 if option is None and is_node_present:
                     value = True
             # Check the children of this id
             id_val_map = self._get_family_dict(
-                this_id, config_data, meta_config)
+                this_id, config_data, meta_config
+            )
             for child_id, vals in id_val_map.items():
                 if has_ignored_parent or value is None:
                     help_text = self.IGNORED_STATUS_PARENT.format(this_id)
@@ -227,8 +239,10 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
                             self.enabled_dict[child_id].append(this_id)
                         if this_id in self.ignored_dict.get(child_id, {}):
                             self.ignored_dict[child_id].pop(this_id)
-                        if (child_id in self.ignored_dict and
-                                self.ignored_dict[child_id] == {}):
+                        if (
+                            child_id in self.ignored_dict
+                            and self.ignored_dict[child_id] == {}
+                        ):
                             self.ignored_dict.pop(child_id)
                         id_stack.insert(1, (child_id, False))
                     elif not self._check_values_ok(value, this_id, vals):
@@ -236,13 +250,16 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
                         repr_value = self.PARENT_VALUE.format(value)
                         if len(vals) == 1:
                             help_text = self.IGNORED_STATUS_VALUE.format(
-                                this_id, repr_value, repr(vals[0]))
+                                this_id, repr_value, repr(vals[0])
+                            )
                         else:
                             help_text = self.IGNORED_STATUS_VALUES.format(
-                                this_id, repr_value, repr(vals))
+                                this_id, repr_value, repr(vals)
+                            )
                         self.ignored_dict.setdefault(child_id, {})
                         self.ignored_dict[child_id].update(
-                            {this_id: help_text})
+                            {this_id: help_text}
+                        )
                         if child_id in self.enabled_dict:
                             child_list = self.enabled_dict[child_id]
                             if this_id in child_list:
@@ -257,8 +274,10 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
                             self.enabled_dict[child_id].append(this_id)
                         if this_id in self.ignored_dict.get(child_id, {}):
                             self.ignored_dict[child_id].pop(this_id)
-                        if (child_id in self.ignored_dict and
-                                self.ignored_dict[child_id] == {}):
+                        if (
+                            child_id in self.ignored_dict
+                            and self.ignored_dict[child_id] == {}
+                        ):
                             self.ignored_dict.pop(child_id)
                         id_stack.insert(1, (child_id, False))
             id_stack.pop(0)
@@ -303,12 +322,15 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
         enabled = metomi.rose.config.ConfigNode.STATE_NORMAL
         trig_ignored = metomi.rose.config.ConfigNode.STATE_SYST_IGNORED
         user_ignored = metomi.rose.config.ConfigNode.STATE_USER_IGNORED
-        state_map = {enabled: 'enabled     ',
-                     trig_ignored: 'trig-ignored',
-                     user_ignored: 'user-ignored'}
+        state_map = {
+            enabled: 'enabled     ',
+            trig_ignored: 'trig-ignored',
+            user_ignored: 'user-ignored',
+        }
 
-        invalid_trigger_reports = self.validate_dependencies(config,
-                                                             meta_config)
+        invalid_trigger_reports = self.validate_dependencies(
+            config, meta_config
+        )
         if invalid_trigger_reports:
             return invalid_trigger_reports
         macro_config = copy.deepcopy(config)
@@ -323,8 +345,7 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
                 value = trig_config_node.value
             after_state_string = state_map[trig_config_node.state].strip()
             info = self.ERROR_BAD_STATE.format(after_state_string)
-            self.add_report(report.section, report.option,
-                            value, info)
+            self.add_report(report.section, report.option, value, info)
         return self.reports
 
     def validate_dependencies(self, config, meta_config):
@@ -335,8 +356,11 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
         if not hasattr(self, 'trigger_family_lookup'):
             self._setup_triggers(meta_config)
         config_sections = config.value
-        meta_settings = [k for k in meta_config.value
-                         if not meta_config.value[k].is_ignored()]
+        meta_settings = [
+            k
+            for k in meta_config.value
+            if not meta_config.value[k].is_ignored()
+        ]
         allowed_repetitions = {}
         trigger_ids = list(self.trigger_family_lookup)
         trigger_ids.sort()
@@ -347,8 +371,9 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
                 allowed_repetitions.setdefault(var_id, 0)
                 allowed_repetitions[var_id] += 1
         for start_id in trigger_ids:
-            id_value_dict = self._get_family_dict(start_id, config,
-                                                  meta_config)
+            id_value_dict = self._get_family_dict(
+                start_id, config, meta_config
+            )
             triggered_ids = list(id_value_dict)
             triggered_ids.sort()
             if self._check_is_id_dupl(start_id, meta_config):
@@ -357,8 +382,10 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
                     tr_sect = self._get_section_option_from_id(tr_id)[0]
                     if tr_sect != st_sect:
                         return self._get_error_report_for_id(
-                            start_id, config,
-                            self.ERROR_DUPL_TRIG.format(st_sect))
+                            start_id,
+                            config,
+                            self.ERROR_DUPL_TRIG.format(st_sect),
+                        )
             for value_list in id_value_dict.values():
                 for string in [s for s in value_list if s is not None]:
                     if self.rec_rule.search(string):
@@ -368,8 +395,10 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
                             continue
                         except Exception:
                             return self._get_error_report_for_id(
-                                start_id, config,
-                                self.ERROR_BAD_EXPR.format(string))
+                                start_id,
+                                config,
+                                self.ERROR_BAD_EXPR.format(string),
+                            )
             stack = [(start_id, triggered_ids)]
             id_list = []
             while stack:
@@ -377,7 +406,8 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
                 base_id = self._get_stripped_id(var_id, meta_config)
                 if base_id not in meta_settings:
                     return self._get_error_report_for_id(
-                        var_id, config, self.ERROR_MISSING_METADATA)
+                        var_id, config, self.ERROR_MISSING_METADATA
+                    )
                 id_list.append(var_id)
                 child_ids.sort()
                 if var_id in config_sections:
@@ -386,27 +416,35 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
                     base_id = self._get_stripped_id(child_id, meta_config)
                     if base_id not in meta_settings:
                         return self._get_error_report_for_id(
-                            child_id, config, self.ERROR_MISSING_METADATA)
+                            child_id, config, self.ERROR_MISSING_METADATA
+                        )
                     if child_id in self.trigger_family_lookup:
                         grandchildren = list(
-                            self.trigger_family_lookup[child_id])
+                            self.trigger_family_lookup[child_id]
+                        )
                         grandchildren.sort()
                         stack.insert(1, (child_id, grandchildren))
-                        if (id_list.count(child_id) + 1 >
-                                allowed_repetitions[child_id] and
-                                id_list.count(child_id) >= 2):
+                        if (
+                            id_list.count(child_id) + 1
+                            > allowed_repetitions[child_id]
+                            and id_list.count(child_id) >= 2
+                        ):
                             # Then it may be looping cyclically.
-                            duplicate_seq = self._get_dup_sequence(id_list,
-                                                                   child_id)
+                            duplicate_seq = self._get_dup_sequence(
+                                id_list, child_id
+                            )
                             if duplicate_seq:
                                 return self._get_error_report_for_id(
-                                    var_id, config,
-                                    self.ERROR_CYCLIC.format(child_id, var_id))
+                                    var_id,
+                                    config,
+                                    self.ERROR_CYCLIC.format(child_id, var_id),
+                                )
                 stack.pop(0)
         return []
 
-    def _get_duplicate_config_sections(self, config_data,
-                                       config_sections=None):
+    def _get_duplicate_config_sections(
+        self, config_data, config_sections=None
+    ):
         if config_sections is None:
             config_sections = self._get_config_sections(config_data)
         config_sections_duplicate_map = {}
@@ -425,8 +463,10 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
             items = list(self.trigger_family_lookup.get(trig_id, {}).items())
             for i, (child_id, vals) in enumerate(items):
                 ch_sect, ch_opt = self._get_section_option_from_id(child_id)
-                if metomi.rose.macro.REC_ID_STRIP.sub("", ch_sect)\
-                        == base_sect:
+                if (
+                    metomi.rose.macro.REC_ID_STRIP.sub("", ch_sect)
+                    == base_sect
+                ):
                     new_id = self._get_id_from_section_option(sect, ch_opt)
                     items[i] = (new_id, vals)
             return dict(items)
@@ -435,7 +475,8 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
         while items:
             child_id, vals = items.pop(0)
             alt_ids = self._get_id_duplicates(
-                child_id, config_data, meta_config)
+                child_id, config_data, meta_config
+            )
             if alt_ids:
                 for alt_id in alt_ids:
                     dupl_adjusted_items.append((alt_id, vals))
@@ -443,14 +484,20 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
                 dupl_adjusted_items.append((child_id, vals))
         return dict(dupl_adjusted_items)
 
-    def _get_id_duplicates(self, setting_id, config_data, meta_config,
-                           config_sections_duplicate_map=None):
+    def _get_id_duplicates(
+        self,
+        setting_id,
+        config_data,
+        meta_config,
+        config_sections_duplicate_map=None,
+    ):
         dupl_ids = []
         if self._check_is_id_dupl(setting_id, meta_config):
             sect, opt = self._get_section_option_from_id(setting_id)
             if config_sections_duplicate_map is None:
                 config_sections_duplicate_map = (
-                    self._get_duplicate_config_sections(config_data))
+                    self._get_duplicate_config_sections(config_data)
+                )
             for section in config_sections_duplicate_map.get(sect, []):
                 new_id = self._get_id_from_section_option(section, opt)
                 dupl_ids.append(new_id)
@@ -464,7 +511,8 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
             node = meta_config.get([sect, metomi.rose.META_PROP_DUPLICATE])
             self._id_is_duplicate[setting_id] = (
                 node is not None
-                and node.value == metomi.rose.META_PROP_VALUE_TRUE)
+                and node.value == metomi.rose.META_PROP_VALUE_TRUE
+            )
         return self._id_is_duplicate[setting_id]
 
     def _get_stripped_id(self, setting_id, meta_config):
@@ -475,8 +523,10 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
         return setting_id
 
     def check_is_id_trigger(self, setting_id, meta_config):
-        return (self._get_stripped_id(setting_id, meta_config) in
-                self.trigger_family_lookup)
+        return (
+            self._get_stripped_id(setting_id, meta_config)
+            in self.trigger_family_lookup
+        )
 
     def _get_error_report_for_id(self, variable_id, config, error_string):
         section, option = self._get_section_option_from_id(variable_id)
@@ -493,7 +543,7 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
         if index_1 == 0:
             return id_copy_list
         index_2 = id_copy_list.index(child_id, index_1 + 1)
-        if (id_copy_list[:index_1] == id_copy_list[index_1 + 1: index_2]):
+        if id_copy_list[:index_1] == id_copy_list[index_1 + 1 : index_2]:
             return [i for i in reversed(id_copy_list[:index_2])]
         return []
 
@@ -518,7 +568,8 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
             tiny_config.set([section, option], value)
             tiny_meta_config = metomi.rose.config.ConfigNode()
             check_failed = self.evaluator.evaluate_rule(
-                rule, setting_id, tiny_config, tiny_meta_config)
+                rule, setting_id, tiny_config, tiny_meta_config
+            )
             if len(self._EVALUATED_RULE_CHECKS) > self.MAX_STORED_RULE_CHECKS:
                 self._EVALUATED_RULE_CHECKS.popitem()
             self._EVALUATED_RULE_CHECKS[(rule, value)] = check_failed

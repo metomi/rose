@@ -36,5 +36,6 @@ class SpongeDeSoggifier(metomi.rose.macro.MacroBase):
             # 1 g cm^-3 is pure water, so this is pretty soggy.
             config.set(["env", "SPONGE_DENSITY"], "0.3")
             self.add_report(
-                "env", "SPONGE_DENSITY", "0.3", self.SOGGY_FIX_TEXT)
+                "env", "SPONGE_DENSITY", "0.3", self.SOGGY_FIX_TEXT
+            )
         return config, self.reports

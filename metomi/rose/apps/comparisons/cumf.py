@@ -56,7 +56,8 @@ class CumfWarnHeader:
     """As cumf, but issue a warning if only the header has changed"""
 
     RE_NUM_FIELDS = re.compile(
-        r"Number\s*of\s*fields\s*with\s*differences\s*=\s*0\D")
+        r"Number\s*of\s*fields\s*with\s*differences\s*=\s*0\D"
+    )
 
     def __init__(self):
         self.cumf = Cumf()
@@ -88,8 +89,13 @@ class CumfComparisonFailure:
         if self.errors:
             for error in self.errors:
                 errors += "\n         %s: >%s%%" % (error, self.errors[error])
-        return OUTPUT_STRING % (FAIL, self.resultfile, self.kgo1file,
-                                self.cumfdir, errors)
+        return OUTPUT_STRING % (
+            FAIL,
+            self.resultfile,
+            self.kgo1file,
+            self.cumfdir,
+            errors,
+        )
 
     __str__ = __repr__
 
@@ -105,8 +111,13 @@ class CumfComparisonSuccess:
         self.cumfdir = os.path.dirname(task.cumfsummaryfile)
 
     def __repr__(self):
-        return OUTPUT_STRING % (PASS, self.resultfile, self.kgo1file,
-                                self.cumfdir, "")
+        return OUTPUT_STRING % (
+            PASS,
+            self.resultfile,
+            self.kgo1file,
+            self.cumfdir,
+            "",
+        )
 
     __str__ = __repr__
 
@@ -122,8 +133,13 @@ class CumfComparisonHeaderWarning:
         self.cumfdir = os.path.dirname(task.cumfsummaryfile)
 
     def __repr__(self):
-        return OUTPUT_STRING % (HEADER, self.resultfile, self.kgo1file,
-                                self.cumfdir, "")
+        return OUTPUT_STRING % (
+            HEADER,
+            self.resultfile,
+            self.kgo1file,
+            self.cumfdir,
+            "",
+        )
 
     __str__ = __repr__
 
@@ -140,7 +156,8 @@ class CumfSummaryNotFoundFailure:
 
     def __repr__(self):
         return "Cannot ascertain cumf summary file from:\n%s" % (
-               self.resultdata)
+            self.resultdata
+        )
 
     __str__ = __repr__
 
@@ -173,7 +190,10 @@ class DiffNotUnderstoodException(Exception):
 
     def __repr__(self):
         return "Invalid character '%s' in cumf diff between %s and %s" % (
-               self.character, self.file1, self.file2)
+            self.character,
+            self.file1,
+            self.file2,
+        )
 
     __str__ = __repr__
 

@@ -81,18 +81,24 @@ class HostThresholdNotMetEvent(Event):
     """An error raised when a host does not meet a threshold."""
 
     KIND = Event.KIND_ERR
-    FMT = ("%(host)s: %(method)s:%(method_arg)s threshold not met: " +
-           "%(score)s %(scorer_op)s %(value)s")
+    FMT = (
+        "%(host)s: %(method)s:%(method_arg)s threshold not met: "
+        + "%(score)s %(scorer_op)s %(value)s"
+    )
 
     def __str__(self):
         host, threshold_conf, score = self.args
         scorer_op = ">"
         if threshold_conf.scorer.SIGN < 0:
             scorer_op = "<"
-        fmt_map = {"host": host, "score": score, "scorer_op": scorer_op,
-                   "method": threshold_conf.method,
-                   "method_arg": threshold_conf.method_arg,
-                   "value": threshold_conf.value}
+        fmt_map = {
+            "host": host,
+            "score": score,
+            "scorer_op": scorer_op,
+            "method": threshold_conf.method,
+            "method_arg": threshold_conf.method_arg,
+            "value": threshold_conf.value,
+        }
         for key, value in fmt_map.items():
             if value is None:
                 fmt_map[key] = ""
@@ -195,9 +201,11 @@ class HostSelector:
             method = self.RANK_METHOD_DEFAULT
         if method not in self.scorers:
             for value in globals().values():
-                if (isinstance(value, type) and
-                        issubclass(value, RandomScorer) and
-                        value.KEY == method):
+                if (
+                    isinstance(value, type)
+                    and issubclass(value, RandomScorer)
+                    and value.KEY == method
+                ):
                     self.scorers[method] = value()
         return self.scorers[method]
 
@@ -220,8 +228,7 @@ class HostSelector:
         """
         conf = ResourceLocator.default().get_conf()
         if not names:
-            node = conf.get(["rose-host-select", "default"],
-                            no_ignore=True)
+            node = conf.get(["rose-host-select", "default"], no_ignore=True)
             if node:
                 names = [node.value]
             else:
@@ -253,7 +260,8 @@ class HostSelector:
                         thresholds_set.add(())
                     else:
                         thresholds_set.add(
-                            tuple(sorted(shlex.split(threshold_str))))
+                            tuple(sorted(shlex.split(threshold_str)))
+                        )
 
         # If default rank method differs in hosts, use load:15.
         if rank_method is None:
@@ -268,8 +276,13 @@ class HostSelector:
 
         return host_names, rank_method, thresholds
 
-    def select(self, names=None, rank_method=None, thresholds=None,
-               ssh_cmd_timeout=None):
+    def select(
+        self,
+        names=None,
+        rank_method=None,
+        thresholds=None,
+        ssh_cmd_timeout=None,
+    ):
         """Return a list. Element 0 is most desirable.
         Each element of the list is a tuple (host, score).
 
@@ -292,8 +305,9 @@ class HostSelector:
 
         """
 
-        host_names, rank_method, thresholds = self.expand(names, rank_method,
-                                                          thresholds)
+        host_names, rank_method, thresholds = self.expand(
+            names, rank_method, thresholds
+        )
 
         # Load scorers, ranking and thresholds
         rank_method_arg = None
@@ -323,14 +337,18 @@ class HostSelector:
                 scorer = self.get_scorer(method)
                 if method_arg is None:
                     method_arg = scorer.ARG
-                threshold_conf = ScorerConf(self.get_scorer(method),
-                                            method_arg, value)
+                threshold_conf = ScorerConf(
+                    self.get_scorer(method), method_arg, value
+                )
                 threshold_confs.append(threshold_conf)
 
         if ssh_cmd_timeout is None:
             conf = ResourceLocator.default().get_conf()
-            ssh_cmd_timeout = float(conf.get_value(
-                ["rose-host-select", "timeout"], self.SSH_CMD_TIMEOUT))
+            ssh_cmd_timeout = float(
+                conf.get_value(
+                    ["rose-host-select", "timeout"], self.SSH_CMD_TIMEOUT
+                )
+            )
 
         host_name_list = list(host_names)
         host_names = []
@@ -350,8 +368,9 @@ class HostSelector:
                 command = self.popen.get_cmd("ssh", host_name, "true")
                 proc = self.popen.run_bg(*command, preexec_fn=os.setpgrp)
                 time0 = time()
-                while (proc.poll() is None and
-                       time() - time0 <= ssh_cmd_timeout):
+                while (
+                    proc.poll() is None and time() - time0 <= ssh_cmd_timeout
+                ):
                     sleep(self.SSH_CMD_POLL_DELAY)
                 if proc.poll() is None:
                     os.killpg(proc.pid, signal.SIGTERM)
@@ -399,17 +418,11 @@ class HostSelector:
                         metrics.append(metric)
 
             # convert metrics list to JSON stdin
-            stdin = (
-                '\n***start**\n'
-                + json.dumps(metrics)
-                + '\n**end**\n'
-            )
+            stdin = '\n***start**\n' + json.dumps(metrics) + '\n**end**\n'
 
             # fire off host-select-client processes
             proc = self.popen.run_bg(
-                *command,
-                stdin=stdin,
-                preexec_fn=os.setpgrp
+                *command, stdin=stdin, preexec_fn=os.setpgrp
             )
             proc.stdin.write(stdin.encode('UTF-8'))
             proc.stdin.flush()
@@ -446,8 +459,11 @@ class HostSelector:
                             is_bad = True
                             score = None
                         if is_bad:
-                            self.handle_event(HostThresholdNotMetEvent(
-                                host_name, threshold_conf, score))
+                            self.handle_event(
+                                HostThresholdNotMetEvent(
+                                    host_name, threshold_conf, score
+                                )
+                            )
                             break
                     else:
                         try:
@@ -456,7 +472,8 @@ class HostSelector:
                         except ValueError:
                             score = None
                         self.handle_event(
-                            HostSelectScoreEvent(host_name, score))
+                            HostSelectScoreEvent(host_name, score)
+                        )
             if time() - time0 > ssh_cmd_timeout:
                 break
 
@@ -469,8 +486,8 @@ class HostSelector:
         if not host_score_list:
             raise NoHostSelectError()
         host_score_list.sort(
-            key=lambda a: a[1],
-            reverse=rank_conf.scorer.SIGN < 0)
+            key=lambda a: a[1], reverse=rank_conf.scorer.SIGN < 0
+        )
         return host_score_list
 
     __call__ = select
@@ -501,10 +518,7 @@ def _deserialise(metrics, data):
     """
     for index, (metric, datum) in enumerate(zip(metrics, data)):
         if isinstance(datum, dict):
-            data[index] = _tuple_factory(
-                metric[0],
-                tuple(datum.keys())
-            )(
+            data[index] = _tuple_factory(metric[0], tuple(datum.keys()))(
                 *datum.values()
             )
     return data
@@ -526,8 +540,10 @@ class ScorerConf:
 
     def check_threshold(self, score):
         """Parse command output. Return True if threshold not met."""
-        return (float(score) * self.scorer.SIGN >
-                float(self.value) * self.scorer.SIGN)
+        return (
+            float(score) * self.scorer.SIGN
+            > float(self.value) * self.scorer.SIGN
+        )
 
     def command_out_parser(self, out, metrics):
         """Parse command output to return a numeric score."""
@@ -625,14 +641,15 @@ def main():
             names=args,
             rank_method=opts.rank_method,
             thresholds=opts.thresholds,
-            ssh_cmd_timeout=opts.timeout)
+            ssh_cmd_timeout=opts.timeout,
+        )
     except (NoHostError, NoHostSelectError) as exc:
         report(exc)
         if opts.debug_mode:
             traceback.print_exc()
         sys.exit(1)
     opts.choice = int(opts.choice)
-    report(choice(host_score_list[0:opts.choice])[0] + "\n", level=0)
+    report(choice(host_score_list[0 : opts.choice])[0] + "\n", level=0)
 
 
 if __name__ == "__main__":

@@ -51,7 +51,8 @@ _RE_DEFAULT = re.compile(
     r")"
     r"(?P<tail>.*)"
     r"\Z",
-    re.M | re.S)
+    re.M | re.S,
+)
 
 
 # _RE_BRACE = re.compile(r"""
@@ -73,12 +74,11 @@ _RE_BRACE = re.compile(
     r"\})"
     r"(?P<tail>.*)"
     r"\Z",
-    re.M | re.S)
+    re.M | re.S,
+)
 
 
-_MATCH_MODES = {"brace": _RE_BRACE,
-                "default": _RE_DEFAULT,
-                None: _RE_DEFAULT}
+_MATCH_MODES = {"brace": _RE_BRACE, "default": _RE_DEFAULT, None: _RE_DEFAULT}
 
 
 _EXPORTED_ENVS = {}
@@ -124,8 +124,9 @@ def env_var_escape(text, match_mode=None):
         match = _MATCH_MODES[match_mode].match(tail)
         if match:
             groups = match.groupdict()
-            ret += (groups["head"] + groups["escape"] * 2 + "\\" +
-                    groups["symbol"])
+            ret += (
+                groups["head"] + groups["escape"] * 2 + "\\" + groups["symbol"]
+            )
             tail = groups["tail"]
         else:
             ret += tail
@@ -161,9 +162,11 @@ def env_var_process(text, unbound=None, match_mode=None, environ=os.environ):
                     substitute = str(unbound)
                 else:
                     raise UnboundEnvironmentVariableError(groups["name"])
-            ret += (groups["head"] +
-                    groups["escape"][0:len(groups["escape"]) // 2] +
-                    substitute)
+            ret += (
+                groups["head"]
+                + groups["escape"][0 : len(groups["escape"]) // 2]
+                + substitute
+            )
             tail = groups["tail"]
         else:
             ret += tail
@@ -174,4 +177,4 @@ def env_var_process(text, unbound=None, match_mode=None, environ=os.environ):
 def contains_env_var(text, match_mode=None):
     """Check if a string contains unescaped $NAME and/or ${NAME} syntax."""
     match = _MATCH_MODES[match_mode].match(text)
-    return (match and len(match.groupdict()["escape"]) % 2 == 0)
+    return match and len(match.groupdict()["escape"]) % 2 == 0

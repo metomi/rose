@@ -108,15 +108,23 @@ class RosieSvnHook(object):
             popen = RosePopener(self.event_handler)
         self.popen = popen
         self.path = os.path.dirname(
-            os.path.dirname(sys.modules["metomi.rosie"].__file__))
+            os.path.dirname(sys.modules["metomi.rosie"].__file__)
+        )
 
     def _svnlook(self, *args):
         """Return the standard output from "svnlook"."""
         command = ["svnlook", *args]
         return self.popen(*command)[0].decode()
 
-    def _load_info(self, repos, sid, branch=None, revision=None,
-                   transaction=None, allow_popen_err=False):
+    def _load_info(
+        self,
+        repos,
+        sid,
+        branch=None,
+        revision=None,
+        transaction=None,
+        allow_popen_err=False,
+    ):
         """Load info file from branch_path in repos @revision.
 
         Returns a ConfigNode for the "rose-suite.info" of a suite at a
@@ -140,7 +148,8 @@ class RosieSvnHook(object):
             if revision is not None:
                 raise ValueError(
                     f"Cannot load transaction {transaction} and "
-                    f"revision {revision} at the same time")
+                    f"revision {revision} at the same time"
+                )
             commit_opts = ["-t", transaction]
         if revision is not None:
             commit_opts = ["-r", str(revision)]
@@ -149,7 +158,8 @@ class RosieSvnHook(object):
         try:
             t_handle.write(
                 self._svnlook(
-                    "cat", repos, info_file_path, *commit_opts).encode()
+                    "cat", repos, info_file_path, *commit_opts
+                ).encode()
             )
         except UnicodeDecodeError as err:
             raise ConfigDecodeError(info_file_path, err)

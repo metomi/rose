@@ -46,6 +46,10 @@ class ProhibitedStringResult:
 
     def __repr__(self):
         return OUTPUT_STRING % (
-            self.extract, self.resultfile, self.status, self.subextract)
+            self.extract,
+            self.resultfile,
+            self.status,
+            self.subextract,
+        )
 
     __str__ = __repr__

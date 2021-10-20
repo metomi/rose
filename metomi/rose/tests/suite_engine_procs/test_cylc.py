@@ -27,17 +27,17 @@ from metomi.rose.suite_engine_procs.cylc import CylcProcessor
 @pytest.mark.parametrize(
     'platform, expect',
     [
-        param(
-            {'hosts': ['localhost']}, None, id='platform is local'
-        ),
+        param({'hosts': ['localhost']}, None, id='platform is local'),
         param(
             {
                 'hosts': ['my_host'],
-                'selection': {'method': 'definition order'}
-            }, 'my_host', id='platform is remote'
+                'selection': {'method': 'definition order'},
+            },
+            'my_host',
+            id='platform is remote',
         ),
-        param(None, None, id='Task not in config')
-    ]
+        param(None, None, id='Task not in config'),
+    ],
 )
 def test_get_task_auth(monkeypatch, platform, expect):
     def fake_get_platform(*_):
@@ -45,9 +45,11 @@ def test_get_task_auth(monkeypatch, platform, expect):
             raise KeyError
         else:
             return platform
+
     monkeypatch.setattr(
-        cylc.rose.platform_utils, 'get_platform_from_task_def',
-        fake_get_platform
+        cylc.rose.platform_utils,
+        'get_platform_from_task_def',
+        fake_get_platform,
     )
     result = CylcProcessor().get_task_auth('foo', 'bar')
     assert result is expect
@@ -59,63 +61,76 @@ def test_get_task_auth(monkeypatch, platform, expect):
         param(
             [('1', None)],
             {
-                '1': {'task_1': {
-                    'hosts': ['hello'],
-                    'selection': {'method': 'definition order'}
-                }}
+                '1': {
+                    'task_1': {
+                        'hosts': ['hello'],
+                        'selection': {'method': 'definition order'},
+                    }
+                }
             },
             ['hello'],
-            id='1 cycle:1 host'
+            id='1 cycle:1 host',
         ),
         param(
             [('1', None)],
             {
-                '1': {'task_1': {
-                    'hosts': ['hey', 'hi', 'howdy'],
-                    'selection': {'method': 'definition order'}
-                }}
+                '1': {
+                    'task_1': {
+                        'hosts': ['hey', 'hi', 'howdy'],
+                        'selection': {'method': 'definition order'},
+                    }
+                }
             },
             ['hey', 'hi', 'howdy'],
-            id='1 cycle:3 hosts'
+            id='1 cycle:3 hosts',
         ),
         param(
             [('1', None), ('2', None)],
             {
-                '1': {'task_1': {
-                    'hosts': ['hello'],
-                    'selection': {'method': 'definition order'}
-                }},
-                '2': {'task_1': {
-                    'hosts': ['hello'],
-                    'selection': {'method': 'definition order'}
-                }}
+                '1': {
+                    'task_1': {
+                        'hosts': ['hello'],
+                        'selection': {'method': 'definition order'},
+                    }
+                },
+                '2': {
+                    'task_1': {
+                        'hosts': ['hello'],
+                        'selection': {'method': 'definition order'},
+                    }
+                },
             },
             ['hello'],
-            id='2 cycles:1 platform'
+            id='2 cycles:1 platform',
         ),
         param(
             [('1', None), ('2', None)],
             {
-                '1': {'task_1': {
-                    'hosts': ['hello'],
-                    'selection': {'method': 'definition order'}
-                }},
-                '2': {'task_1': {
-                    'hosts': ['goodbye'],
-                    'selection': {'method': 'definition order'}
-                }}
+                '1': {
+                    'task_1': {
+                        'hosts': ['hello'],
+                        'selection': {'method': 'definition order'},
+                    }
+                },
+                '2': {
+                    'task_1': {
+                        'hosts': ['goodbye'],
+                        'selection': {'method': 'definition order'},
+                    }
+                },
             },
             ['hello', 'goodbye'],
-            id='2 cycles:2 platforms'
-        )
-    ]
+            id='2 cycles:2 platforms',
+        ),
+    ],
 )
 def test_get_suite_jobs_auths(
     monkeypatch, cycle_name_tuples, job_platform_map, expect
 ):
     monkeypatch.setattr(
-        cylc.rose.platform_utils, 'get_platforms_from_task_jobs',
-        lambda _, cycle: job_platform_map[cycle]
+        cylc.rose.platform_utils,
+        'get_platforms_from_task_jobs',
+        lambda _, cycle: job_platform_map[cycle],
     )
     for item in CylcProcessor().get_suite_jobs_auths(
         'suite_name', cycle_name_tuples

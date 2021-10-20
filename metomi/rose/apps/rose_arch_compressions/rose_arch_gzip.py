@@ -41,7 +41,8 @@ class RoseArchGzip:
             name_gz = source.name + "." + target.compress_scheme
             work_path_gz = os.path.join(work_dir, name_gz)
             self.app_runner.fs_util.makedirs(
-                self.app_runner.fs_util.dirname(work_path_gz))
+                self.app_runner.fs_util.dirname(work_path_gz)
+            )
             # N.B. Python's gzip is slow
             command = "gzip -c '%s' >'%s'" % (source.path, work_path_gz)
             self.app_runner.popen.run_simple(command, shell=True)

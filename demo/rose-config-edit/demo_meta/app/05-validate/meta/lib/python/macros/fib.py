@@ -29,17 +29,16 @@ class FibonacciChecker(metomi.rose.macro.MacroBase):
         if all([w.isdigit() for w in elems]) and len(elems) > 1:
             int_elems = [int(w) for w in elems]
             if len(int_elems) >= 2 and int_elems[:2] != seq:
-                self.add_report(section, option, value,
-                                self.BAD_SEQUENCE)
+                self.add_report(section, option, value, self.BAD_SEQUENCE)
             else:
                 for i, element in enumerate(int_elems):
                     if i < 2:
                         continue
                     if element != int_elems[i - 1] + int_elems[i - 2]:
-                        self.add_report(section, option, value,
-                                        self.BAD_SEQUENCE)
+                        self.add_report(
+                            section, option, value, self.BAD_SEQUENCE
+                        )
                         break
         else:
-            self.add_report(section, option, value,
-                            self.BAD_SEQUENCE)
+            self.add_report(section, option, value, self.BAD_SEQUENCE)
         return self.reports

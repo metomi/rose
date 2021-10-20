@@ -17,8 +17,10 @@ def main():
         print(("{0} | {1} | {2}".format(itask + 1, *task)))
 
     # Print out the comparison entries
-    res = conn.execute("SELECT comp_task, kgo_file, suite_file, "
-                       "status, comparison FROM comparisons")
+    res = conn.execute(
+        "SELECT comp_task, kgo_file, suite_file, "
+        "status, comparison FROM comparisons"
+    )
     for icomparison, comparison in enumerate(res.fetchall()):
         print(("{0} | ".format(icomparison + 1) + " | ".join(comparison)))
 

@@ -33,4 +33,4 @@ def test_trigger_file():
     meta.set(keys=['namelist:foo=switch', 'trigger'], value='file:foo: .true.')
 
     _, reports = TriggerMacro().transform(config, meta)
-    assert(reports[0].info == 'enabled      -> trig-ignored')
+    assert reports[0].info == 'enabled      -> trig-ignored'

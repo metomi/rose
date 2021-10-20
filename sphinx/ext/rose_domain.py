@@ -136,23 +136,23 @@ from metomi.rose import config
 LOGGER = logging.getLogger(__name__)
 
 ROSE_DOMAIN_REGEX = re.compile(  # Regex for a fully qualified Rose domain.
-    r'rose:(\w+):'    # Rose domain prefix + object type.
+    r'rose:(\w+):'  # Rose domain prefix + object type.
     r'([^\|\[ \n]+)'  # Configuration file.
-    r'(\[.*\])?'      # Configuration section.
-    r'(?:\|?(.*))?'   # Configuration setting.
+    r'(\[.*\])?'  # Configuration section.
+    r'(?:\|?(.*))?'  # Configuration setting.
 )
 SECTION_REGEX = re.compile(  # Regex for splitting sections and settings.
     r'(\[.*\])(.*)'
 )
 OPT_ARG_REGEX = re.compile(  # Regex for splitting domains and arguments
     r'(^(?:[^\[\|=]+)?'  # Configuration file.
-    r'(?:\[[^\]]+\])?'   # Configuration section.
-    r'(?:[^=]+)?)'       # Configuration setting.
-    r'(?:=(.*))?$'       # Argument.
+    r'(?:\[[^\]]+\])?'  # Configuration section.
+    r'(?:[^=]+)?)'  # Configuration setting.
+    r'(?:=(.*))?$'  # Argument.
 )
 CROSS_DOMAIN_REGEX = re.compile(  # Catch leading target from inter-sphinx ref.
     r'^([\w\-]+)'  # inter-sphinx mapping
-    r':'            # colon divider
+    r':'  # colon divider
     r'([\w\-].*)$'  # rose object reference
 )
 
@@ -282,7 +282,7 @@ TOKEN_ORDER = [
     ('rose:file', 'rose:file'),
     ('rose:app', 'rose:app'),
     ('rose:conf-section', 'rose:conf'),
-    ('rose:conf', 'rose:conf')
+    ('rose:conf', 'rose:conf'),
 ]
 
 
@@ -378,8 +378,9 @@ class RoseDirective(ObjectDescription):
         # Add a marker on the output node so we can determine the context
         # namespace later (see RoseDomain.resolve_xref).
         context_var = self.ROSE_CONTEXT % self.NAME
-        cont_node.ref_context = {context_var: self.process_name(
-            self.arguments[0].strip())[0]}
+        cont_node.ref_context = {
+            context_var: self.process_name(self.arguments[0].strip())[0]
+        }
 
         # Add children if initialised via python - see RoseAutoDirective.
         block = block_quote()  # Create indented section.
@@ -412,8 +413,9 @@ class RoseDirective(ObjectDescription):
         """
         ref_context = self.state.document.settings.env.ref_context
         context_var = self.ROSE_CONTEXT % key
-        ref_context[context_var] = (
-            self.process_name(self.arguments[0].strip())[0])
+        ref_context[context_var] = self.process_name(
+            self.arguments[0].strip()
+        )[0]
         self.ref_context_to_remove.append(key)
 
     def remove_ref_context(self, key):
@@ -426,7 +428,8 @@ class RoseDirective(ObjectDescription):
         ref_context = self.state.document.settings.env.ref_context
         context_var = self.ROSE_CONTEXT % key
         if ref_context.get(context_var) == (
-                self.process_name(self.arguments[0].strip())[0]):
+            self.process_name(self.arguments[0].strip())[0]
+        ):
             del ref_context[context_var]
 
     def get_ref_context(self, key):
@@ -513,7 +516,8 @@ class RoseDirective(ObjectDescription):
         # Add alternate object names.
         if alt_forms:
             signode += addnodes.desc_annotation(
-                *(self.ALT_FORM_TEMPLATE % (', '.join(alt_forms)),) * 2)
+                *(self.ALT_FORM_TEMPLATE % (', '.join(alt_forms)),) * 2
+            )
 
         signode['fullname'] = sig
         return (sig, self.NAME, sig)
@@ -546,13 +550,17 @@ class RoseDirective(ObjectDescription):
         # Generate a namespace from the tokens.
         namespace = namespace_from_tokens(context_tokens)
         if namespace is False:
-            LOGGER.error('Invalid namespace for Rose object "%s"' % namespace,
-                         location=signode)
+            LOGGER.error(
+                'Invalid namespace for Rose object "%s"' % namespace,
+                location=signode,
+            )
 
         # Register this namespace.
         signode['ids'].append(namespace)
         self.env.domaindata['rose']['objects'][namespace] = (
-            self.env.docname, '')
+            self.env.docname,
+            '',
+        )
 
     def get_index_text(self, modname, name):
         return ''
@@ -634,6 +642,7 @@ class RoseConfigDirective(RoseDirective):
 
                  A config called ``[bar]baz``.
     """
+
     NAME = 'conf'
     LABEL = 'Config'
     SECTION_REF_CONTEXT = 'conf-section'
@@ -643,21 +652,36 @@ class RoseConfigDirective(RoseDirective):
     # Add custom fields.
     doc_field_types = [
         # NOTE: The field label must be sort to avoid causing a line break.
-        Field('envvar', label='Env Var', has_arg=False, names=('env',),
-              bodyrolename='obj'),
-        Field('compulsory', label='Compulsory', has_arg=True,
-              names=('compulsory',)),
+        Field(
+            'envvar',
+            label='Env Var',
+            has_arg=False,
+            names=('env',),
+            bodyrolename='obj',
+        ),
+        Field(
+            'compulsory',
+            label='Compulsory',
+            has_arg=True,
+            names=('compulsory',),
+        ),
         Field('default', label='Default', has_arg=False, names=('default',)),
-        TypedField('option', label='Options', names=('opt',),
-                   typerolename='obj', typenames=('paramtype', 'type'),
-                   can_collapse=True)
+        TypedField(
+            'option',
+            label='Options',
+            names=('opt',),
+            typerolename='obj',
+            typenames=('paramtype', 'type'),
+            can_collapse=True,
+        ),
     ]
 
     def run(self):
         """Overridden to add the :rose:conf-section: ``ref_context`` variable
         for nested sections."""
-        if self.registered_children or any('.. rose:conf::' in line for
-                                           line in self.content):
+        if self.registered_children or any(
+            '.. rose:conf::' in line for line in self.content
+        ):
             # This configuration contains other configurations i.e. it is a
             # configuration section. Apply a custom_name_template so that it is
             # written inside square brackets.
@@ -718,14 +742,14 @@ class RoseDomain(Domain):
     object_types = {
         'app': ObjType('app', 'app', 'obj'),
         'file': ObjType('file', 'file', 'obj'),
-        'conf': ObjType('conf', 'conf', 'obj')
+        'conf': ObjType('conf', 'conf', 'obj'),
     }
     """List of object types, this should mirror ``directives``."""
 
     directives = {
         'app': RoseAppDirective,
         'file': RoseFileDirective,
-        'conf': RoseConfigDirective
+        'conf': RoseConfigDirective,
     }
     """List of domains associated with prefixes (e.g. ``app`` becomes the
     ``rose:app`` domain."""
@@ -733,15 +757,13 @@ class RoseDomain(Domain):
     roles = {
         'app': RoseXRefRole(),
         'file': RoseXRefRole(),
-        'conf': RoseXRefRole()
+        'conf': RoseXRefRole(),
     }
     """Sphinx text roles associated with the domain. Text roles are required
     for referencing objects. There should be one role for each item in
     ``object_types``"""
 
-    initial_data = {
-        'objects': {}  # path: (docname, synopsis)
-    }
+    initial_data = {'objects': {}}  # path: (docname, synopsis)
     """This sets ``self.data`` on initialisation."""
 
     def clear_doc(self, docname):
@@ -791,8 +813,9 @@ class RoseDomain(Domain):
                 # 3. ref_name - The remainder of the reference.
                 _, type_, ref_name = obj_name.split(':', 2)
             except ValueError:
-                LOGGER.warning('Could not parse object reference for "%s"'
-                               % ref_name)
+                LOGGER.warning(
+                    'Could not parse object reference for "%s"' % ref_name
+                )
                 continue
             yield ref_name, ref_name, type_, doc_name, obj_name, 1
 
@@ -810,27 +833,35 @@ class RoseDomain(Domain):
         """
         try:
             # Get the inter-sphinx mapping.
-            cross_target = env.config.intersphinx_mapping[
-                intersphinx_mapping][0]
+            cross_target = env.config.intersphinx_mapping[intersphinx_mapping][
+                0
+            ]
         except KeyError:
-            LOGGER.warning('Could not find inter-sphinx mapping for "%s"'
-                           % intersphinx_mapping)
+            LOGGER.warning(
+                'Could not find inter-sphinx mapping for "%s"'
+                % intersphinx_mapping
+            )
             return False
         except AttributeError:
-            LOGGER.warning('inter-sphinx required for cross-project '
-                           'references.')
+            LOGGER.warning(
+                'inter-sphinx required for cross-project ' 'references.'
+            )
             return False
         try:
             # Test that there is a rose object in that mapping.
             env.intersphinx_cache[cross_target][2]['rose:%s' % typ][target]
         except (IndexError, KeyError, ValueError):
-            LOGGER.warning('No Ref for "rose:%s:`%s:%s`"'
-                           % (typ, intersphinx_mapping, target), location=node)
+            LOGGER.warning(
+                'No Ref for "rose:%s:`%s:%s`"'
+                % (typ, intersphinx_mapping, target),
+                location=node,
+            )
             return False
         return True
 
-    def resolve_xref(self, env, fromdocname, builder, typ, target, node,
-                     contnode):
+    def resolve_xref(
+        self, env, fromdocname, builder, typ, target, node, contnode
+    ):
         """Associate a reference with a documented object.
 
         The important parameters are:
@@ -859,8 +890,9 @@ class RoseDomain(Domain):
             # This is a cross-reference to a Rose object in another Sphinx
             # project (via inter-sphinx).
             intersphinx_mapping, target = match.groups()
-            self.validate_external_xref(env, typ, target, node,
-                                        intersphinx_mapping)
+            self.validate_external_xref(
+                env, typ, target, node, intersphinx_mapping
+            )
             # The reference itself is handled somewhere else.
             return
 
@@ -880,27 +912,33 @@ class RoseDomain(Domain):
 
             # Get the referenced namespace in tokenised form.
             reference_namespace = tokenise_namespace(
-                'rose:%s:%s' % (typ, target))
+                'rose:%s:%s' % (typ, target)
+            )
             if reference_namespace[0][0] in ['rose:app', 'rose:file']:
                 # Target is a root rose config - path is absolute.
                 namespace = 'rose:%s:%s' % (typ, target)
             else:
                 # Target is not a root config - path is relative.
                 context_namespace = tokens_from_ref_context(
-                    node['ref_context'])
+                    node['ref_context']
+                )
                 if not context_namespace:
                     LOGGER.warning(
-                        'Relative reference requires local context ' +
-                        '"%s".' % (target), location=node)
+                        'Relative reference requires local context '
+                        + '"%s".' % (target),
+                        location=node,
+                    )
                     return
                 if relative_to_conf:
                     # Target is relative to the context conf_file.
-                    namespace_tokens = (context_namespace[:1] +
-                                        reference_namespace)
+                    namespace_tokens = (
+                        context_namespace[:1] + reference_namespace
+                    )
                 else:
                     # Target is relative to the current namespace.
-                    namespace_tokens = (context_namespace[:-1] +
-                                        reference_namespace)
+                    namespace_tokens = (
+                        context_namespace[:-1] + reference_namespace
+                    )
                 # Convert the tokenised namespace into a string namespace.
                 namespace = namespace_from_tokens(namespace_tokens)
 
@@ -913,8 +951,9 @@ class RoseDomain(Domain):
             return None
 
         # Create a link pointing at the object.
-        return make_refnode(builder, fromdocname, data[0], namespace,
-                            contnode, namespace)
+        return make_refnode(
+            builder, fromdocname, data[0], namespace, contnode, namespace
+        )
 
 
 class RoseAutoDirective(Directive):
@@ -933,6 +972,7 @@ class RoseAutoDirective(Directive):
 
               .. autoconfig:: path/to/foo.conf
     """
+
     option_spec = {}
     required_arguments = 1
     domain = 'rose'
@@ -945,24 +985,23 @@ class RoseAutoDirective(Directive):
             conf = config.load(filename)
         except config.ConfigSyntaxError:
             LOGGER.error(
-                'Syntax error in Rose configuration file "%s".' % filename)
+                'Syntax error in Rose configuration file "%s".' % filename
+            )
             raise
 
         nodes = []
-        nodes.append(addnodes.highlightlang(
-            lang='rose',
-            force=False,
-            linenothreshold=20
-        ))
+        nodes.append(
+            addnodes.highlightlang(
+                lang='rose', force=False, linenothreshold=20
+            )
+        )
 
         # Append file level comments if present.
         if conf.comments:
             contentnode = addnodes.desc_content()
             contentnode.document = self.state.document
             self.state.nested_parse(
-                StringList(conf.comments),
-                self.content_offset,
-                contentnode
+                StringList(conf.comments), self.content_offset, contentnode
             )
             nodes.append(contentnode)
 
@@ -1003,11 +1042,11 @@ class RoseAutoDirective(Directive):
             node.append(section.run()[1])
         nodes.append(node)
 
-        nodes.append(addnodes.highlightlang(
-            lang='bash',
-            force=False,
-            linenothreshold=20
-        ))
+        nodes.append(
+            addnodes.highlightlang(
+                lang='bash', force=False, linenothreshold=20
+            )
+        )
 
         return nodes
 

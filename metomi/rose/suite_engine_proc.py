@@ -70,16 +70,20 @@ class OldFormatCycleOffset(BaseCycleOffset):
 
     """Represent a cycle time offset, back compat syntax."""
 
-    KEYS = {"W": ("days", 7),
-            "D": ("days", 1),
-            "H": ("hours", 1),
-            "M": ("minutes", 1)}
-    REC_TEXT = re.compile(r"\A"
-                          r"(?P<sign>__)?"
-                          r"(?P<is_time>T)?"
-                          r"(?P<amount>\d+)"
-                          r"(?P<unit>(?(is_time)[SMH]|[DW]))?"
-                          r"\Z")
+    KEYS = {
+        "W": ("days", 7),
+        "D": ("days", 1),
+        "H": ("hours", 1),
+        "M": ("minutes", 1),
+    }
+    REC_TEXT = re.compile(
+        r"\A"
+        r"(?P<sign>__)?"
+        r"(?P<is_time>T)?"
+        r"(?P<amount>\d+)"
+        r"(?P<unit>(?(is_time)[SMH]|[DW]))?"
+        r"\Z"
+    )
     SIGN_DEFAULT = ""
 
     def __init__(self, offset_text):
@@ -201,22 +205,24 @@ class TaskProps:
 
     """
 
-    ATTRS = {"suite_name": "ROSE_SUITE_NAME",
-             "suite_dir_rel": "ROSE_SUITE_DIR_REL",
-             "suite_dir": "ROSE_SUITE_DIR",
-             "task_id": "ROSE_TASK_ID",
-             "task_name": "ROSE_TASK_NAME",
-             "task_prefix": "ROSE_TASK_PREFIX",
-             "task_suffix": "ROSE_TASK_SUFFIX",
-             "cycling_mode": "ROSE_CYCLING_MODE",
-             "task_cycle_time": "ROSE_TASK_CYCLE_TIME",
-             "task_log_dir": "ROSE_TASK_LOG_DIR",
-             "task_log_root": "ROSE_TASK_LOG_ROOT",
-             "task_is_cold_start": "ROSE_TASK_IS_COLD_START",
-             "dir_data": "ROSE_DATA",
-             "dir_data_cycle": "ROSE_DATAC",
-             "dir_data_cycle_offsets": "ROSE_DATAC%s",
-             "dir_etc": "ROSE_ETC"}
+    ATTRS = {
+        "suite_name": "ROSE_SUITE_NAME",
+        "suite_dir_rel": "ROSE_SUITE_DIR_REL",
+        "suite_dir": "ROSE_SUITE_DIR",
+        "task_id": "ROSE_TASK_ID",
+        "task_name": "ROSE_TASK_NAME",
+        "task_prefix": "ROSE_TASK_PREFIX",
+        "task_suffix": "ROSE_TASK_SUFFIX",
+        "cycling_mode": "ROSE_CYCLING_MODE",
+        "task_cycle_time": "ROSE_TASK_CYCLE_TIME",
+        "task_log_dir": "ROSE_TASK_LOG_DIR",
+        "task_log_root": "ROSE_TASK_LOG_ROOT",
+        "task_is_cold_start": "ROSE_TASK_IS_COLD_START",
+        "dir_data": "ROSE_DATA",
+        "dir_data_cycle": "ROSE_DATAC",
+        "dir_data_cycle_offsets": "ROSE_DATAC%s",
+        "dir_etc": "ROSE_ETC",
+    }
 
     def __init__(self, **kwargs):
         for attr_key, env_key in self.ATTRS.items():
@@ -230,7 +236,8 @@ class TaskProps:
                         continue
                     try:
                         cycle_offset = get_cycle_offset(
-                            key.replace(prefix, ""))
+                            key.replace(prefix, "")
+                        )
                     except ValueError:
                         continue
                     getattr(self, attr_key)[cycle_offset] = value
@@ -267,24 +274,43 @@ class SuiteEngineProcessor:
     TIMEOUT = 5  # seconds
 
     @classmethod
-    def get_processor(cls, key=None, event_handler=None, popen=None,
-                      fs_util=None, host_selector=None):
+    def get_processor(
+        cls,
+        key=None,
+        event_handler=None,
+        popen=None,
+        fs_util=None,
+        host_selector=None,
+    ):
         """Return a processor for the suite engine named by "key"."""
 
         if cls.SCHEME_HANDLER_MANAGER is None:
             path = os.path.dirname(
-                os.path.dirname(sys.modules["metomi.rose"].__file__))
+                os.path.dirname(sys.modules["metomi.rose"].__file__)
+            )
             cls.SCHEME_HANDLER_MANAGER = SchemeHandlersManager(
-                [path], ns="rose.suite_engine_procs", attrs=["SCHEME"],
-                can_handle=None, event_handler=event_handler, popen=popen,
-                fs_util=fs_util, host_selector=host_selector)
+                [path],
+                ns="rose.suite_engine_procs",
+                attrs=["SCHEME"],
+                can_handle=None,
+                event_handler=event_handler,
+                popen=popen,
+                fs_util=fs_util,
+                host_selector=host_selector,
+            )
         if key is None:
             key = cls.SCHEME_DEFAULT
         x = cls.SCHEME_HANDLER_MANAGER.get_handler(key)
         return x
 
-    def __init__(self, event_handler=None, popen=None, fs_util=None,
-                 host_selector=None, **_):
+    def __init__(
+        self,
+        event_handler=None,
+        popen=None,
+        fs_util=None,
+        host_selector=None,
+        **_
+    ):
         self.event_handler = event_handler
         if popen is None:
             popen = RosePopener(event_handler)
@@ -303,8 +329,9 @@ class SuiteEngineProcessor:
         paths -- if specified, are added to the end of the path.
 
         """
-        return os.path.join(os.path.expanduser("~"),
-                            self.get_suite_dir_rel(suite_name, *paths))
+        return os.path.join(
+            os.path.expanduser("~"), self.get_suite_dir_rel(suite_name, *paths)
+        )
 
     def get_suite_dir_rel(self, suite_name, *paths):
         """Return the relative path to the suite running directory.
@@ -348,7 +375,8 @@ class SuiteEngineProcessor:
             else:
                 if tprops.task_cycle_time:
                     tprops.task_cycle_time = self._get_offset_cycle_time(
-                        tprops.task_cycle_time, cycle_offset)
+                        tprops.task_cycle_time, cycle_offset
+                    )
                 else:
                     tprops.task_cycle_time = kwargs["cycle"]
 
@@ -361,7 +389,8 @@ class SuiteEngineProcessor:
         if tprops.task_cycle_time is not None:
             task_cycle_time = tprops.task_cycle_time
             tprops.dir_data_cycle = os.path.join(
-                tprops.suite_dir, "share", "cycle", str(task_cycle_time))
+                tprops.suite_dir, "share", "cycle", str(task_cycle_time)
+            )
 
             # Offset cycles
             if kwargs.get("cycle_offsets"):
@@ -377,21 +406,25 @@ class SuiteEngineProcessor:
                             sign_factor = -1
                         offset_val = cycle_offset.replace("__", "")
                         cycle_time = str(
-                            int(task_cycle_time) +
-                            sign_factor * int(offset_val.replace("P", "")))
+                            int(task_cycle_time)
+                            + sign_factor * int(offset_val.replace("P", ""))
+                        )
                     else:
                         cycle_offset = get_cycle_offset(value)
                         cycle_time = self._get_offset_cycle_time(
-                            task_cycle_time, cycle_offset)
-                    tprops.dir_data_cycle_offsets[str(cycle_offset)] = (
-                        os.path.join(
-                            tprops.suite_dir, "share", "cycle", cycle_time))
+                            task_cycle_time, cycle_offset
+                        )
+                    tprops.dir_data_cycle_offsets[
+                        str(cycle_offset)
+                    ] = os.path.join(
+                        tprops.suite_dir, "share", "cycle", cycle_time
+                    )
 
         # Create data directories if necessary
         # Note: should we create the offsets directories?
-        for dir_ in (
-                [tprops.dir_data, tprops.dir_data_cycle] +
-                list(tprops.dir_data_cycle_offsets.values())):
+        for dir_ in [tprops.dir_data, tprops.dir_data_cycle] + list(
+            tprops.dir_data_cycle_offsets.values()
+        ):
             if dir_ is None:
                 continue
             if os.path.exists(dir_) and not os.path.isdir(dir_):
@@ -399,8 +432,10 @@ class SuiteEngineProcessor:
             self.fs_util.makedirs(dir_)
 
         # Task prefix and suffix
-        for key, split, index in [("prefix", str.split, 0),
-                                  ("suffix", str.rsplit, 1)]:
+        for key, split, index in [
+            ("prefix", str.split, 0),
+            ("suffix", str.rsplit, 1),
+        ]:
             delim = self.TASK_NAME_DELIM[key]
             if kwargs.get(key + "_delim"):
                 delim = kwargs.get(key + "_delim")
@@ -432,8 +467,9 @@ class SuiteEngineProcessor:
         """
         raise NotImplementedError()
 
-    def job_logs_pull_remote(self, suite_name, items,
-                             prune_remote_mode=False, force_mode=False):
+    def job_logs_pull_remote(
+        self, suite_name, items, prune_remote_mode=False, force_mode=False
+    ):
         """Pull and housekeep the job logs on remote task hosts.
 
         suite_name -- The name of a suite.

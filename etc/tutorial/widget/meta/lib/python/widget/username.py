@@ -10,6 +10,7 @@ Classes:
 from functools import partial
 
 import pygtk
+
 pygtk.require('2.0')
 # flake8: noqa: E402
 import gtk
@@ -31,10 +32,8 @@ class UsernameValueWidget(gtk.HBox):
         self.entry.connect_after("key-release-event", self._setter)
         self.entry.connect_after("button-release-event", self._setter)
         self.entry.show()
-        self.pack_start(self.entry, expand=True, fill=True,
-                        padding=0)
-        self.entry.connect('focus-in-event',
-                           hook.trigger_scroll)
+        self.pack_start(self.entry, expand=True, fill=True, padding=0)
+        self.entry.connect('focus-in-event', hook.trigger_scroll)
         self.grab_focus = partial(hook.get_focus, self.entry)
 
     def _setter(self, *args):

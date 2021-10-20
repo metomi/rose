@@ -43,15 +43,18 @@ class SvnLocHandler:
         scheme = urlparse(loc.name).scheme
         if scheme in self.SCHEMES:
             return True
-        return (scheme in self.WEB_SCHEMES and
-                not os.path.exists(loc.name) and
-                not self.manager.popen.run(self.svn, "info", loc.name)[0])
+        return (
+            scheme in self.WEB_SCHEMES
+            and not os.path.exists(loc.name)
+            and not self.manager.popen.run(self.svn, "info", loc.name)[0]
+        )
 
     def parse(self, loc, conf_tree):
         """Set loc.real_name, loc.scheme, loc.loc_type."""
         loc.scheme = self.SCHEMES[0]
         ret_code, xml_str = self.manager.popen.run(
-            self.svn, "info", "--xml", loc.name)[0:2]
+            self.svn, "info", "--xml", loc.name
+        )[0:2]
         if ret_code:
             raise ValueError(loc.name)
         info_entry = SvnInfoXMLParser()(xml_str)
@@ -67,7 +70,8 @@ class SvnLocHandler:
         if not loc.real_name:
             self.parse(loc, conf_tree)
         await self.manager.popen.run_ok_async(
-            "svn", "export", "-q", loc.real_name, loc.cache)
+            "svn", "export", "-q", loc.real_name, loc.cache
+        )
 
 
 class SvnInfoXMLParser:

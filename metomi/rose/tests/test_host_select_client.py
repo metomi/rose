@@ -25,11 +25,15 @@ def test_empty(monkeypatch, capsys):
     """It should not return any results for an empty request."""
     monkeypatch.setattr(
         'sys.stdin',
-        StringIO(dedent('''
+        StringIO(
+            dedent(
+                '''
         **start**
         []
         **end**
-        '''))
+        '''
+            )
+        ),
     )
     host_select()
     captured = capsys.readouterr()
@@ -44,13 +48,17 @@ def test_stdin_pollution(monkeypatch, capsys):
     """
     monkeypatch.setattr(
         'sys.stdin',
-        StringIO(dedent('''
+        StringIO(
+            dedent(
+                '''
         hello
         *&^%$**start**
         []
         **end***&^%$E
         world
-        '''))
+        '''
+            )
+        ),
     )
     host_select()
     captured = capsys.readouterr()
@@ -62,11 +70,15 @@ def test_request(monkeypatch, capsys):
     """Test a simple request."""
     monkeypatch.setattr(
         'sys.stdin',
-        StringIO(dedent('''
+        StringIO(
+            dedent(
+                '''
         **start**
         [["virtual_memory"]]
         **end**
-        '''))
+        '''
+            )
+        ),
     )
     host_select()
     captured = capsys.readouterr()

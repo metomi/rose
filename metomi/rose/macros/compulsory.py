@@ -34,12 +34,15 @@ class CompulsoryChecker(metomi.rose.macro.MacroBaseRoseEdit):
 
     """
 
-    WARNING_COMPULSORY_SECT_MISSING = ('Section set as compulsory, but '
-                                       'not in configuration.')
-    WARNING_COMPULSORY_OPT_MISSING = ('Variable set as compulsory, but '
-                                      'not in configuration.')
-    WARNING_COMPULSORY_USER_IGNORED = ('Compulsory settings should not be '
-                                       'user-ignored.')
+    WARNING_COMPULSORY_SECT_MISSING = (
+        'Section set as compulsory, but ' 'not in configuration.'
+    )
+    WARNING_COMPULSORY_OPT_MISSING = (
+        'Variable set as compulsory, but ' 'not in configuration.'
+    )
+    WARNING_COMPULSORY_USER_IGNORED = (
+        'Compulsory settings should not be ' 'user-ignored.'
+    )
 
     def __init__(self, *args, **kwargs):
         self.basic_section_aliases = {}
@@ -54,27 +57,37 @@ class CompulsoryChecker(metomi.rose.macro.MacroBaseRoseEdit):
         for setting_id, sect_node in meta_config.value.items():
             if sect_node.is_ignored() or isinstance(sect_node.value, str):
                 continue
-            if (sect_node.get_value([metomi.rose.META_PROP_COMPULSORY]) ==
-                    metomi.rose.META_PROP_VALUE_TRUE):
-                config_sect, config_opt = (
-                    self._get_section_option_from_id(setting_id))
+            if (
+                sect_node.get_value([metomi.rose.META_PROP_COMPULSORY])
+                == metomi.rose.META_PROP_VALUE_TRUE
+            ):
+                config_sect, config_opt = self._get_section_option_from_id(
+                    setting_id
+                )
                 compulsory_data.setdefault(
                     config_sect,
-                    {_SECTION_IS_COMPULSORY_KEY: False,
-                     _REPORTED_SECTION_KEY: config_sect,
-                     _OPTIONS_KEY: []}
+                    {
+                        _SECTION_IS_COMPULSORY_KEY: False,
+                        _REPORTED_SECTION_KEY: config_sect,
+                        _OPTIONS_KEY: [],
+                    },
                 )
                 if config_opt is None:
                     compulsory_data[config_sect][
-                        _SECTION_IS_COMPULSORY_KEY] = True
+                        _SECTION_IS_COMPULSORY_KEY
+                    ] = True
                 else:
                     compulsory_data[config_sect][_OPTIONS_KEY].append(
-                        config_opt)
-                if (sect_node.get_value([metomi.rose.META_PROP_DUPLICATE]) ==
-                        metomi.rose.META_PROP_VALUE_TRUE):
-                    compulsory_data[config_sect][_REPORTED_SECTION_KEY] = (
-                        config_sect + "({0})".format(
-                            metomi.rose.CONFIG_SETTING_INDEX_DEFAULT)
+                        config_opt
+                    )
+                if (
+                    sect_node.get_value([metomi.rose.META_PROP_DUPLICATE])
+                    == metomi.rose.META_PROP_VALUE_TRUE
+                ):
+                    compulsory_data[config_sect][
+                        _REPORTED_SECTION_KEY
+                    ] = config_sect + "({0})".format(
+                        metomi.rose.CONFIG_SETTING_INDEX_DEFAULT
                     )
         return compulsory_data
 
@@ -97,8 +110,9 @@ class CompulsoryChecker(metomi.rose.macro.MacroBaseRoseEdit):
         """
         return self.validate_settings(config_data, meta_config)
 
-    def validate_settings(self, config_data, meta_config,
-                          only_these_sections=None):
+    def validate_settings(
+        self, config_data, meta_config, only_these_sections=None
+    ):
         """Return a list of compulsory-related errors, if any.
 
         config_data - a metomi.rose.config.ConfigNode or a dictionary that
@@ -129,9 +143,11 @@ class CompulsoryChecker(metomi.rose.macro.MacroBaseRoseEdit):
             alias_sections_to_check = []
             for section in list(only_these_sections):
                 basic_sections_to_check.extend(
-                    self.alias_section_to_basics.get(section, [section]))
+                    self.alias_section_to_basics.get(section, [section])
+                )
                 alias_sections_to_check.extend(
-                    self.basic_section_aliases.get(section, [section]))
+                    self.basic_section_aliases.get(section, [section])
+                )
         check_user_ignored_ids = []
         for basic_section in basic_sections_to_check:
             section_data = self.compulsory_data.get(basic_section)
@@ -142,7 +158,8 @@ class CompulsoryChecker(metomi.rose.macro.MacroBaseRoseEdit):
             # Find all sections in config_data that belong to basic_section.
             present_section_aliases = []
             for alias_section in self.basic_section_aliases.get(
-                    basic_section, []):
+                basic_section, []
+            ):
                 if self._get_config_has_id(config_data, alias_section):
                     present_section_aliases.append(alias_section)
                     if section_data[_SECTION_IS_COMPULSORY_KEY]:
@@ -152,8 +169,10 @@ class CompulsoryChecker(metomi.rose.macro.MacroBaseRoseEdit):
                 # No sections in config_data that belong to basic_section.
                 if section_data[_SECTION_IS_COMPULSORY_KEY]:
                     self.add_report(
-                        section_data[_REPORTED_SECTION_KEY], None, None,
-                        self.WARNING_COMPULSORY_SECT_MISSING
+                        section_data[_REPORTED_SECTION_KEY],
+                        None,
+                        None,
+                        self.WARNING_COMPULSORY_SECT_MISSING,
                     )
                 continue
 
@@ -163,50 +182,67 @@ class CompulsoryChecker(metomi.rose.macro.MacroBaseRoseEdit):
 
             # Check for compulsory options in the present sections.
             for alias_section in present_section_aliases:
-                if (only_these_sections is not None and
-                        alias_section not in alias_sections_to_check):
+                if (
+                    only_these_sections is not None
+                    and alias_section not in alias_sections_to_check
+                ):
                     continue
                 for option in section_data[_OPTIONS_KEY]:
                     present_option_aliases = []
                     for alias_option in self._get_config_section_options(
-                            config_data, alias_section):
-                        if (option == alias_option or
-                            (alias_option.startswith(option) and
-                             metomi.rose.macro.REC_ID_STRIP_DUPL.sub(
-                                 "", alias_option) == option)):
+                        config_data, alias_section
+                    ):
+                        if option == alias_option or (
+                            alias_option.startswith(option)
+                            and metomi.rose.macro.REC_ID_STRIP_DUPL.sub(
+                                "", alias_option
+                            )
+                            == option
+                        ):
                             setting_id = self._get_id_from_section_option(
-                                alias_section, alias_option)
+                                alias_section, alias_option
+                            )
                             check_user_ignored_ids.append(setting_id)
                             present_option_aliases.append(alias_option)
                     if not present_option_aliases:
                         self.add_report(
-                            alias_section, option, None,
-                            self.WARNING_COMPULSORY_OPT_MISSING
+                            alias_section,
+                            option,
+                            None,
+                            self.WARNING_COMPULSORY_OPT_MISSING,
                         )
         # Check that ids that we have found are not user-ignored.
         for setting_id in check_user_ignored_ids:
-            if (self._get_config_id_state(config_data, setting_id) ==
-                    metomi.rose.config.ConfigNode.STATE_USER_IGNORED):
+            if (
+                self._get_config_id_state(config_data, setting_id)
+                == metomi.rose.config.ConfigNode.STATE_USER_IGNORED
+            ):
                 value = self._get_config_id_value(config_data, setting_id)
                 section, option = self._get_section_option_from_id(setting_id)
-                self.add_report(section, option, value,
-                                self.WARNING_COMPULSORY_USER_IGNORED)
+                self.add_report(
+                    section,
+                    option,
+                    value,
+                    self.WARNING_COMPULSORY_USER_IGNORED,
+                )
         return self.reports
 
     def _generate_aliases_for_sections(self, config_data):
         """Generate maps of duplicate-vs-basic sections in config_data."""
         for section in self._get_config_sections(config_data):
             if section not in self.alias_section_to_basics:
-                basic_section_no_modifier = (
-                    metomi.rose.macro.REC_ID_STRIP.sub('', section))
+                basic_section_no_modifier = metomi.rose.macro.REC_ID_STRIP.sub(
+                    '', section
+                )
                 basic_section_keep_modifier = (
-                    metomi.rose.macro.REC_ID_STRIP_DUPL.sub('', section))
-                basic_sections = set([basic_section_no_modifier,
-                                      basic_section_keep_modifier])
+                    metomi.rose.macro.REC_ID_STRIP_DUPL.sub('', section)
+                )
+                basic_sections = set(
+                    [basic_section_no_modifier, basic_section_keep_modifier]
+                )
                 for basic_section in basic_sections:
                     self.alias_section_to_basics.setdefault(section, [])
-                    self.alias_section_to_basics[section].append(
-                        basic_section)
+                    self.alias_section_to_basics[section].append(basic_section)
                     self.basic_section_aliases.setdefault(basic_section, [])
                     self.basic_section_aliases[basic_section].append(section)
 
@@ -220,9 +256,9 @@ class CompulsoryChanger(metomi.rose.macro.MacroBase):
 
     """
 
-    ADD_COMPULSORY_SECT = ('Added compulsory section')
-    ADD_COMPULSORY_OPT = ('Added compulsory option')
-    ADD_MISSING_SECT = ('Added section for compulsory option')
+    ADD_COMPULSORY_SECT = 'Added compulsory section'
+    ADD_COMPULSORY_OPT = 'Added compulsory option'
+    ADD_MISSING_SECT = 'Added section for compulsory option'
 
     def transform(self, config, meta_config=None):
         """Return a config and a list of changes, if any."""
@@ -237,8 +273,7 @@ class CompulsoryChanger(metomi.rose.macro.MacroBase):
         for sect, opt in missing_sect_opts:
             if opt is None:
                 config.set([sect])
-                self.add_report(sect, opt, None,
-                                self.ADD_COMPULSORY_SECT)
+                self.add_report(sect, opt, None, self.ADD_COMPULSORY_SECT)
         problem_list = checker.validate(config, meta_config)
         missing_sect_opts = []
         for report in problem_list:
@@ -251,9 +286,9 @@ class CompulsoryChanger(metomi.rose.macro.MacroBase):
                 continue
             var_id = self._get_id_from_section_option(sect, opt)
             metadata = metomi.rose.macro.get_metadata_for_config_id(
-                var_id, meta_config)
+                var_id, meta_config
+            )
             value = metomi.rose.variable.get_value_from_metadata(metadata)
             config.set([sect, opt], value)
-            self.add_report(sect, opt, value,
-                            self.ADD_COMPULSORY_OPT)
+            self.add_report(sect, opt, value, self.ADD_COMPULSORY_OPT)
         return config, self.reports

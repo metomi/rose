@@ -47,15 +47,19 @@ def get_allowed_metadata_properties():
     """Return a list of allowed properties such as type or values."""
     properties = []
     for key in dir(metomi.rose):
-        if (key.startswith("META_PROP_") and
-                key not in ["META_PROP_VALUE_TRUE", "META_PROP_VALUE_FALSE"]):
+        if key.startswith("META_PROP_") and key not in [
+            "META_PROP_VALUE_TRUE",
+            "META_PROP_VALUE_FALSE",
+        ]:
             properties.append(getattr(metomi.rose, key))
     return properties
 
 
 def _check_compulsory(value):
-    allowed_values = [metomi.rose.META_PROP_VALUE_TRUE,
-                      metomi.rose.META_PROP_VALUE_FALSE]
+    allowed_values = [
+        metomi.rose.META_PROP_VALUE_TRUE,
+        metomi.rose.META_PROP_VALUE_FALSE,
+    ]
     if value not in allowed_values:
         return INVALID_SYNTAX.format(value)
 
@@ -67,16 +71,17 @@ def _check_copy_mode(value):
 
 
 def _check_duplicate(value):
-    allowed_values = [metomi.rose.META_PROP_VALUE_TRUE,
-                      metomi.rose.META_PROP_VALUE_FALSE]
+    allowed_values = [
+        metomi.rose.META_PROP_VALUE_TRUE,
+        metomi.rose.META_PROP_VALUE_FALSE,
+    ]
     if value not in allowed_values:
         return INVALID_SYNTAX.format(value)
 
 
 def _check_rule(value, setting_id, meta_config):
     evaluator = metomi.rose.macros.rule.RuleEvaluator()
-    ids_used = evaluator.evaluate_rule_id_usage(
-        value, setting_id, meta_config)
+    ids_used = evaluator.evaluate_rule_id_usage(value, setting_id, meta_config)
     ids_not_found = []
     for id_ in sorted(ids_used):
         id_to_find = metomi.rose.macro.REC_ID_STRIP.sub("", id_)
@@ -104,12 +109,14 @@ def _check_macro(value, module_files=None, meta_dir=None):
     for macro in macros:
         macro_name = macro
         method = None
-        if (macro.endswith("." + metomi.rose.macro.VALIDATE_METHOD) or
-                macro.endswith("." + metomi.rose.macro.TRANSFORM_METHOD)):
+        if macro.endswith(
+            "." + metomi.rose.macro.VALIDATE_METHOD
+        ) or macro.endswith("." + metomi.rose.macro.TRANSFORM_METHOD):
             macro_name, method = macro.rsplit(".", 1)
         try:
             macro_obj = metomi.rose.resource.import_object(
-                macro_name, module_files, _import_err_handler)
+                macro_name, module_files, _import_err_handler
+            )
         except Exception as exc:
             return INVALID_IMPORT.format(macro, type(exc).__name__, exc)
         if macro_obj is None:
@@ -137,7 +144,8 @@ def _check_range(value):
         evaluator = metomi.rose.macros.rule.RuleEvaluator()
         try:
             evaluator.evaluate_rule(
-                value, test_id, test_config, test_meta_config)
+                value, test_id, test_config, test_meta_config
+            )
         except metomi.rose.macros.rule.RuleValueError as exc:
             return INVALID_RANGE_RULE_IDS.format(exc)
         except Exception as exc:
@@ -154,14 +162,14 @@ def _check_range(value):
 def _check_value_titles(title_value, values_value):
     try:
         title_list = metomi.rose.variable.array_split(
-            title_value,
-            only_this_delim=",")
+            title_value, only_this_delim=","
+        )
     except Exception as exc:
         return INVALID_SYNTAX.format(type(exc).__name__ + ": " + str(exc))
     try:
         value_list = metomi.rose.variable.array_split(
-            values_value,
-            only_this_delim=",")
+            values_value, only_this_delim=","
+        )
     except Exception:
         return INCOMPATIBLE.format(metomi.rose.META_PROP_VALUES)
     if len(title_list) != len(value_list):
@@ -195,8 +203,8 @@ def _check_value_hints(hints_value):
     """Checks that the input is a valid format"""
     try:
         hints_list = metomi.rose.variable.array_split(
-            hints_value,
-            only_this_delim=",")
+            hints_value, only_this_delim=","
+        )
     except Exception as exc:
         return INVALID_SYNTAX.format(type(exc).__name__ + ": " + str(exc))
     if not hints_list:
@@ -204,8 +212,7 @@ def _check_value_hints(hints_value):
 
 
 def _check_widget(value, module_files=None, meta_dir=None):
-    """Check widget setting is OK.
-    """
+    """Check widget setting is OK."""
     if module_files is None:
         module_files = _get_module_files(meta_dir)
     if not module_files:
@@ -213,7 +220,8 @@ def _check_widget(value, module_files=None, meta_dir=None):
     widget_name = value.split()[0]
     try:
         widget = metomi.rose.resource.import_object(
-            widget_name, module_files, _import_err_handler)
+            widget_name, module_files, _import_err_handler
+        )
     except Exception as exc:
         return INVALID_IMPORT.format(widget_name, type(exc).__name__, exc)
     if widget is None:
@@ -231,14 +239,18 @@ def _get_module_files(meta_dir=None):
                 for filename in filenames:
                     if filename.endswith(".py"):
                         abs_filename = os.path.abspath(
-                            os.path.join(dirpath, filename))
+                            os.path.join(dirpath, filename)
+                        )
                         module_files.append(abs_filename)
     return module_files
 
 
-def metadata_check(meta_config, meta_dir=None,
-                   only_these_sections=None,
-                   only_these_properties=None):
+def metadata_check(
+    meta_config,
+    meta_dir=None,
+    only_these_sections=None,
+    only_these_properties=None,
+):
     """Check metadata validity."""
     allowed_properties = get_allowed_metadata_properties()
     reports = []
@@ -249,52 +261,72 @@ def metadata_check(meta_config, meta_dir=None,
         node = meta_config.value[section]
         if node.is_ignored() or not isinstance(node.value, dict):
             continue
-        if (only_these_sections is not None and
-                section not in only_these_sections):
+        if (
+            only_these_sections is not None
+            and section not in only_these_sections
+        ):
             continue
-        if node.get(
-                [metomi.rose.META_PROP_VALUES], no_ignore=True) is not None:
+        if (
+            node.get([metomi.rose.META_PROP_VALUES], no_ignore=True)
+            is not None
+        ):
             # 'values' supercedes other type-like props, so don't use them.
-            for type_like_prop in [metomi.rose.META_PROP_PATTERN,
-                                   metomi.rose.META_PROP_RANGE,
-                                   metomi.rose.META_PROP_TYPE]:
+            for type_like_prop in [
+                metomi.rose.META_PROP_PATTERN,
+                metomi.rose.META_PROP_RANGE,
+                metomi.rose.META_PROP_TYPE,
+            ]:
                 if node.get([type_like_prop], no_ignore=True) is not None:
                     info = UNNECESSARY_VALUES_PROP
                     value = node.get([type_like_prop]).value
-                    reports.append(metomi.rose.macro.MacroReport(
-                        section, type_like_prop, value, info))
+                    reports.append(
+                        metomi.rose.macro.MacroReport(
+                            section, type_like_prop, value, info
+                        )
+                    )
         if node.get_value([metomi.rose.META_PROP_TYPE]) == "python_list":
             if node.get_value([metomi.rose.META_PROP_LENGTH]):
                 info = INCOMPATIBLE.format(metomi.rose.META_PROP_TYPE)
                 value = node.get_value([metomi.rose.META_PROP_LENGTH])
-                reports.append(metomi.rose.macro.MacroReport(
-                    section, metomi.rose.META_PROP_LENGTH, value, info))
+                reports.append(
+                    metomi.rose.macro.MacroReport(
+                        section, metomi.rose.META_PROP_LENGTH, value, info
+                    )
+                )
         options = list(node.value)
         options.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         for option in options:
             opt_node = node.value[option]
-            if ((only_these_properties is not None and
-                 option not in only_these_properties) or
-                    opt_node.is_ignored()):
+            if (
+                only_these_properties is not None
+                and option not in only_these_properties
+            ) or opt_node.is_ignored():
                 continue
             value = opt_node.value
-            if (option not in allowed_properties and
-                    not option.startswith(metomi.rose.META_PROP_WIDGET)):
+            if option not in allowed_properties and not option.startswith(
+                metomi.rose.META_PROP_WIDGET
+            ):
                 info = UNKNOWN_PROP.format(option)
-                reports.append(metomi.rose.macro.MacroReport(
-                    section, option, value, info))
+                reports.append(
+                    metomi.rose.macro.MacroReport(section, option, value, info)
+                )
             if section.split('=')[0] == 'ns':
-                allowed = [metomi.rose.META_PROP_TITLE,
-                           metomi.rose.META_PROP_DESCRIPTION,
-                           metomi.rose.META_PROP_HELP,
-                           metomi.rose.META_PROP_SORT_KEY,
-                           metomi.rose.META_PROP_MACRO,
-                           metomi.rose.META_PROP_URL,
-                           metomi.rose.META_PROP_WIDGET]
+                allowed = [
+                    metomi.rose.META_PROP_TITLE,
+                    metomi.rose.META_PROP_DESCRIPTION,
+                    metomi.rose.META_PROP_HELP,
+                    metomi.rose.META_PROP_SORT_KEY,
+                    metomi.rose.META_PROP_MACRO,
+                    metomi.rose.META_PROP_URL,
+                    metomi.rose.META_PROP_WIDGET,
+                ]
                 if option not in allowed:
                     info = INVALID_SETTING_FOR_NAMESPACE.format(option)
-                    reports.append(metomi.rose.macro.MacroReport(
-                        section, option, value, info))
+                    reports.append(
+                        metomi.rose.macro.MacroReport(
+                            section, option, value, info
+                        )
+                    )
             if option.startswith(metomi.rose.META_PROP_WIDGET):
                 check_func = partial(_check_widget, module_files=module_files)
             elif option == metomi.rose.META_PROP_MACRO:
@@ -302,44 +334,56 @@ def metadata_check(meta_config, meta_dir=None,
             elif option == metomi.rose.META_PROP_VALUE_TITLES:
                 check_func = partial(
                     _check_value_titles,
-                    values_value=node.get_value([metomi.rose.META_PROP_VALUES])
+                    values_value=node.get_value(
+                        [metomi.rose.META_PROP_VALUES]
+                    ),
                 )
-            elif option in [metomi.rose.META_PROP_FAIL_IF,
-                            metomi.rose.META_PROP_WARN_IF]:
+            elif option in [
+                metomi.rose.META_PROP_FAIL_IF,
+                metomi.rose.META_PROP_WARN_IF,
+            ]:
                 check_func = partial(
-                    _check_rule, setting_id=section, meta_config=meta_config)
+                    _check_rule, setting_id=section, meta_config=meta_config
+                )
             else:
                 func_name = "_check_" + option.replace("-", "_")
                 check_func = globals().get(func_name, lambda v: None)
             info = check_func(value)
             if info:
-                reports.append(metomi.rose.macro.MacroReport(
-                    section, option, value, info))
+                reports.append(
+                    metomi.rose.macro.MacroReport(section, option, value, info)
+                )
     # Check triggering.
     trigger_macro = metomi.rose.macros.trigger.TriggerMacro()
     # The .validate method will be replaced in a forthcoming enhancement.
-    trig_reports = trigger_macro.validate(metomi.rose.config.ConfigNode(),
-                                          meta_config=meta_config)
+    trig_reports = trigger_macro.validate(
+        metomi.rose.config.ConfigNode(), meta_config=meta_config
+    )
     for report in trig_reports:
         if report.option is None:
             new_rep_section = report.section
         else:
-            new_rep_section = (report.section + metomi.rose.CONFIG_DELIMITER +
-                               report.option)
+            new_rep_section = (
+                report.section + metomi.rose.CONFIG_DELIMITER + report.option
+            )
         rep_id_node = meta_config.get([new_rep_section], no_ignore=True)
         if rep_id_node is None:
             new_rep_option = None
             new_rep_value = None
         else:
             new_rep_option = metomi.rose.META_PROP_TRIGGER
-            rep_trig_node = meta_config.get([new_rep_section, new_rep_option],
-                                            no_ignore=True)
+            rep_trig_node = meta_config.get(
+                [new_rep_section, new_rep_option], no_ignore=True
+            )
             if rep_trig_node is None:
                 new_rep_value = None
             else:
                 new_rep_value = rep_trig_node.value
-        reports.append(metomi.rose.macro.MacroReport(
-            new_rep_section, new_rep_option, new_rep_value, report.info))
+        reports.append(
+            metomi.rose.macro.MacroReport(
+                new_rep_section, new_rep_option, new_rep_value, report.info
+            )
+        )
     reports.sort(key=cmp_to_key(metomi.rose.macro.report_sort))
     return reports
 
@@ -360,11 +404,11 @@ def main():
         opts.conf_dir = os.getcwd()
     opts.conf_dir = os.path.abspath(opts.conf_dir)
     try:
-        meta_config = metomi.rose.config_tree.ConfigTreeLoader().load(
-            opts.conf_dir,
-            metomi.rose.META_CONFIG_NAME,
-            list(sys.path)
-        ).node
+        meta_config = (
+            metomi.rose.config_tree.ConfigTreeLoader()
+            .load(opts.conf_dir, metomi.rose.META_CONFIG_NAME, list(sys.path))
+            .node
+        )
     except IOError:
         sys.exit(ERROR_LOAD_META_CONFIG_DIR.format(opts.conf_dir))
     sections = None
@@ -373,13 +417,16 @@ def main():
     properties = None
     if opts.property:
         properties = opts.property
-    reports = metadata_check(meta_config,
-                             meta_dir=opts.conf_dir,
-                             only_these_sections=sections,
-                             only_these_properties=properties)
+    reports = metadata_check(
+        meta_config,
+        meta_dir=opts.conf_dir,
+        only_these_sections=sections,
+        only_these_properties=properties,
+    )
     macro_id = metomi.rose.macro.MACRO_OUTPUT_ID.format(
         metomi.rose.macro.VALIDATE_METHOD.upper()[0],
-        "rose.metadata_check.MetadataChecker")
+        "rose.metadata_check.MetadataChecker",
+    )
     reports_map = {None: reports}
     text = metomi.rose.macro.get_reports_as_text(reports_map, macro_id)
     if reports:

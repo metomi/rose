@@ -43,19 +43,30 @@ RST_INDENT = '   '  # 3 spaces ( .. following sections must be flush with 'f').
 # Characters used to underline rst headings in order of precedence.
 RST_HEADING_CHARS = ['=', '-', '^', '"']
 # Concrete forms of the admonition directive.
-RST_ADMONITIONS = ['attention', 'caution', 'danger', 'error', 'hint',
-                   'important', 'note', 'tip', 'warning']
+RST_ADMONITIONS = [
+    'attention',
+    'caution',
+    'danger',
+    'error',
+    'hint',
+    'important',
+    'note',
+    'tip',
+    'warning',
+]
 
 
 # --- Rose specific regex'es. ---
 
 # Splits the documentation file into commands and their associated
 # documentation.
-ROSE_COMMAND_REGEX = re.compile(r'={%d}\n(.*)\n={%d}\n(((?!====).*\n)+)' %
-                                (50, 50))
+ROSE_COMMAND_REGEX = re.compile(
+    r'={%d}\n(.*)\n={%d}\n(((?!====).*\n)+)' % (50, 50)
+)
 # Splits command documentation into sections and content.
-ROSE_HELP_SECTION_REGEX = re.compile(r'(^(?:\w+\s?)+$)((?:\n(?!^\w).*)+)',
-                                     re.MULTILINE)
+ROSE_HELP_SECTION_REGEX = re.compile(
+    r'(^(?:\w+\s?)+$)((?:\n(?!^\w).*)+)', re.MULTILINE
+)
 
 # --- Rose specific help section formatting. ---
 
@@ -65,8 +76,13 @@ ROSE_CODE_SECTIONS = {  # SECTION_NAME: SYNTAX_HIGHLIGHTING
 }
 # Documentation sections which contain lists of options (along with one or more
 # un-formatted description lines at the start of the block).
-ROSE_OPTION_SECTIONS = ['OPTIONS', 'ARGUMENTS', 'ENVIRONMENT VARIABLES',
-                        'JINJA2 VARIABLES', 'CONFIGURATION']
+ROSE_OPTION_SECTIONS = [
+    'OPTIONS',
+    'ARGUMENTS',
+    'ENVIRONMENT VARIABLES',
+    'JINJA2 VARIABLES',
+    'CONFIGURATION',
+]
 
 
 def get_indentation(lines):
@@ -200,8 +216,9 @@ def format_literals(text, references_to_match=None, ref_template='%s'):
     return text
 
 
-def write_rst_heading(write, text, heading_level, label_section=False,
-                      label_template='%s'):
+def write_rst_heading(
+    write, text, heading_level, label_section=False, label_template='%s'
+):
     """Write a rst heading element.
 
     Args:
@@ -315,8 +332,10 @@ def write_command_reference(write, commands):
             command, alias = command.split('->')
             # Don't label alias sections, we shouldn't be referencing them!
             write_rst_heading(write, command, 2)
-            write('Alias - see :ref:`command-%s`' % (
-                alias.strip().replace(' ', '-')))
+            write(
+                'Alias - see :ref:`command-%s`'
+                % (alias.strip().replace(' ', '-'))
+            )
             write('')
             continue
 
@@ -325,7 +344,7 @@ def write_command_reference(write, commands):
             sections = {
                 'NAME': command,
                 'DESCRIPTION': '',
-                'SYNOPSIS': '\n  '.join(help_text.splitlines())
+                'SYNOPSIS': '\n  '.join(help_text.splitlines()),
             }
             write('')
         else:
@@ -335,8 +354,9 @@ def write_command_reference(write, commands):
 
             # Split the help-text into sections.
             sections = OrderedDict(
-                (a.strip(), b) for a, b in
-                ROSE_HELP_SECTION_REGEX.findall(help_text))
+                (a.strip(), b)
+                for a, b in ROSE_HELP_SECTION_REGEX.findall(help_text)
+            )
 
         # Write command name as a heading.
         write_rst_heading(write, command, 2, True, 'command-%s')
@@ -360,8 +380,9 @@ def write_command_reference(write, commands):
             # Remove indentation and strip any leading/trailing new lines.
             section_lines = section.split('\n')
             indentation = get_indentation(section_lines)
-            section_lines = line_strip([line[indentation:] for line in
-                                        section_lines])
+            section_lines = line_strip(
+                [line[indentation:] for line in section_lines]
+            )
 
             # Write title as a paragraph.
             title = title.strip().upper()
@@ -453,6 +474,7 @@ class AutoCLIDoc(Directive):
         command (str): The command to document.
 
     """
+
     option_spec = {}
     required_arguments = 2
 
@@ -474,8 +496,9 @@ class AutoCLIDoc(Directive):
             # Return the children of this node (the generated nodes).
             return node.children
         else:
-            raise Exception('Invalid/Unsupported CLI help format "%s"' %
-                            cli_help_format)
+            raise Exception(
+                'Invalid/Unsupported CLI help format "%s"' % cli_help_format
+            )
 
 
 def setup(app):

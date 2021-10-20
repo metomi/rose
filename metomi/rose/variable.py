@@ -34,9 +34,8 @@ RE_CAPT_REAL = '(' + RE_REAL + ')'
 REC_RANGE_NUM = re.compile(RE_CAPT_REAL + r"$")
 REC_RANGE_SPLIT = re.compile(r'\s*(,)\s*')
 REC_RANGE_RANGE = re.compile(
-    r"(" + RE_REAL + r"?)" + r"\s*:\s*" +
-    r"(" + RE_REAL + r"?)" +
-    r"(?<!^:)$")  # Expression can't just be a colon.
+    r"(" + RE_REAL + r"?)" + r"\s*:\s*" + r"(" + RE_REAL + r"?)" + r"(?<!^:)$"
+)  # Expression can't just be a colon.
 REC_FULL_URL = re.compile(r"^(\w+://|www\.)")
 
 # Ignored types used in metomi.rose.variable.ignored_reason,
@@ -55,12 +54,29 @@ class Variable:
 
     """
 
-    __slots__ = ["name", "value", "metadata", "old_value",
-                 "flags", "ignored_reason", "error", "warning",
-                 "comments"]
+    __slots__ = [
+        "name",
+        "value",
+        "metadata",
+        "old_value",
+        "flags",
+        "ignored_reason",
+        "error",
+        "warning",
+        "comments",
+    ]
 
-    def __init__(self, name, value, metadata=None, ignored_reason=None,
-                 error=None, warning=None, flags=None, comments=None):
+    def __init__(
+        self,
+        name,
+        value,
+        metadata=None,
+        ignored_reason=None,
+        error=None,
+        warning=None,
+        flags=None,
+        comments=None,
+    ):
         self.name = name
         self.value = value
         if metadata is None:
@@ -87,43 +103,56 @@ class Variable:
         """Process existing or resupplied metadata into the correct form."""
         if metadata is not None:
             self.metadata = metadata
-        if ('type' in self.metadata and
-                not isinstance(self.metadata['type'], list)):
+        if 'type' in self.metadata and not isinstance(
+            self.metadata['type'], list
+        ):
             self.metadata['type'] = parse_type_expression(
-                self.metadata['type'])
-        if ('element-titles' in self.metadata and
-                not isinstance(self.metadata['element-titles'], list)):
+                self.metadata['type']
+            )
+        if 'element-titles' in self.metadata and not isinstance(
+            self.metadata['element-titles'], list
+        ):
             self.metadata['element-titles'] = parse_type_expression(
-                self.metadata['element-titles'])
+                self.metadata['element-titles']
+            )
         # Replace this kind of thing with a proper metadata handler later.
         for key, delim in [
-                ("values", ","),
-                ("value-titles", None),
-                ("value-hints", ",")]:
-            if (key in self.metadata and
-                    not isinstance(self.metadata[key], list)):
+            ("values", ","),
+            ("value-titles", None),
+            ("value-hints", ","),
+        ]:
+            if key in self.metadata and not isinstance(
+                self.metadata[key], list
+            ):
                 self.metadata[key] = array_split(
                     self.metadata[key],
                     only_this_delim=delim,
-                    remove_esc_char=True)
+                    remove_esc_char=True,
+                )
 
         return self.metadata
 
     def to_hashable(self):
         """Return a hashable summary of the current state."""
-        return (self.name, self.value, self.metadata['id'],
-                tuple(sorted(self.ignored_reason.keys())),
-                tuple(self.comments))
+        return (
+            self.name,
+            self.value,
+            self.metadata['id'],
+            tuple(sorted(self.ignored_reason.keys())),
+            tuple(self.comments),
+        )
 
     def copy(self):
-        new_variable = Variable(self.name,
-                                self.value,
-                                copy.deepcopy(self.metadata),
-                                copy.deepcopy(self.ignored_reason),
-                                copy.deepcopy(self.error),
-                                copy.deepcopy(self.warning),
-                                copy.deepcopy(self.flags),
-                                copy.deepcopy(self.comments))
+        new_variable = Variable(
+            self.name,
+            self.value,
+            copy.deepcopy(self.metadata),
+            copy.deepcopy(self.ignored_reason),
+            copy.deepcopy(self.error),
+            copy.deepcopy(self.warning),
+            copy.deepcopy(self.flags),
+            copy.deepcopy(self.comments),
+        )
         new_variable.old_value = self.old_value
         return new_variable
 
@@ -137,7 +166,8 @@ class Variable:
     def __repr__(self):
         text = '<rose.variable :- name: ' + self.name + ', value: '
         text += (
-            repr(self.value) + ', old value: ' + repr(self.old_value) + ', ')
+            repr(self.value) + ', old value: ' + repr(self.old_value) + ', '
+        )
         text += 'metadata: ' + str(self.metadata)
         text += ', ignored: ' + ['yes', 'no'][self.ignored_reason == {}]
         text += ', error: ' + str(self.error)
@@ -178,18 +208,22 @@ def _scan_string(value, delim=',', remove_esc_char=False):
     is_escaped = False
     letter = None
     for i, letter in enumerate(value):
-        if (letter in is_in_quotes and
-                i not in skip_inds and
-                not is_in_quotes[other_quote[letter]] and
-                not is_escaped):
+        if (
+            letter in is_in_quotes
+            and i not in skip_inds
+            and not is_in_quotes[other_quote[letter]]
+            and not is_escaped
+        ):
             is_in_quotes[letter] = not is_in_quotes[letter]
         was_escaped = is_escaped
-        is_escaped = (letter == esc_char and not is_escaped)
+        is_escaped = letter == esc_char and not is_escaped
         if remove_esc_char and was_escaped and letter in (delim + esc_char):
             item = item[:-1] + letter
-        elif (letter == delim and
-                not any(is_in_quotes.values()) and
-                not was_escaped):
+        elif (
+            letter == delim
+            and not any(is_in_quotes.values())
+            and not was_escaped
+        ):
             yield item
             item = ''
         elif item + letter == value:
@@ -198,8 +232,9 @@ def _scan_string(value, delim=',', remove_esc_char=False):
             item = ''
         else:
             item += letter
-    if (item or (letter == delim and
-                 not any(is_in_quotes.values()) and not was_escaped)):
+    if item or (
+        letter == delim and not any(is_in_quotes.values()) and not was_escaped
+    ):
         yield item
 
 
@@ -236,14 +271,14 @@ def _is_quote_state_change(string, index, quote_lookup, quote_state):
     letter = string[index]
     next_letter_is_same = False
     i = 0
-    while (i > 0):
+    while i > 0:
         if string[i - 1] != letter:
             break
         i += 1
-    prev_letters_escaped = (i % 2 == 0)
+    prev_letters_escaped = i % 2 == 0
     if index < len(string) - 1:
-        next_letter_is_same = (string[index + 1] == letter)
-    if (letter in quote_state and not quote_state[quote_lookup[letter]]):
+        next_letter_is_same = string[index + 1] == letter
+    if letter in quote_state and not quote_state[quote_lookup[letter]]:
         if prev_letters_escaped and not next_letter_is_same:
             return True
     return False
@@ -267,8 +302,9 @@ def get_value_from_metadata(meta_data):
         elif var_type == 'quoted':
             var_value = '""'
     elif metomi.rose.META_PROP_VALUE_HINTS in meta_data:
-        var_value = array_split(
-            meta_data[metomi.rose.META_PROP_VALUE_HINTS])[0]
+        var_value = array_split(meta_data[metomi.rose.META_PROP_VALUE_HINTS])[
+            0
+        ]
     return var_value
 
 
@@ -291,17 +327,18 @@ class RangeSubFunction:
         if self.operator == '==':
             return number == self.values
         if isinstance(self.values, list):
-            return ((self.values[1] is None or self.values[1] >= number) and
-                    (self.values[0] is None or number >= self.values[0]))
+            return (self.values[1] is None or self.values[1] >= number) and (
+                self.values[0] is None or number >= self.values[0]
+            )
         return None
 
     def __repr__(self):
         return "<RangeSubFunction operator:{0} values:{1}>".format(
-            self.operator, self.values)
+            self.operator, self.values
+        )
 
 
 class CombinedRangeSubFunction:
-
     def __init__(self, *range_insts):
         self.range_insts = range_insts
 
@@ -309,8 +346,11 @@ class CombinedRangeSubFunction:
         return all([r.check(number) for r in self.range_insts])
 
     def __repr__(self):
-        return ("<CombinedRangeSubFunction members:" +
-                ", ".join([repr(r) for r in self.range_insts]) + ">")
+        return (
+            "<CombinedRangeSubFunction members:"
+            + ", ".join([repr(r) for r in self.range_insts])
+            + ">"
+        )
 
 
 class RangeSyntaxError(Exception):
@@ -401,14 +441,16 @@ def _scan_trigger_string(string):
         i += 1
         letter = string[i]
         is_letter_junk = False
-        if (letter in is_in_quotes and
-                not is_in_quotes[other_quote[letter]] and
-                not is_escaped):
+        if (
+            letter in is_in_quotes
+            and not is_in_quotes[other_quote[letter]]
+            and not is_escaped
+        ):
             # Quote state change.
             is_in_quotes[letter] = not is_in_quotes[letter]
         if not any(is_in_quotes.values()) and not is_escaped:
             for delim, token in delim_tokens.items():
-                if string[i:i + len(delim)] == delim:
+                if string[i : i + len(delim)] == delim:
                     # String next contains a valid delimiter
                     # Yield the built-up item and a token
                     yield item.strip(), token
@@ -416,11 +458,15 @@ def _scan_trigger_string(string):
                     i += len(delim) - 1
                     is_letter_junk = True
                     break
-        is_escaped = (letter == esc_char and not is_escaped)
-        if (letter == esc_char and is_escaped and
-                not any(is_in_quotes.values()) and i + 1 < len(string)):
+        is_escaped = letter == esc_char and not is_escaped
+        if (
+            letter == esc_char
+            and is_escaped
+            and not any(is_in_quotes.values())
+            and i + 1 < len(string)
+        ):
             for delim, token in delim_tokens.items():
-                if string[i + 1:i + 1 + len(delim)] == delim:
+                if string[i + 1 : i + 1 + len(delim)] == delim:
                     # A valid escape character before a delimiter.
                     # Discard the escape character for the parsed text.
                     is_letter_junk = True

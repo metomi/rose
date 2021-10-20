@@ -38,14 +38,22 @@ class UpgradeGarden02(metomi.rose.upgrade.MacroUpgrade):
         return config, self.reports
 
     def upgrade(self, config, meta_config=None):
-        self.add_setting(config, ["namelist:features", "shrubbery_laurels"],
-                         "'particularly nice'")
+        self.add_setting(
+            config,
+            ["namelist:features", "shrubbery_laurels"],
+            "'particularly nice'",
+        )
         shrub_num = self.get_setting_value(
-            config, ["namelist:features", "shrubberies"])
+            config, ["namelist:features", "shrubberies"]
+        )
         if shrub_num in ["0", "1"]:
-            self.add_report("namelist:features", "shrubberies", shrub_num,
-                            info="More than one shrubbery is desirable",
-                            is_warning=True)
+            self.add_report(
+                "namelist:features",
+                "shrubberies",
+                shrub_num,
+                info="More than one shrubbery is desirable",
+                is_warning=True,
+            )
         return config, self.reports
 
 
@@ -59,19 +67,24 @@ class UpgradeGarden03(metomi.rose.upgrade.MacroUpgrade):
     def downgrade(self, config, meta_config=None):
         if self._get_shrub_num(config) == 2:
             self.change_setting_value(
-                config, ["namelist:features", "shrubberies"], "1")
+                config, ["namelist:features", "shrubberies"], "1"
+            )
         return config, self.reports
 
     def upgrade(self, config, meta_config=None):
         if self._get_shrub_num(config) == 1:
             self.change_setting_value(
-                config, ["namelist:features", "shrubberies"], "2",
-                info="Fetched another shrubbery")
+                config,
+                ["namelist:features", "shrubberies"],
+                "2",
+                info="Fetched another shrubbery",
+            )
         return config, self.reports
 
     def _get_shrub_num(self, config):
         shrub_num = self.get_setting_value(
-            config, ["namelist:features", "shrubberies"])
+            config, ["namelist:features", "shrubberies"]
+        )
         try:
             shrub_num = float(shrub_num)
         except (TypeError, ValueError):

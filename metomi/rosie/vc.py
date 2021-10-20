@@ -53,11 +53,13 @@ YES = "y"
 YES_TO_ALL = "a"
 PROMPT_TAIL_YN = " [" + YES + " or n (default)] "
 PROMPT_TAIL_YNA = (
-    " [" + YES + " or n (default) or " + YES_TO_ALL + " (yes to all)] ")
+    " [" + YES + " or n (default) or " + YES_TO_ALL + " (yes to all)] "
+)
 PROMPT_COPY = "Copy \"%s\" to \"%s-?????\"?" + PROMPT_TAIL_YN
 PROMPT_CREATE = "Create suite as \"%s-?????\"?" + PROMPT_TAIL_YN
 PROMPT_FIX_INFO_CONFIG = (
-    "rose-suite.info has invalid settings. Try again?" + PROMPT_TAIL_YN)
+    "rose-suite.info has invalid settings. Try again?" + PROMPT_TAIL_YN
+)
 PROMPT_DELETE = "%s: delete local+repository copies?" + PROMPT_TAIL_YNA
 PROMPT_DELETE_LOCAL = "%s: delete local copy?" + PROMPT_TAIL_YNA
 
@@ -68,6 +70,7 @@ class FileExistError(Exception):
     e.args is a list containing the items that cannot be overwritten.
 
     """
+
     def __str__(self):
         return "%s: already exists" % " ".join(self.args)
 
@@ -80,6 +83,7 @@ class LocalCopyStatusError(Exception):
     e.status is the "svn status" output of the local copy.
 
     """
+
     def __init__(self, id_, status):
         self.id_ = id_
         self.status = status
@@ -92,9 +96,11 @@ class LocalCopyStatusError(Exception):
 
 class SuiteInfoError(Exception):
     """Raised when settings in rose-suite.info are invalid."""
+
     def __str__(self):
         return metomi.rose.macro.get_reports_as_text(
-            {None: self.args[0]}, "rose-suite.info")
+            {None: self.args[0]}, "rose-suite.info"
+        )
 
 
 class LocalCopyCreateEvent(Event):
@@ -103,6 +109,7 @@ class LocalCopyCreateEvent(Event):
     event.args[0] is the SuiteId of the suite.
 
     """
+
     def __str__(self):
         id_ = self.args[0]
         return "%s: local copy created at %s" % (str(id_), id_.to_local_copy())
@@ -120,7 +127,9 @@ class LocalCopyCreateSkipEvent(Event):
     def __str__(self):
         id_ = self.args[0]
         return "%s: skip, local copy already exists at %s" % (
-            str(id_), id_.to_local_copy())
+            str(id_),
+            id_.to_local_copy(),
+        )
 
 
 class SuiteCreateEvent(Event):
@@ -147,7 +156,8 @@ class SuiteCopyEvent(Event):
         new_id, from_id = self.args
         return "%s: copied items from %s" % (
             new_id,
-            from_id.to_string_with_version())
+            from_id.to_string_with_version(),
+        )
 
 
 class SuiteDeleteEvent(Event):
@@ -171,8 +181,9 @@ class RosieVCClient:
     COMMIT_MESSAGE_CREATE = "%s: new suite"
     COMMIT_MESSAGE_DELETE = "%s: deleted"
 
-    def __init__(self, event_handler=None, popen=None, fs_util=None,
-                 force_mode=False):
+    def __init__(
+        self, event_handler=None, popen=None, fs_util=None, force_mode=False
+    ):
         if event_handler is None:
             event_handler = self._dummy
         self.event_handler = event_handler
@@ -191,7 +202,8 @@ class RosieVCClient:
             self.subversion_servers_conf = subversion_servers_conf
         else:
             subversion_servers_conf = os.path.expanduser(
-                self.SUBVERSION_SERVERS_CONF)
+                self.SUBVERSION_SERVERS_CONF
+            )
             if os.path.exists(subversion_servers_conf):
                 self.subversion_servers_conf = subversion_servers_conf
 
@@ -242,8 +254,9 @@ class RosieVCClient:
         self.event_handler(LocalCopyCreateEvent(id_))
         return id_
 
-    def create(self, info_config, from_id=None, prefix=None,
-               meta_suite_mode=False):
+    def create(
+        self, info_config, from_id=None, prefix=None, meta_suite_mode=False
+    ):
         """Create a suite.
 
         info_config -- A metomi.rose.config.ConfigNode object, which will be
@@ -265,12 +278,16 @@ class RosieVCClient:
             # Create a temporary suite in the file system
             if from_id:
                 from_id_url = "%s/%s@%s" % (
-                    from_id.to_origin(), from_id.branch, from_id.revision)
+                    from_id.to_origin(),
+                    from_id.branch,
+                    from_id.revision,
+                )
                 self.popen("svn", "export", "-q", "--force", from_id_url, dir_)
             else:
                 open(os.path.join(dir_, "rose-suite.conf"), "w").close()
             metomi.rose.config.dump(
-                info_config, os.path.join(dir_, "rose-suite.info"))
+                info_config, os.path.join(dir_, "rose-suite.info")
+            )
 
             # Attempt to import the temporary suite to the repository
             new_id = None
@@ -287,11 +304,14 @@ class RosieVCClient:
                 try:
                     if from_id:
                         message = self.COMMIT_MESSAGE_COPY % (
-                            new_id, from_id.to_string_with_version())
+                            new_id,
+                            from_id.to_string_with_version(),
+                        )
                     else:
                         message = self.COMMIT_MESSAGE_CREATE % str(new_id)
                     self.popen(
-                        "svn", "import", "-q", "-m", message, dir_, new_origin)
+                        "svn", "import", "-q", "-m", message, dir_, new_origin
+                    )
                     self.event_handler(SuiteCreateEvent(new_id))
                     if from_id:
                         self.event_handler(SuiteCopyEvent(new_id, from_id))
@@ -326,9 +346,13 @@ class RosieVCClient:
             self.fs_util.delete(local_copy)
         if not local_only:
             self.popen(
-                "svn", "delete", "-q",
-                "-m", self.COMMIT_MESSAGE_DELETE % str(id_),
-                id_.to_origin())
+                "svn",
+                "delete",
+                "-q",
+                "-m",
+                self.COMMIT_MESSAGE_DELETE % str(id_),
+                id_.to_origin(),
+            )
             self.event_handler(SuiteDeleteEvent(id_))
         return id_
 
@@ -344,9 +368,11 @@ class RosieVCClient:
         from_project = None
         from_title = None
         if from_id is not None:
-            from_info_url = "%s/%s/rose-suite.info@%s" % (from_id.to_origin(),
-                                                          from_id.branch,
-                                                          from_id.revision)
+            from_info_url = "%s/%s/rose-suite.info@%s" % (
+                from_id.to_origin(),
+                from_id.branch,
+                from_id.revision,
+            )
             out_data = self.popen("svn", "cat", from_info_url)[0]
             from_config = metomi.rose.config.load(StringIO(out_data.decode()))
 
@@ -361,7 +387,8 @@ class RosieVCClient:
         # Set the compulsory fields and use the project and metadata if
         #  available.
         meta_config = load_meta_config(
-            info_config, config_type=metomi.rose.INFO_CONFIG_NAME)
+            info_config, config_type=metomi.rose.INFO_CONFIG_NAME
+        )
         if from_id is None and project is not None:
             for node_keys, node in meta_config.walk(no_ignore=True):
                 if isinstance(node.value, dict):
@@ -391,10 +418,12 @@ class RosieVCClient:
         #    ~/.subversion/servers
         # 3. Current user ID
         owner = res_loc.get_conf().get_value(
-            ["rosie-id", "prefix-username." + prefix])
+            ["rosie-id", "prefix-username." + prefix]
+        )
         if not owner and self.subversion_servers_conf:
             servers_conf = metomi.rose.config.load(
-                self.subversion_servers_conf)
+                self.subversion_servers_conf
+            )
             groups_node = servers_conf.get(["groups"])
             if groups_node is not None:
                 prefix_loc = SuiteId.get_prefix_location(prefix)
@@ -412,7 +441,8 @@ class RosieVCClient:
             from_id.to_string_with_version()
             info_config.set(
                 ["description"],
-                "Copy of %s" % (from_id.to_string_with_version()))
+                "Copy of %s" % (from_id.to_string_with_version()),
+            )
         except AttributeError:
             pass
 
@@ -424,8 +454,9 @@ class RosieVCClient:
                     continue
                 sect, key = node_keys
                 value = node.value
-                if (key in ["description", "owner", "access-list"] or
-                        (key == "project" and from_project is not None)):
+                if key in ["description", "owner", "access-list"] or (
+                    key == "project" and from_project is not None
+                ):
                     pass
                 else:
                     info_config.set([key], value)
@@ -434,7 +465,8 @@ class RosieVCClient:
 
         # Determine access list
         access_list_str = res_loc.get_conf().get_value(
-            ["rosie-vc", "access-list-default"])
+            ["rosie-vc", "access-list-default"]
+        )
         if access_list_str:
             info_config.set(["access-list"], access_list_str)
         if from_id is None and project is not None:
@@ -445,11 +477,15 @@ class RosieVCClient:
                 value = node.value
                 sect = sect.translate(None, "=")
                 if key == "value-hints" or key == "values":
-                    reminder = ("please remove all commented hints/lines " +
-                                "in the main/top section before saving.")
-                    info_config.set([sect],
-                                    metomi.rose.variable.array_split(value)[0],
-                                    comments=[value, reminder])
+                    reminder = (
+                        "please remove all commented hints/lines "
+                        + "in the main/top section before saving."
+                    )
+                    info_config.set(
+                        [sect],
+                        metomi.rose.variable.array_split(value)[0],
+                        comments=[value, reminder],
+                    )
         if older_config is not None:
             for node_keys, node in older_config.walk(no_ignore=True):
                 if isinstance(node.value, dict):
@@ -465,15 +501,20 @@ class RosieVCClient:
         """Validate contents in suite info file."""
         reports = DefaultValidators().validate(
             info_config,
-            load_meta_config(info_config,
-                             config_type=metomi.rose.INFO_CONFIG_NAME))
+            load_meta_config(
+                info_config, config_type=metomi.rose.INFO_CONFIG_NAME
+            ),
+        )
         if reports:
             raise SuiteInfoError(reports)
 
     def _copy1(self, info_config, from_id):
         """Copy a suite from the same repository."""
-        from_id_url = "%s/%s@%s" % (from_id.to_origin(), from_id.branch,
-                                    from_id.revision)
+        from_id_url = "%s/%s@%s" % (
+            from_id.to_origin(),
+            from_id.branch,
+            from_id.revision,
+        )
         self.popen("svn", "info", from_id_url)  # Die if from_id not exists
         prefix = from_id.prefix
         temp_local_copy = os.path.join(self._get_work_dir(), "work")
@@ -483,26 +524,39 @@ class RosieVCClient:
         while new_id is None:
             if os.path.exists(temp_local_copy):
                 shutil.rmtree(temp_local_copy)
-            self.popen("svn", "checkout", "-q", "--depth", "empty",
-                       SuiteId.get_prefix_location(prefix), temp_local_copy)
+            self.popen(
+                "svn",
+                "checkout",
+                "-q",
+                "--depth",
+                "empty",
+                SuiteId.get_prefix_location(prefix),
+                temp_local_copy,
+            )
             new_id = SuiteId.get_next(prefix)
             for i in range(len(new_id.sid)):
                 dir_ = os.path.join(
-                    temp_local_copy, os.sep.join(new_id.sid[0:i + 1]))
+                    temp_local_copy, os.sep.join(new_id.sid[0 : i + 1])
+                )
                 self.popen("svn", "update", "-q", "--depth", "empty", dir_)
                 if not os.path.isdir(dir_):
                     os.mkdir(dir_)
                     self.popen("svn", "add", "-q", dir_)
             dir_ = os.path.join(temp_local_copy, os.sep.join(new_id.sid))
             self.popen(
-                "svn", "cp", "-q", from_id_url, os.path.join(dir_, "trunk"))
+                "svn", "cp", "-q", from_id_url, os.path.join(dir_, "trunk")
+            )
             metomi.rose.config.dump(
-                info_config, os.path.join(dir_, "trunk", "rose-suite.info"))
+                info_config, os.path.join(dir_, "trunk", "rose-suite.info")
+            )
             message = self.COMMIT_MESSAGE_COPY % (
-                new_id, from_id.to_string_with_version())
+                new_id,
+                from_id.to_string_with_version(),
+            )
             try:
                 self.popen(
-                    "svn", "commit", "-q", "-m", message, temp_local_copy)
+                    "svn", "commit", "-q", "-m", message, temp_local_copy
+                )
                 self.event_handler(SuiteCreateEvent(new_id))
                 self.event_handler(SuiteCopyEvent(new_id, from_id))
             except RosePopenError as exc:
@@ -541,8 +595,13 @@ def create(argv):
     """CLI function: create and copy."""
     opt_parser = RoseOptionParser()
     opt_parser.add_my_options(
-        "checkout_mode", "info_file", "meta_suite_mode", "non_interactive",
-        "prefix", "project")
+        "checkout_mode",
+        "info_file",
+        "meta_suite_mode",
+        "non_interactive",
+        "prefix",
+        "project",
+    )
     opts, args = opt_parser.parse_args(argv)
     verbosity = opts.verbosity - opts.quietness
     client = RosieVCClient(event_handler=Reporter(verbosity))
@@ -558,14 +617,16 @@ def create(argv):
     interactive_mode = not opts.non_interactive
     if opts.info_file is None:
         info_config = client.generate_info_config(
-            from_id, opts.prefix, opts.project)
+            from_id, opts.prefix, opts.project
+        )
         if from_id is not None:
             meta_config = load_meta_config(
                 info_config,
                 directory=None,
                 config_type=metomi.rose.INFO_CONFIG_NAME,
                 error_handler=None,
-                ignore_meta_error=False)
+                ignore_meta_error=False,
+            )
             for node_keys, node in meta_config.walk(no_ignore=True):
                 if isinstance(node.value, dict):
                     continue
@@ -602,7 +663,8 @@ def create(argv):
             sys.exit(1)
     try:
         id_ = client.create(
-            info_config, from_id, opts.prefix, opts.meta_suite_mode)
+            info_config, from_id, opts.prefix, opts.meta_suite_mode
+        )
     except (RosePopenError, SuiteIdOverflowError) as exc:
         client.event_handler(exc)
         sys.exit(1)
@@ -658,7 +720,8 @@ def _edit_info_config(opts, client, info_config):
 def delete(argv):
     """CLI function: delete."""
     opt_parser = RoseOptionParser().add_my_options(
-        "force_mode", "non_interactive", "local_only")
+        "force_mode", "non_interactive", "local_only"
+    )
     opts, args = opt_parser.parse_args(argv)
     report = Reporter(opts.verbosity - opts.quietness)
     client = RosieVCClient(event_handler=report, force_mode=opts.force_mode)
@@ -687,8 +750,11 @@ def delete(argv):
         else:
             try:
                 client.delete(arg, opts.local_only)
-            except (LocalCopyStatusError, RosePopenError,
-                    SuiteIdPrefixError) as exc:
+            except (
+                LocalCopyStatusError,
+                RosePopenError,
+                SuiteIdPrefixError,
+            ) as exc:
                 client.event_handler(exc)
                 ret_code = 1
                 if not opts.force_mode:

@@ -59,12 +59,13 @@ def get_checksum(name, checksum_func=None):
     if os.path.isfile(name):
         checksum = checksum_func(name, "")
         path_and_checksum_list.append(
-            ("", checksum, os.stat(os.path.realpath(name)).st_mode))
+            ("", checksum, os.stat(os.path.realpath(name)).st_mode)
+        )
     else:  # if os.path.isdir(path):
         name = os.path.normpath(name)
         path_and_checksum_list = []
         for dirpath, _, filenames in os.walk(name):
-            path = dirpath[len(name) + 1:]
+            path = dirpath[len(name) + 1 :]
             path_and_checksum_list.append((path, None, None))
             for filename in filenames:
                 filepath = os.path.join(path, filename)
@@ -87,8 +88,11 @@ def get_checksum_func(algorithm=None):
     if not algorithm:
         global _DEFAULT_KEY
         if _DEFAULT_KEY is None:
-            _DEFAULT_KEY = ResourceLocator.default().get_conf().get_value(
-                ["checksum-method"], _DEFAULT_DEFAULT_KEY)
+            _DEFAULT_KEY = (
+                ResourceLocator.default()
+                .get_conf()
+                .get_value(["checksum-method"], _DEFAULT_DEFAULT_KEY)
+            )
         algorithm = _DEFAULT_KEY
     if algorithm == MTIME_AND_SIZE:
         return _mtime_and_size
@@ -161,6 +165,10 @@ def _mtime_and_size(source, root):
     stat = os.stat(os.path.realpath(source))
     if root:
         source = os.path.relpath(source, root)
-    return os.pathsep.join(["source=" + source,
-                            "mtime=" + str(stat.st_mtime),
-                            "size=" + str(stat.st_size)])
+    return os.pathsep.join(
+        [
+            "source=" + source,
+            "mtime=" + str(stat.st_mtime),
+            "size=" + str(stat.st_size),
+        ]
+    )

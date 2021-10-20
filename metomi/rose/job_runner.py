@@ -22,6 +22,7 @@ from metomi.rose.reporter import Event
 
 class JobEvent(Event):
     """Event raised when a job completes."""
+
     def __init__(self, job):
         Event.__init__(self, job)
         if job.event_level is not None:
@@ -83,7 +84,7 @@ class JobManager:
 
     def has_jobs(self):
         """Return True if there are ready jobs or working jobs."""
-        return (bool(self.ready_jobs) or bool(self.working_jobs))
+        return bool(self.ready_jobs) or bool(self.working_jobs)
 
     def has_ready_jobs(self):
         """Return True if there are ready jobs."""
@@ -222,7 +223,8 @@ class JobRunner:
                     if job is None:
                         break
                     task = loop.create_task(
-                        self.job_processor.process_job(job, *args))
+                        self.job_processor.process_job(job, *args)
+                    )
                     task.job = job
                     awaiting.add(task)
 
@@ -246,6 +248,7 @@ class JobRunner:
 
 class JobRunnerNotCompletedError(Exception):
     """Error raised when there are no ready/working jobs but pending ones."""
+
     def __str__(self):
         ret = ""
         for job in self.args[0]:

@@ -39,19 +39,22 @@ class RoseArchTarGzip:
 
         """
         sources = list(target.sources.values())
-        if (len(sources) == 1 and
-                sources[0].path.endswith("." + target.compress_scheme)):
+        if len(sources) == 1 and sources[0].path.endswith(
+            "." + target.compress_scheme
+        ):
             target.work_source_path = sources[0].path
             return  # Assume that it has been done
         fdsec, tar_name = mkstemp(suffix=".tar", dir=work_dir)
         os.close(fdsec)
         target.work_source_path = tar_name
-        scheme_format = self.SCHEME_FORMATS.get(target.compress_scheme,
-                                                tarfile.DEFAULT_FORMAT)
+        scheme_format = self.SCHEME_FORMATS.get(
+            target.compress_scheme, tarfile.DEFAULT_FORMAT
+        )
         f_bsize = os.statvfs(work_dir).f_bsize
         # @TODO This is not very Python3: context managers and tarhandle.add
         tarhandle = tarfile.open(
-            tar_name, "w", bufsize=f_bsize, format=scheme_format)
+            tar_name, "w", bufsize=f_bsize, format=scheme_format
+        )
         for source in sources:
             handle = open(source.path, 'rb')
             tarinfo = tarhandle.gettarinfo(arcname=source.name, fileobj=handle)
@@ -60,7 +63,8 @@ class RoseArchTarGzip:
         # N.B. Python's gzip is slow
         if target.compress_scheme in self.GZIP_EXTS:
             fdsec, gz_name = mkstemp(
-                suffix="." + target.compress_scheme, dir=work_dir)
+                suffix="." + target.compress_scheme, dir=work_dir
+            )
             os.close(fdsec)
             target.work_source_path = gz_name
             command = "gzip -c '%s' >'%s'" % (tar_name, gz_name)

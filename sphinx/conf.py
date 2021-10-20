@@ -37,17 +37,14 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
-
     # sphinx user community extensions
     'hieroglyph',
     'sphinxcontrib.httpdomain',
-
     # custom project extensions (located in ext/)
     'auto_cli_doc',
     'rose_lang',
     'rose_domain',
     'script_include',
-
     # cylc.sphinx_ext extensions (from cylc.sphinx_ext-extensions library)
     'cylc.sphinx_ext.cylc_lang',
     'cylc.sphinx_ext.diff_selection',
@@ -61,8 +58,9 @@ extensions = [
 
 # Select best available SVG image converter.
 for svg_converter, extension in [
-        ('rsvg', 'sphinxcontrib.rsvgconverter'),
-        ('inkscape', 'sphinxcontrib.inkscapeconverter')]:
+    ('rsvg', 'sphinxcontrib.rsvgconverter'),
+    ('inkscape', 'sphinxcontrib.inkscapeconverter'),
+]:
     try:
         assert RosePopener.which(svg_converter)
         __import__(extension)
@@ -81,12 +79,8 @@ else:
 # (allows us to reference objects from other projects)
 cylc_version = '8.0a2'
 intersphinx_mapping = {
-    'cylc': (
-        f'https://cylc.github.io/cylc-doc/{cylc_version}/html/', None
-    ),
-    'python': (
-        'https://docs.python.org/', None
-    )
+    'cylc': (f'https://cylc.github.io/cylc-doc/{cylc_version}/html/', None),
+    'python': ('https://docs.python.org/', None),
 }
 
 # Slide (hieroglyph) settings.
@@ -98,8 +92,7 @@ slide_theme_options = {'custom_css': 'css/slides-custom.css'}
 graphviz_output_format = 'svg'
 
 # Global configuration for graphviz diagrams.
-graphviz_dot_args = ['-Gfontname=sans', '-Gbgcolor=none',
-                     '-Nfontname=sans']
+graphviz_dot_args = ['-Gfontname=sans', '-Gbgcolor=none', '-Nfontname=sans']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -115,7 +108,8 @@ project = 'Rose Documentation'
 copyright = (
     ': Copyright (C) British Crown (Met Office) & Contributors. '
     'See Terms of Use. '
-    'This document is released under the Open Government Licence')
+    'This document is released under the Open Government Licence'
+)
 
 # The full version for the project you're documenting, acts as replacement for
 # |version|.
@@ -157,18 +151,33 @@ html_favicon = 'img/rose-favicon.png'
 
 latex_elements = {
     'papersize': 'a4paper',
-    'maxlistdepth': 10  # Prevent "Too Deeply Nested" errors.
+    'maxlistdepth': 10,  # Prevent "Too Deeply Nested" errors.
 }
 
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    ('index', 'rose-documentation.tex', 'Rose Documentation',
-     'Metomi', 'manual'),
-    ('tutorial/cylc/index', 'cylc-tutorial.tex', 'Cylc Tutorial',
-     'Metomi', 'manual'),
-    ('tutorial/rose/index', 'rose-tutorial.tex', 'Rose Tutorial',
-     'Metomi', 'manual'),
+    (
+        'index',
+        'rose-documentation.tex',
+        'Rose Documentation',
+        'Metomi',
+        'manual',
+    ),
+    (
+        'tutorial/cylc/index',
+        'cylc-tutorial.tex',
+        'Cylc Tutorial',
+        'Metomi',
+        'manual',
+    ),
+    (
+        'tutorial/rose/index',
+        'rose-tutorial.tex',
+        'Rose Tutorial',
+        'Metomi',
+        'manual',
+    ),
 ]
 latex_logo = 'img/rose-logo.png'
 # If true, show page references after internal links.
@@ -183,10 +192,7 @@ html_css_files = ['custom.css']
 # -- Options for manual page output ---------------------------------------
 
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    ('index', 'rose-doc', 'rose-doc Documentation',
-     ['Metomi'], 1)
-]
+man_pages = [('index', 'rose-doc', 'rose-doc Documentation', ['Metomi'], 1)]
 
 
 # -- Options for Texinfo output -------------------------------------------
@@ -194,8 +200,15 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'rose-doc', 'Rose Documentation', 'Metomi', 'rose-doc',
-     'Documentation For The Rose Configuration System.', 'Miscellaneous'),
+    (
+        'index',
+        'rose-doc',
+        'Rose Documentation',
+        'Metomi',
+        'rose-doc',
+        'Documentation For The Rose Configuration System.',
+        'Miscellaneous',
+    ),
 ]
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 # texinfo_show_urls = 'footnote'

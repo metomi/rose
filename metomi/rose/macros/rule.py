@@ -45,11 +45,12 @@ REC_EXPR_IS_THIS_RULE = re.compile(
            )               (?# End operator)
            .*              (?# anything)
            $               (?# the end)
-         )""", re.X)
+         )""",
+    re.X,
+)
 
 
 class RuleValueError(Exception):
-
     def __init__(self, *args):
         self.args = args
 
@@ -83,7 +84,8 @@ class FailureRuleChecker(metomi.rose.macro.MacroBase):
             value = node.value
             setting_id = self._get_id_from_section_option(sect, opt)
             metadata = metomi.rose.macro.get_metadata_for_config_id(
-                setting_id, meta_config)
+                setting_id, meta_config
+            )
             for rule_opt in [self.RULE_ERROR_NAME, self.RULE_WARNING_NAME]:
                 if rule_opt in metadata:
                     rule = metadata.get(rule_opt)
@@ -104,7 +106,7 @@ class FailureRuleChecker(metomi.rose.macro.MacroBase):
                             id_rules[setting_id][-1][-1] = message
 
         for rule_type in rule_data:
-            is_warning = (rule_type == self.RULE_WARNING_NAME)
+            is_warning = rule_type == self.RULE_WARNING_NAME
             if is_warning:
                 f_type = self.WARNING_RULE_FAILED
             else:
@@ -115,16 +117,23 @@ class FailureRuleChecker(metomi.rose.macro.MacroBase):
                     info = None
                     try:
                         test_failed = evaluator.evaluate_rule(
-                            rule, setting_id, config, meta_config)
-                    except (ZeroDivisionError, TypeError,
-                            ValueError, IndexError) as exc:
+                            rule, setting_id, config, meta_config
+                        )
+                    except (
+                        ZeroDivisionError,
+                        TypeError,
+                        ValueError,
+                        IndexError,
+                    ) as exc:
                         test_failed = True
                         info = self.RULE_MSG_FAIL_FORMAT.format(
-                            exc, f_type, rule)
+                            exc, f_type, rule
+                        )
                     except jinja2.exceptions.TemplateError as exc:
                         test_failed = True
                         info = self.RULE_SYNTAX_FAIL_FORMAT.format(
-                            rule_type, rule, exc)
+                            rule_type, rule, exc
+                        )
                     except RuleValueError:
                         continue
 
@@ -133,12 +142,15 @@ class FailureRuleChecker(metomi.rose.macro.MacroBase):
                         if info is None:
                             if message is None:
                                 info = self.RULE_FAIL_FORMAT.format(
-                                    f_type, rule)
+                                    f_type, rule
+                                )
                             else:
                                 info = self.RULE_MSG_FAIL_FORMAT.format(
-                                    message, f_type, rule)
-                        self.add_report(section, option, value, info,
-                                        is_warning)
+                                    message, f_type, rule
+                                )
+                        self.add_report(
+                            section, option, value, info, is_warning
+                        )
         return self.reports
 
 
@@ -147,15 +159,17 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
     """Evaluate logical expressions in the metadata."""
 
     ARRAY_EXPR = "{0}({1}) {2} {3}"
-    ARRAY_FUNC_LOGIC = {"all": " and ",
-                        "any": " or "}
+    ARRAY_FUNC_LOGIC = {"all": " and ", "any": " or "}
     INTERNAL_ID_SETTING = "_id{0}"
     INTERNAL_ID_VALUE = "_value{0}"
     INTERNAL_ID_THIS_SETTING = "_thisid{0}"
     INTERNAL_ID_SCI_NUM = "_scinum{0}"
-    REC_ARRAY = {"all": re.compile(r"(\W)all\( *(\S+) *(\S+) *(.*?) *\)(\W)"),
-                 "any": re.compile(r"(\W)any\( *(\S+) *(\S+) *(.*?) *\)(\W)")}
-    REC_CONFIG_ID = re.compile(r"""
+    REC_ARRAY = {
+        "all": re.compile(r"(\W)all\( *(\S+) *(\S+) *(.*?) *\)(\W)"),
+        "any": re.compile(r"(\W)any\( *(\S+) *(\S+) *(.*?) *\)(\W)"),
+    }
+    REC_CONFIG_ID = re.compile(
+        r"""
                       (?:\W|^)        (?# Break or beginning)
                       (               (?# Begin ID capture)
                        [\w:.]*         (?# 1st part of section, including :)
@@ -165,9 +179,12 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
                        [a-zA-Z][\w-]+ (?# Option name )
                        (?:\(\d+\))?   (?# Optional element for the option )
                       )               (?# End ID capture )
-                      (?:\W|$)        (?# Break or end)""", re.X)
+                      (?:\W|$)        (?# Break or end)""",
+        re.X,
+    )
     REC_LEN_FUNC = re.compile(r"(\W)len\( *(\S+) *\)(\W)")
-    REC_SCI_NUM = re.compile(r"""
+    REC_SCI_NUM = re.compile(
+        r"""
                      (?:\W|^)    (?# Break or beginning)
                      (           (?# Begin number capture)
                       [-+]?      (?# Optional sign)
@@ -176,17 +193,23 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
                       \d+        (?# Exponent number)
                      )           (?# End number capture)
                      (?:\W|$)    (?# Break or end)
-                                 """, re.I | re.X)
-    REC_THIS_ELEMENT_ID = re.compile(r"""
+                                 """,
+        re.I | re.X,
+    )
+    REC_THIS_ELEMENT_ID = re.compile(
+        r"""
                              (?:\W|^)        (?# Break or beginning)
                              (this\(\d+\))   (?# 'this' element)
-                             (?:\W|$)        (?# Break or end)""", re.X)
+                             (?:\W|$)        (?# Break or end)""",
+        re.X,
+    )
     REC_VALUE = re.compile(r'("[^"]*")')
 
     def evaluate_rule(self, rule, setting_id, config, meta_config):
         """Evaluate the logic in the provided rule based on config values."""
         rule_template_str, rule_id_values = self._process_rule(
-            rule, setting_id, config, meta_config)
+            rule, setting_id, config, meta_config
+        )
         template = jinja2.Template(rule_template_str)
         return_string = template.render(rule_id_values)
         return ast.literal_eval(return_string)
@@ -194,26 +217,32 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
     def evaluate_rule_id_usage(self, rule, setting_id, meta_config):
         """Return a set of setting ids referenced in the provided rule."""
         log_ids = set([])
-        self._process_rule(rule, setting_id, None, meta_config,
-                           log_ids=log_ids)
+        self._process_rule(
+            rule, setting_id, None, meta_config, log_ids=log_ids
+        )
         return log_ids
 
-    def _process_rule(self, rule, setting_id, config, meta_config,
-                      log_ids=None):
+    def _process_rule(
+        self, rule, setting_id, config, meta_config, log_ids=None
+    ):
         """Pre-process the provided rule into valid jinja2."""
         if log_ids is None:
             get_value_from_id = self._get_value_from_id
         else:
             get_value_from_id = (
                 lambda id_, conf, m_conf, p_id: self._log_id_usage(
-                    id_, conf, m_conf, p_id, log_ids)
+                    id_, conf, m_conf, p_id, log_ids
+                )
             )
         if not (rule.startswith('{%') or rule.startswith('{-%')):
             rule = "{% if " + rule + " %}True{% else %}False{% endif %}"
 
         # Start processing out our additional syntax.
-        local_map = {"this": get_value_from_id(
-            setting_id, config, meta_config, setting_id)}
+        local_map = {
+            "this": get_value_from_id(
+                setting_id, config, meta_config, setting_id
+            )
+        }
         value_id_count = -1
         sci_num_count = -1
 
@@ -224,13 +253,16 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
                 if var_id == "this":
                     var_id = setting_id
                 setting_value = get_value_from_id(
-                    var_id, config, meta_config, setting_id)
+                    var_id, config, meta_config, setting_id
+                )
                 array_value = metomi.rose.variable.array_split(
-                    str(setting_value))
+                    str(setting_value)
+                )
                 new_string = start + "("
                 for elem_num in range(1, len(array_value) + 1):
-                    new_string += self.ARRAY_EXPR.format(var_id, elem_num,
-                                                         operator, value)
+                    new_string += self.ARRAY_EXPR.format(
+                        var_id, elem_num, operator, value
+                    )
                     if elem_num < len(array_value):
                         new_string += self.ARRAY_FUNC_LOGIC[array_func_key]
                 new_string += ")" + end
@@ -244,7 +276,8 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
             elif self.REC_THIS_ELEMENT_ID.search(rule):
                 var_id = var_id.replace("this", setting_id)
             setting_value = get_value_from_id(
-                var_id, config, meta_config, setting_id)
+                var_id, config, meta_config, setting_id
+            )
             array_value = metomi.rose.variable.array_split(str(setting_value))
             new_string = start + str(len(array_value)) + end
             rule = self.REC_LEN_FUNC.sub(new_string, rule, count=1)
@@ -272,7 +305,8 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
         for search_result in self.REC_THIS_ELEMENT_ID.findall(rule):
             proper_id = search_result.replace("this", setting_id)
             value_string = get_value_from_id(
-                proper_id, config, meta_config, setting_id)
+                proper_id, config, meta_config, setting_id
+            )
             for key, value in local_map.items():
                 if value == value_string:
                     break
@@ -286,7 +320,8 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
         config_id_count = -1
         for search_result in self.REC_CONFIG_ID.findall(rule):
             value_string = get_value_from_id(
-                search_result, config, meta_config, setting_id)
+                search_result, config, meta_config, setting_id
+            )
             for key, value in local_map.items():
                 if value == value_string:
                     break
@@ -299,14 +334,16 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
         # Return the now valid Jinja2 template with a map of variables.
         return rule, local_map
 
-    def _log_id_usage(self, variable_id, config, meta_config, parent_id,
-                      id_set):
+    def _log_id_usage(
+        self, variable_id, config, meta_config, parent_id, id_set
+    ):
         """Wrap _get_value_from_id, storing variable_id in id_set."""
         id_set.add(variable_id)
         if config is None:
             return "None"
-        return self._get_value_from_id(variable_id, config, meta_config,
-                                       parent_id)
+        return self._get_value_from_id(
+            variable_id, config, meta_config, parent_id
+        )
 
     def _get_value_from_id(self, variable_id, config, meta_config, parent_id):
         """Extract a value for variable_id from config, or fail."""
@@ -315,15 +352,17 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
             # We may need to de-duplicate the section in the variable_id.
             dupl_section = metomi.rose.macro.REC_ID_STRIP.sub("", section)
             dupl_node = meta_config.get(
-                [dupl_section, metomi.rose.META_PROP_DUPLICATE],
-                no_ignore=True)
-            if (dupl_node is not None and
-                    dupl_node.value == metomi.rose.META_PROP_VALUE_TRUE):
+                [dupl_section, metomi.rose.META_PROP_DUPLICATE], no_ignore=True
+            )
+            if (
+                dupl_node is not None
+                and dupl_node.value == metomi.rose.META_PROP_VALUE_TRUE
+            ):
                 # This is an id in a duplicate namelist.
-                parent_section = self._get_section_option_from_id(
-                    parent_id)[0]
+                parent_section = self._get_section_option_from_id(parent_id)[0]
                 parent_dupl_section = metomi.rose.macro.REC_ID_STRIP.sub(
-                    "", parent_section)
+                    "", parent_section
+                )
                 if parent_dupl_section != dupl_section:
                     raise RuleValueError(variable_id)
                 # Set section to be the same as the parent id's section.
@@ -335,8 +374,11 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
         if opt_node is None:
             if option is None:
                 raise RuleValueError(variable_id)
-            if (option.endswith(')') and '(' in option and
-                    option.count('(') == 1):
+            if (
+                option.endswith(')')
+                and '(' in option
+                and option.count('(') == 1
+            ):
                 option, element = option.rstrip(')').split('(')
                 opt_node = config.get([section, option])
                 if opt_node is not None:

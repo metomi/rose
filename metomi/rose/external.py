@@ -40,8 +40,7 @@ def launch_geditor(source, event_handler=None, **kwargs):
     _launch("geditor", event_handler, False, source, **kwargs)
 
 
-def launch_image_viewer(source, event_handler=None, run_fg=False,
-                        **kwargs):
+def launch_image_viewer(source, event_handler=None, run_fg=False, **kwargs):
     """Launch an image viewer for a image file e.g. gimp."""
     _launch("image_viewer", event_handler, run_fg, source, **kwargs)
 

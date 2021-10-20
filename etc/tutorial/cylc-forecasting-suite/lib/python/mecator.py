@@ -7,7 +7,7 @@ import math
 R_0 = 6356752.3
 
 
-def get_offset(bbox, scale=(1., 1.)):
+def get_offset(bbox, scale=(1.0, 1.0)):
     """Define an offset from the origin using the provided bbox.
 
     Args:
@@ -28,13 +28,14 @@ def get_scale(bbox, width):
         width: The width of the projection.
 
     """
-    scale = width * (180. / abs(bbox['lng2'] - bbox['lng1']))
+    scale = width * (180.0 / abs(bbox['lng2'] - bbox['lng1']))
     return (
         (math.pi * R_0) / scale,
-        (math.pi * R_0 * 2.) / scale)
+        (math.pi * R_0 * 2.0) / scale,
+    )
 
 
-def coord_to_pos(lng, lat, offset=(0., 0.), scale=(1., 1.)):
+def coord_to_pos(lng, lat, offset=(0.0, 0.0), scale=(1.0, 1.0)):
     """Convert a lng, lat coord to an x, y position in a mecator projection.
 
     proj equivalent:
@@ -46,7 +47,7 @@ def coord_to_pos(lng, lat, offset=(0., 0.), scale=(1., 1.)):
     lng = math.radians(lng)
     lat = math.radians(lat)
     pos_x = R_0 * lng
-    pos_y = R_0 * math.log(math.tan((math.pi / 4.) + (lat / 2.)))
+    pos_y = R_0 * math.log(math.tan((math.pi / 4.0) + (lat / 2.0)))
     pos_x /= scale[0]
     pos_y /= scale[1]
     pos_x -= offset[0]
@@ -54,7 +55,7 @@ def coord_to_pos(lng, lat, offset=(0., 0.), scale=(1., 1.)):
     return pos_x, pos_y
 
 
-def pos_to_coord(pos_x, pos_y, offset=(0., 0.), scale=(1., 1.)):
+def pos_to_coord(pos_x, pos_y, offset=(0.0, 0.0), scale=(1.0, 1.0)):
     """Convert an x, y coordinate in a mecator projection to a lng, lat coord.
 
     proj equivalent:
@@ -68,5 +69,5 @@ def pos_to_coord(pos_x, pos_y, offset=(0., 0.), scale=(1., 1.)):
     pos_x *= scale[0]
     pos_y *= scale[1]
     lng = pos_x / R_0
-    lat = 2 * math.atan(math.exp(pos_y / R_0)) - (math.pi / 2.)
+    lat = 2 * math.atan(math.exp(pos_y / R_0)) - (math.pi / 2.0)
     return math.degrees(lng), math.degrees(lat)

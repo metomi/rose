@@ -46,11 +46,16 @@ def write_source_vc_info(run_source_dir, output=None, popen=None):
     environ = dict(os.environ)
     environ["LANG"] = "C"
     for vcs, args_list in [
-            ("svn", [
+        (
+            "svn",
+            [
                 ["info", "--non-interactive"],
                 ["status", "--non-interactive"],
-                ["diff", "--internal-diff", "--non-interactive"]]),
-            ("git", [["describe"], ["status"], ["diff"]])]:
+                ["diff", "--internal-diff", "--non-interactive"],
+            ],
+        ),
+        ("git", [["describe"], ["status"], ["diff"]]),
+    ]:
         if not popen.which(vcs):
             continue
         cwd = os.getcwd()
@@ -61,8 +66,9 @@ def write_source_vc_info(run_source_dir, output=None, popen=None):
                 ret_code, out, _ = popen.run(*cmd, env=environ)
                 if out:
                     write_safely(("#" * 80 + "\n"), handle)
-                    write_safely(("# %s\n" % popen.list_to_shell_str(cmd)),
-                                 handle)
+                    write_safely(
+                        ("# %s\n" % popen.list_to_shell_str(cmd)), handle
+                    )
                     write_safely(("#" * 80 + "\n"), handle)
                     write_safely(out, handle)
                 if ret_code:  # If cmd fails once, it will likely fail again

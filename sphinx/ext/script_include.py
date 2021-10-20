@@ -30,20 +30,23 @@ from sphinx.util.nodes import nested_parse_with_titles
 
 class ScriptInclude(Directive):
     """Insert parsed RST node from command output."""
+
     option_spec = {}
     required_arguments = 1
     optional_arguments = 1000
 
     def run(self):
         command = sh_split(' '.join(self.arguments[0:]))
-        stdout = Popen(command, stdout=PIPE, stdin=open(os.devnull)
-                       ).communicate()[0]
+        stdout = Popen(
+            command, stdout=PIPE, stdin=open(os.devnull)
+        ).communicate()[0]
         node = nodes.section()
         node.document = self.state.document
         nested_parse_with_titles(
             self.state,
             ViewList([i.decode() for i in stdout.splitlines()]),
-            node)
+            node,
+        )
         return node.children
 
 

@@ -37,13 +37,13 @@ from metomi.rose.suite_engine_proc import (
 )
 
 
-
 class CylcProcessor(SuiteEngineProcessor):
 
     """Logic specific to the cylc suite engine."""
 
     REC_CYCLE_TIME = re.compile(
-        r"\A[\+\-]?\d+(?:W\d+)?(?:T\d+(?:Z|[+-]\d+)?)?\Z")  # Good enough?
+        r"\A[\+\-]?\d+(?:W\d+)?(?:T\d+(?:Z|[+-]\d+)?)?\Z"
+    )  # Good enough?
     SCHEME = "cylc"
     SUITE_CONF = "flow.cylc"
     SUITE_ID_ENV = "CYLC_WORKFLOW_ID"
@@ -77,9 +77,7 @@ class CylcProcessor(SuiteEngineProcessor):
         # n.b. Imports inside function to avoid dependency on Cylc and
         # Cylc-Rose is Rose is being used with a different workflow engine.
         from cylc.flow.platforms import get_host_from_platform
-        from cylc.rose.platform_utils import (
-            get_platforms_from_task_jobs
-        )
+        from cylc.rose.platform_utils import get_platforms_from_task_jobs
 
         task_platforms = {}
         if cycle_name_tuples is not None:
@@ -143,16 +141,18 @@ class CylcProcessor(SuiteEngineProcessor):
         if os.environ.get("CYLC_TASK_IS_COLDSTART", "True") == "True":
             task_is_cold_start = "true"
 
-        return TaskProps(suite_name=suite_name,
-                         suite_dir_rel=suite_dir_rel,
-                         suite_dir=suite_dir,
-                         task_id=task_id,
-                         task_name=task_name,
-                         task_cycle_time=task_cycle_time,
-                         task_log_dir=os.path.dirname(task_log_root),
-                         task_log_root=task_log_root,
-                         task_is_cold_start=task_is_cold_start,
-                         cycling_mode=cycling_mode)
+        return TaskProps(
+            suite_name=suite_name,
+            suite_dir_rel=suite_dir_rel,
+            suite_dir=suite_dir,
+            task_id=task_id,
+            task_name=task_name,
+            task_cycle_time=task_cycle_time,
+            task_log_dir=os.path.dirname(task_log_root),
+            task_log_root=task_log_root,
+            task_is_cold_start=task_is_cold_start,
+            cycling_mode=cycling_mode,
+        )
 
     def job_logs_archive(self, suite_name, items):
         """Archive cycle job logs.
@@ -177,8 +177,9 @@ class CylcProcessor(SuiteEngineProcessor):
         self.fs_util.chdir(self.get_suite_dir(suite_name))
         try:
             for cycle in cycles:
-                archive_file_name0 = os.path.join("log",
-                                                  "job-" + cycle + ".tar")
+                archive_file_name0 = os.path.join(
+                    "log", "job-" + cycle + ".tar"
+                )
                 archive_file_name = archive_file_name0 + ".gz"
                 if os.path.exists(archive_file_name):
                     continue
@@ -196,8 +197,9 @@ class CylcProcessor(SuiteEngineProcessor):
                 tar.close()
                 # N.B. Python's gzip is slow
                 self.popen.run_simple("gzip", "-f", archive_file_name0)
-                self.handle_event(FileSystemEvent(FileSystemEvent.CREATE,
-                                                  archive_file_name))
+                self.handle_event(
+                    FileSystemEvent(FileSystemEvent.CREATE, archive_file_name)
+                )
                 self.fs_util.delete(os.path.join("log", "job", cycle))
         finally:
             try:
@@ -205,8 +207,9 @@ class CylcProcessor(SuiteEngineProcessor):
             except OSError:
                 pass
 
-    def job_logs_pull_remote(self, suite_name, items,
-                             prune_remote_mode=False, force_mode=False):
+    def job_logs_pull_remote(
+        self, suite_name, items, prune_remote_mode=False, force_mode=False
+    ):
         """Pull and housekeep the job logs on remote task hosts.
 
         suite_name -- The name of a suite.
@@ -241,13 +244,21 @@ class CylcProcessor(SuiteEngineProcessor):
                             continue
                     # Don't bother if "job.out" already exists
                     # Unless forced to do so
-                    if (cycle is not None and name is not None and
-                            not prune_remote_mode and not force_mode and
-                            os.path.exists(os.path.join(
-                                log_dir, str(cycle), name, "NN", "job.out"))):
+                    if (
+                        cycle is not None
+                        and name is not None
+                        and not prune_remote_mode
+                        and not force_mode
+                        and os.path.exists(
+                            os.path.join(
+                                log_dir, str(cycle), name, "NN", "job.out"
+                            )
+                        )
+                    ):
                         continue
                     auths = self.get_suite_jobs_auths(
-                        suite_name, [(cycle, name)])
+                        suite_name, [(cycle, name)]
+                    )
                     if auths:
                         # A shuffle here should allow the load for doing "rm
                         # -rf" to be shared between job hosts who share a file
@@ -271,16 +282,23 @@ class CylcProcessor(SuiteEngineProcessor):
 
             for auths, includes, excludes in auths_filters:
                 for auth in auths:
-                    data = {"auth": auth,
-                            "log_dir_rel": log_dir_rel,
-                            "uuid": uuid,
-                            "glob_": "*"}
+                    data = {
+                        "auth": auth,
+                        "log_dir_rel": log_dir_rel,
+                        "uuid": uuid,
+                        "glob_": "*",
+                    }
                     if includes:
                         data["glob_"] = includes[-1][1:]  # Remove leading /
                     cmd = self.popen.get_cmd(
-                        "ssh", auth,
-                        ("cd %(log_dir_rel)s && " +
-                         "(! test -f %(uuid)s && ls -d %(glob_)s)") % data)
+                        "ssh",
+                        auth,
+                        (
+                            "cd %(log_dir_rel)s && "
+                            + "(! test -f %(uuid)s && ls -d %(glob_)s)"
+                        )
+                        % data,
+                    )
                     ret_code, ssh_ls_out, _ = self.popen.run(*cmd)
                     if ret_code:
                         continue
@@ -300,8 +318,10 @@ class CylcProcessor(SuiteEngineProcessor):
                         continue
                     try:
                         cmd = self.popen.get_cmd(
-                            "ssh", auth,
-                            "cd %(log_dir_rel)s && rm -fr %(glob_)s" % data)
+                            "ssh",
+                            auth,
+                            "cd %(log_dir_rel)s && rm -fr %(glob_)s" % data,
+                        )
                         self.popen(*cmd)
                     except RosePopenError as exc:
                         self.handle_event(exc, level=Reporter.WARN)
@@ -310,7 +330,8 @@ class CylcProcessor(SuiteEngineProcessor):
                             line = line.decode()
                             event = FileSystemEvent(
                                 FileSystemEvent.DELETE,
-                                "%s:log/job/%s/" % (auth, line))
+                                "%s:log/job/%s/" % (auth, line),
+                            )
                             self.handle_event(event)
         finally:
             self.fs_util.delete(uuid_file_name)
@@ -339,8 +360,9 @@ class CylcProcessor(SuiteEngineProcessor):
         try:
             for cycle in cycles:
                 # tar.gz files
-                archive_file_name = os.path.join("log",
-                                                 "job-" + cycle + ".tar.gz")
+                archive_file_name = os.path.join(
+                    "log", "job-" + cycle + ".tar.gz"
+                )
                 if os.path.exists(archive_file_name):
                     self.fs_util.delete(archive_file_name)
                 # cycle directories
@@ -373,8 +395,11 @@ class CylcProcessor(SuiteEngineProcessor):
         """Initialise a named database connection."""
         if suite_name not in self.daos:
             prefix = "~"
-            db_f_name = os.path.expanduser(os.path.join(
-                prefix, self.get_suite_dir_rel(suite_name, "log", "db")))
+            db_f_name = os.path.expanduser(
+                os.path.join(
+                    prefix, self.get_suite_dir_rel(suite_name, "log", "db")
+                )
+            )
             self.daos[suite_name] = CylcSuiteDAO(db_f_name)
         return self.daos[suite_name]
 
@@ -401,14 +426,16 @@ class CylcProcessor(SuiteEngineProcessor):
             if "@" in auth:
                 user, host = auth.split("@", 1)
         user, host = [
-            i.decode() if isinstance(i, bytes) else i for i in [user, host]]
+            i.decode() if isinstance(i, bytes) else i for i in [user, host]
+        ]
         if user in ["None", self.user]:
             user = None
         if host and ("`" in host or "$" in host):
             command = ["bash", "-ec", "H=" + host + "; echo $H"]
             host = self.popen(*command)[0].strip().decode()
-        if (host in ["None", self.host] or
-                self.host_selector.is_local_host(host)):
+        if host in ["None", self.host] or self.host_selector.is_local_host(
+            host
+        ):
             host = None
         if user and host:
             auth = user + "@" + host
@@ -452,7 +479,8 @@ class CylcSuiteDAO:
         for _ in range(self.N_CONNECT_TRIES):
             try:
                 self.conn = sqlite3.connect(
-                    self.db_f_name, self.CONNECT_RETRY_DELAY)
+                    self.db_f_name, self.CONNECT_RETRY_DELAY
+                )
                 self.cursor = self.conn.cursor()
             except sqlite3.OperationalError:
                 sleep(self.CONNECT_RETRY_DELAY)

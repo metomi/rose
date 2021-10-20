@@ -53,6 +53,7 @@ class KGODatabase:
     apps.
 
     """
+
     # This SQL command ensures a "comparisons" table exists in the database
     # and then populates it with a series of columns (which in this case
     # are all storing strings/text). The primary key is the comparison name
@@ -87,17 +88,24 @@ class KGODatabase:
         self.task_name = "task_name not set"
 
     def enter_comparison(
-            self, comp_task, kgo_file, suite_file, status, comparison):
+        self, comp_task, kgo_file, suite_file, status, comparison
+    ):
         """Add a command to insert a new comparison entry to the database."""
         # This SQL command indicates that a single "row" is to be entered into
         # the "comparisons" table
         sql_statement = (
-            "INSERT OR REPLACE INTO comparisons VALUES (?, ?, ?, ?, ?)")
+            "INSERT OR REPLACE INTO comparisons VALUES (?, ?, ?, ?, ?)"
+        )
         # Prepend the task_name onto each entry, to try and ensure it is
         # unique (the individual comparison names may not be, but the
         # rose task name + the comparison task name should)
-        sql_args = [self.task_name + " - " + comp_task,
-                    kgo_file, suite_file, status, comparison]
+        sql_args = [
+            self.task_name + " - " + comp_task,
+            kgo_file,
+            suite_file,
+            status,
+            comparison,
+        ]
         # Add the command and arguments to the buffer
         self.statement_buffer.append((sql_statement, sql_args))
 
@@ -135,7 +143,8 @@ class KGODatabase:
             return
         # Otherwise locate the database
         file_name = os.path.join(
-            os.getenv("ROSE_SUITE_DIR"), "log", "rose-ana-comparisons.db")
+            os.getenv("ROSE_SUITE_DIR"), "log", "rose-ana-comparisons.db"
+        )
         lock_name = file_name + ".lock"
 
         if reporter is not None:
@@ -225,8 +234,10 @@ class AnalysisTask(object, metaclass=abc.ABCMeta):
             if option not in ["full_task_name", "description"]:
                 unhandled.append(option)
         if unhandled:
-            msg = ("Options provided but not understood for this "
-                   "analysis type: {0}")
+            msg = (
+                "Options provided but not understood for this "
+                "analysis type: {0}"
+            )
             raise ValueError(msg.format(unhandled))
 
 
@@ -246,20 +257,20 @@ class TaskRunner(threading.Thread):
 
     def run(self):
         # Create a temporary handler for the reporter class
-        reporter = Reporter(self.app.opts.verbosity -
-                            self.app.opts.quietness)
+        reporter = Reporter(self.app.opts.verbosity - self.app.opts.quietness)
 
         def handler(message, kind, level, prefix, clip):
             self.reporter_args.append((message, kind, level, prefix, clip))
+
         reporter.event_handler = handler
         self.task.reporter = reporter
 
         # Report the name of the task and a banner line to aid readability.
-        self.app.titlebar("Running task #{0}".format(self.index + 1),
-                          reporter)
+        self.app.titlebar("Running task #{0}".format(self.index + 1), reporter)
         reporter("Method: {0}".format(self.task.options["full_task_name"]))
-        reporter("Thread ID {0} starting at {1}"
-                 .format(self.ident, timestamp()))
+        reporter(
+            "Thread ID {0} starting at {1}".format(self.ident, timestamp())
+        )
 
         # Since the run_analysis method is out of rose's control in many
         # cases the safest thing to do is a blanket try/except; since we
@@ -269,44 +280,66 @@ class TaskRunner(threading.Thread):
             # In the case that the task didn't raise any exception,
             # we can now check whether it passed or failed.
             if self.task.passed:
-                msg = "Task #{0} passed at {1}".format(self.index + 1,
-                                                       timestamp())
-                self.summary_status.append(("{0} ({1})".format(
-                    msg, self.task.options["full_task_name"]),
-                    self.app._prefix_pass))
+                msg = "Task #{0} passed at {1}".format(
+                    self.index + 1, timestamp()
+                )
+                self.summary_status.append(
+                    (
+                        "{0} ({1})".format(
+                            msg, self.task.options["full_task_name"]
+                        ),
+                        self.app._prefix_pass,
+                    )
+                )
                 reporter(msg, prefix=self.app._prefix_pass)
             elif self.task.skipped:
                 self.skips = 1
                 msg = "Task #{0} skipped by method".format(self.index + 1)
-                self.summary_status.append(("{0} ({1})".format(
-                    msg, self.task.options["full_task_name"]),
-                    self.app._prefix_skip))
+                self.summary_status.append(
+                    (
+                        "{0} ({1})".format(
+                            msg, self.task.options["full_task_name"]
+                        ),
+                        self.app._prefix_skip,
+                    )
+                )
                 reporter(msg, prefix=self.app._prefix_skip)
             else:
                 self.failures = 1
-                msg = "Task #{0} did not pass at {1}".format(self.index + 1,
-                                                             timestamp())
-                self.summary_status.append(("{0} ({1})".format(
-                    msg, self.task.options["full_task_name"]),
-                    self.app._prefix_fail))
+                msg = "Task #{0} did not pass at {1}".format(
+                    self.index + 1, timestamp()
+                )
+                self.summary_status.append(
+                    (
+                        "{0} ({1})".format(
+                            msg, self.task.options["full_task_name"]
+                        ),
+                        self.app._prefix_fail,
+                    )
+                )
                 reporter(msg, prefix=self.app._prefix_fail)
         except Exception:
             # If an exception was raised, print a traceback and treat it
             # as a failure.
             self.task_error = True
             self.failures = 1
-            msg = ("Task #{0} encountered an error at {1}"
-                   .format(self.index + 1, timestamp()))
-            self.summary_status.append(("{0} ({1})".format(
-                msg, self.task.options["full_task_name"]),
-                self.app._prefix_fail))
-            reporter(msg + " (see stderr)",
-                     prefix=self.app._prefix_fail)
+            msg = "Task #{0} encountered an error at {1}".format(
+                self.index + 1, timestamp()
+            )
+            self.summary_status.append(
+                (
+                    "{0} ({1})".format(
+                        msg, self.task.options["full_task_name"]
+                    ),
+                    self.app._prefix_fail,
+                )
+            )
+            reporter(msg + " (see stderr)", prefix=self.app._prefix_fail)
             exception = traceback.format_exc()
-            reporter(msg, prefix=self.app._prefix_fail,
-                     kind=reporter.KIND_ERR)
-            reporter(exception, prefix=self.app._prefix_fail,
-                     kind=reporter.KIND_ERR)
+            reporter(msg, prefix=self.app._prefix_fail, kind=reporter.KIND_ERR)
+            reporter(
+                exception, prefix=self.app._prefix_fail, kind=reporter.KIND_ERR
+            )
 
 
 class RoseAnaApp(BuiltinApp):
@@ -351,11 +384,14 @@ class RoseAnaApp(BuiltinApp):
             # Use the previous app by instantiating and calling it explicitly
             self.reporter(
                 "!!WARNING!! - Detected old style rose_ana app; "
-                "Using previous rose_ana version...")
+                "Using previous rose_ana version..."
+            )
             from metomi.rose.apps.rose_ana_v1 import RoseAnaV1App
+
             old_app = RoseAnaV1App(manager=self.manager)
             return old_app.run(
-                app_runner, conf_tree, opts, args, uuid, work_files)
+                app_runner, conf_tree, opts, args, uuid, work_files
+            )
 
         # Load any rose_ana specific configuration settings either from
         # the site defaults or the user's personal config
@@ -367,8 +403,9 @@ class RoseAnaApp(BuiltinApp):
         self.kgo_db = None
         if use_kgo == TYPE_LOGICAL_VALUE_TRUE:
             self.kgo_db = KGODatabase()
-            self.kgo_db.enter_task(self.task_name,
-                                   self.kgo_db.TASK_STATUS_RUNNING)
+            self.kgo_db.enter_task(
+                self.task_name, self.kgo_db.TASK_STATUS_RUNNING
+            )
             self.titlebar("Initialising KGO database")
             self.kgo_db.buffer_to_db(self.reporter)
 
@@ -396,7 +433,8 @@ class RoseAnaApp(BuiltinApp):
                 # readability
                 self.titlebar("Running task #{0}".format(itask + 1))
                 self.reporter(
-                    "Method: {0}".format(task.options["full_task_name"]))
+                    "Method: {0}".format(task.options["full_task_name"])
+                )
 
                 # Since the run_analysis method is out of rose's control in
                 # many cases the safest thing to do is a blanket try/except;
@@ -407,26 +445,43 @@ class RoseAnaApp(BuiltinApp):
                     # In the case that the task didn't raise any exception,
                     # we can now check whether it passed or failed.
                     if task.passed:
-                        msg = "Task #{0} passed at {1}".format(itask + 1,
-                                                               timestamp())
-                        summary_status.append(("{0} ({1})".format(
-                            msg, task.options["full_task_name"]),
-                            self._prefix_pass))
+                        msg = "Task #{0} passed at {1}".format(
+                            itask + 1, timestamp()
+                        )
+                        summary_status.append(
+                            (
+                                "{0} ({1})".format(
+                                    msg, task.options["full_task_name"]
+                                ),
+                                self._prefix_pass,
+                            )
+                        )
                         self.reporter(msg, prefix=self._prefix_pass)
                     elif task.skipped:
                         number_of_skips += 1
                         msg = "Task #{0} skipped by method".format(itask + 1)
-                        summary_status.append(("{0} ({1})".format(
-                            msg, task.options["full_task_name"]),
-                            self._prefix_skip))
+                        summary_status.append(
+                            (
+                                "{0} ({1})".format(
+                                    msg, task.options["full_task_name"]
+                                ),
+                                self._prefix_skip,
+                            )
+                        )
                         self.reporter(msg, prefix=self._prefix_skip)
                     else:
                         number_of_failures += 1
-                        msg = ("Task #{0} did not pass at {1}"
-                               .format(itask + 1, timestamp()))
-                        summary_status.append(("{0} ({1})".format(
-                            msg, task.options["full_task_name"]),
-                            self._prefix_fail))
+                        msg = "Task #{0} did not pass at {1}".format(
+                            itask + 1, timestamp()
+                        )
+                        summary_status.append(
+                            (
+                                "{0} ({1})".format(
+                                    msg, task.options["full_task_name"]
+                                ),
+                                self._prefix_fail,
+                            )
+                        )
                         self.reporter(msg, prefix=self._prefix_fail)
 
                 except Exception:
@@ -434,22 +489,36 @@ class RoseAnaApp(BuiltinApp):
                     # it as a failure.
                     task_error = True
                     number_of_failures += 1
-                    msg = ("Task #{0} encountered an error at {1}"
-                           .format(itask + 1, timestamp()))
-                    summary_status.append(("{0} ({1})".format(
-                        msg, task.options["full_task_name"]),
-                        self._prefix_fail))
-                    self.reporter(msg + " (see stderr)",
-                                  prefix=self._prefix_fail)
+                    msg = "Task #{0} encountered an error at {1}".format(
+                        itask + 1, timestamp()
+                    )
+                    summary_status.append(
+                        (
+                            "{0} ({1})".format(
+                                msg, task.options["full_task_name"]
+                            ),
+                            self._prefix_fail,
+                        )
+                    )
+                    self.reporter(
+                        msg + " (see stderr)", prefix=self._prefix_fail
+                    )
                     exception = traceback.format_exc()
-                    self.reporter(msg, prefix=self._prefix_fail,
-                                  kind=self.reporter.KIND_ERR)
-                    self.reporter(exception, prefix=self._prefix_fail,
-                                  kind=self.reporter.KIND_ERR)
+                    self.reporter(
+                        msg,
+                        prefix=self._prefix_fail,
+                        kind=self.reporter.KIND_ERR,
+                    )
+                    self.reporter(
+                        exception,
+                        prefix=self._prefix_fail,
+                        kind=self.reporter.KIND_ERR,
+                    )
 
         elif n_threads > 1:
-            self.reporter("Running in THREADED mode, with {0} threads"
-                          .format(n_threads))
+            self.reporter(
+                "Running in THREADED mode, with {0} threads".format(n_threads)
+            )
             # Multithreaded case
             # Create threading objects for each comparison task
             threads = []
@@ -463,8 +532,10 @@ class RoseAnaApp(BuiltinApp):
             while itask < len(threads):
                 if len(running) < n_threads:
                     self.reporter(
-                        "Starting thread for task {0} at {1}"
-                        .format(itask + 1, timestamp()))
+                        "Starting thread for task {0} at {1}".format(
+                            itask + 1, timestamp()
+                        )
+                    )
                     running.append(threads[itask])
                     threads[itask].start()
                     itask += 1
@@ -482,7 +553,7 @@ class RoseAnaApp(BuiltinApp):
                 thread.join()
                 number_of_failures += thread.failures
                 number_of_skips += thread.skips
-                task_error = (task_error or thread.task_error)
+                task_error = task_error or thread.task_error
                 summary_status += thread.summary_status
                 # And print the output via the main reporter
                 for args in thread.reporter_args:
@@ -496,8 +567,9 @@ class RoseAnaApp(BuiltinApp):
         # The KGO database (if needed by the task) also stores its status - to
         # indicate whether there was some unexpected exception above.
         if self.kgo_db is not None and not task_error:
-            self.kgo_db.enter_task(self.task_name,
-                                   self.kgo_db.TASK_STATUS_SUCCEEDED)
+            self.kgo_db.enter_task(
+                self.task_name, self.kgo_db.TASK_STATUS_SUCCEEDED
+            )
             self.titlebar("Updating KGO database")
             self.kgo_db.buffer_to_db(self.reporter)
 
@@ -516,12 +588,14 @@ class RoseAnaApp(BuiltinApp):
 
         if number_of_failures > 0:
             msg += ", {0} Task{1} Failed".format(
-                number_of_failures, plural.get(number_of_failures, "s"))
+                number_of_failures, plural.get(number_of_failures, "s")
+            )
             prefix = self._prefix_fail
 
         if number_of_skips > 0:
             msg += ", {0} Task{1} Skipped".format(
-                number_of_skips, plural.get(number_of_skips, "s"))
+                number_of_skips, plural.get(number_of_skips, "s")
+            )
 
         msg += " (of {0} processed)".format(total)
         self.titlebar("Final status")
@@ -545,8 +619,7 @@ class RoseAnaApp(BuiltinApp):
         """Retrieves all rose_ana config options; these could be from
         the site's settings or the user's personal settings."""
         self.ana_config = {}
-        user_config = (
-            self.rose_conf.get_value(["rose-ana"]))
+        user_config = self.rose_conf.get_value(["rose-ana"])
         if user_config is not None:
             for name, obj in user_config.items():
                 if obj.state == "":
@@ -577,8 +650,7 @@ class RoseAnaApp(BuiltinApp):
                 # Find python files and attempt to import them; if a module
                 # fails to import report it but don't crash (the module may
                 # not actually be needed by this task)
-                module_name = os.path.splitext(
-                    os.path.basename(filename))[0]
+                module_name = os.path.splitext(os.path.basename(filename))[0]
                 try:
                     self.modules.add(__import__(module_name))
                 except ImportError:
@@ -586,12 +658,16 @@ class RoseAnaApp(BuiltinApp):
                     # here, as we want to avoid a single mistake in a user
                     # supplied method bringing down the entire task
                     msg = "Failed to import module: {0} ".format(module_name)
-                    self.reporter(msg, prefix="[WARN] ",
-                                  kind=self.reporter.KIND_ERR)
+                    self.reporter(
+                        msg, prefix="[WARN] ", kind=self.reporter.KIND_ERR
+                    )
                     exception = traceback.format_exc().split("\n")
                     for line in exception:
-                        self.reporter(line, prefix="[WARN]   ",
-                                      kind=self.reporter.KIND_ERR)
+                        self.reporter(
+                            line,
+                            prefix="[WARN]   ",
+                            kind=self.reporter.KIND_ERR,
+                        )
 
             # Remove the method path from the sys.path
             sys.path.pop(0)
@@ -648,8 +724,9 @@ class RoseAnaApp(BuiltinApp):
                     value = env_var_process(node.value)
                     values = value.split("\n")
                     for ival, value in enumerate(values):
-                        values[ival] = (
-                            re.sub(r"^((?:'|\")*)(.*)(\1)$", r"\2", value))
+                        values[ival] = re.sub(
+                            r"^((?:'|\")*)(.*)(\1)$", r"\2", value
+                        )
 
                     # If the user passed a blank curled-braces expression
                     # it should be expanded to contain each of the arguments
@@ -702,6 +779,7 @@ class RoseAnaApp(BuiltinApp):
                 class Dummy(AnalysisTask):
                     def run_analysis(self):
                         raise ImportError(msg.format(atype))
+
                 self.analysis_tasks.append(Dummy(self, options))
 
     def _get_method_paths(self):
@@ -716,7 +794,8 @@ class RoseAnaApp(BuiltinApp):
         if app_dir_var not in os.environ:
             app_dir_var = "ROSE_TASK_NAME"
         app_dir = os.path.join(
-            suite_dir, "app", os.environ[app_dir_var], "ana")
+            suite_dir, "app", os.environ[app_dir_var], "ana"
+        )
         if os.path.exists(app_dir):
             method_paths.append(app_dir)
 
@@ -735,7 +814,8 @@ class RoseAnaApp(BuiltinApp):
 
         # Finally there are some built-in methods within Rose itself
         method_paths.append(
-            os.path.join(os.path.dirname(__file__), "ana_builtin"))
+            os.path.join(os.path.dirname(__file__), "ana_builtin")
+        )
 
         return method_paths
 
@@ -749,7 +829,8 @@ class TestsFailedException(Exception):
 
     def __repr__(self):
         msg = "{0} test{1} did not pass".format(
-            self.failed, {1: ""}.get(self.failed, "s"))
+            self.failed, {1: ""}.get(self.failed, "s")
+        )
         return msg
 
     __str__ = __repr__

@@ -47,7 +47,8 @@ RE_CHARACTER = r"'(?:[^']|'')*'|\"(?:[^\"]|\"\")*\""
 REC_CHARACTER = _rec(r"\A(?:" + RE_CHARACTER + r")\Z")
 # Matches a complex literal, capture real and imaginary parts
 RE_COMPLEX_R_I = (
-    r"\(\s*(" + RE_REAL + r")\s*" + RE_SEP + r"\s*(" + RE_REAL + r")\s*\)")
+    r"\(\s*(" + RE_REAL + r")\s*" + RE_SEP + r"\s*(" + RE_REAL + r")\s*\)"
+)
 REC_COMPLEX_R_I = _rec(RE_COMPLEX_R_I)
 # Matches a comment
 RE_COMMENT = r"(?:! .*)"
@@ -55,21 +56,23 @@ RE_COMMENT = r"(?:! .*)"
 RE_NAME = r"(?:[A-Za-z_]\w*)"
 # Matches an array index (range)
 RE_NAME_INDEX2 = r":(?:" + RE_INTEGER + r")?"
-RE_NAME_INDEX1 = (
-    RE_INTEGER + r"(?:" + RE_NAME_INDEX2 + r")?|" + RE_NAME_INDEX2)
+RE_NAME_INDEX1 = RE_INTEGER + r"(?:" + RE_NAME_INDEX2 + r")?|" + RE_NAME_INDEX2
 RE_NAME_INDEX0 = (
-    r"\((?:(?:" + RE_NAME_INDEX1 + r")(?:," + RE_NAME_INDEX1 + r")*)\)")
+    r"\((?:(?:" + RE_NAME_INDEX1 + r")(?:," + RE_NAME_INDEX1 + r")*)\)"
+)
 RE_NAME_INDEX = r"(?:" + RE_NAME_INDEX0 + r"(?!" + RE_NAME_INDEX0 + r"))"
 # Matches a derived type component in a name
 RE_NAME_COMP = r"(?:\%" + RE_NAME + r")"
 # Matches an object name
 RE_OBJECT_NAME = (
-    r"(?:" + RE_NAME + r"(?:" + RE_NAME_COMP + r"|" + RE_NAME_INDEX + r")*)")
+    r"(?:" + RE_NAME + r"(?:" + RE_NAME_COMP + r"|" + RE_NAME_INDEX + r")*)"
+)
 # Matches an object initialisation, captures designator
 RE_OBJECT_INIT = r"(" + RE_OBJECT_NAME + r")\s*="
 # Matches a value, captures value
 RE_VALUE = (
-    r"(" + r"|".join([RE_REAL, RE_LOGICAL, RE_CHARACTER, RE_COMPLEX]) + r")")
+    r"(" + r"|".join([RE_REAL, RE_LOGICAL, RE_CHARACTER, RE_COMPLEX]) + r")"
+)
 REC_VALUE = _rec(r"\A" + RE_VALUE + r"\Z")
 # Matches a repeat-value, captures count and value
 RE_VALUE_REPEAT = r"(" + RE_NATURAL + r")\*(?:" + RE_VALUE + r")?"
@@ -80,15 +83,16 @@ RE_GROUP_INIT = r"[^&]* &(" + RE_NAME + r")"
 RE_GROUP_TERM = r"/"
 # Real literal tidy
 REC_REAL_TIDY = [
-    [_rec(r"[DdE]"), r"e"],                   # 1.d0, 1.D0, 1.E0 => 1.e0
-    [_rec(r"\A([\+\-]?)\."), r"\g<1>0."],     # .1 => 0.1, -.1 => -0.1
+    [_rec(r"[DdE]"), r"e"],  # 1.d0, 1.D0, 1.E0 => 1.e0
+    [_rec(r"\A([\+\-]?)\."), r"\g<1>0."],  # .1 => 0.1, -.1 => -0.1
     [_rec(r"\A([\+\-]?\d+)(e)"), r"\1.0\2"],  # 1e1 => 1.0e1
-    [_rec(r"e[\+\-]?0+\Z"), r""],             # 1.0e0 => 1.0
-    [_rec(r"e0+"), r"e"],                     # 1.0e01 => 1.0e1
-    [_rec(r"e([\+\-])0+"), r"e\1"],           # 1.0e-01 => 1.0e-1
-    [_rec(r"\.(e|\Z)"), r".0\1"],             # 1. => 1.0, 1.e0 => 1.0e0
-    [_rec(r"^0+(\d)"), r"\1"],                # 02.0 => 2.0, 000.5 => 0.5
-    [_rec(r"^([+-])0+(\d)"), r"\1\2"]]        # +02.0 => +2.0, -000.5 => -0.5
+    [_rec(r"e[\+\-]?0+\Z"), r""],  # 1.0e0 => 1.0
+    [_rec(r"e0+"), r"e"],  # 1.0e01 => 1.0e1
+    [_rec(r"e([\+\-])0+"), r"e\1"],  # 1.0e-01 => 1.0e-1
+    [_rec(r"\.(e|\Z)"), r".0\1"],  # 1. => 1.0, 1.e0 => 1.0e0
+    [_rec(r"^0+(\d)"), r"\1"],  # 02.0 => 2.0, 000.5 => 0.5
+    [_rec(r"^([+-])0+(\d)"), r"\1\2"],
+]  # +02.0 => +2.0, -000.5 => -0.5
 
 
 class NamelistGroup:
@@ -159,10 +163,12 @@ class NamelistObject:
         values = []
         for item in items:
             if item[self.IDX_R] > 1:
-                if (item[self.IDX_R] >= min_repeat_length and
-                        REC_VALUE.search(str(item[self.IDX_V]))):
+                if item[self.IDX_R] >= min_repeat_length and REC_VALUE.search(
+                    str(item[self.IDX_V])
+                ):
                     values.append(
-                        str(item[self.IDX_R]) + "*" + str(item[self.IDX_V]))
+                        str(item[self.IDX_R]) + "*" + str(item[self.IDX_V])
+                    )
                 else:
                     values.extend([str(item[self.IDX_V])] * item[self.IDX_R])
             else:
@@ -195,6 +201,7 @@ class NamelistValue:
         if self.value is None:
             self.tidy()
         return str(self.value)
+
     __str__ = __repr__
 
     def tidy(self):
@@ -245,10 +252,12 @@ def parse(in_files):
     """Parse namelist groups in a list of input files "in_files".
     Return a list of NamelistGroup objects.
     """
-    handler_of = {"group-init": _handle_group,
-                  "name": _handle_name,
-                  "value": _handle_value,
-                  "value-repeat": _handle_value}
+    handler_of = {
+        "group-init": _handle_group,
+        "name": _handle_name,
+        "value": _handle_value,
+        "value-repeat": _handle_value,
+    }
     groups = []
     ctx = _ParseContext()
     ctx.files += in_files
@@ -258,23 +267,30 @@ def parse(in_files):
     return groups
 
 
-_PARSERS_FOR = {"": [[RE_GROUP_INIT, "group-init", "group"],
-                     [r".*", "comment", None]],
-                "group": [[RE_OBJECT_INIT, "name", "value0"],
-                          [RE_GROUP_TERM, "group-term", ""],
-                          [RE_COMMENT, "comment", None]],
-                "value0": [[RE_OBJECT_INIT, "name", "value0"],
-                           [RE_VALUE_REPEAT, "value-repeat", "value1"],
-                           [RE_VALUE, "value", "value1"],
-                           [RE_SEP, "value", None],
-                           [RE_GROUP_TERM, "group-term", ""],
-                           [RE_COMMENT, "comment", None]],
-                "value1": [[RE_OBJECT_INIT, "name", "value0"],
-                           [RE_VALUE_REPEAT, "value-repeat", None],
-                           [RE_VALUE, "value", None],
-                           [RE_SEP, "value-sep", "value0"],
-                           [RE_GROUP_TERM, "group-term", ""],
-                           [RE_COMMENT, "comment", None]]}
+_PARSERS_FOR = {
+    "": [[RE_GROUP_INIT, "group-init", "group"], [r".*", "comment", None]],
+    "group": [
+        [RE_OBJECT_INIT, "name", "value0"],
+        [RE_GROUP_TERM, "group-term", ""],
+        [RE_COMMENT, "comment", None],
+    ],
+    "value0": [
+        [RE_OBJECT_INIT, "name", "value0"],
+        [RE_VALUE_REPEAT, "value-repeat", "value1"],
+        [RE_VALUE, "value", "value1"],
+        [RE_SEP, "value", None],
+        [RE_GROUP_TERM, "group-term", ""],
+        [RE_COMMENT, "comment", None],
+    ],
+    "value1": [
+        [RE_OBJECT_INIT, "name", "value0"],
+        [RE_VALUE_REPEAT, "value-repeat", None],
+        [RE_VALUE, "value", None],
+        [RE_SEP, "value-sep", "value0"],
+        [RE_GROUP_TERM, "group-term", ""],
+        [RE_COMMENT, "comment", None],
+    ],
+}
 
 
 def _parse_func(ctx):
@@ -348,7 +364,7 @@ def _handle_value(groups, _, data):
         value = data[0]
     if value and REC_CHARACTER.match(value):
         quote_mark = value[0]
-        value = value[1:len(value) - 1]
+        value = value[1 : len(value) - 1]
         value = value.replace(quote_mark + quote_mark, quote_mark)
         quote = True
     groups[-1].objects[-1].append_rhs(NamelistValue(value, quote), repeat)
@@ -394,10 +410,10 @@ def validate_config(config, meta_config, add_report_func):
         if len(keys) == 1:
             option = None
             value = None
-            is_error = (section.lower() != section)
+            is_error = section.lower() != section
         else:
             option = keys[1]
             value = node.value
-            is_error = (option.lower() != option)
+            is_error = option.lower() != option
         if is_error:
             add_report_func(section, option, value, ERROR_UPPERCASE)
