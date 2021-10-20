@@ -73,7 +73,7 @@ class RosePopenEvent(Event):
             self.stdin.fileno()
             # ask select if it is readable (real files can hang)
             readable = bool(select.select([self.stdin], [], [], 0.0)[0])
-        except (AttributeError, IOError):
+        except (AttributeError, IOError, ValueError):
             # file like
             readable = True
 
