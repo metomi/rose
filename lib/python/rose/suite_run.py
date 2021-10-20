@@ -474,9 +474,10 @@ class SuiteRunner(Runner):
         - ``flow.cylc`` (a file)
 
         Args:
-            destpath (str): Installation destination to check.
+            destpath (str): Installation destination relative to user home
+                to check.
             scan_depth (int): Maximum number of levels to check for
-            installations.
+                installations.
 
         Raises:
             InstalledByCylc8Error
@@ -497,13 +498,13 @@ class SuiteRunner(Runner):
 
         # Checking through the children of the destination path to a maximum
         # depth of max_depth.
-        searches = [
+        patterns = [
             destpath + '{}/'.format("/*"*i) + banned_file
             for i in range(scan_depth)
             for banned_file in ['_cylc-install', 'flow.cylc']
         ]
-        for search in searches:
-            result = glob(search)
+        for pattern in patterns:
+            result = glob(pattern)
             if result:
                 raise InstalledByCylc8Error(os.path.dirname(result[0]))
 

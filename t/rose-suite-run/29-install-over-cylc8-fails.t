@@ -27,11 +27,7 @@ tests 10
 
 mock_cylc8_install() {
     # Create a mocked up Cylc 8 Installed workflow.
-    if [[ -n "${1:-}" ]]; then
-        FLOW_NAME="${1}"
-    else
-        FLOW_NAME=""
-    fi
+    FLOW_NAME="${1:-}"
     UUID=$(uuidgen)
     WORKFLOW_NAME="rose-test-battery-${UUID::10}/${FLOW_NAME}"
     CYLC_RUN_DIR=$(cylc get-global-config -i '[hosts][localhost]run directory')
@@ -56,7 +52,7 @@ __HEREDOC__
 touch "${ROSE_1_SUITE_SRC}/rose-suite.conf"
 
 
-# We want to overwrite a Cylc 8 workflow installed in the top level dir.
+# Don't overwrite a Cylc 8 workflow installed in the top level dir.
 # > cylc install simplest --flow-name s.6 --no-run-name
 # |-- _cylc-install
 # |-- flow.cylc
@@ -68,7 +64,7 @@ run_fail "${TEST_NAME}" rose suite-run -i -C "${ROSE_1_SUITE_SRC}" --name="$WORK
 file_grep "${TEST_NAME}-error" "already has a Cylc 8 workflow installed." "${TEST_NAME}.err"
 rm -fr "$INSTALLED_WORKFLOW_PATH"
 
-# We want to over-write a simply installed Cylc 8 workflow with numbered runs.
+# Don't over-write a simply installed Cylc 8 workflow with numbered runs.
 # > cylc install simplest
 # |-- _cylc-install
 # |-- run1
@@ -80,7 +76,7 @@ run_fail "${TEST_KEY_BASE}" rose suite-run -i -C "${ROSE_1_SUITE_SRC}" --name="$
 file_grep "${TEST_KEY_BASE}-error" "already has a Cylc 8 workflow installed." "${TEST_KEY_BASE}.err"
 rm -fr "$INSTALLED_WORKFLOW_PATH"
 
-# We want to over-write a simply installed Cylc 8 workflow with named runs.
+# Don't over-write a simply installed Cylc 8 workflow with named runs.
 # > cylc install simplest --flow-name s.7 --run-name=bar
 # |-- _cylc-install
 # `-- bar
@@ -93,7 +89,7 @@ run_fail "${TEST_NAME}" rose suite-run -i -C "${ROSE_1_SUITE_SRC}" --name="$WORK
 file_grep "${TEST_NAME}-error" "already has a Cylc 8 workflow installed." "${TEST_NAME}.err"
 rm -fr "$INSTALLED_WORKFLOW_PATH"
 
-# We want to over-write a directory containing a Cylc 8 install
+# Don't over-write a directory containing a Cylc 8 install
 # > cylc install simplest --flow-name s.5/foo
 # `-- foo
 #     |-- _cylc-install
@@ -120,5 +116,6 @@ mkdir -p "${INSTALLED_WORKFLOW_PATH}/_cylc-install"
 mkdir -p "${INSTALLED_WORKFLOW_PATH}/run1/flow.cylc"
 run_fail "${TEST_NAME}" rose suite-run -i -C "${ROSE_1_SUITE_SRC}" \
     --name "${INSTALLED_WORKFLOW_PATH}baz"
+echo "${ROSE_1_SUITE_SRC}" "${INSTALLED_WORKFLOW_PATH}/baz" >&2
 file_grep "${TEST_NAME}-error" "already has a Cylc 8 workflow installed." "${TEST_NAME}.err"
 rm -fr "$INSTALLED_WORKFLOW_PATH"
