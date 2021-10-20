@@ -135,7 +135,18 @@ def namelist_dump(args=None, output_file=None, case_mode=None):
 
 def main():
     """CLI for "rose namelist-dump"."""
-    opt_parser = RoseOptionParser()
+    opt_parser = RoseOptionParser(
+        usage='rose-namelist-dump [OPTIONS] [FILE ...]',
+        description='''
+Convert namelist files into a Rose application configuration snippet.
+Each argument should be the path to an empty file or a file containing
+Fortran namelist groups. A `-` can be used once in the argument list to
+specify the standard input. If no argument is given, it assumes the
+standard input is specified. Where possible, use relative path for file
+names, as the file names appear as-specified in the generated
+configuration.
+        ''',
+    )
     opt_parser.add_my_options("case_mode", "lower", "output_file", "upper")
     opts, args = opt_parser.parse_args()
     return namelist_dump(args, opts.output_file, opts.case_mode)

@@ -28,9 +28,16 @@
 #
 # DESCRIPTION
 #     Make a copy of one of the tutorial SUITE in the cylc-run directory.
-#
 #-------------------------------------------------------------------------------
 set -eu
+
+if [[ $1 == '--help' ]]; then
+    # shellcheck source=metomi/rose/etc/lib/bash/rose_usage
+    . "$(rose resource lib/bash/rose_usage)"
+    rose_help
+    exit 0
+fi
+
 mkdir -p "$HOME/cylc-run"
 
 usage () {

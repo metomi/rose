@@ -1,7 +1,4 @@
-#!/usr/bin/env python3
-# -----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -187,6 +184,13 @@ def main():
         file=sys.stderr
     )
 
+    if '--help' in sys.argv:
+        print('\n' + __doc__)
+        sys.exit()
+
+    # strip the rose end of the CLI args
+    sys.argv = sys.argv[2:]
+
     # Handle Legacy Rose-date -c functionality
     if '-c' in sys.argv or '--use-task-cycle-time' in sys.argv:
         if os.getenv('ROSE_TASK_CYCLE_TIME'):
@@ -206,10 +210,3 @@ def main():
         os.environ['ISODATETIMECALENDAR'] = os.getenv('ROSE_CYCLING_MODE')
 
     sys.exit(iso_main())
-
-
-if __name__ == '__main__':
-    if '--help' in sys.argv:
-        print(__doc__)
-    else:
-        main()

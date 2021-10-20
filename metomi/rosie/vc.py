@@ -64,6 +64,17 @@ PROMPT_DELETE = "%s: delete local+repository copies?" + PROMPT_TAIL_YNA
 PROMPT_DELETE_LOCAL = "%s: delete local copy?" + PROMPT_TAIL_YNA
 
 
+def cli(fcn):
+    """Launcher for the CLI functions."""
+
+    def _inner(argv):
+        nonlocal fcn
+        add_meta_paths()
+        return fcn()
+
+    return _inner
+
+
 class FileExistError(Exception):
     """Raised when a file exists and can't be overwritten.
 
@@ -570,10 +581,27 @@ class RosieVCClient:
         return new_id
 
 
-def checkout(argv):
+@cli
+def checkout():
     """CLI function: checkout."""
-    opt_parser = RoseOptionParser().add_my_options("force_mode")
-    opts, args = opt_parser.parse_args(argv)
+    opt_parser = RoseOptionParser(
+        usage='rosie checkout [OPTIONS] ID ...',
+        description='''
+Checkout local copies of suites.
+
+For each `ID` in the argument list, checkout a working copy of the suite
+identified by `ID` to the standard location.
+        ''',
+    ).add_my_options("force_mode")
+    opt_parser.modify_option(
+        'force_mode',
+        help=(
+            'If working copy for suite identified by `ID` already exists,'
+            ' remove it. Continue to the next `ID` if checkout of a suite'
+            ' fails.'
+        ),
+    )
+    opts, args = opt_parser.parse_args()
     verbosity = opts.verbosity - opts.quietness
     report = Reporter(verbosity)
     client = RosieVCClient(event_handler=report, force_mode=opts.force_mode)
@@ -591,9 +619,41 @@ def checkout(argv):
         sys.exit(ret_code)
 
 
-def create(argv):
+@cli
+def create():
     """CLI function: create and copy."""
-    opt_parser = RoseOptionParser()
+    opt_parser = RoseOptionParser(
+        usage=(
+            'rosie create [OPTIONS]'
+            '\n       rosie copy [OPTIONS] ID-OF-EXISTING-SUITE'
+        ),
+        description='''
+rosie create: Create a new suite
+rosie copy  : Create a new suite and copy content from an existing one.
+
+Assign a new `ID` and create the directory structure in the central
+repository for a new suite.
+
+The location of the repository for the new suite is determined in order
+of preference:
+
+1. `--prefix=PREFIX` option
+2. prefix of the `ID-OF-EXISTING-SUITE`
+3. `[rosie-id]prefix-default` option in the site/user configuration.
+
+If `ID-OF-EXISTING-SUITE` is specified, copy items from the existing suite
+`ID-OF-EXISTING-SUITE` when the suite is created. It is worth noting that
+revision history of the copied items can only be preserved if
+`ID-OF-EXISTING-SUITE` is in the same repository of the new suite
+
+The syntax of the ID-OF-EXISTING-SUITE is PREFIX-xxNNN[/BRANCH][@REV]
+(e.g. my-su173, my-su173/trunk, my-su173/trunk@HEAD). If REV is not specified,
+the last changed revision of the branch is used. If BRANCH is not specified,
+"trunk" is used.
+
+NOTE: ID-OF-EXISTING-SUITE is _not_ a filepath.
+        ''',
+    )
     opt_parser.add_my_options(
         "checkout_mode",
         "info_file",
@@ -602,7 +662,7 @@ def create(argv):
         "prefix",
         "project",
     )
-    opts, args = opt_parser.parse_args(argv)
+    opts, args = opt_parser.parse_args()
     verbosity = opts.verbosity - opts.quietness
     client = RosieVCClient(event_handler=Reporter(verbosity))
     SuiteId.svn.event_handler = client.event_handler
@@ -717,12 +777,35 @@ def _edit_info_config(opts, client, info_config):
         os.unlink(temp_name)
 
 
-def delete(argv):
+@cli
+def delete():
     """CLI function: delete."""
-    opt_parser = RoseOptionParser().add_my_options(
+    opt_parser = RoseOptionParser(
+        usage='rosie delete [OPTIONS] [--] [ID ...]',
+        description='''
+Delete suites.
+
+Check the standard working copy location for a checked out suite
+matching `ID` and remove it if there is no uncommitted change (or if
+`--force` is specified).
+
+Delete the suite directory structure from the HEAD of the central
+repository matching the `ID`.
+
+If no `ID` is specified and `$PWD` is a working copy of a suite, use the
+`ID` of the suite in the working copy.
+        '''
+    ).add_my_options(
         "force_mode", "non_interactive", "local_only"
     )
-    opts, args = opt_parser.parse_args(argv)
+    opt_parser.modify_option(
+        'force_mode',
+        help=(
+            "Remove working copies even if there are uncommitted changes."
+            "\nContinue with the next `ID` if delete of a suite fails."
+        ),
+    )
+    opts, args = opt_parser.parse_args(sys.argv)
     report = Reporter(opts.verbosity - opts.quietness)
     client = RosieVCClient(event_handler=report, force_mode=opts.force_mode)
     SuiteId.svn.event_handler = client.event_handler
@@ -761,20 +844,3 @@ def delete(argv):
                     sys.exit(1)
     if ret_code:
         sys.exit(ret_code)
-
-
-def main():
-    """Launcher for the CLI functions."""
-    add_meta_paths()
-    argv = sys.argv[1:]
-    if not argv:
-        return sys.exit(1)
-    for name in ["checkout", "create", "delete"]:
-        if argv[0] == name:
-            return globals()[name](argv[1:])
-    else:
-        sys.exit("metomi.rosie.vc: %s: incorrect usage" % argv[0])
-
-
-if __name__ == "__main__":
-    main()

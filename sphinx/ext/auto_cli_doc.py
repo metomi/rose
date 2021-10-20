@@ -1,4 +1,7 @@
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
+#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -13,13 +16,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-# -----------------------------------------------------------------------------
-"""An extension for auto-documenting command line interfaces."""
-
-from collections import OrderedDict
+#-------------------------------------------------------------------------------
+from argparse import ArgumentParser
 import re
-from subprocess import CalledProcessError, check_output
+from subprocess import DEVNULL, PIPE, Popen
 import sys
+from textwrap import dedent, indent
 
 from docutils import nodes
 from docutils.parsers.rst import Directive
@@ -28,138 +30,15 @@ from docutils.statemachine import ViewList
 import sphinx
 from sphinx.util.nodes import nested_parse_with_titles
 
-# --- Generic regex'es. ---
 
-# Splits the content of a documentation section by indentation.
-INDENT_REGEX = re.compile(r'^([^\s\t].*)((?:\n(?![^\s]).*)+)', re.MULTILINE)
-# Matches rst `literals`.
-LITERAL_REGEX = re.compile(r'(?<!\`)\`(?!\`)([^\`]+)(?<!\`)\`(?!\`)')
+# RE_CMD = re.compile(r'^={5,}$\n^(.*)$\n^={5,}$')
+RE_CMD = re.compile(r'={5,}\n')
+RE_USAGE = re.compile(r'Usage: (.*)')
+RE_SECTION = re.compile(r'^([A-Z][A-Z: ]+)$')
 
+RST_HEADINGS = ['=', '-', '^', '"']
 
-# --- ReStructured Text properties. ---
-
-# Standard re-structured-text indentation level.
-RST_INDENT = '   '  # 3 spaces ( .. following sections must be flush with 'f').
-# Characters used to underline rst headings in order of precedence.
-RST_HEADING_CHARS = ['=', '-', '^', '"']
-# Concrete forms of the admonition directive.
-RST_ADMONITIONS = [
-    'attention',
-    'caution',
-    'danger',
-    'error',
-    'hint',
-    'important',
-    'note',
-    'tip',
-    'warning',
-]
-
-
-# --- Rose specific regex'es. ---
-
-# Splits the documentation file into commands and their associated
-# documentation.
-ROSE_COMMAND_REGEX = re.compile(
-    r'={%d}\n(.*)\n={%d}\n(((?!====).*\n)+)' % (50, 50)
-)
-# Splits command documentation into sections and content.
-ROSE_HELP_SECTION_REGEX = re.compile(
-    r'(^(?:\w+\s?)+$)((?:\n(?!^\w).*)+)', re.MULTILINE
-)
-
-# --- Rose specific help section formatting. ---
-
-# Documentation sections which should be rendered as mono-spaced plain-text.
-ROSE_CODE_SECTIONS = {  # SECTION_NAME: SYNTAX_HIGHLIGHTING
-    'EXAMPLES': 'bash',
-}
-# Documentation sections which contain lists of options (along with one or more
-# un-formatted description lines at the start of the block).
-ROSE_OPTION_SECTIONS = [
-    'OPTIONS',
-    'ARGUMENTS',
-    'ENVIRONMENT VARIABLES',
-    'JINJA2 VARIABLES',
-    'CONFIGURATION',
-]
-
-
-def get_indentation(lines):
-    """Return the minimum indentation of a collection of lines.
-
-    Example:
-        >>> get_indentation([
-        ...     '    abc',
-        ...     '     def',
-        ...     '',
-        ...     '   ghi'
-        ... ])
-        3
-    """
-    indentation = None
-    contains_new_lines = False
-    for line in lines:
-        if not line:
-            contains_new_lines = True
-            continue
-        count = 0
-        for char in line:
-            if char == ' ':
-                count += 1
-            else:
-                break
-        if not indentation or count < indentation:
-            indentation = count
-    if indentation is None and contains_new_lines:
-        return 0
-    return indentation
-
-
-def parse_admonitions(lines):
-    """Transform admonitions into valid rst.
-
-    Example:
-        >>> parse_admonitions(['NOTE: Some text here.'])
-        ['.. note:: Some text here.']
-    """
-    for itt, line in enumerate(lines):
-        for admonition in RST_ADMONITIONS:
-            tag = '%s:' % admonition.upper()
-            if tag in line:
-                lines[itt] = line.replace(tag, '.. %s::' % admonition)
-    return lines
-
-
-def line_strip(lines):
-    """Remove leading and trailing empty lines from a line list
-
-    Example:
-        >>> line_strip([
-        ...     ''
-        ...     'a'
-        ...     ''
-        ... ])
-        ['a']
-        >>> line_strip([''])
-        []
-
-    """
-    if all(not line for line in lines):
-        return []
-    lines = list(lines)
-    kill = []
-    for itt in range(0, len(lines)):
-        if lines[itt]:
-            break
-        kill.append(itt)
-    for itt in reversed(range(0, len(lines))):
-        if lines[itt]:
-            break
-        kill.append(itt)
-    for itt in reversed(sorted(kill)):
-        del lines[itt]
-    return lines
+RE_LITERAL = re.compile(r'(?<!\`)\`(?!\`)([^\`]+)(?<!\`)\`(?!\`)')
 
 
 def format_literals(text, references_to_match=None, ref_template='%s'):
@@ -187,7 +66,7 @@ def format_literals(text, references_to_match=None, ref_template='%s'):
         references_to_match = []
     ref_template = ':ref:`{0}`'.format(ref_template)
 
-    for match in reversed([x for x in LITERAL_REGEX.finditer(text)]):
+    for match in reversed([x for x in RE_LITERAL.finditer(text)]):
         repl = ''
         start, end = match.span()
 
@@ -216,253 +95,208 @@ def format_literals(text, references_to_match=None, ref_template='%s'):
     return text
 
 
-def write_rst_heading(
-    write, text, heading_level, label_section=False, label_template='%s'
-):
-    """Write a rst heading element.
-
-    Args:
-        write (function): A writer function which will be called with each line
-            to be written.
-        text (str): The title to write.
-        heading_level (int): Zero is a top level heading, 4 is the lowest.
-        label_section (bool): If true add a sphinx label for referencing this
-            section with. The label is formatted using the label_template.
-        label_template (str): A template for formatting the name assigned to
-            the rst label.
+def list_strip(lst):
+    """
 
     Examples:
-        >>> write_rst_heading(print, 'Hello World!', 0)
-        Hello World!
-        ============
-        <BLANKLINE>
-
-        >>> write_rst_heading(print, 'Hello World!', 2, True, 'section-%s-')
-        .. _section-Hello-World!-:
-        <BLANKLINE>
-        Hello World!
-        ^^^^^^^^^^^^
-        <BLANKLINE>
+        >>> list_strip(['', '', 'foo', '', ''])
+        ['foo']
+        >>> list_strip(['foo', '', 'bar'])
+        ['foo', '', 'bar']
 
     """
-    text = text.strip()
-    if label_section:
-        write('.. _%s:' % (label_template % text.replace(' ', '-')))
-        write('')
-    write(text)
-    write(RST_HEADING_CHARS[heading_level] * len(text))
-    write('')
-
-
-def write_rst_section(write, text, indent_level=0):
-    """Write out text with indentation striped.
-
-    Optionally apply rst indentation as required.
-
-    Args:
-        write (function): A writer function which will be called with each line
-            to be written.
-        text (str): The text to write out.
-        indent_level (int): The desired indentation level for the output text.
-
-    Examples:
-        >>> write_rst_section(print, 'foo')
-        foo
-        <BLANKLINE>
-
-        >>> write_rst_section(print, 'NOTE: Foo')
-        .. note:: Foo
-        <BLANKLINE>
-
-        >>> write_rst_section(print, 'foo', 1)
-           foo
-        <BLANKLINE>
-
-    """
-    lines = line_strip(text.split('\n'))
-    parse_admonitions(lines)
-    indentation = get_indentation(lines)
-    for line in lines:
-        write('%s%s' % (RST_INDENT * indent_level, line[indentation:]))
-    write('')
-
-
-def write_command_reference(write, commands):
-    """Write out the provided command documentation in rst format.
-
-    Args:
-        write (function): A writer function which will be called with each line
-            to be written.
-        commands (dict): Dictionary of command, doc-text pairs.
-
-    Examples:
-        >>> write_command_reference(print, {'foo': '''
-        ... NAME
-        ...     Foo
-        ...
-        ... SYNOPSIS
-        ...     foo
-        ...
-        ... DESCRIPTION
-        ...     Foo bar baz.
-        ...
-        ...     NOTE: pub
-        ... '''})
-        .. _command-foo:
-        <BLANKLINE>
-        foo
-        ^^^
-        <BLANKLINE>
-        .. code-block:: bash
-        <BLANKLINE>
-           foo
-        <BLANKLINE>
-        Foo bar baz.
-        <BLANKLINE>
-        .. note:: pub
-        <BLANKLINE>
-        <BLANKLINE>
-
-    """
-    # For each command.
-    for num, (command, help_text) in enumerate(sorted(commands.items())):
-        # Deal with aliases.
-        if '->' in command:
-            # Command is an alias -> write a see also label.
-            command, alias = command.split('->')
-            # Don't label alias sections, we shouldn't be referencing them!
-            write_rst_heading(write, command, 2)
-            write(
-                'Alias - see :ref:`command-%s`'
-                % (alias.strip().replace(' ', '-'))
-            )
-            write('')
-            continue
-
-        # Rose Stem is documented in Cylc format
-        if command == 'rose stem':
-            sections = {
-                'NAME': command,
-                'DESCRIPTION': '',
-                'SYNOPSIS': '\n  '.join(help_text.splitlines()),
-            }
-            write('')
+    for item in list(lst):
+        if not item:
+            lst.pop(0)
         else:
-            # Replace single back-quotes with double ones and insert links to
-            # other commands as required.
-            help_text = format_literals(help_text, commands, 'command-%s')
-
-            # Split the help-text into sections.
-            sections = OrderedDict(
-                (a.strip(), b)
-                for a, b in ROSE_HELP_SECTION_REGEX.findall(help_text)
-            )
-
-        # Write command name as a heading.
-        write_rst_heading(write, command, 2, True, 'command-%s')
-
-        # The NAME section is not used
-        del sections['NAME']
-
-        # Write synopsis as a bash formatted code block.
-        lang = 'none' if command == 'rose stem' else 'bash'
-        write(f'.. code-block:: {lang}')
-        write('')
-        write_rst_section(write, sections['SYNOPSIS'], indent_level=1)
-        del sections['SYNOPSIS']
-
-        # Write description as rst.
-        write_rst_section(write, sections['DESCRIPTION'])
-        del sections['DESCRIPTION']
-
-        # Write out remaining sections.
-        for title, section in sections.items():
-            # Remove indentation and strip any leading/trailing new lines.
-            section_lines = section.split('\n')
-            indentation = get_indentation(section_lines)
-            section_lines = line_strip(
-                [line[indentation:] for line in section_lines]
-            )
-
-            # Write title as a paragraph.
-            title = title.strip().upper()
-            write('**%s**' % title)  # **bold-text**
-            write('')
-
-            if title in ROSE_OPTION_SECTIONS:
-                # Write an option-description section, the option is a literal
-                # and the description is rst.
-                section_text = '\n'.join(section_lines)
-
-                # Permit one or more lines at the top of an option section to
-                # be rendered as a paragraph.
-                header_lines = []
-                header_lines_present = False
-                for line in section_lines:
-                    # Detect these "header lines".
-                    if line and not line.startswith(' '):
-                        header_lines.append(line)
-                    elif not line:
-                        header_lines_present = True
-                        break
-                    else:
-                        break
-                if header_lines_present:
-                    # Write out these lines if detected
-                    for line in header_lines:
-                        write(line)
-                        section_lines.remove(line)
-                    write('')
-                    # Remove these lines from the section.
-                    section_text = '\n'.join(section_lines)
-
-                # Write out options as definition blocks.
-                for option, description in INDENT_REGEX.findall(section_text):
-                    # Write out the option as a literal.
-                    write('``%s``' % option)
-                    # Write out the option text as a definition block.
-                    # Description starts with a new line.
-                    write_rst_section(write, description, 1)
-
-            elif title in ROSE_CODE_SECTIONS:
-                # Write a rst code-block.
-                write('.. code-block:: %s' % ROSE_CODE_SECTIONS[title])
-                write('')
-                write_rst_section(write, section, 1)
-
-            else:
-                # Unknown documentation section - write an rst block.
-                for line in section_lines:
-                    write(line)
-                write('')
-
-        # Write section divide.
-        if num != len(commands) - 1:
-            write('')
-            write('----')
-
-        write('')
+            break
+    for item in reversed(lst):
+        if not item:
+            lst.pop(-1)
+        else:
+            break
+    return lst
 
 
-def get_rose_command_reference(command_name):
-    """Generate help text for a Rose command.
+def split(text):
+    parts = RE_CMD.split(text)
 
-    Args:
-        command_name (str): The name of the Rose command to be documented (i.e.
-            rose / rosie.
+    return {
+        cmd.strip(): parse(content.strip())
+        for cmd, content in zip(parts[1::2], parts[2::2])
+    }
 
-    """
-    # Obtain help text.
-    cmd = [command_name, 'doc']
+
+def parse(text):
+    if not text:
+        return
+    lines = text.splitlines()
+    ret = {}
+
     try:
-        stdout = check_output(cmd).decode()
-    except CalledProcessError:
-        sys.exit(1)
+        ret['USAGE'] = RE_USAGE.search(lines[0]).group()
+    except AttributeError:
+        pass
+    except IndexError:
+        breakpoint()
 
-    # Extract commands / aliases.
-    commands = dict((x, y) for x, y, _ in ROSE_COMMAND_REGEX.findall(stdout))
+    section = 'DESCRIPTION'
+    buffer = []
+    for line in lines[1:]:
+        if RE_SECTION.search(line):
+            ret[section] = '\n'.join(list_strip(buffer))
+            buffer = []
+            section = RE_SECTION.search(line).groups()[0].replace(':', '')
+        else:
+            buffer.append(line)
+    else:
+        ret[section] = '\n'.join(list_strip(buffer))
 
-    return commands
+    if 'USAGE' not in ret:
+        try:
+            ret['USAGE'] = ret.pop('SYNOPSIS')
+        except KeyError:
+            ret['USAGE'] = ''
+
+    if 'NAME' in ret:
+        ret.pop('NAME')
+
+    return ret
+
+
+def rst_heading(text, level=0):
+    return f'\n{text}\n{RST_HEADINGS[level] * len(text)}\n'
+
+
+def rst_code_block(code, lang=None):
+    return (
+        '\n'
+        f'.. code-block:: {lang or ""}'
+        '\n\n'
+        + indent(dedent(code), ' ' * 3)
+        + '\n'
+    )
+    return dedent(f'''
+        .. code-block:: {lang}
+
+           {indent(dedent(code), ' ' * 0)}\n
+    ''')
+
+
+def rst_anchor(text):
+    return f'\n.. _{text}:\n'
+
+
+def rst_body(text):
+    return f'\n{format_literals(dedent(text))}\n'
+
+
+def write(ns, cmds, _write):
+    for cmd, content in cmds.items():
+        if 'USAGE' not in content:
+            breakpoint()
+        _write(
+            rst_anchor(f'command-{cmd.replace(" ", "-")}')
+        )
+        _write(
+            rst_heading(cmd, 1)
+        )
+        _write(
+            rst_code_block(content['USAGE'], 'bash')
+        )
+        _write(
+            rst_body(content['DESCRIPTION'])
+        )
+        for key, text in content.items():
+            if key in {'USAGE', 'DESCRIPTION'}:
+                continue
+            _write(
+                rst_heading(key.capitalize(), 2)
+            )
+            if key in {'OPTIONS'}:
+                _write(
+                    rst_code_block(text)
+                )
+            elif key in {'EXAMPLE', 'EXAMPLES'}:
+                _write(
+                    rst_code_block(text, 'bash')
+                )
+            else:
+                _write(
+                    rst_body(text)
+                )
+
+
+def load_from_file(filename):
+    with open(filename, 'r') as doc_file:
+        return doc_file.read().strip()
+
+
+def load_from_cli(ns):
+    return Popen(
+        # TODO - remove the "2"
+        [f'{ns}2', 'doc'],
+        stdin=DEVNULL,
+        stdout=PIPE,
+        text=True
+    ).communicate()[0].strip()
+
+
+def get_parser():
+    parser = ArgumentParser()
+
+    parser.add_argument(
+        'ns',
+        default=None,
+        help='Rose namespace i.e. rose, rosie, rosa'
+    )
+
+    parser.add_argument(
+        'doc_file',
+        nargs='?',
+        default=None,
+        help='read `rose doc` output from a file (for testing).'
+    )
+
+    return parser
+
+
+def test():
+    parser = get_parser()
+    args = parser.parse_args()
+
+    if args.doc_file:
+        text = load_from_file(args.doc_file)
+    else:
+        text = load_from_cli(args.ns)
+
+    main(args.ns, text, sys.stdout.write)
+
+
+def make(ns):
+    text = load_from_cli(ns)
+    lines = []
+
+    def _write(text):
+        nonlocal lines
+        lines.extend(text.splitlines())
+
+    main(ns, text, _write)
+    return lines
+
+
+def main(ns, text, _write):
+    cmds = split(text)
+
+    for cmd, contents in dict(cmds).items():
+        # print(f'# {cmd}\n    {contents}')
+        if not contents:
+            breakpoint()
+        if 'USAGE' not in contents:
+            # TODO
+            cmds.pop(cmd)
+
+    write(ns, cmds, _write)
 
 
 class AutoCLIDoc(Directive):
@@ -480,25 +314,17 @@ class AutoCLIDoc(Directive):
 
     def run(self):
         # The rose command to document (i.e. rose / rosie)
-        cli_help_format, command = self.arguments[0:2]
+        _, ns = self.arguments[0:2]
 
-        if cli_help_format == 'rose':
-            # Generate CLI documentation as a list of rst formatted text lines.
-            lines = []
-            write = lines.append
-            write_command_reference(write, get_rose_command_reference(command))
+        lines = make(ns)
 
-            # Parse these lines into a docutills node.
-            node = nodes.section()
-            node.document = self.state.document
-            nested_parse_with_titles(self.state, ViewList(lines), node)
+        # Parse these lines into a docutills node.
+        node = nodes.section()
+        node.document = self.state.document
+        nested_parse_with_titles(self.state, ViewList(lines), node)
 
-            # Return the children of this node (the generated nodes).
-            return node.children
-        else:
-            raise Exception(
-                'Invalid/Unsupported CLI help format "%s"' % cli_help_format
-            )
+        # Return the children of this node (the generated nodes).
+        return node.children
 
 
 def setup(app):
@@ -508,14 +334,4 @@ def setup(app):
 
 
 if __name__ == '__main__':
-    # Testing / Development.
-
-    writer = print
-
-    write_rst_heading(writer, 'Command Reference', 0)
-
-    write_rst_heading(writer, 'Rose Commands', 1)
-    write_command_reference(writer, get_rose_command_reference('rose'))
-
-    write_rst_heading(writer, 'Rosie Commands', 1)
-    write_command_reference(writer, get_rose_command_reference('rosie'))
+    test()

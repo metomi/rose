@@ -579,7 +579,39 @@ class SuiteId:
 
 def main():
     """Implement the "rose suite-id" command."""
-    opt_parser = RoseOptionParser()
+    opt_parser = RoseOptionParser(
+        description='''
+Utility for working with suite IDs.
+
+EXAMPLES:
+    # Print the repository URL of a given suite ID
+    rosie id --to-origin mo1-abc45
+
+    # Print the local location of a given suite ID
+    rosie id --to-local-copy mo1-abc45
+
+    # Print the web URL of a given suite ID
+    rosie id --to-web mo1-abc45
+
+    # Print suite ID of working copy in $PWD
+    rosie id
+
+    # Print suite ID of working copy in a directory
+    rosie id /path/to/working/copy
+
+    # Print suite ID of a given URL
+    rosie id svn://fcm1/rose_mo1_svn/a/b/c/4/5
+
+    # Print latest suite ID in the default repository
+    rosie id --latest
+
+    # Print latest suite ID in the given repository
+    rosie id --latest mot
+
+    # Print next suite ID in the default repository
+    rosie id --next
+        ''',
+    )
     opt_parser.add_my_options(
         "latest", "next", "to_local_copy", "to_origin", "to_web"
     )

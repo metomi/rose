@@ -135,7 +135,73 @@ def format_metadata_as_text(metadata, only_these_options=None):
 
 def main():
     """Implement the "rose config-diff" command."""
-    opt_parser = metomi.rose.opt_parse.RoseOptionParser()
+    opt_parser = metomi.rose.opt_parse.RoseOptionParser(
+        description='''
+Display the metadata-annotated difference between two Rose config files.
+
+EXAMPLES
+    # Display the metadata-annotated diff between two Rose config files.
+    rose config-diff FILE1 FILE2
+
+    # Display the metadata-annotated diff between two Rose config dirs.
+    rose config-diff DIR1 DIR2
+
+    # Display the diff, ignoring particular setting patterns
+    rose config-diff --ignore=namelist:foo FILE1 FILE2
+
+    # Display the diff with a particular diff tool
+    rose config-diff --diff-tool=kdiff3 FILE1 FILE2
+
+    # Display the diff with some diff tool specific options/arguments
+    rose config-diff FILE1 FILE2 -- [DIFF_OPTIONS] [DIFF_ARGUMENTS]
+        ''',
+        epilog='''
+ENVIRONMENT VARIABLES
+    optional ROSE_META_PATH
+        Prepend `$ROSE_META_PATH` to the metadata search path.
+
+ARGUMENTS
+    PATH1, PATH2
+        Two Rose configuration files or directories to compare.
+        If the path is a directory, look underneath for a Rose configuration
+        file. '-' for `PATH1` or `PATH2` denotes read in from standard input.
+    --
+        Options and arguments after a `--` token are passed directly to the
+        diff tool.
+
+CONFIGURATION
+    [external]diff-tool, [external]gdiff-tool
+       You can override the default non-graphical and graphical diff tools
+       by setting e.g::
+
+          [external]
+          diff-tool=diff3
+          gdiff-tool=kompare
+
+       in your site or user Rose configuration (`rose.conf`).
+
+    [rose-config-diff]properties, [rose-config-diff]ignore{...}
+       You can override the default metadata properties to display by
+       setting e.g::
+
+          [rose-config-diff]
+          properties=title,ns,description,help
+
+       in your site or user Rose configuration (`rose.conf`).
+       You can also set shorthand ignore patterns by setting e.g.::
+
+         [rose-config-diff]
+         ignore{foo}=namelist:bar,namelist:baz
+
+       in the same location. This will allow you to run::
+
+          rose config-diff --ignore=foo ...
+
+       instead of::
+
+          rose config-diff --ignore=namelist:bar --ignore=namelist:baz ...
+        '''
+    )
     opt_parser.add_my_options(
         "diff_tool",
         "graphical",

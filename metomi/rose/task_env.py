@@ -120,7 +120,83 @@ def get_prepend_paths(
 
 def main():
     """rose task-env."""
-    opt_parser = RoseOptionParser()
+    opt_parser = RoseOptionParser(
+        description='''
+STANDARD USAGE:
+    eval $(rose task-env)
+
+Provide an environment for cycling suite task.
+
+Print `KEY=VALUE` of the following to the STDOUT:
+
+`ROSE_SUITE_DIR`
+    The path to the root directory of the running suite.
+`ROSE_SUITE_DIR_REL`
+    The path to the root directory of the running suite relative to
+    `$HOME`.
+`ROSE_SUITE_NAME`
+    The name of the running suite.
+`ROSE_TASK_NAME`
+    The name of the suite task.
+`ROSE_TASK_CYCLE_TIME`
+    The cycle time of the suite task, if there is one.
+`ROSE_CYCLING_MODE`
+    The cycling mode of the running suite.
+`ROSE_TASK_LOG_ROOT`
+    The root path for log files of the suite task.
+`ROSE_DATA`
+    The path to the data directory of the running suite.
+`ROSE_DATAC`
+    The path to the data directory of this cycle
+    time in the running suite.
+`ROSE_DATAC????`
+    The path to the data directory of the cycle time with an offset
+    relative to the current cycle time. `????` is a duration:
+
+    A `__` (double underscore) prefix denotes a cycle time in the
+    future (because a minus sign cannot be used in an environment
+    variable). Otherwise, it is a cycle time in the past.
+
+    The rest should be either an ISO 8601 duration, such as:
+
+    * `P2W` - 2 weeks
+    * `PT12H` - 12 hours
+    * `P1DT6H` - 1 day, 6 hours
+    * `P4M` - 4 months
+    * `PT5M` - 5 minutes
+
+    Or, for the case of integer cycling suites:
+
+    * `P1` - 1 cycle before the current cycle
+    * `P5` - 5 cycles before the current cycle
+
+    Deprecated syntax:
+
+    * `nW` denotes `n` weeks.
+    * `n` or `nD` denotes `n` days.
+    * `Tn` or `TnH` denotes `n` hours.
+    * `TnM` denotes `n` minutes.
+    * `TnS` denotes `s` seconds.
+
+    E.g. `ROSE_DATACPT6H` is the data directory of 6 hours before the
+    current cycle time.
+
+    E.g. `ROSE_DATACP1D` and `ROSE_DATACPT24H` are both the data
+    directory of 1 day before the current cycle time.
+`ROSE_ETC`
+    The path to the etc directory of the running suite.
+`ROSE_TASK_PREFIX`
+    The prefix in the task name.
+`ROSE_TASK_SUFFIX`
+    The suffix in the task name.
+        ''',
+        epilog='''
+USAGE IN SUITES
+    rose `task-env` can be used to make environment variables available to a
+    suite by defining its `flow.cylc` `env-script` option as
+    `env-script = eval $(rose task-env)`.
+        ''',
+    )
     opt_parser.add_my_options(
         "cycle", "cycle_offsets", "path_globs", "prefix_delim", "suffix_delim"
     )

@@ -1715,8 +1715,41 @@ def load_conf_from_file(conf_dir, config_file_path, mode="macro"):
 
 def parse_macro_args(argv=None):
     """Parse options/arguments for rose macro and upgrade."""
-    opt_parser = RoseOptionParser()
-    options = [
+    opt_parser = RoseOptionParser(
+        usage='rose macro [OPTIONS] [MACRO_NAME ...]',
+        description='''
+List or run macros associated with a suite or application.
+
+Macros are listed/run according to the config dir (`$PWD` unless
+`--config=DIR` is set):
+
+* If the config dir is an app directory (or is within an app directory)
+  macros will be listed/run for the `rose-app.conf` file of that app.
+* Otherwise macros will be listed/run for the `rose-suite.conf`,
+  `rose-suite.info` and (unless `--suite-only` is set) all
+  `rose-app.conf` files.
+
+If a configuration contains optional configurations:
+
+* For validator macros, validate the main configuration, then
+  validate each main + optional configuration in turn.
+* For transform macros, transform the main configuration, then
+  transform each main + optional configuration, recreating each
+  optional configuration as the diff vs the transformed main.
+        ''',
+        epilog='''
+ARGUMENTS
+    MACRO_NAME ...
+        A list of macro names to run. If no macro names are specified and
+        `--fix`, `--validate` are not used, list all available macros.
+        Otherwise, run the specified macro names.
+
+ENVIRONMENT VARIABLES
+    optional ROSE_META_PATH
+        Prepend `$ROSE_META_PATH` to the metadata search path.
+        '''
+    )
+    opt_parser.add_my_options(
         "conf_dir",
         "meta_path",
         "non_interactive",
@@ -1726,8 +1759,16 @@ def parse_macro_args(argv=None):
         "no_warn",
         "suite_only",
         "transform_all",
-    ]
-    opt_parser.add_my_options(*options)
+    )
+    opt_parser.modify_option(
+        'output_dir',
+        help=(
+            'The location of the output directory.'
+            '\nOnly meaningful if there is at least one transformer in the'
+            'argument list.'
+        ),
+    )
+
     if argv is None:
         opts, args = opt_parser.parse_args()
     else:

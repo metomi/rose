@@ -22,7 +22,40 @@ import sys
 import psutil
 
 
+def usage():
+    print('''
+rose host-select-client
+
+Internal command for obtaining information about hosts using the
+Python psutil module.
+
+The names of psutil methods are passed to stdin along with any arguments
+as a JSON list.
+
+EXAMPLES:
+    # return the virtual memory and cpu usage
+    [["virual_memory"], ["cpu_percent"]]
+
+    # return disk usage for the filesystem mounted at "/"
+    [["disk_usage", "/"]]
+
+The input json should be preceded by \n**start**\n
+and followed by \n**end**\n to avoid issues with user profile scripts
+and stdin deadlock.
+
+$ rose host-select-client <<'__HERE__'
+> **start**
+> [["virtual_memory"]]
+> **end**
+> __HERE__
+[{"total": 17179869184, "available": 6276612096, "percent": 63.5, ...}]
+'''.strip())
+
+
 def main():
+    if set(sys.argv) & {'--help', '-h'}:
+        usage()
+        sys.exit(0)
     # read metrics from stdin
     started = False
     line = True

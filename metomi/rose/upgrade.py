@@ -780,7 +780,33 @@ def get_meta_upgrade_module(meta_path):
 
 def parse_upgrade_args(argv=None):
     """Parse options/arguments for rose macro and upgrade."""
-    opt_parser = metomi.rose.macro.RoseOptionParser()
+    opt_parser = metomi.rose.macro.RoseOptionParser(
+        usage='rose app-upgrade [OPTIONS] [VERSION]',
+        description='''
+Upgrade an application configuration using metadata upgrade macros.
+
+Alternatively, show the available upgrade/downgrade versions:
+
+* `=` indicates the current version.
+* `*` indicates the default version to change to.
+
+If an application contains optional configurations, loop through
+each one, combine with the main, upgrade it, and re-create it as
+a diff vs the upgraded main configuration.
+        ''',
+        epilog='''
+ARGUMENTS
+    VERSION
+        A version to change to. If no version is specified, show available
+        versions. If `--non-interactive` is used, use the latest version
+        available. If `--non-interactive` and `--downgrade` are used, use
+        the earliest version available.
+
+ENVIRONMENT VARIABLES
+    optional ROSE_META_PATH
+        Prepend `$ROSE_META_PATH` to the metadata search path.
+        '''
+    )
     options = [
         "conf_dir",
         "meta_path",

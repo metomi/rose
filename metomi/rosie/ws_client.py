@@ -115,6 +115,7 @@ class RosieWSClient:
                 prefixes = sorted(self.auth_managers.keys())
         self.set_prefixes(prefixes)
 
+
     def set_prefixes(self, prefixes):
         """Replace the default prefixes.
 

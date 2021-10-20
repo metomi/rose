@@ -38,13 +38,14 @@ from pathlib import Path
 import pwd
 import signal
 from time import sleep
-import wsgiref
+import wsgiref.simple_server
 
 import jinja2
 import pkg_resources
 from tornado.ioloop import IOLoop, PeriodicCallback
 import tornado.log
 import tornado.web
+import tornado.wsgi
 
 from metomi.isodatetime.data import get_timepoint_from_seconds_since_unix_epoch
 from metomi.rose import __version__ as ROSE_VERSION
@@ -471,7 +472,19 @@ def parse_cli(*args, **kwargs):
         None:
             bare command, requesting to print server status
     """
-    opt_parser = RoseOptionParser()
+    opt_parser = RoseOptionParser(
+        description='''
+Start/stop ad-hoc Rosie suite discovery web service server.
+
+For `rosie disco start`, if `PORT` is not specified, use port 8080.
+
+Examples:
+    rosie disco start [PORT] # start ad-hoc web service server (on PORT)
+    rosie disco stop         # stop ad-hoc web service server
+    rosie disco stop -y      # stop ad-hoc web service server w/o prompting
+    rosie disco              # print status of ad-hoc web service server
+        ''',
+    )
     opt_parser.add_my_options("non_interactive", "service_root_mode")
     opts, args = opt_parser.parse_args()
 
@@ -584,12 +597,3 @@ def main():
             print("Stopped" + user_msg_end)
             # Close all logging handlers to release log files:
             logging.shutdown()
-
-
-if __name__ == "__main__":  # Run on an ad-hoc server in a test environment.
-    main()
-else:  # Run as a WSGI application in a system service environment.
-    app = RosieDiscoServiceApplication()
-    wsgi_app = tornado.wsgi.WSGIAdapter(app)
-    server = wsgiref.simple_server.make_server("", DEFAULT_PORT, wsgi_app)
-    server.serve_forever()

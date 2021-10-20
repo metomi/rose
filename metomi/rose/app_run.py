@@ -511,10 +511,44 @@ class AppRunner(Runner):
 
 def main():
     """Launcher for the CLI."""
-    opt_parser = RoseOptionParser()
+    opt_parser = RoseOptionParser(
+        usage='%prog [OPTIONS] [--] [COMMAND ...]',
+        description='''
+Run an application according to its configuration.
+
+May run a builtin application (if the `mode` setting in the configuration
+specifies the name of a builtin application) or a command.
+
+Determine the command to run in this order:
+
+1. If `COMMAND` is specified, invoke the command.
+2. If the `--command-key=KEY` option is defined, invoke the command
+   specified in `[command]KEY`.
+3. If the `ROSE_APP_COMMAND_KEY` environment variable is set, the command
+   specified in the `[command]KEY` setting in the application
+   configuration whose `KEY` matches it is used.
+4. If the environment variable `ROSE_TASK_NAME` is defined and a setting
+   in the `[command]` section has a key matching the value of the
+   environment variable, then the value of the setting is used as the
+   command.
+5. Invoke the command specified in `[command]default`.
+        ''',
+        epilog='''
+ENVIRONMENT VARIABLES
+    optional ROSE_APP_COMMAND_KEY
+        Switch to a particular command specified in `[command]KEY`.
+    optional ROSE_APP_MODE
+        Specifies a builtin application to run.
+    optional ROSE_APP_OPT_CONF_KEYS
+        Each `KEY` in this space delimited list switches on an optional
+        configuration. The configurations are applied first-to-last.
+    optional ROSE_FILE_INSTALL_ROOT
+        If specified, change to the specified directory to install files.
+        '''
+    )
     option_keys = AppRunner.OPTIONS
     opt_parser.add_my_options(*option_keys)
-    opts, args = opt_parser.parse_args(sys.argv[1:])
+    opts, args = opt_parser.parse_args()
     event_handler = Reporter(opts.verbosity - opts.quietness)
     runner = AppRunner(event_handler)
     try:

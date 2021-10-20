@@ -39,7 +39,22 @@ class ConfigDumpEvent(Event):
 
 def main():
     """Implement the "rose config-dump" command."""
-    opt_parser = RoseOptionParser()
+    opt_parser = RoseOptionParser(
+        description='''
+Re-dump Rose configuration files in the common format.
+
+Load and dump `"rose-*.conf"` files in place. Apply format-specific
+pretty-printing.
+
+By default, it recursively loads and dumps all `rose-*.conf` files in the
+current working directory.
+
+EXAMPLES
+    rose config-dump
+    rose config-dump -C /path/to/conf/dir
+    rose config-dump -f /path/to/file1 -f /path/to/file2
+        '''
+    )
     opt_parser.add_my_options("conf_dir", "files", "no_pretty_mode")
     opts = opt_parser.parse_args()[0]
     verbosity = opts.verbosity - opts.quietness
