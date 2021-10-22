@@ -115,7 +115,6 @@ TEST_NAME="${TEST_KEY_BASE}-grandchild"
 mkdir -p "${INSTALLED_WORKFLOW_PATH}/_cylc-install"
 mkdir -p "${INSTALLED_WORKFLOW_PATH}/run1/flow.cylc"
 run_fail "${TEST_NAME}" rose suite-run -i -C "${ROSE_1_SUITE_SRC}" \
-    --name "${INSTALLED_WORKFLOW_PATH}baz"
-echo "${ROSE_1_SUITE_SRC}" "${INSTALLED_WORKFLOW_PATH}/baz" >&2
+    --name "${INSTALLED_WORKFLOW_PATH}/baz"
 file_grep "${TEST_NAME}-error" "already has a Cylc 8 workflow installed." "${TEST_NAME}.err"
 rm -fr "$INSTALLED_WORKFLOW_PATH"
