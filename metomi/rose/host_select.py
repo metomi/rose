@@ -377,6 +377,18 @@ class HostSelector:
                 command_args = []
                 command_args.append(host_name)
                 command = self.popen.get_cmd("ssh", *command_args)
+
+            # pass through CYLC_VERSION to support use of cylc wrapperf script
+            try:
+                import cylc.flow
+            except ModuleNotFoundError:
+                pass
+            else:
+                command.extend([
+                    'env',
+                    f'CYLC_VERSION={cylc.flow.__version__}'
+                ])
+
             command.extend(["rose", "host-select-client"])
 
             # build list of metrics to obtain for each host
