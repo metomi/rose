@@ -24,6 +24,8 @@ JOB_HOST=$(rose config --default= 't' 'job-host')
 tests 9
 if [[ -z $JOB_HOST ]]; then
     JOB_HOST=localhost
+else
+    JOB_HOST="$(rose host-select "$JOB_HOST")"
 fi
 export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE

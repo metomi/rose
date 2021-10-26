@@ -46,7 +46,7 @@ class CylcProcessor(SuiteEngineProcessor):
         r"\A[\+\-]?\d+(?:W\d+)?(?:T\d+(?:Z|[+-]\d+)?)?\Z")  # Good enough?
     SCHEME = "cylc"
     SUITE_CONF = "flow.cylc"
-    SUITE_NAME_ENV = "CYLC_SUITE_NAME"
+    SUITE_ID_ENV = "CYLC_WORKFLOW_ID"
     SUITE_DIR_REL_ROOT = "cylc-run"
     TASK_ID_DELIM = "."
 
@@ -129,7 +129,7 @@ class CylcProcessor(SuiteEngineProcessor):
 
         """
 
-        suite_name = os.environ[self.SUITE_NAME_ENV]
+        suite_name = os.environ[self.SUITE_ID_ENV]
         suite_dir_rel = self.get_suite_dir_rel(suite_name)
         suite_dir = self.get_suite_dir(suite_name)
         task_id = os.environ["CYLC_TASK_ID"]

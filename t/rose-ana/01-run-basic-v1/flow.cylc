@@ -9,7 +9,6 @@ UTC mode=True
 [scheduling]
     [[dependencies]]
         graph="""
-          rose_ana_t1 # basic
           rose_ana_t2_activated:fail => rose_ana_t2_deactivated
           rose_ana_t3_within_tolerance & rose_ana_t3_outside_tolerance:fail => \
           rose_ana_t1:fail & rose_ana_t2_deactivated => db_check

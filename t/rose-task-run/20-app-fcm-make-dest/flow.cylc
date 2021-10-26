@@ -1,15 +1,19 @@
 #!jinja2
-[cylc]
+
+[scheduler]
     UTC mode = True
+
 [scheduling]
     [[dependencies]]
-        graph = """hello-make => hello-make-bin => hello-run"""
+        graph = """
+            hello-make => hello-make-bin => hello-run
+        """
 
 [runtime]
     [[MAKE]]
         script = """
-rose task-run --app-key=make{% if GREET %} -O {{GREET}}{% endif %}
-"""
+            rose task-run --app-key=make{% if GREET %} -O {{GREET}}{% endif %}
+        """
     [[hello-make]]
         inherit = MAKE
     [[hello-make-bin]]
@@ -18,7 +22,7 @@ rose task-run --app-key=make{% if GREET %} -O {{GREET}}{% endif %}
             host = {{HOST}}
     [[hello-run]]
         script = """
-rose task-run --app-key=run --path=opt/{{GREET|default("hello", true)}}/build/bin
-"""
+            rose task-run --app-key=run --path=opt/{{GREET|default("hello", true)}}/build/bin
+        """
         [[[remote]]]
             host = {{HOST}}
