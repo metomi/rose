@@ -45,12 +45,10 @@ tests "$(($(wc -w <<<"${HOSTS}") + 2))"
 run_pass "${TEST_KEY_BASE}" rose 'host-select' -v -v ${HOSTS}
 
 # 1 bash command
-sed 's/[0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0-9]*/YYYY-MM-DDTHHMM/g'\
-     "${TEST_KEY_BASE}.out" > stamp-removed.log
-grep -F "[INFO] YYYY-MM-DDTHHMM rose" "stamp-removed.log" >"${TEST_KEY_BASE}.out.1"
-file_cmp "${TEST_KEY_BASE}.out.1" "${TEST_KEY_BASE}.out.1" <<'__OUT__'
-[INFO] YYYY-MM-DDTHHMM rose host-select-client <<'__STDIN__'
-__OUT__
+file_grep \
+    "${TEST_KEY_BASE}.out" \
+    "rose host-select-client <<'__STDIN__'" \
+    "${TEST_KEY_BASE}.out"
 
 # 0 ssh LOCAL_HOST command
 for LOCAL_HOST in ${LOCAL_HOSTS}; do
@@ -65,6 +63,7 @@ if [[ -n ${MORE_HOST} ]]; then
         "${TEST_KEY_BASE}.out" > stamp-removed.log
     grep -F "[INFO] YYYY-MM-DDTHHMM ssh -oBatchMode=yes -oConnectTimeout=10 ${MORE_HOST}" \
         "stamp-removed.log" >"${TEST_KEY_BASE}.out.${MORE_HOST}"
+    sed -i 's/env CYLC_VERSION=[^ ]* //' "${TEST_KEY_BASE}.out.${MORE_HOST}"
     file_cmp "${TEST_KEY_BASE}.out.${MORE_HOST}" \
         "${TEST_KEY_BASE}.out.${MORE_HOST}" <<__OUT__
 [INFO] YYYY-MM-DDTHHMM ssh -oBatchMode=yes -oConnectTimeout=10 ${MORE_HOST} rose host-select-client <<'__STDIN__'
