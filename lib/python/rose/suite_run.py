@@ -50,6 +50,12 @@ class VersionMismatchError(Exception):
         return "Version expected=%s, actual=%s" % self.args
 
 
+class InstalledByCylc8Error(Exception):
+    """Exception raised if attempting to install over a Cylc 8 workflow."""
+    def __str__(self):
+        return '%s already has a Cylc 8 workflow installed.' % self.args
+
+
 class SkipReloadEvent(Event):
 
     """An event raised to report that suite configuration reload is skipped."""
@@ -202,6 +208,7 @@ class SuiteRunner(Runner):
 
         # Install the suite to its run location
         suite_dir_rel = self._suite_dir_rel(suite_name)
+        self.fail_if_cylc_8(suite_dir_rel)
 
         # Unfortunately a large try/finally block to ensure a temporary folder
         # created in validate only mode is cleaned up. Exceptions are not
@@ -457,6 +464,49 @@ class SuiteRunner(Runner):
             self.suite_engine_proc.gcontrol(suite_name)
 
         return 0
+
+    def fail_if_cylc_8(self, destpath, scan_depth=4):
+        """Exit with a failure if installing over a Cylc 8 Workflow.
+
+        Do _not_ allow Rose 1 to modify workflows installed by Cylc 8:
+        Identify these workflows by the presence of:
+        - ``_cylc-install`` (a directory)
+        - ``flow.cylc`` (a file)
+
+        Args:
+            destpath (str): Installation destination relative to user home
+                to check.
+            scan_depth (int): Maximum number of levels to check for
+                installations.
+
+        Raises:
+            InstalledByCylc8Error
+        """
+        orig_destpath = destpath
+        destpath = os.path.expanduser(os.path.join("~", destpath))
+        suite_dir_rel_root = os.path.expanduser(os.path.join(
+            '~', self.suite_engine_proc.SUITE_DIR_REL_ROOT))
+
+        # Checking through parents of the destination path between it and
+        # the Cylc Run path for files.
+        parent = destpath
+        while parent != suite_dir_rel_root:
+            for file_ in ['_cylc-install', 'flow.cylc']:
+                if os.path.exists(os.path.join(parent, file_)):
+                    raise InstalledByCylc8Error(orig_destpath)
+            parent = os.path.dirname(parent)
+
+        # Checking through the children of the destination path to a maximum
+        # depth of max_depth.
+        patterns = [
+            destpath + '{}/'.format("/*"*i) + banned_file
+            for i in range(scan_depth)
+            for banned_file in ['_cylc-install', 'flow.cylc']
+        ]
+        for pattern in patterns:
+            result = glob(pattern)
+            if result:
+                raise InstalledByCylc8Error(os.path.dirname(result[0]))
 
     @classmethod
     def _run_conf(

@@ -1,0 +1,23 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+    abort if any task fails = True
+    [[events]]
+        abort on timeout = True
+        timeout = PT2M
+[scheduling]
+    initial cycle point = 20130101
+    final cycle point   = 20130102
+    [[dependencies]]
+        [[[T00, T12]]]
+            graph = my_task_1
+
+[runtime]
+    [[my_task_1]]
+        script = rose task-run
+        [[[job]]]
+            execution time limit = PT1M
+{% if HOST is defined %}
+        [[[remote]]]
+            host = {{HOST}}
+{% endif %}
