@@ -36,6 +36,7 @@ file_cmp "$TEST_KEY.sorted.err" "$TEST_KEY.sorted.err" <<'__ERR__'
 [WARN] sleepy2: (timed out)
 __ERR__
 cut -f2- mock-ssh.out | LANG=C sort >mock-ssh.out.sorted
+sed -i 's/env CYLC_VERSION=[^ ]* //' mock-ssh.out.sorted
 # N.B. Tab between 1 and sleepy?
 file_cmp "$TEST_KEY.mock-ssh.out" mock-ssh.out.sorted <<'__OUT__'
 sleepy1 rose host-select-client
