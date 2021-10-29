@@ -26,22 +26,29 @@ Ensure that commits conform to the rules of Rosie.
 
 from fnmatch import fnmatch
 import re
+import shlex
+import sys
+import traceback
+
 import metomi.rose
 from metomi.rose.config import ConfigSyntaxError
-from metomi.rose.opt_parse import RoseOptionParser
-from metomi.rose.macro import (add_meta_paths,
-                               get_reports_as_text,
-                               load_meta_config)
+from metomi.rose.macro import (
+    add_meta_paths,
+    get_reports_as_text,
+    load_meta_config,
+)
 from metomi.rose.macros import DefaultValidators
+from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.popen import RosePopenError
 from metomi.rose.reporter import Reporter
 from metomi.rose.resource import ResourceLocator
 from metomi.rose.scheme_handler import SchemeHandlersManager
 from metomi.rosie.svn_hook import (
-    RosieSvnHook, BadChange, InfoFileError, BadChanges)
-import shlex
-import sys
-import traceback
+    BadChange,
+    BadChanges,
+    InfoFileError,
+    RosieSvnHook,
+)
 
 
 class RosieSvnPreCommitHook(RosieSvnHook):
@@ -59,7 +66,8 @@ class RosieSvnPreCommitHook(RosieSvnHook):
     def __init__(self, event_handler=None, popen=None):
         super(RosieSvnPreCommitHook, self).__init__(event_handler, popen)
         self.usertools_manager = SchemeHandlersManager(
-            [self.path], "rosie.usertools", ["verify_users"])
+            [self.path], "rosie.usertools", ["verify_users"]
+        )
 
     def _get_access_info(self, info_node):
         """Return (owner, access_list) from "info_node"."""
@@ -68,8 +76,9 @@ class RosieSvnPreCommitHook(RosieSvnHook):
         access_list.sort()
         return owner, access_list
 
-    def _verify_users(self, status, path, txn_owner, txn_access_list,
-                      bad_changes):
+    def _verify_users(
+        self, status, path, txn_owner, txn_access_list, bad_changes
+    ):
         """Check txn_owner and txn_access_list.
 
         For any invalid users, append to bad_changes and return True.
@@ -87,17 +96,13 @@ class RosieSvnPreCommitHook(RosieSvnHook):
         for bad_user in bad_users:
             if txn_owner == bad_user:
                 bad_change = BadChange(
-                    status,
-                    path,
-                    BadChange.USER,
-                    "owner=" + bad_user)
+                    status, path, BadChange.USER, "owner=" + bad_user
+                )
                 bad_changes.append(bad_change)
             if bad_user in txn_access_list:
                 bad_change = BadChange(
-                    status,
-                    path,
-                    BadChange.USER,
-                    "access-list=" + bad_user)
+                    status, path, BadChange.USER, "access-list=" + bad_user
+                )
                 bad_changes.append(bad_change)
         return bool(bad_users)
 
@@ -141,8 +146,10 @@ class RosieSvnPreCommitHook(RosieSvnHook):
             # At levels above the suites, can only add directories
             if len(names) < self.LEN_ID:
                 if status[0] != self.ST_ADDED:
-                    msg = ("At levels above the suites, "
-                           "can only add directories")
+                    msg = (
+                        "At levels above the suites, "
+                        "can only add directories"
+                    )
                     bad_changes.append(BadChange(status, path, content=msg))
                 continue
 
@@ -156,28 +163,32 @@ class RosieSvnPreCommitHook(RosieSvnHook):
             if len(names) == self.LEN_ID and status == self.ST_ADDED:
                 if (self.ST_ADDED, path + "trunk/") not in changes:
                     bad_changes.append(
-                        BadChange(status, path, BadChange.NO_TRUNK))
+                        BadChange(status, path, BadChange.NO_TRUNK)
+                    )
                     continue
                 path_trunk_info_file = path + self.TRUNK_INFO_FILE
-                if ((self.ST_ADDED, path_trunk_info_file) not in changes and
-                        (self.ST_UPDATED,
-                         path_trunk_info_file) not in changes):
+                if (self.ST_ADDED, path_trunk_info_file) not in changes and (
+                    self.ST_UPDATED,
+                    path_trunk_info_file,
+                ) not in changes:
                     bad_changes.append(
-                        BadChange(status, path, BadChange.NO_INFO))
+                        BadChange(status, path, BadChange.NO_INFO)
+                    )
                 continue
 
-            sid = "".join(names[0:self.LEN_ID])
+            sid = "".join(names[0 : self.LEN_ID])
             branch = names[self.LEN_ID] if len(names) > self.LEN_ID else None
             path_head = "/".join(sid) + "/"
-            path_tail = path[len(path_head):]
-            is_meta_suite = (sid == "ROSIE")
+            path_tail = path[len(path_head) :]
+            is_meta_suite = sid == "ROSIE"
 
             if status != self.ST_DELETED:
                 # Check info file
                 if sid not in txn_info_map:
                     try:
                         txn_info_map[sid] = self._load_info(
-                            repos, sid, branch=branch, transaction=txn)
+                            repos, sid, branch=branch, transaction=txn
+                        )
                         err = None
                     except ConfigSyntaxError as exc:
                         err = InfoFileError(InfoFileError.VALUE, exc)
@@ -190,10 +201,12 @@ class RosieSvnPreCommitHook(RosieSvnHook):
 
                     # Suite must have an owner
                     txn_owner, txn_access_list = self._get_access_info(
-                        txn_info_map[sid])
+                        txn_info_map[sid]
+                    )
                     if not txn_owner:
                         bad_changes.append(
-                            InfoFileError(InfoFileError.NO_OWNER))
+                            InfoFileError(InfoFileError.NO_OWNER)
+                        )
                         continue
 
             # No need to check other non-trunk changes
@@ -207,34 +220,43 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                     shlex.split(out)
                 except ValueError:
                     bad_changes.append(
-                        BadChange(status, path, BadChange.VALUE))
+                        BadChange(status, path, BadChange.VALUE)
+                    )
                     continue
 
             # User IDs of owner and access list must be real
-            if (status != self.ST_DELETED and
-                    path_tail == self.TRUNK_INFO_FILE and
-                    not isinstance(txn_info_map[sid], InfoFileError)):
+            if (
+                status != self.ST_DELETED
+                and path_tail == self.TRUNK_INFO_FILE
+                and not isinstance(txn_info_map[sid], InfoFileError)
+            ):
                 txn_owner, txn_access_list = self._get_access_info(
-                    txn_info_map[sid])
+                    txn_info_map[sid]
+                )
                 if self._verify_users(
-                        status, path, txn_owner, txn_access_list, bad_changes):
+                    status, path, txn_owner, txn_access_list, bad_changes
+                ):
                     continue
                 reports = DefaultValidators().validate(
                     txn_info_map[sid],
                     load_meta_config(
                         txn_info_map[sid],
-                        config_type=metomi.rose.INFO_CONFIG_NAME))
+                        config_type=metomi.rose.INFO_CONFIG_NAME,
+                    ),
+                )
                 if reports:
                     reports_str = get_reports_as_text({None: reports}, path)
                     bad_changes.append(
-                        BadChange(status, path, BadChange.VALUE, reports_str))
+                        BadChange(status, path, BadChange.VALUE, reports_str)
+                    )
                     continue
 
             # Can only remove trunk information file with suite
             if status == self.ST_DELETED and path_tail == self.TRUNK_INFO_FILE:
                 if (self.ST_DELETED, path_head) not in changes:
                     bad_changes.append(
-                        BadChange(status, path, BadChange.NO_INFO))
+                        BadChange(status, path, BadChange.NO_INFO)
+                    )
                 continue
 
             # Can only remove trunk with suite
@@ -242,7 +264,8 @@ class RosieSvnPreCommitHook(RosieSvnHook):
             if status == self.ST_DELETED and path_tail == "trunk/":
                 if (self.ST_DELETED, path_head) not in changes:
                     bad_changes.append(
-                        BadChange(status, path, BadChange.NO_TRUNK))
+                        BadChange(status, path, BadChange.NO_TRUNK)
+                    )
                 continue
 
             # New suite trunk: ignore the rest
@@ -260,8 +283,7 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                         super_users = shlex.split(value)
                         break
             if sid not in rev_info_map:
-                rev_info_map[sid] = self._load_info(
-                    repos, sid, branch=branch)
+                rev_info_map[sid] = self._load_info(repos, sid, branch=branch)
             owner, access_list = self._get_access_info(rev_info_map[sid])
             admin_users = super_users + [owner]
 
@@ -286,12 +308,18 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                 continue
             if author not in admin_users:
                 if owner != txn_owner:
-                    bad_changes.append(BadChange(status, path, BadChange.PERM,
-                                                 "owner=" + txn_owner))
+                    bad_changes.append(
+                        BadChange(
+                            status, path, BadChange.PERM, "owner=" + txn_owner
+                        )
+                    )
                 else:  # access list
                     bad_change = BadChange(
-                        status, path, BadChange.PERM,
-                        "access-list=" + " ".join(txn_access_list))
+                        status,
+                        path,
+                        BadChange.PERM,
+                        "access-list=" + " ".join(txn_access_list),
+                    )
                     bad_changes.append(bad_change)
                 continue
 

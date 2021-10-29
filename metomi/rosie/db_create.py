@@ -17,19 +17,24 @@
 """Create database files for Rosie web service."""
 
 import os
-import sqlalchemy as al
 import sys
 
+import sqlalchemy as al
+
+from metomi.rose.config import ConfigError
 from metomi.rose.fs_util import FileSystemUtil
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.popen import RosePopener
-from metomi.rose.reporter import Reporter, Event
+from metomi.rose.reporter import Event, Reporter
 from metomi.rose.resource import ResourceLocator
 from metomi.rosie.db import (
-    LATEST_TABLE_NAME, MAIN_TABLE_NAME, META_TABLE_NAME, OPTIONAL_TABLE_NAME)
+    LATEST_TABLE_NAME,
+    MAIN_TABLE_NAME,
+    META_TABLE_NAME,
+    OPTIONAL_TABLE_NAME,
+)
 from metomi.rosie.svn_hook import InfoFileError
 from metomi.rosie.svn_post_commit import RosieSvnPostCommitHook
-from metomi.rose.config import ConfigError
 
 
 class RosieDatabaseCreateEvent(Event):
@@ -100,8 +105,8 @@ class RosieDatabaseInitiator:
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
         self.post_commit_hook = RosieSvnPostCommitHook(
-            event_handler=event_handler,
-            popen=popen)
+            event_handler=event_handler, popen=popen
+        )
 
     def _dummy(self, *args, **kwargs):
         """Does nothing."""
@@ -126,53 +131,90 @@ class RosieDatabaseInitiator:
     def create(self, db_url):
         """Create database tables."""
         if db_url.startswith(self.SQLITE_PREFIX):
-            db_url_dir = os.path.dirname(db_url[len(self.SQLITE_PREFIX):])
+            db_url_dir = os.path.dirname(db_url[len(self.SQLITE_PREFIX) :])
             self.fs_util.makedirs(db_url_dir)
         try:
             engine = al.create_engine(db_url)
             metadata = al.MetaData()
             db_string = al.String(self.LEN_DB_STRING)
             tables = []
-            tables.append(al.Table(
-                LATEST_TABLE_NAME, metadata,
-                al.Column("idx", db_string, nullable=False,
-                          primary_key=True),
-                al.Column("branch", db_string, nullable=False,
-                          primary_key=True),
-                al.Column("revision", al.Integer, nullable=False,
-                          primary_key=True)))
-            tables.append(al.Table(
-                MAIN_TABLE_NAME, metadata,
-                al.Column("idx", db_string, nullable=False,
-                          primary_key=True),
-                al.Column("branch", db_string, nullable=False,
-                          primary_key=True),
-                al.Column("revision", al.Integer, nullable=False,
-                          primary_key=True),
-                al.Column("owner", db_string, nullable=False),
-                al.Column("project", db_string, nullable=False),
-                al.Column("title", db_string, nullable=False),
-                al.Column("author", db_string, nullable=False),
-                al.Column("date", al.Integer, nullable=False),
-                al.Column("status", al.String(self.LEN_STATUS),
-                          nullable=False),
-                al.Column("from_idx", db_string)))
-            tables.append(al.Table(
-                OPTIONAL_TABLE_NAME, metadata,
-                al.Column("idx", db_string, nullable=False,
-                          primary_key=True),
-                al.Column("branch", db_string, nullable=False,
-                          primary_key=True),
-                al.Column("revision", al.Integer, nullable=False,
-                          primary_key=True),
-                al.Column("name", db_string, nullable=False,
-                          primary_key=True),
-                al.Column("value", db_string)))
-            tables.append(al.Table(
-                META_TABLE_NAME, metadata,
-                al.Column("name", db_string, primary_key=True,
-                          nullable=False),
-                al.Column("value", db_string)))
+            tables.append(
+                al.Table(
+                    LATEST_TABLE_NAME,
+                    metadata,
+                    al.Column(
+                        "idx", db_string, nullable=False, primary_key=True
+                    ),
+                    al.Column(
+                        "branch", db_string, nullable=False, primary_key=True
+                    ),
+                    al.Column(
+                        "revision",
+                        al.Integer,
+                        nullable=False,
+                        primary_key=True,
+                    ),
+                )
+            )
+            tables.append(
+                al.Table(
+                    MAIN_TABLE_NAME,
+                    metadata,
+                    al.Column(
+                        "idx", db_string, nullable=False, primary_key=True
+                    ),
+                    al.Column(
+                        "branch", db_string, nullable=False, primary_key=True
+                    ),
+                    al.Column(
+                        "revision",
+                        al.Integer,
+                        nullable=False,
+                        primary_key=True,
+                    ),
+                    al.Column("owner", db_string, nullable=False),
+                    al.Column("project", db_string, nullable=False),
+                    al.Column("title", db_string, nullable=False),
+                    al.Column("author", db_string, nullable=False),
+                    al.Column("date", al.Integer, nullable=False),
+                    al.Column(
+                        "status", al.String(self.LEN_STATUS), nullable=False
+                    ),
+                    al.Column("from_idx", db_string),
+                )
+            )
+            tables.append(
+                al.Table(
+                    OPTIONAL_TABLE_NAME,
+                    metadata,
+                    al.Column(
+                        "idx", db_string, nullable=False, primary_key=True
+                    ),
+                    al.Column(
+                        "branch", db_string, nullable=False, primary_key=True
+                    ),
+                    al.Column(
+                        "revision",
+                        al.Integer,
+                        nullable=False,
+                        primary_key=True,
+                    ),
+                    al.Column(
+                        "name", db_string, nullable=False, primary_key=True
+                    ),
+                    al.Column("value", db_string),
+                )
+            )
+            tables.append(
+                al.Table(
+                    META_TABLE_NAME,
+                    metadata,
+                    al.Column(
+                        "name", db_string, primary_key=True, nullable=False
+                    ),
+                    al.Column("value", db_string),
+                )
+            )
             for table in tables:
                 table.create(engine)
             engine.connect()
@@ -194,11 +236,13 @@ class RosieDatabaseInitiator:
             if sys.stdout.isatty():
                 sys.stdout.write(
                     f"\r{Reporter.PREFIX_INFO}... loading revision {revision} "
-                    f"of {youngest}")
+                    f"of {youngest}"
+                )
                 sys.stdout.flush()
             try:
                 self.post_commit_hook.run(
-                    repos_path, str(revision), no_notification=True)
+                    repos_path, str(revision), no_notification=True
+                )
             except (ConfigError, InfoFileError, al.exc.DatabaseError) as err:
                 if sys.stdout.isatty():
                     sys.stdout.write("\r")
@@ -206,7 +250,8 @@ class RosieDatabaseInitiator:
                 err_msg = f"Exception occurred: {type(err).__name__} - {err}"
                 message = (
                     f"Could not load revision {revision} of {youngest} as "
-                    f"the post-commit hook failed:\n{err_msg}\n")
+                    f"the post-commit hook failed:\n{err_msg}\n"
+                )
                 event = RosieDatabaseLoadSkipEvent(repos_path, message)
             else:
                 event = RosieDatabaseLoadEvent(repos_path, revision, youngest)

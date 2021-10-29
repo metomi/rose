@@ -24,8 +24,12 @@ This module contains the constants that are used globally within these.
 CONFIG_DELIMITER = "="
 
 # Filenames and directory names
-CONFIG_NAMES = ["rose-app.conf", "rose-meta.conf",
-                "rose-suite.conf", "rose-suite.info"]
+CONFIG_NAMES = [
+    "rose-app.conf",
+    "rose-meta.conf",
+    "rose-suite.conf",
+    "rose-suite.info",
+]
 GLOB_CONFIG_FILE = "rose*.conf"
 META_CONFIG_NAME = "rose-meta.conf"
 CONFIG_META_DIR = "meta"
@@ -48,11 +52,24 @@ CONFIG_OPT_META_PATH = "meta-path"
 CONFIG_OPT_META_TYPE = "meta"
 CONFIG_OPT_OWNER = "owner"
 CONFIG_OPT_PROJECT = "project"
-INFO_CONFIG_DEFAULT_META_IDS = ["=access-list", "=description", "=owner",
-                                "=project", "=sub-project", "=title",
-                                "=type"]
-SUB_CONFIG_DEFAULT_META_IDS = ["=file-install-root", "=meta", "=mode",
-                               "=opts", "command", "file:", "poll"]
+INFO_CONFIG_DEFAULT_META_IDS = [
+    "=access-list",
+    "=description",
+    "=owner",
+    "=project",
+    "=sub-project",
+    "=title",
+    "=type",
+]
+SUB_CONFIG_DEFAULT_META_IDS = [
+    "=file-install-root",
+    "=meta",
+    "=mode",
+    "=opts",
+    "command",
+    "file:",
+    "poll",
+]
 CONFIG_SETTING_INDEX_DEFAULT = "1"
 
 
@@ -92,9 +109,20 @@ META_PROP_VALUE_FALSE = "false"  # Not actually used.
 
 # Allowed type settings (that actually do something)
 # "meta" and "file" are for internal use.
-TYPE_VALUES = ["boolean", "character", "integer",
-               "logical", "quoted", "raw", "real",
-               "meta", "file", "python_list", "python_boolean", "spaced_list"]
+TYPE_VALUES = [
+    "boolean",
+    "character",
+    "integer",
+    "logical",
+    "quoted",
+    "raw",
+    "real",
+    "meta",
+    "file",
+    "python_list",
+    "python_boolean",
+    "spaced_list",
+]
 
 # Preferred Fortran logical and environment boolean syntax
 TYPE_BOOLEAN_VALUE_FALSE = "false"

@@ -31,19 +31,20 @@ Sub-classes, for handling API points by inheriting from RosieDiscoService:
 """
 
 from glob import glob
-import jinja2
 import json
 import logging
 import os
 from pathlib import Path
-import pkg_resources
 import pwd
 import signal
 from time import sleep
+import wsgiref
+
+import jinja2
+import pkg_resources
 from tornado.ioloop import IOLoop, PeriodicCallback
 import tornado.log
 import tornado.web
-import wsgiref
 
 from metomi.isodatetime.data import get_timepoint_from_seconds_since_unix_epoch
 from metomi.rose import __version__ as ROSE_VERSION
@@ -53,9 +54,9 @@ from metomi.rose.resource import ResourceLocator
 import metomi.rosie.db
 from metomi.rosie.suite_id import SuiteId
 
-
 LOG_ROOT_TMPL = os.path.join(
-    "~", ".metomi", "%(ns)s-%(util)s-%(host)s-%(port)s")
+    "~", ".metomi", "%(ns)s-%(util)s-%(host)s-%(port)s"
+)
 DEFAULT_PORT = 8080
 INTERVAL_CHECK_FOR_STOP_CMD = 1  # in units of seconds
 
@@ -75,27 +76,32 @@ class RosieDiscoServiceApplication(tornado.web.Application):
         self.props = {}
         rose_conf = ResourceLocator.default().get_conf()
         self.props["title"] = rose_conf.get_value(
-            ["rosie-disco", "title"], self.TITLE)
+            ["rosie-disco", "title"], self.TITLE
+        )
         self.props["host_name"] = rose_conf.get_value(["rosie-disco", "host"])
         if self.props["host_name"] is None:
             self.props["host_name"] = HostSelector().get_local_host()
             if self.props["host_name"] and "." in self.props["host_name"]:
-                self.props["host_name"] = (
-                    self.props["host_name"].split(".", 1)[0])
+                self.props["host_name"] = self.props["host_name"].split(
+                    ".", 1
+                )[0]
         self.props["rose_version"] = ROSE_VERSION
 
         # Get location of HTML files from package
         rosie_lib = os.path.join(
-            pkg_resources.resource_filename(
-                'metomi.rosie', 'lib'
-            ), "html", "template", "rosie-disco"
+            pkg_resources.resource_filename('metomi.rosie', 'lib'),
+            "html",
+            "template",
+            "rosie-disco",
         )
 
         # Autoescape markup to prevent code injection from user inputs.
         self.props["template_env"] = jinja2.Environment(
             autoescape=jinja2.select_autoescape(
-                enabled_extensions=("html", "xml"), default_for_string=True),
-            loader=jinja2.FileSystemLoader(rosie_lib))
+                enabled_extensions=("html", "xml"), default_for_string=True
+            ),
+            loader=jinja2.FileSystemLoader(rosie_lib),
+        )
 
         db_url_map = {}
         for key, node in rose_conf.get(["rosie-db"]).value.items():
@@ -117,34 +123,58 @@ class RosieDiscoServiceApplication(tornado.web.Application):
         root_handler = (service_root, RosieDiscoServiceRoot, root_class_args)
         for key, db_url in self.db_url_map.items():
             prefix_class_args = dict(class_args)  # mutable so copy for safety
-            prefix_class_args.update({
-                "prefix": key,
-                "db_url": db_url,
-                "service_root": service_root,
-            })
-            handler = (service_root + key + r"/?", RosieDiscoService,
-                       prefix_class_args)
-            get_handler = (service_root + key + r"/get_(.+)", GetHandler,
-                           prefix_class_args)
-            hello_handler = (service_root + key + r"/hello/?", HelloHandler,
-                             prefix_class_args)
-            search_handler = (service_root + key + r"/search", SearchHandler,
-                              prefix_class_args)
-            query_handler = (service_root + key + r"/query", QueryHandler,
-                             prefix_class_args)
+            prefix_class_args.update(
+                {
+                    "prefix": key,
+                    "db_url": db_url,
+                    "service_root": service_root,
+                }
+            )
+            handler = (
+                service_root + key + r"/?",
+                RosieDiscoService,
+                prefix_class_args,
+            )
+            get_handler = (
+                service_root + key + r"/get_(.+)",
+                GetHandler,
+                prefix_class_args,
+            )
+            hello_handler = (
+                service_root + key + r"/hello/?",
+                HelloHandler,
+                prefix_class_args,
+            )
+            search_handler = (
+                service_root + key + r"/search",
+                SearchHandler,
+                prefix_class_args,
+            )
+            query_handler = (
+                service_root + key + r"/query",
+                QueryHandler,
+                prefix_class_args,
+            )
             prefix_handlers.extend(
-                [handler, get_handler, hello_handler, search_handler,
-                 query_handler])
+                [
+                    handler,
+                    get_handler,
+                    hello_handler,
+                    search_handler,
+                    query_handler,
+                ]
+            )
 
         handlers = [root_handler] + prefix_handlers
         settings = dict(
             autoreload=True,
             static_path=str(
                 Path(metomi.rosie.__file__).parent / 'lib/html/static'
-            )
+            ),
         )
-        super(
-            RosieDiscoServiceApplication, self).__init__(handlers, **settings)
+        super(RosieDiscoServiceApplication, self).__init__(
+            handlers, **settings
+        )
 
     @staticmethod
     def get_app_pid():
@@ -177,12 +207,14 @@ class RosieDiscoServiceRoot(tornado.web.RequestHandler):
     def get(self):
         """Provide the root index page."""
         tmpl = self.props["template_env"].get_template("index.html")
-        self.write(tmpl.render(
-            title=self.props["title"],
-            host=self.props["host_name"],
-            rose_version=self.props["rose_version"],
-            script="/static",
-            keys=sorted(self.db_url_map.keys()))
+        self.write(
+            tmpl.render(
+                title=self.props["title"],
+                host=self.props["host_name"],
+                rose_version=self.props["rose_version"],
+                script="/static",
+                keys=sorted(self.db_url_map.keys()),
+            )
         )
 
 
@@ -194,8 +226,11 @@ class RosieDiscoService(tornado.web.RequestHandler):
         self.props = props
         self.prefix = prefix
         source_option = "prefix-web." + self.prefix
-        source_url_node = ResourceLocator.default().get_conf().get(
-            ["rosie-id", source_option])
+        source_url_node = (
+            ResourceLocator.default()
+            .get_conf()
+            .get(["rosie-id", source_option])
+        )
         self.source_url = ""
         if source_url_node is not None:
             self.source_url = source_url_node.value
@@ -211,6 +246,7 @@ class RosieDiscoService(tornado.web.RequestHandler):
             self._render()
         except (KeyError, AttributeError, jinja2.exceptions.TemplateError):
             import traceback
+
             traceback.print_exc()
         except metomi.rosie.db.RosieDatabaseConnectError as exc:
             raise tornado.web.HTTPError(404, str(exc))
@@ -220,25 +256,29 @@ class RosieDiscoService(tornado.web.RequestHandler):
         if data:
             for item in data:
                 suite_id = SuiteId.from_idx_branch_revision(
-                    item["idx"], item["branch"], item["revision"])
+                    item["idx"], item["branch"], item["revision"]
+                )
                 item["href"] = suite_id.to_web()
-                item["date"] = str(get_timepoint_from_seconds_since_unix_epoch(
-                    item["date"]))
+                item["date"] = str(
+                    get_timepoint_from_seconds_since_unix_epoch(item["date"])
+                )
         tmpl = self.props["template_env"].get_template("prefix-index.html")
-        self.write(tmpl.render(
-            title=self.props["title"],
-            host=self.props["host_name"],
-            rose_version=self.props["rose_version"],
-            script="/static",
-            service_root=self.service_root,
-            prefix=self.prefix,
-            prefix_source_url=self.source_url,
-            known_keys=self.dao.get_known_keys(),
-            query_operators=self.dao.get_query_operators(),
-            all_revs=all_revs,
-            filters=filters,
-            s=s,
-            data=data)
+        self.write(
+            tmpl.render(
+                title=self.props["title"],
+                host=self.props["host_name"],
+                rose_version=self.props["rose_version"],
+                script="/static",
+                service_root=self.service_root,
+                prefix=self.prefix,
+                prefix_source_url=self.source_url,
+                known_keys=self.dao.get_known_keys(),
+                query_operators=self.dao.get_query_operators(),
+                all_revs=all_revs,
+                filters=filters,
+                s=s,
+                data=data,
+            )
         )
 
 
@@ -341,8 +381,11 @@ class QueryHandler(RosieDiscoService):
             return None
         filt.extend([key, operator])
         last_groups = value.rsplit(" ", 1)
-        if (len(last_groups) > 1 and last_groups[1] and
-                all([s == ")" for s in last_groups[1]])):
+        if (
+            len(last_groups) > 1
+            and last_groups[1]
+            and all([s == ")" for s in last_groups[1]])
+        ):
             filt.extend(last_groups)
         else:
             filt.extend([value])
@@ -350,18 +393,23 @@ class QueryHandler(RosieDiscoService):
 
 
 def _log_app_base(
-        application, host, port, logger_type, file_ext, level_threshold=None):
-    """ Log to file some information from an application and/or its server."""
+    application, host, port, logger_type, file_ext, level_threshold=None
+):
+    """Log to file some information from an application and/or its server."""
     log = logging.getLogger(logger_type)
     log.propagate = False
     if level_threshold:  # else defaults to logging.WARNING
         log.setLevel(level_threshold)
 
-    log_root = os.path.expanduser(LOG_ROOT_TMPL % {
-        "ns": application.NAMESPACE,
-        "util": application.UTIL,
-        "host": host,
-        "port": port})
+    log_root = os.path.expanduser(
+        LOG_ROOT_TMPL
+        % {
+            "ns": application.NAMESPACE,
+            "util": application.UTIL,
+            "host": host,
+            "port": port,
+        }
+    )
     log_channel = logging.FileHandler(log_root + file_ext)
     # Use Tornado's log formatter to add datetime stamps & handle encoding:
     log_channel.setFormatter(tornado.log.LogFormatter(color=False))
@@ -370,12 +418,16 @@ def _log_app_base(
 
 
 def _log_server_status(application, host, port):
-    """ Log a brief status, including process ID, for an application server."""
-    log_root = os.path.expanduser(LOG_ROOT_TMPL % {
-        "ns": application.NAMESPACE,
-        "util": application.UTIL,
-        "host": host,
-        "port": port})
+    """Log a brief status, including process ID, for an application server."""
+    log_root = os.path.expanduser(
+        LOG_ROOT_TMPL
+        % {
+            "ns": application.NAMESPACE,
+            "util": application.UTIL,
+            "host": host,
+            "port": port,
+        }
+    )
     log_status = log_root + ".status"
     os.makedirs(os.path.dirname(log_root), exist_ok=True)
     with open(log_status, "w") as handle:
@@ -388,11 +440,15 @@ def _log_server_status(application, host, port):
 def _get_server_status(application, host, port):
     """Return a dictionary containing a brief application server status."""
     ret = {}
-    log_root_glob = os.path.expanduser(LOG_ROOT_TMPL % {
-        "ns": application.NAMESPACE,
-        "util": application.UTIL,
-        "host": "*",
-        "port": "*"})
+    log_root_glob = os.path.expanduser(
+        LOG_ROOT_TMPL
+        % {
+            "ns": application.NAMESPACE,
+            "util": application.UTIL,
+            "host": "*",
+            "port": "*",
+        }
+    )
     for filename in glob(log_root_glob + ".status"):
         try:
             for line in open(filename):
@@ -461,7 +517,8 @@ def main():
     user_msg_end = " the server providing the Rosie Disco web application"
     # Detailed message to be written to log file:
     log_msg_end = " server running application %s on host %s and port %s" % (
-        app_info)
+        app_info
+    )
 
     if instruction == "start":
         app.listen(port)
@@ -471,7 +528,8 @@ def main():
         # later stop the server cleanly via command on demand, as once start()
         # is called on an IOLoop it blocks; stop() cannot be called directly.
         PeriodicCallback(
-            app.stop_application, INTERVAL_CHECK_FOR_STOP_CMD * 1000).start()
+            app.stop_application, INTERVAL_CHECK_FOR_STOP_CMD * 1000
+        ).start()
 
         # Set-up logging and message outputs
         _log_server_status(*app_info)
@@ -487,8 +545,10 @@ def main():
             append_url_root = "%s-%s/" % (app.NAMESPACE, app.UTIL)
         # Also print the URL for quick access; 'http://' added so that the URL
         # is hyperlinked in the terminal stdout, but it is not required.
-        print("Application root page available at http://%s:%s/%s" % (
-            app.props["host_name"], port, append_url_root))
+        print(
+            "Application root page available at http://%s:%s/%s"
+            % (app.props["host_name"], port, append_url_root)
+        )
 
         IOLoop.current().start()
     elif instruction == "status":
@@ -498,16 +558,21 @@ def main():
             print(json.dumps(status_info, indent=4))
         else:
             print("No such server running.")
-    elif instruction == "stop" and (
-            cli_opt or input("Stop server? y/n (default=n)") == "y") and (
-                _get_server_status(*app_info).get("pid")):
+    elif (
+        instruction == "stop"
+        and (cli_opt or input("Stop server? y/n (default=n)") == "y")
+        and (_get_server_status(*app_info).get("pid"))
+    ):
         stop_server = True
         try:
             os.killpg(
-                int(_get_server_status(*app_info).get("pid")), signal.SIGINT)
+                int(_get_server_status(*app_info).get("pid")), signal.SIGINT
+            )
         except ProcessLookupError:  # process already stopped, e.g. by Ctrl-C
-            print("Failed to stop%s; no such server or process to stop." % (
-                  user_msg_end))
+            print(
+                "Failed to stop%s; no such server or process to stop."
+                % (user_msg_end)
+            )
             stop_server = False
         if stop_server:
             # Must wait for next callback, so server will not stop immediately;

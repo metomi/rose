@@ -17,16 +17,23 @@
 """Compare one list of numbers is within a tolerance of a second."""
 
 import re
+
 from metomi.rose.apps.rose_ana_v1 import DataLengthError
 
-OUTPUT_STRING = "%(extract)s %(percent)s%% %(sign)s %(tolerance)s: " + \
-                "File %(file1)s c.f. %(file2)s (%(numvals)s values)"
-OUTPUT_STRING_WITH_POSN = "%(extract)s %(percent)s%% %(sign)s " + \
-                          "%(tolerance)s: File %(file1)s c.f. " + \
-                          "%(file2)s (value %(valnum)s of %(numvals)s)"
-OUTPUT_STRING_WITH_VALS = "%(extract)s %(percent)s%% %(sign)s " + \
-                          "%(tolerance)s: File %(file1)s " + \
-                          "(%(val1)s) c.f. %(file2)s (%(val2)s)"
+OUTPUT_STRING = (
+    "%(extract)s %(percent)s%% %(sign)s %(tolerance)s: "
+    + "File %(file1)s c.f. %(file2)s (%(numvals)s values)"
+)
+OUTPUT_STRING_WITH_POSN = (
+    "%(extract)s %(percent)s%% %(sign)s "
+    + "%(tolerance)s: File %(file1)s c.f. "
+    + "%(file2)s (value %(valnum)s of %(numvals)s)"
+)
+OUTPUT_STRING_WITH_VALS = (
+    "%(extract)s %(percent)s%% %(sign)s "
+    + "%(tolerance)s: File %(file1)s "
+    + "(%(val1)s) c.f. %(file2)s (%(val2)s)"
+)
 PASS = "<="
 FAIL = ">"
 
@@ -52,8 +59,9 @@ class Within:
                 lwr = val2 - float(task.tolerance)
                 upr = val2 + float(task.tolerance)
             if not lwr <= val1 <= upr:
-                task.set_failure(WithinComparisonFailure(task, val1, val2,
-                                                         val_num))
+                task.set_failure(
+                    WithinComparisonFailure(task, val1, val2, val_num)
+                )
                 return task
             task.set_pass(WithinComparisonSuccess(task))
         return task
@@ -83,23 +91,27 @@ class WithinComparisonFailure:
 
     def __repr__(self):
         if self.numvals == 1:
-            return OUTPUT_STRING_WITH_VALS % {'extract': self.extract,
-                                              'percent': self.percentage,
-                                              'sign': FAIL,
-                                              'tolerance': self.tolerance,
-                                              'file1': self.resultfile,
-                                              'val1': self.val1,
-                                              'file2': self.kgo1file,
-                                              'val2': self.val2}
+            return OUTPUT_STRING_WITH_VALS % {
+                'extract': self.extract,
+                'percent': self.percentage,
+                'sign': FAIL,
+                'tolerance': self.tolerance,
+                'file1': self.resultfile,
+                'val1': self.val1,
+                'file2': self.kgo1file,
+                'val2': self.val2,
+            }
         else:
-            return OUTPUT_STRING_WITH_POSN % {'extract': self.extract,
-                                              'percent': self.percentage,
-                                              'sign': FAIL,
-                                              'tolerance': self.tolerance,
-                                              'file1': self.resultfile,
-                                              'file2': self.kgo1file,
-                                              'valnum': self.valnum,
-                                              'numvals': self.numvals}
+            return OUTPUT_STRING_WITH_POSN % {
+                'extract': self.extract,
+                'percent': self.percentage,
+                'sign': FAIL,
+                'tolerance': self.tolerance,
+                'file1': self.resultfile,
+                'file2': self.kgo1file,
+                'valnum': self.valnum,
+                'numvals': self.numvals,
+            }
 
     __str__ = __repr__
 
@@ -118,12 +130,14 @@ class WithinComparisonSuccess:
         self.tolerance = task.tolerance
 
     def __repr__(self):
-        return OUTPUT_STRING % {'extract': self.extract,
-                                'percent': 'all',
-                                'sign': PASS,
-                                'tolerance': self.tolerance,
-                                'file1': self.resultfile,
-                                'file2': self.kgo1file,
-                                'numvals': self.numvals}
+        return OUTPUT_STRING % {
+            'extract': self.extract,
+            'percent': 'all',
+            'sign': PASS,
+            'tolerance': self.tolerance,
+            'file1': self.resultfile,
+            'file2': self.kgo1file,
+            'numvals': self.numvals,
+        }
 
     __str__ = __repr__

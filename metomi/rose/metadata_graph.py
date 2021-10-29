@@ -17,11 +17,10 @@
 """Module to produce Graphviz graphing of Rose configuration metadata."""
 
 import ast
+from functools import cmp_to_key
 import os
 import sys
 import tempfile
-
-from functools import cmp_to_key
 
 import metomi.rose.config
 import metomi.rose.config_tree
@@ -31,7 +30,6 @@ import metomi.rose.macros.trigger
 import metomi.rose.opt_parse
 import metomi.rose.reporter
 import metomi.rose.resource
-
 
 COLOUR_ENABLED = "green"
 COLOUR_IGNORED = "red"
@@ -61,9 +59,11 @@ def get_node_state_attrs(config, section, option=None, allowed_sections=None):
     state = ""
     config_node = config.get([section, option])
     node_attrs["color"] = COLOUR_IGNORED
-    if (config_section_node is not None and
-            config_section_node.state != STATE_NORMAL and
-            option is not None):
+    if (
+        config_section_node is not None
+        and config_section_node.state != STATE_NORMAL
+        and option is not None
+    ):
         state = metomi.rose.config.STATE_SECT_IGNORED
     if config_node is None:
         node_attrs["color"] = COLOUR_MISSING
@@ -80,10 +80,17 @@ def get_node_state_attrs(config, section, option=None, allowed_sections=None):
     return node_attrs
 
 
-def get_graph(config, meta_config, name, allowed_sections=None,
-              allowed_properties=None, err_reporter=None):
+def get_graph(
+    config,
+    meta_config,
+    name,
+    allowed_sections=None,
+    allowed_properties=None,
+    err_reporter=None,
+):
     """Return a Graphviz graph object constructed from metadata properties."""
     import pygraphviz  # Graphviz and pygraphviz need to be installed.
+
     if allowed_sections is None:
         allowed_sections = []
     if allowed_properties is None:
@@ -94,60 +101,73 @@ def get_graph(config, meta_config, name, allowed_sections=None,
     graph.graph_attr["rankdir"] = "LR"
     graph.graph_attr["label"] = name
     if not allowed_properties or (
-            allowed_properties and "trigger" in allowed_properties):
-        add_trigger_graph(graph, config, meta_config,
-                          err_reporter, allowed_sections=allowed_sections)
+        allowed_properties and "trigger" in allowed_properties
+    ):
+        add_trigger_graph(
+            graph,
+            config,
+            meta_config,
+            err_reporter,
+            allowed_sections=allowed_sections,
+        )
     return graph
 
 
-def add_trigger_graph(graph, config, meta_config, err_reporter,
-                      allowed_sections=None):
+def add_trigger_graph(
+    graph, config, meta_config, err_reporter, allowed_sections=None
+):
     """Add trigger-related nodes and edges to the graph."""
     trigger = metomi.rose.macros.trigger.TriggerMacro()
     bad_reports = trigger.validate_dependencies(config, meta_config)
     if bad_reports:
-        err_reporter(metomi.rose.macro.get_reports_as_text(
-                     bad_reports, "trigger.TriggerMacro"))
+        err_reporter(
+            metomi.rose.macro.get_reports_as_text(
+                bad_reports, "trigger.TriggerMacro"
+            )
+        )
         return None
     ids = []
     for keylist, node in meta_config.walk(no_ignore=True):
         id_ = keylist[0]
-        if (id_.startswith(
-                metomi.rose.META_PROP_NS + metomi.rose.CONFIG_DELIMITER) or
-                id_.startswith(metomi.rose.SUB_CONFIG_FILE_DIR + ":*")):
+        if id_.startswith(
+            metomi.rose.META_PROP_NS + metomi.rose.CONFIG_DELIMITER
+        ) or id_.startswith(metomi.rose.SUB_CONFIG_FILE_DIR + ":*"):
             continue
         if isinstance(node.value, dict):
-            section, option = (
-                metomi.rose.macro.get_section_option_from_id(id_))
+            section, option = metomi.rose.macro.get_section_option_from_id(id_)
             if not allowed_sections or (
-                    allowed_sections and section in allowed_sections):
+                allowed_sections and section in allowed_sections
+            ):
                 ids.append(id_)
     ids.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
     for id_ in ids:
         section, option = metomi.rose.macro.get_section_option_from_id(id_)
         node_attrs = get_node_state_attrs(
-            config, section, option,
-            allowed_sections=allowed_sections
+            config, section, option, allowed_sections=allowed_sections
         )
         graph.add_node(id_, **node_attrs)
     for setting_id, id_value_dict in sorted(
-            trigger.trigger_family_lookup.items()):
+        trigger.trigger_family_lookup.items()
+    ):
         section, option = metomi.rose.macro.get_section_option_from_id(
-            setting_id)
+            setting_id
+        )
         section_node = config.get([section], no_ignore=True)
         node = config.get([section, option])
         if node is None:
             setting_value = None
         else:
             setting_value = node.value
-        setting_is_section_ignored = (option is None and section_node is None)
+        setting_is_section_ignored = option is None and section_node is None
         for dependent_id, values in sorted(id_value_dict.items()):
-            dep_section, dep_option = \
-                metomi.rose.macro.get_section_option_from_id(
-                    dependent_id)
-            if (allowed_sections and
-                    (section not in allowed_sections and
-                     dep_section not in allowed_sections)):
+            (
+                dep_section,
+                dep_option,
+            ) = metomi.rose.macro.get_section_option_from_id(dependent_id)
+            if allowed_sections and (
+                section not in allowed_sections
+                and dep_section not in allowed_sections
+            ):
                 continue
             if not values:
                 values = [None]
@@ -155,12 +175,15 @@ def add_trigger_graph(graph, config, meta_config, err_reporter,
             if setting_value is not None:
                 for value in values:
                     if value is None:
-                        if (node.state == node.STATE_NORMAL and
-                                not setting_is_section_ignored):
+                        if (
+                            node.state == node.STATE_NORMAL
+                            and not setting_is_section_ignored
+                        ):
                             has_success = True
                             break
                     elif trigger._check_values_ok(
-                            setting_value, setting_id, [value]):
+                        setting_value, setting_id, [value]
+                    ):
                         has_success = True
                         break
             for value in values:
@@ -171,28 +194,37 @@ def add_trigger_graph(graph, config, meta_config, err_reporter,
                 else:
                     dependent_attrs["color"] = COLOUR_IGNORED
                     if value is None:
-                        if (node.state == node.STATE_NORMAL and
-                                not setting_is_section_ignored):
+                        if (
+                            node.state == node.STATE_NORMAL
+                            and not setting_is_section_ignored
+                        ):
                             dependent_attrs["color"] = COLOUR_ENABLED
                     elif trigger._check_values_ok(
-                            setting_value, setting_id, [value]):
+                        setting_value, setting_id, [value]
+                    ):
                         dependent_attrs["color"] = COLOUR_ENABLED
                 if not graph.has_node(setting_id):
                     node_attrs = get_node_state_attrs(
-                        config, section, option,
-                        allowed_sections=allowed_sections
+                        config,
+                        section,
+                        option,
+                        allowed_sections=allowed_sections,
                     )
                     graph.add_node(setting_id, **node_attrs)
                 if not graph.has_node(dependent_id):
                     node_attrs = get_node_state_attrs(
-                        config, dep_section, dep_option,
-                        allowed_sections=allowed_sections
+                        config,
+                        dep_section,
+                        dep_option,
+                        allowed_sections=allowed_sections,
                     )
                     graph.add_node(dependent_id, **node_attrs)
                 if not graph.has_node(value_id):
-                    node_attrs = {"style": "filled",
-                                  "label": value,
-                                  "shape": "box"}
+                    node_attrs = {
+                        "style": "filled",
+                        "label": value,
+                        "shape": "box",
+                    }
                     node_attrs.update(dependent_attrs)
                     graph.add_node(value_id, **node_attrs)
                 edge_attrs = {}
@@ -225,7 +257,8 @@ def output_graph(graph, debug_mode=False, filename=None, form="svg"):
         image_file_handle.close()
         return
     metomi.rose.external.launch_image_viewer(
-        image_file_handle.name, run_fg=True)
+        image_file_handle.name, run_fg=True
+    )
 
 
 def _exit_with_metadata_fail():
@@ -234,13 +267,17 @@ def _exit_with_metadata_fail():
     metomi.rose.reporter.Reporter()(
         text,
         kind=metomi.rose.reporter.Reporter.KIND_ERR,
-        level=metomi.rose.reporter.Reporter.FAIL)
+        level=metomi.rose.reporter.Reporter.FAIL,
+    )
     sys.exit(1)
 
 
 def _load_override_config():
-    conf = metomi.rose.resource.ResourceLocator.default().get_conf().get(
-        ["rose-metadata-graph"])
+    conf = (
+        metomi.rose.resource.ResourceLocator.default()
+        .get_conf()
+        .get(["rose-metadata-graph"])
+    )
     if conf is None:
         return
     for key, node in conf.value.items():
@@ -268,11 +305,13 @@ def main():
 
     config_file_path = os.path.join(opts.conf_dir, metomi.rose.SUB_CONFIG_NAME)
     meta_config_file_path = os.path.join(
-        opts.conf_dir, metomi.rose.META_CONFIG_NAME)
+        opts.conf_dir, metomi.rose.META_CONFIG_NAME
+    )
     config_tree_loader = metomi.rose.config_tree.ConfigTreeLoader()
     if os.path.exists(config_file_path):
-        config = config_tree_loader(opts.conf_dir, metomi.rose.SUB_CONFIG_NAME,
-                                    conf_dir_paths=sys.path).node
+        config = config_tree_loader(
+            opts.conf_dir, metomi.rose.SUB_CONFIG_NAME, conf_dir_paths=sys.path
+        ).node
         meta_path = metomi.rose.macro.load_meta_path(config, opts.conf_dir)[0]
         if meta_path is None:
             _exit_with_metadata_fail()
@@ -285,8 +324,8 @@ def main():
     elif os.path.exists(meta_config_file_path):
         config = metomi.rose.config.ConfigNode()
         meta_config = (
-            config_tree_loader(
-                opts.conf_dir, metomi.rose.META_CONFIG_NAME)).node
+            config_tree_loader(opts.conf_dir, metomi.rose.META_CONFIG_NAME)
+        ).node
     else:
         _exit_with_metadata_fail()
     name = opts.conf_dir
@@ -294,8 +333,13 @@ def main():
         name += ": " + ",".join(args)
     if opts.property:
         name += " (" + ",".join(opts.property) + ")"
-    graph = get_graph(config, meta_config, name, allowed_sections=args,
-                      allowed_properties=opts.property)
+    graph = get_graph(
+        config,
+        meta_config,
+        name,
+        allowed_sections=args,
+        allowed_properties=opts.property,
+    )
     if graph is None:
         _exit_with_metadata_fail()
     output_graph(graph, debug_mode=opts.debug_mode)

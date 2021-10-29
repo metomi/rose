@@ -24,9 +24,10 @@ Classes:
 
 import json
 from multiprocessing import Pool
-import requests
 import shlex
 from time import sleep
+
+import requests
 
 from metomi.rose.popen import RosePopener
 from metomi.rose.reporter import Reporter
@@ -40,8 +41,10 @@ class RosieWSClientConfError(Exception):
     """Raised if no Rosie service server is configured."""
 
     def __str__(self):
-        msg = ("[metomi.rosie-id] settings not defined in site/user"
-               " configuration.")
+        msg = (
+            "[metomi.rosie-id] settings not defined in site/user"
+            " configuration."
+        )
         return msg
 
 
@@ -80,8 +83,9 @@ class RosieWSClient:
     POLL_DELAY = 0.1
     REMOVABLE_PARAMS = ["all_revs=0", "format=json"]
 
-    def __init__(self, prefixes=None, prompt_func=None, popen=None,
-                 event_handler=None):
+    def __init__(
+        self, prefixes=None, prompt_func=None, popen=None, event_handler=None
+    ):
         if not event_handler:
             event_handler = Reporter()
         if not popen:
@@ -101,7 +105,8 @@ class RosieWSClient:
                 continue
             prefix = key.replace("prefix-ws.", "")
             self.auth_managers[prefix] = RosieWSClientAuthManager(
-                prefix, popen=self.popen, prompt_func=self.prompt_func)
+                prefix, popen=self.popen, prompt_func=self.prompt_func
+            )
         if not prefixes:
             prefixes_str = conf_rosie_id.get_value(["prefixes-ws-default"])
             if prefixes_str:
@@ -123,8 +128,11 @@ class RosieWSClient:
             if prefix in self.auth_managers:
                 continue
             self.auth_managers[prefix] = RosieWSClientAuthManager(
-                prefix, popen=self.popen, prompt_func=self.prompt_func,
-                event_handler=self.event_handler)
+                prefix,
+                popen=self.popen,
+                prompt_func=self.prompt_func,
+                event_handler=self.event_handler,
+            )
         # Remove uncontactable prefixes from the list.
         ok_prefixes = self.hello(return_ok_prefixes=True)
         prefixes = []
@@ -155,17 +163,20 @@ class RosieWSClient:
                 auth_manager = self.auth_managers[prefix]
                 if url.startswith(auth_manager.root):
                     request_details[url] = self._create_request_detail(
-                        url, prefix, kwargs, auth_manager)
+                        url, prefix, kwargs, auth_manager
+                    )
                     break
             else:
                 request_details[url] = self._create_request_detail(
-                    url, prefix, kwargs)
+                    url, prefix, kwargs
+                )
         else:
             for prefix in self.prefixes:
                 auth_manager = self.auth_managers[prefix]
                 full_url = auth_manager.root + url
                 request_details[full_url] = self._create_request_detail(
-                    full_url, prefix, kwargs, auth_manager)
+                    full_url, prefix, kwargs, auth_manager
+                )
         if not request_details:
             raise RosieWSClientError(method, kwargs)
 
@@ -174,7 +185,8 @@ class RosieWSClient:
         results = {}
         for url, request_detail in request_details.items():
             results[url] = pool.apply_async(
-                requests.get, [url], request_detail["requests_kwargs"])
+                requests.get, [url], request_detail["requests_kwargs"]
+            )
         while results:
             for url, result in list(results.items()):
                 if not result.ready():
@@ -182,30 +194,36 @@ class RosieWSClient:
                 results.pop(url)
                 try:
                     response = result.get()
-                except (requests.exceptions.ConnectionError,
-                        requests.exceptions.MissingSchema) as exc:
-                    self.event_handler(
-                        RosieWSClientError(url, exc), level=1)
+                except (
+                    requests.exceptions.ConnectionError,
+                    requests.exceptions.MissingSchema,
+                ) as exc:
+                    self.event_handler(RosieWSClientError(url, exc), level=1)
                     continue
                 request_detail = request_details[url]
                 # Retry request once, if it fails with a 401
-                if (response.status_code == requests.codes["unauthorized"] and
-                        request_detail["can_retry"]):
+                if (
+                    response.status_code == requests.codes["unauthorized"]
+                    and request_detail["can_retry"]
+                ):
                     requests_kwargs = request_detail["requests_kwargs"]
                     auth_manager = request_detail["auth_manager"]
                     prev_auth = requests_kwargs["auth"]
                     try:
                         requests_kwargs["auth"] = auth_manager.get_auth(
-                            is_retry=True)
+                            is_retry=True
+                        )
                     except KeyboardInterrupt as exc:
                         error = RosieWSClientError(url, kwargs, exc)
                         self.event_handler(error, level=1)
                         request_detail["can_retry"] = False
                     else:
                         results[url] = pool.apply_async(
-                            requests.get, [url], requests_kwargs)
+                            requests.get, [url], requests_kwargs
+                        )
                         request_detail["can_retry"] = (
-                            prev_auth != requests_kwargs["auth"])
+                            prev_auth != requests_kwargs["auth"]
+                        )
                     continue
                 request_detail["response"] = response
             if results:
@@ -226,7 +244,8 @@ class RosieWSClient:
                     request_detail["auth_manager"].clear_password()
                 self.event_handler(
                     RosieWSClientError(url, kwargs, response.status_code),
-                    level=1)
+                    level=1,
+                )
                 continue
             if request_detail["auth_manager"] is not None:
                 request_detail["auth_manager"].store_password()
@@ -238,8 +257,7 @@ class RosieWSClient:
                 else:
                     ret.append((response_data, response_url))
             except ValueError:
-                self.event_handler(
-                    RosieWSClientError(url, kwargs), level=1)
+                self.event_handler(RosieWSClientError(url, kwargs), level=1)
 
         if not ret:
             raise RosieWSClientError(method, kwargs)
@@ -270,7 +288,7 @@ class RosieWSClient:
         params = dict(params)
         params["format"] = "json"
         requests_kwargs = {"params": params}
-        can_retry = (auth_manager is not None)
+        can_retry = auth_manager is not None
         if auth_manager:
             requests_kwargs.update(auth_manager.requests_kwargs)
             requests_kwargs["auth"] = auth_manager.get_auth()
@@ -284,7 +302,8 @@ class RosieWSClient:
             "requests_kwargs": requests_kwargs,
             "response": None,
             "prefix": prefix,
-            "url": url}
+            "url": url,
+        }
 
     def _get_keys(self, name):
         """Return named keys from web services."""
@@ -375,9 +394,10 @@ class RosieWSClient:
             new_results = {}
             for result in more_results:
                 idx_branch = (result["idx"], result["branch"])
-                if (idx_branch not in new_results or
-                        result["revision"] >
-                        new_results[idx_branch]["revision"]):
+                if (
+                    idx_branch not in new_results
+                    or result["revision"] > new_results[idx_branch]["revision"]
+                ):
                     new_results.update({idx_branch: result})
             for _, result in sorted(new_results.items()):
                 results.append(result)
@@ -395,7 +415,7 @@ class RosieWSClient:
         while args:
             arg = args.pop(0)
             arg_1 = args[0] if args else None
-            if (arg in ["and", "or"] and arg_1 not in ["and", "or"]):
+            if arg in ["and", "or"] and arg_1 not in ["and", "or"]:
                 if len(q_item) >= 4:
                     q_list.append(q_item)
                     q_item = []
@@ -409,8 +429,9 @@ class RosieWSClient:
             level += len(arg) if all([c == "(" for c in arg]) else 0
             level -= len(arg) if all([c == ")" for c in arg]) else 0
         if (
-            len(q_item) > 1 or level != 0 or
-            any(len(q_item) not in [4, 5, 6] for q_item in q_list)
+            len(q_item) > 1
+            or level != 0
+            or any(len(q_item) not in [4, 5, 6] for q_item in q_list)
         ):
             raise RosieWSClientQuerySplitError(args)
         return q_list

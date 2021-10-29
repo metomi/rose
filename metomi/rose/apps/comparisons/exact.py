@@ -36,7 +36,8 @@ class Exact:
             location += 1
             if val1 != val2:
                 task.set_failure(
-                    ExactComparisonFailure(task, val1, val2, location))
+                    ExactComparisonFailure(task, val1, val2, location)
+                )
                 return task
         task.set_pass(ExactComparisonSuccess(task))
         return task
@@ -68,9 +69,15 @@ class ExactComparisonFailure:
         self.location = location
 
     def __repr__(self):
-        return OUTPUT_STRING % (self.extract, self.location, self.percentage,
-                                self.resultfile, FAIL, self.kgo1file,
-                                self.numvals)
+        return OUTPUT_STRING % (
+            self.extract,
+            self.location,
+            self.percentage,
+            self.resultfile,
+            FAIL,
+            self.kgo1file,
+            self.numvals,
+        )
 
     __str__ = __repr__
 
@@ -88,8 +95,14 @@ class ExactComparisonSuccess:
             self.extract = self.extract + ":" + task.subextract
 
     def __repr__(self):
-        return OUTPUT_STRING % (self.extract, "all", 0,
-                                self.resultfile, PASS, self.kgo1file,
-                                self.numvals)
+        return OUTPUT_STRING % (
+            self.extract,
+            "all",
+            0,
+            self.resultfile,
+            PASS,
+            self.kgo1file,
+            self.numvals,
+        )
 
     __str__ = __repr__

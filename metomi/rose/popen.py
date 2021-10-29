@@ -16,13 +16,14 @@
 # -----------------------------------------------------------------------------
 """Wraps Python's subprocess.Popen."""
 
-import asyncio
 import os
 import re
 import select
 import shlex
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
 import sys
+
+import asyncio
 
 from metomi.rose.reporter import Event
 from metomi.rose.resource import ResourceLocator
@@ -115,8 +116,13 @@ class RosePopener:
         "gdiff_tool": ["gvimdiff"],
         "geditor": ["gedit"],
         "image_viewer": ["eog", "--new-instance"],
-        "rsync": ["rsync", "-a", "--exclude=.*", "--timeout=1800",
-                  "--rsh=ssh -oBatchMode=yes -oConnectTimeout=10"],
+        "rsync": [
+            "rsync",
+            "-a",
+            "--exclude=.*",
+            "--timeout=1800",
+            "--rsh=ssh -oBatchMode=yes -oConnectTimeout=10",
+        ],
         "ssh": ["ssh", "-oBatchMode=yes", "-oConnectTimeout=10"],
         "terminal": ["xterm"],
     }
@@ -257,7 +263,8 @@ class RosePopener:
             else:
                 stderr = ''
             raise RosePopenError(
-                args, ret_code, stdout, stderr, kwargs.get("stdin"))
+                args, ret_code, stdout, stderr, kwargs.get("stdin")
+            )
         return stdout, stderr
 
     def run_simple(self, *args, **kwargs):
@@ -273,13 +280,14 @@ class RosePopener:
         stdout_level = kwargs.pop("stdout_level", None)
         ret_code, stdout, stderr = self.run(*args, **kwargs)
         stderr, stdout = [
-            i.decode() if isinstance(i, bytes) else i for i in [
-                stderr, stdout]]
+            i.decode() if isinstance(i, bytes) else i for i in [stderr, stdout]
+        ]
         if stdout:
             self.handle_event(stdout, level=stdout_level)
         if ret_code:
             raise RosePopenError(
-                args, ret_code, stdout, stderr, kwargs.get("stdin"))
+                args, ret_code, stdout, stderr, kwargs.get("stdin")
+            )
         if stderr:
             self.handle_event(stderr, level=stderr_level)
 
@@ -354,7 +362,8 @@ class RosePopener:
             else:
                 stderr = ''
             raise RosePopenError(
-                args, ret_code, stdout, stderr, kwargs.get("stdin"))
+                args, ret_code, stdout, stderr, kwargs.get("stdin")
+            )
         return stdout, stderr
 
     __call__ = run_ok

@@ -31,9 +31,17 @@ class Section:
 
     """
 
-    def __init__(self, name, options=None,
-                 metadata=None, ignored_reason=None,
-                 error=None, warning=None, flags=None, comments=None):
+    def __init__(
+        self,
+        name,
+        options=None,
+        metadata=None,
+        ignored_reason=None,
+        error=None,
+        warning=None,
+        flags=None,
+        comments=None,
+    ):
         self.name = name
         if options is None:
             options = []
@@ -59,23 +67,27 @@ class Section:
 
     def to_hashable(self):
         """Return a hashable summary of the current state."""
-        return (self.name,
-                tuple(sorted(self.ignored_reason.keys())),
-                tuple(self.comments))
+        return (
+            self.name,
+            tuple(sorted(self.ignored_reason.keys())),
+            tuple(self.comments),
+        )
 
     def process_metadata(self, metadata):
         """Update metadata."""
         self.metadata.update(metadata)
 
     def copy(self):
-        new_section = Section(self.name,
-                              copy.deepcopy(self.options),
-                              copy.deepcopy(self.metadata),
-                              copy.deepcopy(self.ignored_reason),
-                              copy.deepcopy(self.error),
-                              copy.deepcopy(self.warning),
-                              copy.deepcopy(self.flags),
-                              copy.deepcopy(self.comments))
+        new_section = Section(
+            self.name,
+            copy.deepcopy(self.options),
+            copy.deepcopy(self.metadata),
+            copy.deepcopy(self.ignored_reason),
+            copy.deepcopy(self.error),
+            copy.deepcopy(self.warning),
+            copy.deepcopy(self.flags),
+            copy.deepcopy(self.comments),
+        )
         return new_section
 
     def __repr__(self):

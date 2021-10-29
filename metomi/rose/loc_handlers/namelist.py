@@ -18,13 +18,13 @@
 name."""
 
 
+from functools import cmp_to_key
 import re
+
 import metomi.rose.config
 from metomi.rose.config_processor import ConfigProcessError
-from metomi.rose.env import env_var_process, UnboundEnvironmentVariableError
+from metomi.rose.env import UnboundEnvironmentVariableError, env_var_process
 from metomi.rose.reporter import Event
-from functools import cmp_to_key
-
 
 RE_NAMELIST_GROUP = re.compile(r"\Anamelist:(\w+).*\Z")
 
@@ -51,11 +51,11 @@ class NamelistLocHandler:
         loc.loc_type = loc.TYPE_BLOB
         if loc.name.endswith("(:)"):
             name = loc.name[0:-2]
-            sections = [k for k in list(conf_tree.node.value)
-                        if k.startswith(name)]
+            sections = [
+                k for k in list(conf_tree.node.value) if k.startswith(name)
+            ]
         else:
-            sections = [k for k in list(conf_tree.node.value)
-                        if k == loc.name]
+            sections = [k for k in list(conf_tree.node.value) if k == loc.name]
         for section in list(sections):
             section_value = conf_tree.node.get_value([section])
             if section_value is None:
@@ -80,9 +80,9 @@ class NamelistLocHandler:
                     try:
                         value = env_var_process(node.value)
                     except UnboundEnvironmentVariableError as exc:
-                        raise ConfigProcessError([section, key],
-                                                 node.value,
-                                                 exc)
+                        raise ConfigProcessError(
+                            [section, key], node.value, exc
+                        )
                     nlg += "%s=%s,\n" % (key, value)
                 nlg += "/" + "\n"
                 handle.write(nlg.encode('UTF-8'))

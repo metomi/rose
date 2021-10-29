@@ -19,13 +19,11 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 
 import codecs
-
 from glob import glob
-from os.path import join, abspath, dirname
+from os.path import abspath, dirname, join
 import re
 
-
-from setuptools import setup, find_namespace_packages
+from setuptools import find_namespace_packages, setup
 
 here = abspath(dirname(__file__))
 
@@ -37,8 +35,9 @@ def read(*parts):
 
 def find_version(*file_paths):
     version_file = read(*file_paths)
-    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
-                              version_file, re.M)
+    version_match = re.search(
+        r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M
+    )
     if version_match:
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
@@ -65,7 +64,7 @@ EXTRAS_REQUIRE = {
         'sphinxcontrib-httpdomain',
         'hieroglyph>=2.1.0',
         'sphinxcontrib-svg2pdfconverter',
-        'cylc-sphinx-extensions[all]>=1.2.0'
+        'cylc-sphinx-extensions[all]>=1.2.0',
     ]
 }
 TESTS_REQUIRE = [
@@ -74,9 +73,9 @@ TESTS_REQUIRE = [
     'mypy>=0.800',
     'types-aiofiles',
 ]
-EXTRAS_REQUIRE['all'] = list(set(
-    [y for x in EXTRAS_REQUIRE.values() for y in x] + TESTS_REQUIRE
-))
+EXTRAS_REQUIRE['all'] = list(
+    set([y for x in EXTRAS_REQUIRE.values() for y in x] + TESTS_REQUIRE)
+)
 
 
 setup(
@@ -84,12 +83,8 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     version=find_version("metomi", "rose", "__init__.py"),
-
     # Options
-    scripts=(
-        glob(join("bin", "*"))
-        + glob(join("sbin", "*"))
-    ),
+    scripts=(glob(join("bin", "*")) + glob(join("sbin", "*"))),
     install_requires=INSTALL_REQUIRES,
     extras_require=EXTRAS_REQUIRE,
     tests_require=TESTS_REQUIRE,

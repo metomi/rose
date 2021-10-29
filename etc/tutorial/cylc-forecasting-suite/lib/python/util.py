@@ -4,11 +4,11 @@
 # -----------------------------------------------------------------------------
 from copy import copy
 import math
-import jinja2
 import sys
 
+import jinja2
 
-R_0 = 6371.  # Radius of the Earth (km).
+R_0 = 6371.0  # Radius of the Earth (km).
 
 
 def frange(start, stop, step):
@@ -59,11 +59,12 @@ def field_to_csv(field, x_range, y_range, filename):
     """
     with open(filename, 'w+') as csv_file:
         for itt_y in y_range:
-            csv_file.write(', '.join('%.2f' % field(x, itt_y) for
-                                     x in x_range) + '\n')
+            csv_file.write(
+                ', '.join('%.2f' % field(x, itt_y) for x in x_range) + '\n'
+            )
 
 
-def generate_matrix(dim_x, dim_y, value=0.):
+def generate_matrix(dim_x, dim_y, value=0.0):
     """Generates a 2D list with the desired dimensions.
 
     Args:
@@ -102,12 +103,15 @@ def great_arc_distance(coordinate_1, coordinate_2):
     lng_2 = math.radians(lng_2)
     lat_2 = math.radians(lat_2)
     return (
-        2 * R_0 * math.asin(
+        2
+        * R_0
+        * math.asin(
             math.sqrt(
-                (math.sin((lat_2 - lat_1) / 2.) ** 2) + (
-                    math.cos(lat_1) *
-                    math.cos(lat_2) *
-                    (math.sin((lng_2 - lng_1) / 2.) ** 2)
+                (math.sin((lat_2 - lat_1) / 2.0) ** 2)
+                + (
+                    math.cos(lat_1)
+                    * math.cos(lat_2)
+                    * (math.sin((lng_2 - lng_1) / 2.0) ** 2)
                 )
             )
         )
@@ -132,6 +136,7 @@ def interpolate_grid(points, dim_x, dim_y, d_x, d_y, spline_order=0):
         data.
 
     """
+
     def spline_0(pos_x, pos_y, z_val):
         """Zeroth order beta spline (i.e. nearest point)."""
         return [(int(round(pos_x)), int(round(pos_y)), z_val)]  # [(x, y, z)]
@@ -147,7 +152,7 @@ def interpolate_grid(points, dim_x, dim_y, d_x, d_y, spline_order=0):
             (x_0, y_0, (x_0 + d_x - pos_x) * (y_0 + d_y - pos_y) * z_val),
             (x_1, y_0, (pos_x - x_0) * (y_0 + d_y - pos_y) * z_val),
             (x_0, y_1, (x_0 + d_x - pos_x) * (pos_y - y_0) * z_val),
-            (x_1, y_1, (pos_x - x_0) * (pos_y - y_0) * z_val)
+            (x_1, y_1, (pos_x - x_0) * (pos_y - y_0) * z_val),
         ]
 
     if spline_order == 0:
@@ -155,10 +160,11 @@ def interpolate_grid(points, dim_x, dim_y, d_x, d_y, spline_order=0):
     elif spline_order == 1:
         spline = spline_1
     else:
-        raise ValueError('Invalid spline order "%d" must be in (0, 1).' %
-                         spline_order)
+        raise ValueError(
+            'Invalid spline order "%d" must be in (0, 1).' % spline_order
+        )
 
-    grid = generate_matrix(dim_x, dim_y, 0.)
+    grid = generate_matrix(dim_x, dim_y, 0.0)
 
     for x_val, y_val, z_val in points:
         x_coord = x_val / d_x
@@ -176,6 +182,7 @@ def interpolate_grid(points, dim_x, dim_y, d_x, d_y, spline_order=0):
 def plot_vector_grid(filename, x_grid, y_grid):
     try:
         import matplotlib
+
         matplotlib.use('Agg')
         import matplotlib.pyplot as plt
     except ImportError:
@@ -192,13 +199,15 @@ def plot_vector_grid(filename, x_grid, y_grid):
             y_coords.append(itt_y)
             z_coords.append((
                 x_grid[itt_y][itt_x],
-                y_grid[itt_y][itt_x]
+                y_grid[itt_y][itt_x],
             ))
 
-    plt.quiver(x_coords,
-               y_coords,
-               [x[0] for x in z_coords],
-               [y[1] for y in z_coords])
+    plt.quiver(
+        x_coords,
+        y_coords,
+        [x[0] for x in z_coords],
+        [y[1] for y in z_coords],
+    )
     fig.savefig(filename)
 
 
@@ -208,7 +217,8 @@ def get_grid_coordinates(lng, lat, domain, resolution):
     length_y = int(abs(domain['lat2'] - domain['lat1']) // resolution)
     return (
         int((abs(lng - domain['lng1'])) // resolution),
-        length_y - int((abs(lat - domain['lat1'])) // resolution))
+        length_y - int((abs(lat - domain['lat1'])) // resolution),
+    )
 
 
 class SurfaceFitter:
@@ -233,11 +243,11 @@ class SurfaceFitter:
         self.points = list(zip(x_points, y_points, z_points))
 
         if kind == 'linear':
-            self.power = 1.
+            self.power = 1.0
         elif kind == 'quadratic':
-            self.power = 2.
+            self.power = 2.0
         elif kind == 'cubic':
-            self.power = 3.
+            self.power = 3.0
         else:
             raise ValueError('"%s" is not a valid interpolation method' % kind)
 
@@ -254,7 +264,7 @@ class SurfaceFitter:
                 z_val = z_point
                 break
             else:
-                weight = 1. / ((math.sqrt(d_x ** 2 + d_y ** 2)) ** self.power)
+                weight = 1.0 / ((math.sqrt(d_x ** 2 + d_y ** 2)) ** self.power)
                 sum_weight += weight
                 sum_value += weight * z_point
 
@@ -270,17 +280,20 @@ def parse_domain(domain):
         'lng1': bbox[0],
         'lat1': bbox[1],
         'lng2': bbox[2],
-        'lat2': bbox[3]
+        'lat2': bbox[3],
     }
 
 
 def generate_html_map(filename, template_file, data, domain, resolution):
     with open(template_file, 'r') as template:
         with open(filename, 'w+') as html_file:
-            html_file.write(jinja2.Template(template.read()).render(
-                resolution=resolution,
-                lng1=domain['lng1'],
-                lng2=domain['lng2'],
-                lat1=domain['lat1'],
-                lat2=domain['lat2'],
-                data=data))
+            html_file.write(
+                jinja2.Template(template.read()).render(
+                    resolution=resolution,
+                    lng1=domain['lng1'],
+                    lng2=domain['lng2'],
+                    lat1=domain['lat1'],
+                    lat2=domain['lat2'],
+                    data=data,
+                )
+            )

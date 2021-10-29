@@ -17,18 +17,25 @@
 """Process an env section in node of a metomi.rose.config_tree.ConfigTree."""
 
 import os
-from metomi.rose.env import (
-    env_export, env_var_process, UnboundEnvironmentVariableError)
+
 from metomi.rose.config_processor import (
-    ConfigProcessError, ConfigProcessorBase)
+    ConfigProcessError,
+    ConfigProcessorBase,
+)
+from metomi.rose.env import (
+    UnboundEnvironmentVariableError,
+    env_export,
+    env_var_process,
+)
 
 
 class ConfigProcessorForEnv(ConfigProcessorBase):
 
     SCHEME = "env"
 
-    def process(self, conf_tree, item, orig_keys=None, orig_value=None,
-                **kwargs):
+    def process(
+        self, conf_tree, item, orig_keys=None, orig_value=None, **kwargs
+    ):
         """Export environment variables in an [env] in "conf_tree.node"."""
         env_node = conf_tree.node.get([item], no_ignore=True)
         if env_node is None:

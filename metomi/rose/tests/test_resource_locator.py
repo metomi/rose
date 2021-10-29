@@ -16,13 +16,12 @@
 
 from textwrap import dedent
 
-import pytest
-
 from metomi.rose.resource import (
     ROSE_CONF_PATH,
     ROSE_SITE_CONF_PATH,
-    ResourceLocator
+    ResourceLocator,
 )
+import pytest
 
 
 @pytest.fixture(scope='module')
@@ -45,20 +44,32 @@ def sys_site_user_config(mod_monkeypatch, mod_tmp_path):
     site.mkdir()
     user.mkdir()
     with open(syst / 'rose.conf', 'w+') as conf:
-        conf.write(dedent('''
+        conf.write(
+            dedent(
+                '''
         all=syst
         syst=syst
-        '''))
+        '''
+            )
+        )
     with open(site / 'rose.conf', 'w+') as conf:
-        conf.write(dedent('''
+        conf.write(
+            dedent(
+                '''
         all=site
         site=site
-        '''))
+        '''
+            )
+        )
     with open(user / 'rose.conf', 'w+') as conf:
-        conf.write(dedent('''
+        conf.write(
+            dedent(
+                '''
         all=user
         user=user
-        '''))
+        '''
+            )
+        )
 
     # patch the ResourceLocator
     mod_monkeypatch.setattr(
@@ -98,18 +109,13 @@ def test_default(sys_site_user_config, resource_locator):
 def test_skip_no_read(sys_site_user_config, resource_locator, monkeypatch):
     """It should skip config files it can't read."""
     # make it look like all files are not readable.
-    monkeypatch.setattr(
-        'os.access',
-        lambda x, y: False
-    )
+    monkeypatch.setattr('os.access', lambda x, y: False)
     conf = resource_locator.get_conf()
     assert conf.value == {}
 
 
 def test_rose_conf_path_blank(
-    sys_site_user_config,
-    resource_locator,
-    monkeypatch
+    sys_site_user_config, resource_locator, monkeypatch
 ):
     """Setting ROSE_CONF_PATH= should prevent any conf files being loaded."""
     monkeypatch.setenv(ROSE_CONF_PATH, '')
@@ -117,11 +123,7 @@ def test_rose_conf_path_blank(
     assert conf.value == {}
 
 
-def test_rose_conf_path(
-    sys_site_user_config,
-    resource_locator,
-    monkeypatch
-):
+def test_rose_conf_path(sys_site_user_config, resource_locator, monkeypatch):
     """If ROSE_CONF_PATH is defined no other files should be loaded."""
     # set ROSE_CONF_PATH to point at the system config
     syst, site, *_ = sys_site_user_config
@@ -134,9 +136,7 @@ def test_rose_conf_path(
 
 
 def test_rose_site_conf_path(
-    sys_site_user_config,
-    resource_locator,
-    monkeypatch
+    sys_site_user_config, resource_locator, monkeypatch
 ):
     """If ROSE_SITE_CONF_PATH is defined it should be loaded."""
     # set ROSE_SITE_CONF_PATH to point at the system config

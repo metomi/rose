@@ -17,7 +17,6 @@
 """Class to check if a URL is valid."""
 
 import http.client
-
 import metomi.rose.macro
 
 
@@ -36,8 +35,11 @@ class URLChecker(metomi.rose.macro.MacroBase):
                 if "URL" not in option:
                     continue
                 value = config.get([section, option]).value
-                if (not value.isdigit() and " " not in value and
-                        "," not in value):
+                if (
+                    not value.isdigit()
+                    and " " not in value
+                    and "," not in value
+                ):
                     try:
                         connection = http.client.HTTPConnection(value, 80)
                         connection.request("HEAD", "")

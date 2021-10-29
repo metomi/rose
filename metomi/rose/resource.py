@@ -18,18 +18,17 @@
 Convenient functions for searching resource files.
 """
 
+from importlib.machinery import SourceFileLoader
+import inspect
 import os
 from pathlib import Path
-import inspect
 import string
 import sys
-from importlib.machinery import SourceFileLoader
 
 import metomi.rose
 from metomi.rose.config import ConfigLoader, ConfigNode
 import metomi.rose.opt_parse
 from metomi.rose.reporter import Reporter
-
 
 ERROR_LOCATE_OBJECT = "Could not locate {0}"
 
@@ -84,7 +83,7 @@ class ResourceLocator:
         else:
             self.paths = [
                 (ROSE_INSTALL_ROOT / 'etc') / self.get_util_name("-"),
-                ROSE_INSTALL_ROOT / 'etc'
+                ROSE_INSTALL_ROOT / 'etc',
             ]
         self.conf = None
 
@@ -108,8 +107,7 @@ class ResourceLocator:
                 paths_str = os.getenv("ROSE_CONF_PATH").strip()
                 if paths_str:
                     paths = [
-                        Path(path)
-                        for path in paths_str.split(os.pathsep)
+                        Path(path) for path in paths_str.split(os.pathsep)
                     ]
                 else:
                     paths = []
@@ -166,8 +164,9 @@ class ResourceLocator:
         raise ResourceError(key)
 
 
-def import_object(import_string, from_files, error_handler,
-                  module_prefix=None):
+def import_object(
+    import_string, from_files, error_handler, module_prefix=None
+):
     """Import a Python callable.
 
     import_string is the '.' delimited path to the callable,
@@ -199,8 +198,7 @@ def import_object(import_string, from_files, error_handler,
     module = None
     if is_builtin:
         try:
-            module = __import__(module_name, globals(), locals(),
-                                [], 0)
+            module = __import__(module_name, globals(), locals(), [], 0)
         except ImportError as exc:
             error_handler(exc)
     else:

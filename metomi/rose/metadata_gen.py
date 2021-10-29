@@ -46,25 +46,33 @@ def metadata_gen(config, meta_config=None, auto_type=False, prop_map=None):
             option = keylist[1]
         if sect in [metomi.rose.CONFIG_SECT_CMD]:
             continue
-        if keylist == [metomi.rose.CONFIG_SECT_TOP,
-                       metomi.rose.CONFIG_OPT_META_TYPE]:
+        if keylist == [
+            metomi.rose.CONFIG_SECT_TOP,
+            metomi.rose.CONFIG_OPT_META_TYPE,
+        ]:
             continue
         meta_sect = metomi.rose.macro.REC_ID_STRIP.sub("", sect)
         modifier_sect = metomi.rose.macro.REC_ID_STRIP_DUPL.sub("", sect)
         if sect and option is None:
-            if (modifier_sect != meta_sect and
-                    modifier_sect != sect and
-                    meta_config.get([modifier_sect]) is None and auto_type):
+            if (
+                modifier_sect != meta_sect
+                and modifier_sect != sect
+                and meta_config.get([modifier_sect]) is None
+                and auto_type
+            ):
                 meta_config.set(
                     [modifier_sect, metomi.rose.META_PROP_DUPLICATE],
-                    metomi.rose.META_PROP_VALUE_TRUE)
+                    metomi.rose.META_PROP_VALUE_TRUE,
+                )
             if meta_config.get([meta_sect]) is not None:
                 continue
             meta_config.set([meta_sect])
             if meta_sect != sect and auto_type:
                 # Add duplicate = true at base and modifier level (if needed).
-                meta_config.set([meta_sect, metomi.rose.META_PROP_DUPLICATE],
-                                metomi.rose.META_PROP_VALUE_TRUE)
+                meta_config.set(
+                    [meta_sect, metomi.rose.META_PROP_DUPLICATE],
+                    metomi.rose.META_PROP_VALUE_TRUE,
+                )
             for prop_key, prop_value in prop_map.items():
                 meta_config.set([meta_sect, prop_key], prop_value)
         if option is None:
@@ -80,10 +88,12 @@ def metadata_gen(config, meta_config=None, auto_type=False, prop_map=None):
             opt_type, length = type_gen(node.value)
             if opt_type is not None:
                 meta_config.set(
-                    [meta_opt, metomi.rose.META_PROP_TYPE], opt_type)
+                    [meta_opt, metomi.rose.META_PROP_TYPE], opt_type
+                )
             if int(length) > 1:
                 meta_config.set(
-                    [meta_opt, metomi.rose.META_PROP_LENGTH], length)
+                    [meta_opt, metomi.rose.META_PROP_LENGTH], length
+                )
     return meta_config
 
 
@@ -100,8 +110,14 @@ def type_gen(value):
     for val in metomi.rose.variable.array_split(value):
         length += 1
         val_meta_type = "raw"
-        for meta_type in ["integer", "real", "quoted", "character", "logical",
-                          "boolean"]:
+        for meta_type in [
+            "integer",
+            "real",
+            "quoted",
+            "character",
+            "logical",
+            "boolean",
+        ]:
             is_ok = metomi.rose.meta_type.meta_type_checker(val, meta_type)[0]
             if is_ok:
                 val_meta_type = meta_type
@@ -149,14 +165,19 @@ def main():
     meta_dir = os.path.join(opts.conf_dir, metomi.rose.CONFIG_META_DIR)
     metadata_config = metomi.rose.config.ConfigNode()
     try:
-        metadata_config = metomi.rose.config_tree.ConfigTreeLoader().load(
-            meta_dir, metomi.rose.META_CONFIG_NAME, list(sys.path)).node
+        metadata_config = (
+            metomi.rose.config_tree.ConfigTreeLoader()
+            .load(meta_dir, metomi.rose.META_CONFIG_NAME, list(sys.path))
+            .node
+        )
     except IOError:
         pass
-    metadata_config = metadata_gen(source_config,
-                                   metadata_config,
-                                   auto_type=opts.type,
-                                   prop_map=prop_val_map)
+    metadata_config = metadata_gen(
+        source_config,
+        metadata_config,
+        auto_type=opts.type,
+        prop_map=prop_val_map,
+    )
     if opts.output_dir is None:
         dest = meta_dir
     else:

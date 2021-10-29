@@ -14,8 +14,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-import json
 from io import StringIO
+import json
 from textwrap import dedent
 
 from metomi.rose.host_select_client import main as host_select
@@ -25,11 +25,15 @@ def test_empty(monkeypatch, capsys):
     """It should not return any results for an empty request."""
     monkeypatch.setattr(
         'sys.stdin',
-        StringIO(dedent('''
+        StringIO(
+            dedent(
+                '''
         **start**
         []
         **end**
-        '''))
+        '''
+            )
+        ),
     )
     host_select()
     captured = capsys.readouterr()
@@ -44,13 +48,17 @@ def test_stdin_pollution(monkeypatch, capsys):
     """
     monkeypatch.setattr(
         'sys.stdin',
-        StringIO(dedent('''
+        StringIO(
+            dedent(
+                '''
         hello
         *&^%$**start**
         []
         **end***&^%$E
         world
-        '''))
+        '''
+            )
+        ),
     )
     host_select()
     captured = capsys.readouterr()
@@ -62,11 +70,15 @@ def test_request(monkeypatch, capsys):
     """Test a simple request."""
     monkeypatch.setattr(
         'sys.stdin',
-        StringIO(dedent('''
+        StringIO(
+            dedent(
+                '''
         **start**
         [["virtual_memory"]]
         **end**
-        '''))
+        '''
+            )
+        ),
     )
     host_select()
     captured = capsys.readouterr()

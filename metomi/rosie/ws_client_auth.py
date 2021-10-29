@@ -20,8 +20,8 @@ import ast
 from getpass import getpass
 import os
 import re
-import socket
 import shlex
+import socket
 import sys
 from urllib.parse import urlparse
 import warnings
@@ -32,12 +32,13 @@ from metomi.rose.popen import RosePopener
 from metomi.rose.reporter import Reporter
 from metomi.rose.resource import ResourceLocator
 
-
 try:
     from gi import require_version, pygtkcompat
+
     require_version('Gtk', '3.0')  # For GTK+ >=v3 use PyGObject; v2 use PyGTK
     require_version('Secret', '1')
     from gi.repository import Secret
+
     del pygtkcompat
     GI_FLAG = True
 except (ImportError, ValueError):
@@ -106,7 +107,8 @@ class GnomekeyringStore:
         """Return the password of username@root."""
         try:
             res = gnomekeyring.find_network_password_sync(
-                username, None, host, None, scheme)
+                username, None, host, None, scheme
+            )
             ring_id = res[0]["keyring"]
             item_id = res[0]["item_id"]
             self.item_ids[(scheme, host, username)] = (ring_id, item_id)
@@ -128,9 +130,12 @@ class GnomekeyringStore:
                 host,
                 {"user": username, "protocol": scheme, "server": host},
                 password,
-                True)
-        except (gnomekeyring.CancelledError,
-                gnomekeyring.NoKeyringDaemonError):
+                True,
+            )
+        except (
+            gnomekeyring.CancelledError,
+            gnomekeyring.NoKeyringDaemonError,
+        ):
             pass
         self.item_ids[(scheme, host, username)] = (None, item_id)
 
@@ -166,8 +171,7 @@ class GPGAgentStore:
         gpg_socket.send(b"GETINFO socket_name\n")
         reply = cls._socket_receive(gpg_socket, b"^(?!OK)[^ ]+ .*\n")
         if not reply.startswith(b"D"):
-            raise GPGAgentStoreConnectionError(
-                "socket: bad reply: %r" % reply)
+            raise GPGAgentStoreConnectionError("socket: bad reply: %r" % reply)
         reply_socket_address = reply.split()[1]
         if reply_socket_address != socket_address:
             # The gpg-agent documentation advises making this check.
@@ -176,7 +180,8 @@ class GPGAgentStore:
         if tty is None:
             if not sys.stdin.isatty():
                 raise GPGAgentStoreConnectionError(
-                    "no $GPG_TTY env var and failed to extrapolate it")
+                    "no $GPG_TTY env var and failed to extrapolate it"
+                )
             tty = os.ttyname(sys.stdin.fileno())
         gpg_socket.send(b"OPTION putenv=GPG_TTY=%s\n" % tty)
         cls._socket_receive(gpg_socket, b"^OK\n")
@@ -218,8 +223,10 @@ class GPGAgentStore:
             prompt = "X"
         else:
             prompt = prompt.replace(" ", "+")
-        gpg_socket.send("GET_PASSPHRASE --data %s rosie:%s:%s X X %s\n" % (
-            no_ask_option, scheme, host, prompt))
+        gpg_socket.send(
+            "GET_PASSPHRASE --data %s rosie:%s:%s X X %s\n"
+            % (no_ask_option, scheme, host, prompt)
+        )
         reply = self._socket_receive(gpg_socket, b"^(?!OK)[^ ]+ .*\n")
         replylines = reply.splitlines()
         for line in replylines:
@@ -228,13 +235,16 @@ class GPGAgentStore:
         if not no_ask:
             # We want gpg-agent to prompt for a password.
             for line in replylines:
-                if (line.startswith("INQUIRE ") or
-                        "Operation cancelled" in line):
+                if (
+                    line.startswith("INQUIRE ")
+                    or "Operation cancelled" in line
+                ):
                     # Prompt was launched, or a launched prompt was cancelled.
                     return None
             # Prompt couldn't be launched.
             raise RosieStoreRetrievalError(
-                "gpg-agent", reply.replace("OK\n", "").replace("\n", " "))
+                "gpg-agent", reply.replace("OK\n", "").replace("\n", " ")
+            )
         return None
 
     def prompt_password(self, prompt, scheme, host, username):
@@ -258,10 +268,12 @@ class LibsecretStore:
     def __init__(self):
         # Attributes must be explicitly defined; not managed by the schema
         self.category = ("protocol", "server", "user")
-        self.attributes = dict((key, Secret.SchemaAttributeType.STRING) for
-                               key in self.category)
+        self.attributes = dict(
+            (key, Secret.SchemaAttributeType.STRING) for key in self.category
+        )
         self.schema = Secret.Schema.new(
-            "org.rosie.disco.Store", Secret.SchemaFlags.NONE, self.attributes)
+            "org.rosie.disco.Store", Secret.SchemaFlags.NONE, self.attributes
+        )
 
     def clear_password(self, scheme, host, username):
         """Remove the password from the cache."""
@@ -283,8 +295,13 @@ class LibsecretStore:
         self.clear_password(scheme, host, username)
         try:
             Secret.password_store_sync(
-                self.schema, template, Secret.COLLECTION_DEFAULT, host,
-                password, None)
+                self.schema,
+                template,
+                Secret.COLLECTION_DEFAULT,
+                host,
+                password,
+                None,
+            )
         except Secret.SECRET_ERROR_PROTOCOL:
             pass
 
@@ -305,8 +322,9 @@ class RosieWSClientAuthManager:
     PROMPT_PASSWORD = "Password for %(username)s at %(prefix)r - %(root)r: "
     STR_CANCELLED = "cancelled by user"
 
-    def __init__(self, prefix, popen=None, prompt_func=None,
-                 event_handler=None):
+    def __init__(
+        self, prefix, popen=None, prompt_func=None, event_handler=None
+    ):
         self.prefix = prefix
         root = self._get_conf_value("ws")
         if root is None:
@@ -330,12 +348,18 @@ class RosieWSClientAuthManager:
         else:
             self.event_handler = event_handler
         res_loc = ResourceLocator.default()
-        password_stores_str = res_loc.default().get_conf().get_value(
-            keys=["rosie-id", "prefix-password-store." + self.prefix],
-            default=self.PASSWORD_STORES_STR)
+        password_stores_str = (
+            res_loc.default()
+            .get_conf()
+            .get_value(
+                keys=["rosie-id", "prefix-password-store." + self.prefix],
+                default=self.PASSWORD_STORES_STR,
+            )
+        )
         for password_store_name in shlex.split(password_stores_str):
             password_store_cls = self.PASSWORD_STORE_CLASSES.get(
-                password_store_name)
+                password_store_name
+            )
             if password_store_cls is not None and password_store_cls.usable():
                 self.password_store = password_store_cls()
                 break
@@ -348,15 +372,19 @@ class RosieWSClientAuthManager:
     def _init_https_params(self):
         """Helper for __init__. Initialise HTTPS related parameters."""
         res_loc = ResourceLocator.default()
-        https_ssl_verify_mode_str = res_loc.default().get_conf().get_value([
-            "rosie-id",
-            "prefix-https-ssl-verify." + self.prefix])
+        https_ssl_verify_mode_str = (
+            res_loc.default()
+            .get_conf()
+            .get_value(["rosie-id", "prefix-https-ssl-verify." + self.prefix])
+        )
         if https_ssl_verify_mode_str:
             https_ssl_verify_mode = ast.literal_eval(https_ssl_verify_mode_str)
             self.requests_kwargs["verify"] = bool(https_ssl_verify_mode)
-        https_ssl_cert_str = res_loc.default().get_conf().get_value([
-            "rosie-id",
-            "prefix-https-ssl-cert." + self.prefix])
+        https_ssl_cert_str = (
+            res_loc.default()
+            .get_conf()
+            .get_value(["rosie-id", "prefix-https-ssl-cert." + self.prefix])
+        )
         if https_ssl_cert_str:
             https_ssl_cert = shlex.split(https_ssl_cert_str)
             if len(https_ssl_cert) == 1:
@@ -386,41 +414,52 @@ class RosieWSClientAuthManager:
         """Clear stored password information in password_store."""
         if self.password_store is not None:
             self.password_store.clear_password(
-                self.scheme, self.host, self.username)
+                self.scheme, self.host, self.username
+            )
 
     def store_password(self):
         """Store the authentication information for self.prefix."""
         if self.username and self.username_orig != self.username:
-            user_rose_conf_path = os.path.join(ResourceLocator.USER_CONF_PATH,
-                                               ResourceLocator.ROSE_CONF)
+            user_rose_conf_path = os.path.join(
+                ResourceLocator.USER_CONF_PATH, ResourceLocator.ROSE_CONF
+            )
             if os.access(user_rose_conf_path, os.F_OK | os.R_OK | os.W_OK):
                 config = metomi.rose.config.load(user_rose_conf_path)
             else:
                 config = metomi.rose.config.ConfigNode()
             config.set(
-                ["rosie-id", "prefix-username." + self.prefix], self.username)
+                ["rosie-id", "prefix-username." + self.prefix], self.username
+            )
             metomi.rose.config.dump(config, user_rose_conf_path)
-        if (self.password_store is not None and
-                self.password and self.password_orig != self.password):
+        if (
+            self.password_store is not None
+            and self.password
+            and self.password_orig != self.password
+        ):
             self.password_store.store_password(
-                self.scheme, self.host, self.username, self.password)
+                self.scheme, self.host, self.username, self.password
+            )
 
     def _get_conf_value(self, name, default=None):
         """Return the value of a named conf setting for this prefix."""
         conf = ResourceLocator.default().get_conf()
         value = conf.get_value(
-            ["rosie-id", "prefix-%s.%s" % (name, self.prefix)],
-            default=default)
+            ["rosie-id", "prefix-%s.%s" % (name, self.prefix)], default=default
+        )
         if value:
             value = env_var_process(value)
         return value
 
     def _load_password(self, is_retry=False):
         """Load password from store, if possible."""
-        if (self.password_store is not None and
-                self.username and (self.password is None or is_retry)):
+        if (
+            self.password_store is not None
+            and self.username
+            and (self.password is None or is_retry)
+        ):
             self.password = self.password_store.find_password(
-                self.scheme, self.host, self.username)
+                self.scheme, self.host, self.username
+            )
             if self.password_orig is None:
                 self.password_orig = self.password
 
@@ -430,10 +469,12 @@ class RosieWSClientAuthManager:
         Prompt with zenity or raw_input/getpass.
 
         """
-        if (callable(self.prompt_func) and
-                not hasattr(self.password_store, "prompt_password")):
+        if callable(self.prompt_func) and not hasattr(
+            self.password_store, "prompt_password"
+        ):
             self.username, self.password = self.prompt_func(
-                self.username, self.password, is_retry)
+                self.username, self.password, is_retry
+            )
             return
 
         icon_path = ResourceLocator.default().locate("images/rosie-icon.png")
@@ -441,13 +482,17 @@ class RosieWSClientAuthManager:
             username = ""
 
             prompt = self.PROMPT_USERNAME % {
-                "prefix": self.prefix, "root": self.root}
+                "prefix": self.prefix,
+                "root": self.root,
+            }
             if self.popen.which("zenity") and os.getenv("DISPLAY"):
                 username = self.popen.run(
-                    "zenity", "--entry",
+                    "zenity",
+                    "--entry",
                     "--title=Rosie",
                     "--window-icon=" + icon_path,
-                    "--text=" + prompt)[1].strip()
+                    "--text=" + prompt,
+                )[1].strip()
             else:
                 username = input(prompt)
             if not username:
@@ -459,15 +504,18 @@ class RosieWSClientAuthManager:
                     return
 
         if self.username and self.password is None or is_retry:
-            prompt = self.PROMPT_PASSWORD % {"prefix": self.prefix,
-                                             "root": self.root,
-                                             "username": self.username}
+            prompt = self.PROMPT_PASSWORD % {
+                "prefix": self.prefix,
+                "root": self.root,
+                "username": self.username,
+            }
             password = None
             need_prompting = True
             if hasattr(self.password_store, "prompt_password"):
                 try:
                     password = self.password_store.prompt_password(
-                        prompt, self.scheme, self.host, self.username)
+                        prompt, self.scheme, self.host, self.username
+                    )
                 except RosieStoreRetrievalError as exc:
                     self.event_handler(exc)
                 else:
@@ -476,10 +524,13 @@ class RosieWSClientAuthManager:
             if not password and need_prompting:
                 if self.popen.which("zenity") and os.getenv("DISPLAY"):
                     password = self.popen.run(
-                        "zenity", "--entry", "--hide-text",
+                        "zenity",
+                        "--entry",
+                        "--hide-text",
                         "--title=Rosie",
                         "--window-icon=" + icon_path,
-                        "--text=" + prompt)[1].strip()
+                        "--text=" + prompt,
+                    )[1].strip()
                 else:
                     password = getpass(prompt)
             if not password:

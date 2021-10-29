@@ -40,7 +40,7 @@ from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.popen import RosePopener, RosePopenError
 from metomi.rose.reporter import Reporter
 from metomi.rose.resource import ResourceLocator
-from metomi.rose.suite_engine_proc import SuiteEngineProcessor, NoSuiteLogError
+from metomi.rose.suite_engine_proc import NoSuiteLogError, SuiteEngineProcessor
 
 
 class SvnCaller(RosePopener):
@@ -142,8 +142,11 @@ class SuiteId:
                 if i == 0:
                     return None
                 raise SuiteIdLatestError(prefix)
-            dirs = [line for line in out.decode().splitlines() if
-                    line.endswith("/")]
+            dirs = [
+                line
+                for line in out.decode().splitlines()
+                if line.endswith("/")
+            ]
             # Note - 'R/O/S/I/E' sorts to top for lowercase initial idx letter
             dir_url = dir_url + "/" + sorted(dirs)[-1].rstrip("/")
 
@@ -156,9 +159,10 @@ class SuiteId:
                 return
             state["stack"].append(name)
             state["try_text"] = (
-                state["stack"] == ["log", "logentry", "paths", "path"] and
-                attr_map.get("kind") == "dir" and
-                attr_map.get("action") == "A")
+                state["stack"] == ["log", "logentry", "paths", "path"]
+                and attr_map.get("kind") == "dir"
+                and attr_map.get("action") == "A"
+            )
 
         def _handle_tag1(state, _):
             """Handle XML end tag."""
@@ -172,7 +176,7 @@ class SuiteId:
                 return
             names = text.strip().lstrip("/").split("/", cls.SID_LEN)
             if len(names) == cls.SID_LEN:
-                sid = "".join(names[0:cls.SID_LEN])
+                sid = "".join(names[0 : cls.SID_LEN])
                 if cls.REC_IDX.match(sid):
                     state["idx-sid"] = sid
 
@@ -214,7 +218,8 @@ class SuiteId:
             # "~/.metomi/rose.conf", but it may contain environment variables
             # that are only correct in the user's environment.
             local_copy_root = os.path.expanduser(
-                os.path.join("~" + user, "roses"))
+                os.path.join("~" + user, "roses")
+            )
         elif value:
             local_copy_root = metomi.rose.env.env_var_process(value)
         else:
@@ -294,7 +299,7 @@ class SuiteId:
             if node.state:
                 continue
             if key.startswith("prefix-location."):
-                ret[key[len("prefix-location."):]] = node.value
+                ret[key[len("prefix-location.") :]] = node.value
         return ret
 
     @classmethod
@@ -312,8 +317,8 @@ class SuiteId:
     def __init__(self, id_text=None, location=None):
         """Initialise either from an id_text or from a location."""
         self.prefix = None  # Repos id e.g. repo1
-        self.sid = None     # Short/Sub/Suffix id e.g. aa000
-        self.idx = None     # Full idx, join of self.prefix and self.sid
+        self.sid = None  # Short/Sub/Suffix id e.g. aa000
+        self.idx = None  # Full idx, join of self.prefix and self.sid
         self.branch = None
         self.revision = None
         # self.statuses = {
@@ -334,8 +339,9 @@ class SuiteId:
 
     def __eq__(self, other):
         return (
-            self.to_string_with_version() == other.to_string_with_version() and
-            self.get_status() == other.get_status())
+            self.to_string_with_version() == other.to_string_with_version()
+            and self.get_status() == other.get_status()
+        )
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -366,7 +372,8 @@ class SuiteId:
         """Return the ID of a location (origin URL or local copy path)."""
         suite_engine_proc = SuiteEngineProcessor.get_processor()
         suite_dir_rel_root = getattr(
-            suite_engine_proc, "SUITE_DIR_REL_ROOT", None)
+            suite_engine_proc, "SUITE_DIR_REL_ROOT", None
+        )
 
         # Cylc8 run directory
         # TODO: extract version control information
@@ -391,12 +398,14 @@ class SuiteId:
         # Cylc7 run directory
         # Use a hacky way to read the "log/rose-suite-run.version" file
         suite_dir_rel_root = getattr(
-            suite_engine_proc, "SUITE_DIR_REL_ROOT", None)
+            suite_engine_proc, "SUITE_DIR_REL_ROOT", None
+        )
         if suite_dir_rel_root and "/" + suite_dir_rel_root + "/" in location:
             loc = location
             while "/" + suite_dir_rel_root + "/" in loc:
                 suite_version_file_name = os.path.join(
-                    loc, "log/rose-suite-run.version")
+                    loc, "log/rose-suite-run.version"
+                )
                 loc = os.path.dirname(loc)
                 if not os.access(suite_version_file_name, os.F_OK | os.R_OK):
                     continue
@@ -430,14 +439,14 @@ class SuiteId:
             raise SuiteIdLocationError(location)
         root = info_entry["repository:root"]
         url = info_entry["url"]
-        path = url[len(root):]
+        path = url[len(root) :]
         if not path:
             raise SuiteIdLocationError(location)
         self.prefix = self.get_prefix_from_location_root(root)
         names = path.lstrip("/").split("/", self.SID_LEN + 1)
         if len(names) < self.SID_LEN:
             raise SuiteIdLocationError(location)
-        sid = "".join(names[0:self.SID_LEN])
+        sid = "".join(names[0 : self.SID_LEN])
         if not self.REC_IDX.match(sid):
             raise SuiteIdLocationError(location)
         self.idx = self.FORMAT_IDX % (self.prefix, sid)
@@ -456,9 +465,11 @@ class SuiteId:
         previously determined status.
 
         """
-        if (not force_mode and
-                self.statuses is not None and
-                self.statuses.get(user) is not None):
+        if (
+            not force_mode
+            and self.statuses is not None
+            and self.statuses.get(user) is not None
+        ):
             return self.statuses.get(user)
         if self.statuses is None:
             self.statuses = {}
@@ -472,11 +483,13 @@ class SuiteId:
         else:
             if self.branch != location_suite_id.branch:
                 self.statuses[user] = self.STATUS_SW
-            elif (location_suite_id.revision and
-                    int(self.revision) > int(location_suite_id.revision)):
+            elif location_suite_id.revision and int(self.revision) > int(
+                location_suite_id.revision
+            ):
                 self.statuses[user] = self.STATUS_UP
-            elif (location_suite_id.revision and
-                    int(self.revision) < int(location_suite_id.revision)):
+            elif location_suite_id.revision and int(self.revision) < int(
+                location_suite_id.revision
+            ):
                 self.statuses[user] = self.STATUS_DO
             else:
                 try:
@@ -502,22 +515,26 @@ class SuiteId:
             incr_next = False
             if sid_chars[i].isdigit():
                 sid_chars[i] = str((int(sid_chars[i]) + 1) % 10)
-                incr_next = (sid_chars[i] == "0")
+                incr_next = sid_chars[i] == "0"
             else:
                 index = alphabet.index(sid_chars[i])
                 new_index = (index + 1) % len(alphabet)
                 sid_chars[i] = alphabet[new_index]
-                incr_next = (new_index == 0)
+                incr_next = new_index == 0
             if incr_next and i == 0:
                 raise SuiteIdOverflowError(self)
         self.sid = "".join(sid_chars)
         return self.__class__(
-            id_text=self.FORMAT_IDX % (self.prefix, self.sid))
+            id_text=self.FORMAT_IDX % (self.prefix, self.sid)
+        )
 
     def to_origin(self):
         """Return the origin URL of this ID."""
-        return (self.get_prefix_location(self.prefix) + "/" +
-                "/".join(self._get_sid()))
+        return (
+            self.get_prefix_location(self.prefix)
+            + "/"
+            + "/".join(self._get_sid())
+        )
 
     def to_local_copy(self, user=None):
         """Return the local copy path of this ID."""
@@ -537,7 +554,8 @@ class SuiteId:
             info_parser = SvnInfoXMLParser()
             try:
                 info_entry = info_parser.parse(
-                    self.svn("info", "--xml", location))
+                    self.svn("info", "--xml", location)
+                )
             except RosePopenError:
                 raise SuiteIdTextError(location)
             else:
@@ -562,8 +580,9 @@ class SuiteId:
 def main():
     """Implement the "rose suite-id" command."""
     opt_parser = RoseOptionParser()
-    opt_parser.add_my_options("latest", "next", "to_local_copy", "to_origin",
-                              "to_web")
+    opt_parser.add_my_options(
+        "latest", "next", "to_local_copy", "to_origin", "to_web"
+    )
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
     SuiteId.svn.event_handler = report  # FIXME: ugly?
@@ -578,7 +597,8 @@ def main():
         elif opts.to_local_copy:
             for arg in args:
                 report(
-                    str(SuiteId(id_text=arg).to_local_copy()) + "\n", level=0)
+                    str(SuiteId(id_text=arg).to_local_copy()) + "\n", level=0
+                )
         elif opts.to_web:
             for arg in args:
                 report(str(SuiteId(id_text=arg).to_web()) + "\n", level=0)

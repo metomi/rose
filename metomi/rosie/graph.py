@@ -68,15 +68,12 @@ def get_suite_data(prefix, properties=None):
         properties = []
 
     ws_client = metomi.rosie.ws_client.RosieWSClient(
-        prefixes=[prefix],
-        event_handler=metomi.rose.reporter.Reporter()
+        prefixes=[prefix], event_handler=metomi.rose.reporter.Reporter()
     )
     suite_data = ws_client.search(prefix, all_revs=1)[0][0]
     for dict_row in sorted(suite_data, key=lambda _: _["revision"]):
         suite_id = metomi.rosie.suite_id.SuiteId.from_idx_branch_revision(
-            dict_row["idx"],
-            dict_row["branch"],
-            dict_row["revision"]
+            dict_row["idx"], dict_row["branch"], dict_row["revision"]
         )
         dict_row["suite"] = suite_id.to_string_with_version()
         if "local" in properties:
@@ -84,14 +81,15 @@ def get_suite_data(prefix, properties=None):
         if "date" in properties:
             dict_row["date"] = time.strftime(
                 metomi.rosie.ws_client_cli.DATE_TIME_FORMAT,
-                time.gmtime(dict_row.get("date"))
+                time.gmtime(dict_row.get("date")),
             )
 
     return suite_data
 
 
-def calculate_edges(graph, suite_data, filter_id=None, properties=None,
-                    max_distance=None):
+def calculate_edges(
+    graph, suite_data, filter_id=None, properties=None, max_distance=None
+):
     """Get all connected suites for a prefix, optionally filtered."""
     if properties is None:
         properties = []
@@ -130,8 +128,13 @@ def calculate_edges(graph, suite_data, filter_id=None, properties=None,
         # Only plot the connections involving filter_id.
         node_stack = []
         node_stack = [(filter_id, 0)]
-        add_node(graph, filter_id, node_rosie_properties.get(filter_id),
-                 fillcolor="lightgrey", style="filled")
+        add_node(
+            graph,
+            filter_id,
+            node_rosie_properties.get(filter_id),
+            fillcolor="lightgrey",
+            style="filled",
+        )
 
         ok_nodes = set([])
         while node_stack:
@@ -139,8 +142,9 @@ def calculate_edges(graph, suite_data, filter_id=None, properties=None,
             if max_distance is not None and distance > max_distance:
                 continue
             ok_nodes.add(node)
-            for neighbour_node in (forward_edges.get(node, []) +
-                                   back_edges.get(node, [])):
+            for neighbour_node in forward_edges.get(node, []) + back_edges.get(
+                node, []
+            ):
                 if neighbour_node not in ok_nodes:
                     node_stack.append((neighbour_node, distance + 1))
 
@@ -175,15 +179,17 @@ def make_graph(suite_data, filter_id, properties, prefix, max_distance=None):
         graph.graph_attr["name"] = filter_id + " copy tree"
     else:
         graph.graph_attr["name"] = prefix + " copy tree"
-    calculate_edges(graph, suite_data, filter_id, properties,
-                    max_distance=max_distance)
+    calculate_edges(
+        graph, suite_data, filter_id, properties, max_distance=max_distance
+    )
     return graph
 
 
 def output_graph(graph, filename=None, debug_mode=False):
     """Draw the graph to filename (or temporary file if None)."""
-    metomi.rose.metadata_graph.output_graph(graph, debug_mode=debug_mode,
-                                            filename=filename)
+    metomi.rose.metadata_graph.output_graph(
+        graph, debug_mode=debug_mode, filename=filename
+    )
 
 
 def print_graph(suite_data, filter_id, properties=None, max_distance=None):
@@ -217,9 +223,12 @@ def print_graph(suite_data, filter_id, properties=None, max_distance=None):
     parent_id = ancestry[filter_id]['parent']
 
     if parent_id:
-        reporter(PrintSuiteDetails(
-                 parent_id, [ancestry[parent_id][p] for p in properties]),
-                 prefix="[parent]")
+        reporter(
+            PrintSuiteDetails(
+                parent_id, [ancestry[parent_id][p] for p in properties]
+            ),
+            prefix="[parent]",
+        )
     else:
         reporter(PrintSuiteDetails(None), prefix="[parent]")
 
@@ -229,9 +238,12 @@ def print_graph(suite_data, filter_id, properties=None, max_distance=None):
     while children:
         next_children = []
         for child in children:
-            reporter(PrintSuiteDetails(child,
-                     [ancestry[child][p] for p in properties]),
-                     prefix="[child%s]" % generation)
+            reporter(
+                PrintSuiteDetails(
+                    child, [ancestry[child][p] for p in properties]
+                ),
+                prefix="[child%s]" % generation,
+            )
             # If a child has children add to list of next generation children
             if ancestry[child]['children']:
                 next_children += ancestry[child]['children']
@@ -244,11 +256,9 @@ def print_graph(suite_data, filter_id, properties=None, max_distance=None):
 def main():
     """Provide the CLI interface."""
     opt_parser = metomi.rose.opt_parse.RoseOptionParser()
-    opt_parser.add_my_options("distance",
-                              "output_file",
-                              "prefix",
-                              "property",
-                              "text")
+    opt_parser.add_my_options(
+        "distance", "output_file", "prefix", "property", "text"
+    )
     opts, args = opt_parser.parse_args()
     filter_id = None
     if args:
@@ -268,13 +278,20 @@ def main():
     suite_data = get_suite_data(prefix, opts.property)
 
     if opts.text:
-        print_graph(suite_data, filter_id, opts.property,
-                    max_distance=opts.distance)
+        print_graph(
+            suite_data, filter_id, opts.property, max_distance=opts.distance
+        )
     else:
-        graph = make_graph(suite_data, filter_id, opts.property, prefix,
-                           max_distance=opts.distance)
-        output_graph(graph, filename=opts.output_file,
-                     debug_mode=opts.debug_mode)
+        graph = make_graph(
+            suite_data,
+            filter_id,
+            opts.property,
+            prefix,
+            max_distance=opts.distance,
+        )
+        output_graph(
+            graph, filename=opts.output_file, debug_mode=opts.debug_mode
+        )
 
 
 if __name__ == "__main__":

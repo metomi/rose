@@ -18,10 +18,10 @@
 
 import ast
 import sys
-from metomi.rosie.db import DAO
-from metomi.rosie.db_create import RosieDatabaseInitiator
 from tempfile import NamedTemporaryFile
 
+from metomi.rosie.db import DAO
+from metomi.rosie.db_create import RosieDatabaseInitiator
 
 if __name__ == "__main__":
     f = NamedTemporaryFile()

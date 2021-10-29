@@ -28,8 +28,9 @@ class SchemeHandlersManager:
 
     CAN_HANDLE = "can_handle"
 
-    def __init__(self, paths, ns=None, attrs=None, can_handle=None,
-                 *args, **kwargs):
+    def __init__(
+        self, paths, ns=None, attrs=None, can_handle=None, *args, **kwargs
+    ):
         """Load modules in paths and initialise any classes with a SCHEME.
 
         If "ns" is not None, only modules under the specified name-space in
@@ -79,8 +80,9 @@ class SchemeHandlersManager:
                     if len(members) == 1:
                         scheme0_default = os.path.basename(mod_path)
                     for _, class_ in members:
-                        if any(getattr(class_, a, None) is None
-                                for a in attrs):
+                        if any(
+                            getattr(class_, a, None) is None for a in attrs
+                        ):
                             continue
                         handler = None
                         scheme0 = getattr(class_, "SCHEME", scheme0_default)
@@ -120,5 +122,5 @@ class SchemeHandlersManager:
             return handler
         for handler in self.handlers.values():
             can_handle = getattr(handler, self.can_handle, None)
-            if (callable(can_handle) and can_handle(item)):
+            if callable(can_handle) and can_handle(item):
                 return handler

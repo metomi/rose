@@ -78,8 +78,9 @@ class ConfigProcessorBase:
         if self.SCHEME is not None:
             self.PREFIX = self.SCHEME + ":"
 
-    def process(self, conf_tree, item, orig_keys=None, orig_value=None,
-                **kwargs):
+    def process(
+        self, conf_tree, item, orig_keys=None, orig_value=None, **kwargs
+    ):
         """Sub-class should override this method.
 
         Arguments:
@@ -108,17 +109,20 @@ class ConfigProcessorsManager(SchemeHandlersManager):
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
         path = os.path.dirname(
-            os.path.dirname(sys.modules["metomi.rose"].__file__))
+            os.path.dirname(sys.modules["metomi.rose"].__file__)
+        )
         SchemeHandlersManager.__init__(
-            self, [path], "rose.config_processors", ["process"])
+            self, [path], "rose.config_processors", ["process"]
+        )
 
     def handle_event(self, *args, **kwargs):
         """Report an event."""
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def process(self, conf_tree, item, orig_keys=None, orig_value=None,
-                **kwargs):
+    def process(
+        self, conf_tree, item, orig_keys=None, orig_value=None, **kwargs
+    ):
         """Process a named item in the conf_tree.
 
         orig_keys: The keys for locating the originating setting in conf_tree
@@ -133,7 +137,10 @@ class ConfigProcessorsManager(SchemeHandlersManager):
         processor = self.get_handler(scheme)
         if processor is None:
             raise ConfigProcessError(
-                orig_keys, orig_value, UnknownContentError(scheme))
+                orig_keys, orig_value, UnknownContentError(scheme)
+            )
         return processor.process(
-            conf_tree, item, orig_keys, orig_value, **kwargs)
+            conf_tree, item, orig_keys, orig_value, **kwargs
+        )
+
     __call__ = process

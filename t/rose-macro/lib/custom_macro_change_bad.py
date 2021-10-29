@@ -30,8 +30,9 @@ class InvalidCommentsTransformer(metomi.rose.macro.MacroBase):
         node = config.get(["env", "TRANSFORM_SWITCH"])
         old_comments = node.comments
         node.comments = "?"
-        info = self.WARNING_CHANGED_COMMENTS.format(old_comments,
-                                                    node.comments)
+        info = self.WARNING_CHANGED_COMMENTS.format(
+            old_comments, node.comments
+        )
         self.add_report("env", "TRANSFORM_SWITCH", node.value, info)
         return config, self.reports
 

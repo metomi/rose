@@ -17,7 +17,7 @@
 """An extension providing a pygments lexer for Rose configuration files."""
 
 from pygments.lexer import RegexLexer, bygroups, include
-from pygments.token import (Comment, Name, Text, Operator, String)
+from pygments.token import Comment, Name, Operator, String, Text
 
 
 class RoseLexer(RegexLexer):
@@ -25,18 +25,19 @@ class RoseLexer(RegexLexer):
 
     # Pattern for a Rose setting with capture groups.
     ROSE_SETTING_PATTERN = (
-        r'(\w[^\=\n]+)'      # Setting pattern.
-        r'(\s+)?(=)(\s+)?')  # Optional spaces around = operator, value.
+        r'(\w[^\=\n]+)' r'(\s+)?(=)(\s+)?'  # Setting pattern.
+    )  # Optional spaces around = operator, value.
 
     # Pattern for the value to a Rose setting.
     ROSE_VALUE_PATTERN = (
-        r'.*\n'        # Match anything after the = to the end of the line.
-        r'(?:'         # Optionally match additional lines.
-        r'(?:'         # Repeating line matching group.
+        r'.*\n'  # Match anything after the = to the end of the line.
+        r'(?:'  # Optionally match additional lines.
+        r'(?:'  # Repeating line matching group.
         r'(?: +.*\n)'  # Lines must be prefixed with a space (do not use \s).
-        r'\n?'         # Blank lines are permitted (e.g. foo\n\n bar).
-        r')+'          # End repeating multiline group.
-        r')?')         # End optional group.
+        r'\n?'  # Blank lines are permitted (e.g. foo\n\n bar).
+        r')+'  # End repeating multiline group.
+        r')?'
+    )  # End optional group.
 
     # Pygments tokens for Rose config elements which have no direct
     # translation.
@@ -54,66 +55,65 @@ class RoseLexer(RegexLexer):
         'root': [
             # foo=bar.
             include('setting'),
-
             # !foo=bar.
             include('user-ignored-setting'),
-
             # !!foo=bar.
             include('trigger-ignored-setting'),
-
             # # ...
             include('comment'),
-
             # [!!...]
-            (r'\[\!\!.*\]', ROSE_TRIGGER_IGNORED_TOKEN,
-             'trigger-ignored-section'),
-
+            (
+                r'\[\!\!.*\]',
+                ROSE_TRIGGER_IGNORED_TOKEN,
+                'trigger-ignored-section',
+            ),
             # [!...]
-            (r'\[\!.*\]', ROSE_USER_IGNORED_TOKEN,
-             'user-ignored-section'),
-
+            (r'\[\!.*\]', ROSE_USER_IGNORED_TOKEN, 'user-ignored-section'),
             # [...], []
             (r'\[.*\]', Name.Tag, 'section'),
         ],
-
         # Rose comments - w/ or w/o/ leading whitespace.
-        'comment': [
-            (r'^([\s\t]+)?(#[^\n]+)$', Comment.Single)
-        ],
-
+        'comment': [(r'^([\s\t]+)?(#[^\n]+)$', Comment.Single)],
         # Rose settings broken down by constituent parts, values handled
         # separately.
         'setting': [
-            (ROSE_SETTING_PATTERN, bygroups(
-                Name.Variable,
-                Text,
-                Operator,
-                Text,
-            ), 'value')
+            (
+                ROSE_SETTING_PATTERN,
+                bygroups(
+                    Name.Variable,
+                    Text,
+                    Operator,
+                    Text,
+                ),
+                'value',
+            )
         ],
-
         # Values handled separately so as to colour the equals sign in
         # multi-line values.
         'value': [
-            (r'(\n[ \t]+)(=)?', bygroups(
-                Text,
-                Operator,
-            )),
-            (r'.', String)
+            (
+                r'(\n[ \t]+)(=)?',
+                bygroups(
+                    Text,
+                    Operator,
+                ),
+            ),
+            (r'.', String),
         ],
-
         # !bar=baz.
         'user-ignored-setting': [
-            (r'\!' + ROSE_SETTING_PATTERN + ROSE_VALUE_PATTERN,
-             ROSE_USER_IGNORED_TOKEN),
+            (
+                r'\!' + ROSE_SETTING_PATTERN + ROSE_VALUE_PATTERN,
+                ROSE_USER_IGNORED_TOKEN,
+            ),
         ],
-
         # !!bar=baz.
         'trigger-ignored-setting': [
-            (r'\!\!' + ROSE_SETTING_PATTERN + ROSE_VALUE_PATTERN,
-             ROSE_TRIGGER_IGNORED_TOKEN)
+            (
+                r'\!\!' + ROSE_SETTING_PATTERN + ROSE_VALUE_PATTERN,
+                ROSE_TRIGGER_IGNORED_TOKEN,
+            )
         ],
-
         # [...].
         'section': [
             (r'\n(?!([\s\t]+)?\[)', Text),
@@ -123,32 +123,34 @@ class RoseLexer(RegexLexer):
             include('user-ignored-setting'),
             include('trigger-ignored-setting'),
             # Escape section without swallowing any characters if no matches.
-            (r'(?=.)', Text, '#pop')
+            (r'(?=.)', Text, '#pop'),
         ],
-
         # [!...].
         'user-ignored-section': [
             (r'\n(?!([\s\t]+)?\[)', Text),
             # A newline that is not followed by a '['.
             include('comment'),
             # Match any regular, ignored or trigger ignored setting.
-            (r'([\!]+)?' + ROSE_SETTING_PATTERN + ROSE_VALUE_PATTERN,
-             ROSE_USER_IGNORED_TOKEN),
+            (
+                r'([\!]+)?' + ROSE_SETTING_PATTERN + ROSE_VALUE_PATTERN,
+                ROSE_USER_IGNORED_TOKEN,
+            ),
             # Escape section without swallowing any characters if no matches.
-            (r'(?=.)', Text, '#pop')
+            (r'(?=.)', Text, '#pop'),
         ],
-
         # [!!...].
         'trigger-ignored-section': [
             (r'\n(?!([\s\t]+)?\[)', Text),
             # A newline that is not followed by a '['.
             include('comment'),
             # Match any regular, ignored or trigger ignored setting.
-            (r'([\!]+)?' + ROSE_SETTING_PATTERN + ROSE_VALUE_PATTERN,
-             ROSE_TRIGGER_IGNORED_TOKEN),
+            (
+                r'([\!]+)?' + ROSE_SETTING_PATTERN + ROSE_VALUE_PATTERN,
+                ROSE_TRIGGER_IGNORED_TOKEN,
+            ),
             # Escape section without swallowing any characters if no matches.
-            (r'(?=.)', Text, '#pop')
-        ]
+            (r'(?=.)', Text, '#pop'),
+        ],
     }
 
 

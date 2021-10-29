@@ -24,6 +24,7 @@ try:
 except ImportError:
     pass
 import os
+
 from metomi.rose.resource import ResourceLocator
 
 
@@ -43,9 +44,7 @@ class LDAPUserTool:
 
     @classmethod
     def get_emails(cls, users):
-        """Return emails of valid users.
-
-        """
+        """Return emails of valid users."""
         return cls._search(users, cls.MAIL_IDX)
 
     @classmethod
@@ -72,8 +71,9 @@ class LDAPUserTool:
         uri = conf.get_value(["rosa-ldap", "uri"])
         binddn = conf.get_value(["rosa-ldap", "binddn"])
         passwd = ""
-        passwd_file = conf.get_value(["rosa-ldap", "password-file"],
-                                     cls.PASSWD_FILE)
+        passwd_file = conf.get_value(
+            ["rosa-ldap", "password-file"], cls.PASSWD_FILE
+        )
         if passwd_file:
             passwd = open(os.path.expanduser(passwd_file)).read().strip()
         basedn = conf.get_value(["rosa-ldap", "basedn"], "")

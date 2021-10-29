@@ -22,9 +22,12 @@ import shlex
 import sys
 from tempfile import mkdtemp
 
-from metomi.rose.env import (
-    env_export, env_var_process, UnboundEnvironmentVariableError)
 from metomi.rose.app_run import BuiltinApp, ConfigValueError
+from metomi.rose.env import (
+    UnboundEnvironmentVariableError,
+    env_export,
+    env_var_process,
+)
 from metomi.rose.fs_util import FileSystemEvent
 from metomi.rose.popen import RosePopenError
 
@@ -59,10 +62,12 @@ class FCMMakeApp(BuiltinApp):
 
         if orig_cont_map[CONT] in task.task_name:
             return self._run_cont(
-                app_runner, conf_tree, opts, args, uuid, task, orig_cont_map)
+                app_runner, conf_tree, opts, args, uuid, task, orig_cont_map
+            )
         else:
             return self._run_orig(
-                app_runner, conf_tree, opts, args, uuid, task, orig_cont_map)
+                app_runner, conf_tree, opts, args, uuid, task, orig_cont_map
+            )
 
     def _get_fcm_make_cmd(self, conf_tree, opts, args, dest, make_name):
         """Return a list containing the "fcm make" command to invoke."""
@@ -79,19 +84,35 @@ class FCMMakeApp(BuiltinApp):
             cmd += ["-n", make_name]
         if opts.new_mode:
             cmd.append("-N")
-        cmd += ["-j", _conf_value(
-            conf_tree, ["opt.jobs"],
-            os.getenv("ROSE_TASK_N_JOBS", self.OPT_JOBS))]
+        cmd += [
+            "-j",
+            _conf_value(
+                conf_tree,
+                ["opt.jobs"],
+                os.getenv("ROSE_TASK_N_JOBS", self.OPT_JOBS),
+            ),
+        ]
         cmd_args = _conf_value(
-            conf_tree, ["args"], os.getenv("ROSE_TASK_OPTIONS"))
+            conf_tree, ["args"], os.getenv("ROSE_TASK_OPTIONS")
+        )
         if cmd_args:
             cmd += shlex.split(cmd_args)
         if args:
             cmd += args
         return cmd
 
-    def _invoke_fcm_make(self, app_runner, conf_tree, opts, args, uuid, task,
-                         dests, fast_root, make_name):
+    def _invoke_fcm_make(
+        self,
+        app_runner,
+        conf_tree,
+        opts,
+        args,
+        uuid,
+        task,
+        dests,
+        fast_root,
+        make_name,
+    ):
         """Wrap "fcm make" call, may use fast_root working directory."""
         if opts.new_mode:
             # Remove items in destinations in new mode
@@ -104,15 +125,22 @@ class FCMMakeApp(BuiltinApp):
                         # Remove a remote destination
                         auth, name = dest.split(":", 1)
                         cmd = app_runner.popen.get_cmd(
-                            "ssh", auth, (
-                                "! test -e %(name)s/%(uuid)s && " +
-                                "(ls -d %(name)s || true) && rm -fr %(name)s"
-                            ) % {"name": quote(name), "uuid": uuid})
+                            "ssh",
+                            auth,
+                            (
+                                "! test -e %(name)s/%(uuid)s && "
+                                + "(ls -d %(name)s || true) && rm -fr %(name)s"
+                            )
+                            % {"name": quote(name), "uuid": uuid},
+                        )
                         out = app_runner.popen.run_ok(*cmd)[0]
                         for line in out.splitlines():
                             if line == name:
-                                app_runner.handle_event(FileSystemEvent(
-                                    FileSystemEvent.DELETE, dest))
+                                app_runner.handle_event(
+                                    FileSystemEvent(
+                                        FileSystemEvent.DELETE, dest
+                                    )
+                                )
                     elif dest and not os.path.exists(os.path.join(dest, uuid)):
                         # Remove a local destination
                         app_runner.fs_util.delete(dest)
@@ -123,13 +151,15 @@ class FCMMakeApp(BuiltinApp):
         dest = dests[0]
         if fast_root:
             # N.B. Name in "little endian", like cycle task ID
-            prefix = ".".join([
-                task.task_name,
-                task.task_cycle_time,
-                # suite_name may be a hierarchical registration which
-                # isn't a safe prefix
-                task.suite_name.replace(os.sep, '_')
-            ])
+            prefix = ".".join(
+                [
+                    task.task_name,
+                    task.task_cycle_time,
+                    # suite_name may be a hierarchical registration which
+                    # isn't a safe prefix
+                    task.suite_name.replace(os.sep, '_'),
+                ]
+            )
             os.makedirs(fast_root, exist_ok=True)
             dest = mkdtemp(prefix=prefix, dir=fast_root)
             # N.B. Don't use app_runner.popen.get_cmd("rsync") as we are using
@@ -159,13 +189,15 @@ class FCMMakeApp(BuiltinApp):
                 os.chmod(dests[0], stat.st_mode)
                 app_runner.fs_util.delete(dest)
 
-    def _run_orig(self, app_runner, conf_tree, opts, args, uuid, task,
-                  orig_cont_map):
+    def _run_orig(
+        self, app_runner, conf_tree, opts, args, uuid, task, orig_cont_map
+    ):
         """Run "fcm make" in original location."""
         # Determine the destination
         dest_orig_str = _conf_value(conf_tree, ["dest-orig"])
-        if (dest_orig_str is None and
-                _conf_value(conf_tree, ["use-pwd"]) not in ["True", "true"]):
+        if dest_orig_str is None and _conf_value(
+            conf_tree, ["use-pwd"]
+        ) not in ["True", "true"]:
             dest_orig_str = os.path.join("share", task.task_name)
         dest_orig = dest_orig_str
         if dest_orig is not None and not os.path.isabs(dest_orig):
@@ -175,9 +207,11 @@ class FCMMakeApp(BuiltinApp):
         # Determine if mirror is necessary or not
         # Determine the name of the continuation task
         task_name_cont = task.task_name.replace(
-            orig_cont_map[ORIG], orig_cont_map[CONT])
+            orig_cont_map[ORIG], orig_cont_map[CONT]
+        )
         auth = app_runner.suite_engine_proc.get_task_auth(
-            task.suite_name, task_name_cont)
+            task.suite_name, task_name_cont
+        )
         if auth is not None:
             dest_cont = _conf_value(conf_tree, ["dest-cont"])
             if dest_cont is None:
@@ -187,7 +221,8 @@ class FCMMakeApp(BuiltinApp):
                     dest_cont = os.path.join("share", task.task_name)
                 else:
                     dest_cont = os.path.join(
-                        "work", task.task_cycle_time, task_name_cont)
+                        "work", task.task_cycle_time, task_name_cont
+                    )
             if not os.path.isabs(dest_cont):
                 dest_cont = os.path.join(task.suite_dir_rel, dest_cont)
             dests.append(auth + ":" + dest_cont)
@@ -204,39 +239,64 @@ class FCMMakeApp(BuiltinApp):
                 args.append("%s.target=%s" % (mirror_step, dests[CONT]))
                 # "mirror.prop{config-file.name}" requires fcm-2015.05+
                 make_name_cont = _conf_value(
-                    conf_tree, ["make-name-cont"],
-                    orig_cont_map[CONT].replace(orig_cont_map[ORIG], ""))
+                    conf_tree,
+                    ["make-name-cont"],
+                    orig_cont_map[CONT].replace(orig_cont_map[ORIG], ""),
+                )
                 if make_name_cont:
-                    args.append("%s.prop{config-file.name}=%s" % (
-                        mirror_step, make_name_cont))
+                    args.append(
+                        "%s.prop{config-file.name}=%s"
+                        % (mirror_step, make_name_cont)
+                    )
 
         # Launch "fcm make"
         self._invoke_fcm_make(
-            app_runner, conf_tree, opts, args, uuid, task, dests,
+            app_runner,
+            conf_tree,
+            opts,
+            args,
+            uuid,
+            task,
+            dests,
             _conf_value(conf_tree, ["fast-dest-root-orig"]),
-            _conf_value(conf_tree, ["make-name-orig"]))
+            _conf_value(conf_tree, ["make-name-orig"]),
+        )
 
-    def _run_cont(self, app_runner, conf_tree, opts, args, uuid, task,
-                  orig_cont_map):
+    def _run_cont(
+        self, app_runner, conf_tree, opts, args, uuid, task, orig_cont_map
+    ):
         """Continue "fcm make" in mirror location."""
         # Determine the destination
         dest_cont = _conf_value(conf_tree, ["dest-cont"])
         if dest_cont is None:
             dest_cont = _conf_value(conf_tree, ["dest-orig"])
-        if (dest_cont is None and
-                _conf_value(conf_tree, ["use-pwd"]) not in ["True", "true"]):
+        if dest_cont is None and _conf_value(conf_tree, ["use-pwd"]) not in [
+            "True",
+            "true",
+        ]:
             task_name_orig = task.task_name.replace(
-                orig_cont_map[CONT], orig_cont_map[ORIG])
+                orig_cont_map[CONT], orig_cont_map[ORIG]
+            )
             dest_cont = os.path.join("share", task_name_orig)
         if dest_cont and not os.path.isabs(dest_cont):
             dest_cont = os.path.join(task.suite_dir, dest_cont)
 
         # Launch "fcm make"
         self._invoke_fcm_make(
-            app_runner, conf_tree, opts, args, uuid, task, [dest_cont],
+            app_runner,
+            conf_tree,
+            opts,
+            args,
+            uuid,
+            task,
+            [dest_cont],
             _conf_value(conf_tree, ["fast-dest-root-cont"]),
-            _conf_value(conf_tree, ["make-name-cont"],
-                        orig_cont_map[CONT].replace(orig_cont_map[ORIG], "")))
+            _conf_value(
+                conf_tree,
+                ["make-name-cont"],
+                orig_cont_map[CONT].replace(orig_cont_map[ORIG], ""),
+            ),
+        )
 
 
 def _conf_value(conf_tree, keys, default=None):

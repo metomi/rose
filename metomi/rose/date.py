@@ -17,15 +17,16 @@
 """Parse and format date and time."""
 
 from datetime import datetime
-from metomi.isodatetime.data import Calendar, Duration, get_timepoint_for_now
-from metomi.isodatetime.dumpers import TimePointDumper
-from metomi.isodatetime.parsers import TimePointParser, DurationParser
 import os
 import re
+import sys
+
+from metomi.isodatetime.data import Calendar, Duration, get_timepoint_for_now
+from metomi.isodatetime.dumpers import TimePointDumper
+from metomi.isodatetime.parsers import DurationParser, TimePointParser
 from metomi.rose.env import UnboundEnvironmentVariableError
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.reporter import Reporter
-import sys
 
 
 class OffsetValueError(ValueError):
@@ -47,11 +48,11 @@ class RoseDateTimeOperator:
 
     # strptime formats and their compatibility with the ISO 8601 parser.
     PARSE_FORMATS = [
-        ("%a %b %d %H:%M:%S %Y", True),     # ctime
+        ("%a %b %d %H:%M:%S %Y", True),  # ctime
         ("%a %b %d %H:%M:%S %Z %Y", True),  # Unix "date"
-        ("%Y-%m-%dT%H:%M:%S", False),       # ISO8601, extended
-        ("%Y%m%dT%H%M%S", False),           # ISO8601, basic
-        ("%Y%m%d%H", False)                 # Cylc (current)
+        ("%Y-%m-%dT%H:%M:%S", False),  # ISO8601, extended
+        ("%Y%m%dT%H%M%S", False),  # ISO8601, basic
+        ("%Y%m%d%H", False),  # Cylc (current)
     ]
 
     REC_OFFSET = re.compile(r"""\A[\+\-]?(?:\d+[wdhms])+\Z""", re.I)
@@ -63,14 +64,21 @@ class RoseDateTimeOperator:
 
     TASK_CYCLE_TIME_ENV = "ROSE_TASK_CYCLE_TIME"
 
-    UNITS = {"w": "weeks",
-             "d": "days",
-             "h": "hours",
-             "m": "minutes",
-             "s": "seconds"}
+    UNITS = {
+        "w": "weeks",
+        "d": "days",
+        "h": "hours",
+        "m": "minutes",
+        "s": "seconds",
+    }
 
-    def __init__(self, parse_format=None, utc_mode=False, calendar_mode=None,
-                 ref_point_str=None):
+    def __init__(
+        self,
+        parse_format=None,
+        utc_mode=False,
+        calendar_mode=None,
+        ref_point_str=None,
+    ):
         """Constructor.
 
         parse_format -- If specified, parse with the specified format.
@@ -100,7 +108,8 @@ class RoseDateTimeOperator:
 
         self.time_point_dumper = TimePointDumper()
         self.time_point_parser = TimePointParser(
-            assumed_time_zone=assumed_time_zone)
+            assumed_time_zone=assumed_time_zone
+        )
         self.duration_parser = DurationParser()
 
         self.ref_point_str = ref_point_str
@@ -153,19 +162,19 @@ class RoseDateTimeOperator:
                 try:
                     if should_use_datetime:
                         time_point = self.get_datetime_strptime(
-                            time_point_str,
-                            parse_format)
+                            time_point_str, parse_format
+                        )
                     else:
                         time_point = self.time_point_parser.strptime(
-                            time_point_str,
-                            parse_format)
+                            time_point_str, parse_format
+                        )
                     break
                 except ValueError:
                     pass
             if time_point is None:
                 time_point = self.time_point_parser.parse(
-                    time_point_str,
-                    dump_as_parsed=True)
+                    time_point_str, dump_as_parsed=True
+                )
                 parse_format = time_point.dump_format
         if self.utc_mode:
             time_point.set_time_zone_to_utc()
@@ -229,12 +238,14 @@ class RoseDateTimeOperator:
     def date_diff_format(cls, print_format, duration, sign):
         """Format a duration."""
         if print_format:
-            delta_lookup = {"y": duration.years,
-                            "m": duration.months,
-                            "d": duration.days,
-                            "h": duration.hours,
-                            "M": duration.minutes,
-                            "s": duration.seconds}
+            delta_lookup = {
+                "y": duration.years,
+                "m": duration.months,
+                "d": duration.days,
+                "h": duration.hours,
+                "M": duration.minutes,
+                "s": duration.seconds,
+            }
             expression = ""
             for item in print_format:
                 if item in delta_lookup:
@@ -255,7 +266,7 @@ class RoseDateTimeOperator:
 
     def is_offset(self, offset):
         """Return True if the string offset can be parsed as an offset."""
-        return (self.REC_OFFSET.match(offset) is not None)
+        return self.REC_OFFSET.match(offset) is not None
 
     @staticmethod
     def set_calendar_mode(calendar_mode=None):
@@ -280,11 +291,11 @@ class RoseDateTimeOperator:
             return self.get_datetime_strftime(time_point, print_format)
 
     def strptime(self, time_point_str, parse_format):
-        """Use either the metomi.isodatetime or datetime strptime time parsing.
-        """
+        """Use either the isodatetime or datetime strptime time parsing."""
         try:
-            return self.time_point_parser.strptime(time_point_str,
-                                                   parse_format)
+            return self.time_point_parser.strptime(
+                time_point_str, parse_format
+            )
         except ValueError:
             return self.get_datetime_strptime(time_point_str, parse_format)
 
@@ -298,8 +309,9 @@ class RoseDateTimeOperator:
         hour = int(hour)
         minute = int(minute)
         second = int(second)
-        date_time = datetime(year, month, day, hour, minute, second,
-                             microsecond)
+        date_time = datetime(
+            year, month, day, hour, minute, second, microsecond
+        )
         return date_time.strftime(print_format)
 
     def get_datetime_strptime(self, time_point_str, parse_format):
@@ -320,17 +332,18 @@ def main():
         "print_format",
         "task_cycle_time_mode",
         "as_total",
-        "utc_mode")
+        "utc_mode",
+    )
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
 
     ref_point_str = None
     if opts.task_cycle_time_mode:
-        ref_point_str = os.getenv(
-            RoseDateTimeOperator.TASK_CYCLE_TIME_ENV)
+        ref_point_str = os.getenv(RoseDateTimeOperator.TASK_CYCLE_TIME_ENV)
         if ref_point_str is None:
             exc = UnboundEnvironmentVariableError(
-                RoseDateTimeOperator.TASK_CYCLE_TIME_ENV)
+                RoseDateTimeOperator.TASK_CYCLE_TIME_ENV
+            )
             report(exc)
             if opts.debug_mode:
                 raise exc
@@ -340,7 +353,8 @@ def main():
         parse_format=opts.parse_format,
         utc_mode=opts.utc_mode,
         calendar_mode=opts.calendar,
-        ref_point_str=ref_point_str)
+        ref_point_str=ref_point_str,
+    )
 
     try:
         if len(args) < 2:
@@ -397,7 +411,8 @@ def _print_duration(date_time_oper, opts, args):
 def _convert_duration(date_time_oper, opts, args):
     """Implement usage 3 of "rose date", convert ISO8601 duration."""
     time_in_8601 = date_time_oper.duration_parser.parse(
-        args[0].replace('\\', ''))  # allows parsing of negative durations
+        args[0].replace('\\', '')
+    )  # allows parsing of negative durations
     time = time_in_8601.get_seconds()
     options = {'S': time, 'M': time / 60, 'H': time / 3600}
     if opts.duration_print_format.upper() in options:
@@ -405,8 +420,10 @@ def _convert_duration(date_time_oper, opts, args):
         print(options[opts.duration_print_format.upper()])
     else:
         # supplied duration format not valid
-        print('Invalid date/time format, please use one of H, M, S ' +
-              '(hours, minutes, seconds)')
+        print(
+            'Invalid date/time format, please use one of H, M, S '
+            + '(hours, minutes, seconds)'
+        )
         sys.exit(1)
 
 

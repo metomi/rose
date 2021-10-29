@@ -39,26 +39,27 @@
 
 import os
 import re
+
 from metomi.rose import TYPE_LOGICAL_VALUE_TRUE
 from metomi.rose.apps.rose_ana import AnalysisTask
 
 
 class SingleCommandStatus(AnalysisTask):
     """Run a shell command, passing or failing depending on the exit
-       status of that command.
+    status of that command.
 
-       Options:
-           files (optional):
-               A newline-separated list of filenames which may appear
-               in the command.
-           command:
-               The command to run; if it contains Python style
-               format specifiers these will be expanded using the list of
-               files above (if provided).
-           kgo_file:
-               If the list of files above was provided gives the
-               (0-based) index of the file holding the "kgo" or "control"
-               output for use with the comparisons database (if active).
+    Options:
+        files (optional):
+            A newline-separated list of filenames which may appear
+            in the command.
+        command:
+            The command to run; if it contains Python style
+            format specifiers these will be expanded using the list of
+            files above (if provided).
+        kgo_file:
+            If the list of files above was provided gives the
+            (0-based) index of the file holding the "kgo" or "control"
+            output for use with the comparisons database (if active).
     """
 
     def run_analysis(self):
@@ -82,8 +83,11 @@ class SingleCommandStatus(AnalysisTask):
             kgo_file = self.files[self.kgo]
             if not os.path.exists(kgo_file):
                 self.reporter(
-                    "KGO File (file {0}) appears to be missing"
-                    .format(self.kgo + 1), prefix="[FAIL] ")
+                    "KGO File (file {0}) appears to be missing".format(
+                        self.kgo + 1
+                    ),
+                    prefix="[FAIL] ",
+                )
                 # Note that by exiting early this task counts as failed
                 return
 
@@ -109,8 +113,10 @@ class SingleCommandStatus(AnalysisTask):
                 self.skipped = True
                 self.reporter(
                     "All file arguments are missing, skipping task since "
-                    "'skip-if-all-files-missing' is '{0}'"
-                    .format(TYPE_LOGICAL_VALUE_TRUE))
+                    "'skip-if-all-files-missing' is '{0}'".format(
+                        TYPE_LOGICAL_VALUE_TRUE
+                    )
+                )
         return self.skipped
 
     def get_config_opts(self):
@@ -122,8 +128,10 @@ class SingleCommandStatus(AnalysisTask):
 
         skip_missing = self.config.get("skip-if-all-files-missing", None)
         self.skip_if_missing = False
-        if (skip_missing is not None and
-                skip_missing == TYPE_LOGICAL_VALUE_TRUE):
+        if (
+            skip_missing is not None
+            and skip_missing == TYPE_LOGICAL_VALUE_TRUE
+        ):
             self.skip_if_missing = True
 
     def process_opt_files(self):
@@ -138,8 +146,10 @@ class SingleCommandStatus(AnalysisTask):
         # Report the filenames (with paths)
         for ifile, fname in enumerate(files):
             self.reporter(
-                "File {0}: {1}".format(ifile + 1,
-                                       os.path.abspath(files[ifile])))
+                "File {0}: {1}".format(
+                    ifile + 1, os.path.abspath(files[ifile])
+                )
+            )
         self.files = files
 
     def process_opt_kgo(self):
@@ -162,8 +172,10 @@ class SingleCommandStatus(AnalysisTask):
                     raise ValueError(msg)
                 self.reporter("KGO is file {0}".format(kgo + 1))
             else:
-                msg = ("KGO index not recognised; should be either a digit or "
-                       "left blank")
+                msg = (
+                    "KGO index not recognised; should be either a digit or "
+                    "left blank"
+                )
                 raise ValueError(msg)
         self.kgo = kgo
 
@@ -212,7 +224,9 @@ class SingleCommandStatus(AnalysisTask):
                     self.options["full_task_name"],
                     os.path.abspath(kgo_file),
                     os.path.abspath(suite_file),
-                    ["FAIL", " OK "][self.passed], "Compared using grepper")
+                    ["FAIL", " OK "][self.passed],
+                    "Compared using grepper",
+                )
 
 
 class SingleCommandPattern(SingleCommandStatus):
@@ -262,8 +276,11 @@ class SingleCommandPattern(SingleCommandStatus):
             kgo_file = self.files[self.kgo]
             if not os.path.exists(kgo_file):
                 self.reporter(
-                    "KGO File (file {0}) appears to be missing"
-                    .format(self.kgo + 1), prefix="[FAIL] ")
+                    "KGO File (file {0}) appears to be missing".format(
+                        self.kgo + 1
+                    ),
+                    prefix="[FAIL] ",
+                )
                 # Note that by exiting early this task counts as failed
                 return
 
@@ -317,8 +334,11 @@ class FilePattern(SingleCommandPattern):
             kgo_file = self.files[self.kgo]
             if not os.path.exists(kgo_file):
                 self.reporter(
-                    "KGO File (file {0}) appears to be missing"
-                    .format(self.kgo + 1), prefix="[FAIL] ")
+                    "KGO File (file {0}) appears to be missing".format(
+                        self.kgo + 1
+                    ),
+                    prefix="[FAIL] ",
+                )
                 # Note that by exiting early this task counts as failed
                 return
 
@@ -329,10 +349,18 @@ class FilePattern(SingleCommandPattern):
         group_lens = [len(groups) for groups in matched_groups.values()]
         for igroup, group_len in enumerate(group_lens[1:]):
             if group_len != group_lens[0]:
-                msg = ("File ({0}) matches pattern {1} times, but File ({2}) "
-                       "matches it {3} times, cannot test")
-                raise ValueError(msg.format(self.files[0], group_lens[0],
-                                            self.files[igroup + 1], group_len))
+                msg = (
+                    "File ({0}) matches pattern {1} times, but File ({2}) "
+                    "matches it {3} times, cannot test"
+                )
+                raise ValueError(
+                    msg.format(
+                        self.files[0],
+                        group_lens[0],
+                        self.files[igroup + 1],
+                        group_len,
+                    )
+                )
 
         # Compare the result of each matching
         passed = [True] * len(self.files)
@@ -343,7 +371,8 @@ class FilePattern(SingleCommandPattern):
             for ifile, fname in enumerate(self.files[1:]):
                 group = matched_groups[fname][igroup]
                 for imatch, (match1, match2) in enumerate(
-                        zip(ref_group, group)):
+                    zip(ref_group, group)
+                ):
                     # If a tolerance was given, the matches must be numbers
                     failed = False
                     comparison_total += 1
@@ -352,8 +381,10 @@ class FilePattern(SingleCommandPattern):
                             match1 = float(match1)
                             match2 = float(match2)
                         except ValueError:
-                            msg = ("Cannot do tolerance comparison, groups "
-                                   "matched by pattern are not reals")
+                            msg = (
+                                "Cannot do tolerance comparison, groups "
+                                "matched by pattern are not reals"
+                            )
                             raise ValueError(msg)
                         if self.relative_tol:
                             lower = match2 * (1.0 - 0.01 * self.tolerance)
@@ -373,49 +404,67 @@ class FilePattern(SingleCommandPattern):
 
                     # Now move on to report the output of the comparison (if
                     # the user's config limits the amount of output skip this)
-                    if (self.max_report_lines is not None and
-                            comparison_total > self.max_report_lines):
+                    if (
+                        self.max_report_lines is not None
+                        and comparison_total > self.max_report_lines
+                    ):
                         continue
 
                     if failed:
-                        msg = ("Mismatch in group {0} of pattern for "
-                               "occurrence {1} in files")
+                        msg = (
+                            "Mismatch in group {0} of pattern for "
+                            "occurrence {1} in files"
+                        )
                         prefix = "[FAIL] "
                         self.reporter(
-                            msg.format(imatch + 1, igroup + 1), prefix=prefix)
+                            msg.format(imatch + 1, igroup + 1), prefix=prefix
+                        )
                         msg = "File {0}: {1}"
-                        self.reporter(msg.format(1, match1),
-                                      prefix=prefix)
-                        self.reporter(msg.format(ifile + 2, match2),
-                                      prefix=prefix)
+                        self.reporter(msg.format(1, match1), prefix=prefix)
+                        self.reporter(
+                            msg.format(ifile + 2, match2), prefix=prefix
+                        )
 
                     else:
-                        msg = ("Group {0} of pattern for occurrence {1} in "
-                               "files matches")
+                        msg = (
+                            "Group {0} of pattern for occurrence {1} in "
+                            "files matches"
+                        )
                         self.reporter(
                             msg.format(imatch + 1, igroup + 1),
-                            level=self.reporter.V)
+                            level=self.reporter.V,
+                        )
                         if self.tolerance is None:
                             msg = "Value: {0}"
-                            self.reporter(msg.format(match1),
-                                          level=self.reporter.V)
+                            self.reporter(
+                                msg.format(match1), level=self.reporter.V
+                            )
                         else:
                             msg = "File {0}: {1}"
-                            self.reporter(msg.format(1, match1),
-                                          level=self.reporter.V)
-                            self.reporter(msg.format(ifile + 2, match2),
-                                          level=self.reporter.V)
+                            self.reporter(
+                                msg.format(1, match1), level=self.reporter.V
+                            )
+                            self.reporter(
+                                msg.format(ifile + 2, match2),
+                                level=self.reporter.V,
+                            )
 
         # If not all comparisons were printed, note it here
-        if (self.max_report_lines is not None and
-                comparison_total > self.max_report_lines):
+        if (
+            self.max_report_lines is not None
+            and comparison_total > self.max_report_lines
+        ):
             self.reporter("... Some output omitted due to limit ...")
 
         msg = "Performed {0} comparison{1}, with {2} failure{3}"
-        self.reporter(msg.format(comparison_total,
-                                 {1: ""}.get(comparison_total, "s"),
-                                 failure_total,
-                                 {1: ""}.get(failure_total, "s")))
+        self.reporter(
+            msg.format(
+                comparison_total,
+                {1: ""}.get(comparison_total, "s"),
+                failure_total,
+                {1: ""}.get(failure_total, "s"),
+            )
+        )
 
         # If everything passed - the task did too
         self.passed = all(passed)
@@ -436,12 +485,10 @@ class FilePattern(SingleCommandPattern):
             if tolerance.endswith("%"):
                 self.relative_tol = True
                 tolerance = float(tolerance.strip("%"))
-                self.reporter(
-                    "Relative (%) tolerance: {0}".format(tolerance))
+                self.reporter("Relative (%) tolerance: {0}".format(tolerance))
             else:
                 tolerance = float(tolerance)
-                self.reporter(
-                    "Absolute tolerance: {0}".format(tolerance))
+                self.reporter("Absolute tolerance: {0}".format(tolerance))
         self.tolerance = tolerance
 
     def search_for_matches(self):

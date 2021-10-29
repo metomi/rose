@@ -18,13 +18,14 @@
 
 import os
 from random import shuffle
+import shlex
+
 from metomi.rose.app_run import BuiltinApp, ConfigValueError
 from metomi.rose.date import RoseDateTimeOperator
-from metomi.rose.env import env_var_process, UnboundEnvironmentVariableError
+from metomi.rose.env import UnboundEnvironmentVariableError, env_var_process
 from metomi.rose.fs_util import FileSystemEvent
 from metomi.rose.host_select import HostSelector
 from metomi.rose.popen import RosePopenError
-import shlex
 
 
 class RosePruneApp(BuiltinApp):
@@ -48,14 +49,19 @@ class RosePruneApp(BuiltinApp):
         # Tar-gzip job logs on suite host
         # Prune job logs on remote hosts and suite host
         prune_remote_logs_cycles = self._get_conf(
-            app_runner, conf_tree, "prune-remote-logs-at")
+            app_runner, conf_tree, "prune-remote-logs-at"
+        )
         prune_server_logs_cycles = self._get_conf(
-            app_runner, conf_tree, "prune-server-logs-at")
+            app_runner, conf_tree, "prune-server-logs-at"
+        )
         archive_logs_cycles = self._get_conf(
-            app_runner, conf_tree, "archive-logs-at")
-        if (prune_remote_logs_cycles or
-                prune_server_logs_cycles or
-                archive_logs_cycles):
+            app_runner, conf_tree, "archive-logs-at"
+        )
+        if (
+            prune_remote_logs_cycles
+            or prune_server_logs_cycles
+            or archive_logs_cycles
+        ):
             tmp_prune_remote_logs_cycles = []
             for cycle in prune_remote_logs_cycles:
                 if cycle not in archive_logs_cycles:
@@ -70,16 +76,20 @@ class RosePruneApp(BuiltinApp):
 
             if prune_remote_logs_cycles:
                 app_runner.suite_engine_proc.job_logs_pull_remote(
-                    suite_name, prune_remote_logs_cycles,
-                    prune_remote_mode=True)
+                    suite_name,
+                    prune_remote_logs_cycles,
+                    prune_remote_mode=True,
+                )
 
             if prune_server_logs_cycles:
                 app_runner.suite_engine_proc.job_logs_remove_on_server(
-                    suite_name, prune_server_logs_cycles)
+                    suite_name, prune_server_logs_cycles
+                )
 
             if archive_logs_cycles:
                 app_runner.suite_engine_proc.job_logs_archive(
-                    suite_name, archive_logs_cycles)
+                    suite_name, archive_logs_cycles
+                )
 
         # Prune other directories
         globs, cycle_set = self._get_prune_globs(app_runner, conf_tree)
@@ -87,7 +97,8 @@ class RosePruneApp(BuiltinApp):
             return
         suite_engine_proc = app_runner.suite_engine_proc
         hosts = suite_engine_proc.get_suite_jobs_auths(
-            suite_name, [(cycle, None) for cycle in cycle_set])
+            suite_name, [(cycle, None) for cycle in cycle_set]
+        )
         # A shuffle here should allow the load for doing "rm -rf" to be shared
         # between job hosts who share a file system.
         shuffle(hosts)
@@ -95,11 +106,12 @@ class RosePruneApp(BuiltinApp):
         form_dict = {"d": suite_dir_rel, "g": " ".join(globs)}
         sh_cmd_head = r"set -e; cd %(d)s; " % form_dict
         sh_cmd = (
-            r"set +e; ls -d %(g)s; " +
-            r"set -e; rm -fr %(g)s") % form_dict
+            r"set +e; ls -d %(g)s; " + r"set -e; rm -fr %(g)s"
+        ) % form_dict
         cwd = os.getcwd()
         host_selector = HostSelector(
-            app_runner.event_handler, app_runner.popen)
+            app_runner.event_handler, app_runner.popen
+        )
         for host in hosts + [host_selector.get_local_host()]:
             sdir = None
             try:
@@ -107,25 +119,28 @@ class RosePruneApp(BuiltinApp):
                     sdir = suite_engine_proc.get_suite_dir(suite_name)
                     app_runner.fs_util.chdir(sdir)
                     out = app_runner.popen.run_ok(
-                        "bash", "-O", "extglob", "-c", sh_cmd)[0]
+                        "bash", "-O", "extglob", "-c", sh_cmd
+                    )[0]
                 else:
                     cmd = app_runner.popen.get_cmd(
-                        "ssh", host,
-                        "bash -O extglob -c '" + sh_cmd_head + sh_cmd + "'")
+                        "ssh",
+                        host,
+                        "bash -O extglob -c '" + sh_cmd_head + sh_cmd + "'",
+                    )
                     out = app_runner.popen.run_ok(*cmd)[0]
             except RosePopenError as exc:
                 app_runner.handle_event(exc)
             else:
                 out = out.decode()
                 if sdir is None:
-                    event = FileSystemEvent(FileSystemEvent.CHDIR,
-                                            host + ":" + suite_dir_rel)
+                    event = FileSystemEvent(
+                        FileSystemEvent.CHDIR, host + ":" + suite_dir_rel
+                    )
                     app_runner.handle_event(event)
                 for line in sorted(out.splitlines()):
                     if not host_selector.is_local_host(host):
                         line = host + ":" + line
-                    event = FileSystemEvent(
-                        FileSystemEvent.DELETE, line)
+                    event = FileSystemEvent(FileSystemEvent.DELETE, line)
                     app_runner.handle_event(event)
             finally:
                 if sdir:
@@ -162,8 +177,7 @@ class RosePruneApp(BuiltinApp):
         except UnboundEnvironmentVariableError as exc:
             raise ConfigValueError([self.SECTION, key], items_str, exc)
         items = []
-        ref_point_str = os.getenv(
-            RoseDateTimeOperator.TASK_CYCLE_TIME_ENV)
+        ref_point_str = os.getenv(RoseDateTimeOperator.TASK_CYCLE_TIME_ENV)
         try:
             ref_point = None
             ref_fmt = None
@@ -175,24 +189,31 @@ class RosePruneApp(BuiltinApp):
                     if self._get_cycling_mode() == "integer":
                         # Integer cycling
                         if "P" in when:  # "when" is an offset
-                            cycle = str(int(ref_point_str) +
-                                        int(when.replace("P", "")))
+                            cycle = str(
+                                int(ref_point_str) + int(when.replace("P", ""))
+                            )
                         else:  # "when" is a cycle point
                             cycle = str(when)
                     else:
                         # Date-time cycling
                         if ref_fmt is None:
-                            ref_point, ref_fmt = (
-                                app_runner.date_time_oper.date_parse(
-                                    ref_point_str))
+                            (
+                                ref_point,
+                                ref_fmt,
+                            ) = app_runner.date_time_oper.date_parse(
+                                ref_point_str
+                            )
                         try:
                             time_point = app_runner.date_time_oper.date_parse(
-                                when)[0]
+                                when
+                            )[0]
                         except ValueError:
                             time_point = app_runner.date_time_oper.date_shift(
-                                ref_point, when)
+                                ref_point, when
+                            )
                         cycle = app_runner.date_time_oper.date_format(
-                            ref_fmt, time_point)
+                            ref_fmt, time_point
+                        )
                 if max_args:
                     items.append((cycle, args))
                 else:
@@ -222,7 +243,7 @@ class RosePruneApp(BuiltinApp):
             if node.is_ignored():
                 continue
             if key.startswith("cycle-format{") and key.endswith("}"):
-                fmt = key[len("cycle-format{"):-1]
+                fmt = key[len("cycle-format{") : -1]
                 try:
                     cycle_formats[fmt] = env_var_process(node.value)
                     # Check formats are valid
@@ -230,10 +251,12 @@ class RosePruneApp(BuiltinApp):
                         cycle_formats[fmt] % 0
                     else:
                         app_runner.date_time_oper.date_format(
-                            cycle_formats[fmt])
+                            cycle_formats[fmt]
+                        )
                 except (UnboundEnvironmentVariableError, ValueError) as exc:
                     raise ConfigValueError(
-                        [self.SECTION, key], node.value, exc)
+                        [self.SECTION, key], node.value, exc
+                    )
         cycle_set = set()
         for key, node in sorted(nodes.items()):
             if node.is_ignored():
@@ -243,11 +266,14 @@ class RosePruneApp(BuiltinApp):
             elif key == "prune-work-at":  # backward compat
                 head = "work"
             elif key.startswith("prune{") and key.endswith("}"):
-                head = key[len("prune{"):-1].strip()  # remove "prune{" and "}"
+                head = key[
+                    len("prune{") : -1
+                ].strip()  # remove "prune{" and "}"
             else:
                 continue
             for cycle, cycle_args in self._get_conf(
-                    app_runner, conf_tree, key, max_args=1):
+                app_runner, conf_tree, key, max_args=1
+            ):
                 cycle_set.add(cycle)
                 if cycle_args:
                     cycle_strs = {"cycle": cycle}
@@ -255,11 +281,14 @@ class RosePruneApp(BuiltinApp):
                         if self._get_cycling_mode() == "integer":
                             cycle_strs[cycle_key] = cycle_format % int(cycle)
                         else:  # date time cycling
-                            cycle_point = (
-                                app_runner.date_time_oper.date_parse(cycle)[0])
-                            cycle_strs[cycle_key] = (
-                                app_runner.date_time_oper.date_format(
-                                    cycle_format, cycle_point))
+                            cycle_point = app_runner.date_time_oper.date_parse(
+                                cycle
+                            )[0]
+                            cycle_strs[
+                                cycle_key
+                            ] = app_runner.date_time_oper.date_format(
+                                cycle_format, cycle_point
+                            )
                     for tail_glob in shlex.split(cycle_args.pop()):
                         glob_ = tail_glob % cycle_strs
                         if glob_ == tail_glob:  # no substitution

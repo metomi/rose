@@ -11,7 +11,8 @@ class NullTransformer(metomi.rose.macro.MacroBase):
 
     REPORTS_INFO = [
         (None, None, None, "Warning for null section, null option"),
-        ("made", "up", None, "Warning for non-data & non-metadata setting")]
+        ("made", "up", None, "Warning for non-data & non-metadata setting"),
+    ]
 
     def transform(self, config, meta_config):
         """Report null or made-up setting changes."""
