@@ -64,6 +64,7 @@ DEAD_ENDS=(
     rose-suite-scan
     rose-suite-shutdown
     rose-suite-stop
+    rosie-disco
 )
 
 # NOTE: indicies must match DEAD_ENDS array
@@ -86,6 +87,7 @@ DEAD_END_MSGS=(
     'This command has been replaced by: "cylc scan".'
     'This command has been replaced by: "cylc stop".'
     'This command has been replaced by: "cylc stop".'
+    'Rosie Disco has been disabled pending fixes at a later release.'
 )
 
 # Print actual command of a command alias
