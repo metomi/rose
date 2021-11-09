@@ -114,7 +114,6 @@ BASH_SUB_CMDS = {
     ('rosa', 'svn-post-commit'),
     ('rosa', 'svn-pre-commit'),
     ('rosa', 'ws'),
-    ('rose', 'check-software'),
     ('rose', 'mpi-launch'),
     ('rose', 'tutorial'),
 }
