@@ -10,6 +10,18 @@ updated. Only the first match gets replaced, so it's fine to leave the old
 ones in. -->
 -------------------------------------------------------------------------------
 
+## 2.0b3 (<span actions:bind='release-date'>TBC</span>)
+
+For use with Cylc see [Cylc-Rose](https://github.com/cylc/cylc-rose).
+
+### Noteworthy Changes
+
+[#2493](https://github.com/metomi/rose/pull/2493) -
+Disable the `rosie disco` web service pending a fix to the tornado version
+conflict with cylc-uiserver, see https://github.com/metomi/rose/pull/2493
+
+--------------------------------------------------------------------------------
+
 ## 2.0b2 (<span actions:bind='release-date'>Released 2021-07-28</span>)
 
 Rose release 61. This is a __beta pre-release__.
