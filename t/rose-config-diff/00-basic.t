@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 45
+tests 42
 #-------------------------------------------------------------------------------
 setup
 init app 1 <<'__APP__'
@@ -66,14 +66,6 @@ title=Air Locking?
 __META__
 export ROSE_CONF_PATH=$PWD
 export ROSE_META_PATH=$TEST_DIR/rose-meta
-#-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-one-arg
-run_fail "$TEST_KEY" rose config-diff $TEST_DIR/app1/rose-app.conf
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
-Usage: Display the metadata-annotated diff between two Rose config files.
-
-__ERROR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-bad-dir
 run_fail "$TEST_KEY" rose config-diff $TEST_DIR/app1/rose-app.conf $TEST_DIR

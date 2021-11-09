@@ -189,9 +189,6 @@ def main():
         print('\n' + __doc__)
         sys.exit()
 
-    # strip the rose end of the CLI args
-    sys.argv = sys.argv[2:]
-
     # Handle Legacy Rose-date -c functionality
     if '-c' in sys.argv or '--use-task-cycle-time' in sys.argv:
         if os.getenv('ROSE_TASK_CYCLE_TIME'):

@@ -1,7 +1,4 @@
-#!/usr/bin/env bash
-#-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
-#
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -16,7 +13,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
 from argparse import ArgumentParser
 import re
 from subprocess import DEVNULL, PIPE, Popen
@@ -234,8 +230,7 @@ def load_from_file(filename):
 
 def load_from_cli(ns):
     return Popen(
-        # TODO - remove the "2"
-        [f'{ns}2', 'doc'],
+        [f'{ns}', 'doc'],
         stdin=DEVNULL,
         stdout=PIPE,
         text=True
@@ -287,15 +282,6 @@ def make(ns):
 
 def main(ns, text, _write):
     cmds = split(text)
-
-    for cmd, contents in dict(cmds).items():
-        # print(f'# {cmd}\n    {contents}')
-        if not contents:
-            breakpoint()
-        if 'USAGE' not in contents:
-            # TODO
-            cmds.pop(cmd)
-
     write(ns, cmds, _write)
 
 
@@ -308,7 +294,6 @@ class AutoCLIDoc(Directive):
         command (str): The command to document.
 
     """
-
     option_spec = {}
     required_arguments = 2
 

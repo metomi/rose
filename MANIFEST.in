@@ -1,2 +1,3 @@
 recursive-include metomi/rose/etc/ *
 recursive-include metomi/rosie/lib/ *
+recursive-include metomi/rose/bash_scripts/ *

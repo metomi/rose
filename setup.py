@@ -86,10 +86,6 @@ setup(
     long_description_content_type="text/markdown",
     version=find_version("metomi", "rose", "__init__.py"),
     # Options
-    scripts=(
-        glob(join("bin", "*"))
-        + glob(join("sbin", "*"))
-    ),
     install_requires=INSTALL_REQUIRES,
     extras_require=EXTRAS_REQUIRE,
     tests_require=TESTS_REQUIRE,

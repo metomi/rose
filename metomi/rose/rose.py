@@ -26,6 +26,9 @@ from metomi.rose import (
     __file__ as rose_init_file,
     __version__,
 )
+from metomi.rose.scripts import (
+    __file__ as script_init_file,
+)
 
 
 USAGE = f'''
@@ -75,6 +78,8 @@ DEAD_ENDS = {
         'This command has been replaced by): "cylc stop".',
     ('rose', 'suite-stop'):
         'This command has been replaced by: "cylc stop".',
+    ('rosie', 'disco'):
+        'Rosie Disco has been disabled pending fixes at a later release.',
     ('rosie', 'go'):
         'This command has been removed pending re-implementation',
 }
@@ -143,16 +148,13 @@ def exec_sub_cmd(ns, sub_cmd, args):
 
 
 def _exec_bash(ns, sub_cmd, args):
-    bash_file = Path(
-        rose_init_file
+    script_file = Path(
+        script_init_file,
     ).parent.joinpath(
-        '../',
-        '../',
-        'bin',
         f'{ns}-{sub_cmd}',
     ).resolve()
     os.execv(
-        bash_file,
+        script_file,
         ['bash', *args]  # note the first argument is ignored
     )
     sys.exit(0)
@@ -162,9 +164,8 @@ def _exec_python(ns, sub_cmd, entry_point, args):
     # load the entry point
     fcn = entry_point.load()
 
-    # sys.argv = [ns, sub_cmd, *args]
+    # set the argv for the sub command
     sys.argv = [f'{ns}-{sub_cmd}', *args]
-    # sys.argv = args
 
     # run the entry point
     if signature(fcn).parameters:
@@ -195,7 +196,7 @@ def get_arg_parser(description, sub_cmds):
         dest='help_'
     )
     parser.add_argument(
-        '--version', '-V',
+        '--version',
         action='store_true',
         default=False,
         dest='version'
@@ -258,8 +259,7 @@ def _doc(ns):
         print('==================================================\n')
         from subprocess import Popen, PIPE, DEVNULL
         proc = Popen(
-            [ns + '2', sub_cmd, '--help'],
-            # [ns, sub_cmd, '--help'], TODO
+            [ns, sub_cmd, '--help'],
             stdin=DEVNULL,
             stdout=PIPE,
             text=True
@@ -302,7 +302,8 @@ def main(ns, desc):
 
     if sub_cmd in ('help', 'h', '?'):
         try:
-            _help(ns, sub_cmd=cmd_args[0])
+            ns, sub_cmd = _check_aliases(ns, cmd_args[0])
+            _help(ns, sub_cmd=sub_cmd)
         except IndexError:
             _help(ns, parser)
 

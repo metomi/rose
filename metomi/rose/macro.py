@@ -1713,7 +1713,7 @@ def load_conf_from_file(conf_dir, config_file_path, mode="macro"):
     return app_config, config_map, meta_config
 
 
-def parse_macro_args(argv=None):
+def parse_macro_args():
     """Parse options/arguments for rose macro and upgrade."""
     opt_parser = RoseOptionParser(
         usage='rose macro [OPTIONS] [MACRO_NAME ...]',
@@ -1769,10 +1769,7 @@ ENVIRONMENT VARIABLES
         ),
     )
 
-    if argv is None:
-        opts, args = opt_parser.parse_args()
-    else:
-        opts, args = opt_parser.parse_args(argv)
+    opts, args = opt_parser.parse_args()
     if opts.validate_all and opts.output_dir:
         sys.stderr.write(opt_parser.get_usage())
         return None

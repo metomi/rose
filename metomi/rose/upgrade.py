@@ -778,7 +778,7 @@ def get_meta_upgrade_module(meta_path):
     return version_module
 
 
-def parse_upgrade_args(argv=None):
+def parse_upgrade_args():
     """Parse options/arguments for rose macro and upgrade."""
     opt_parser = metomi.rose.macro.RoseOptionParser(
         usage='rose app-upgrade [OPTIONS] [VERSION]',
@@ -816,10 +816,7 @@ ENVIRONMENT VARIABLES
         "all_versions",
     ]
     opt_parser.add_my_options(*options)
-    if argv is None:
-        opts, args = opt_parser.parse_args()
-    else:
-        opts, args = opt_parser.parse_args(argv)
+    opts, args = opt_parser.parse_args()
     if len(args) > 1:
         sys.stderr.write(opt_parser.get_usage())
         return None
@@ -852,6 +849,7 @@ ENVIRONMENT VARIABLES
 
 def main():
     """Run rose upgrade."""
+    metomi.rose.macro.add_meta_paths()
     return_objects = parse_upgrade_args()
     if return_objects is None:
         sys.exit(1)
@@ -957,8 +955,3 @@ def main():
             opts.non_interactive,
             reporter,
         )
-
-
-if __name__ == "__main__":
-    metomi.rose.macro.add_meta_paths()
-    main()

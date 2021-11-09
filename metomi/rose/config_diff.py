@@ -211,9 +211,8 @@ CONFIGURATION
         "opt_conf_keys_1",
         "opt_conf_keys_2",
     )
-    my_sys_args = list(sys.argv)
 
-    opts, args = opt_parser.parse_args(my_sys_args[1:])
+    opts, args = opt_parser.parse_args()
     metomi.rose.macro.add_meta_paths()
     metomi.rose.macro.add_opt_meta_paths(opts.meta_path)
 

@@ -805,7 +805,7 @@ If no `ID` is specified and `$PWD` is a working copy of a suite, use the
             "\nContinue with the next `ID` if delete of a suite fails."
         ),
     )
-    opts, args = opt_parser.parse_args(sys.argv)
+    opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
     client = RosieVCClient(event_handler=report, force_mode=opts.force_mode)
     SuiteId.svn.event_handler = client.event_handler
