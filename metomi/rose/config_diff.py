@@ -165,7 +165,7 @@ ARGUMENTS
         Two Rose configuration files or directories to compare.
         If the path is a directory, look underneath for a Rose configuration
         file. '-' for `PATH1` or `PATH2` denotes read in from standard input.
-    --
+    ``--``
         Options and arguments after a `--` token are passed directly to the
         diff tool.
 

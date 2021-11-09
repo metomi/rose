@@ -16,21 +16,38 @@ Rose Commands
 rose config-edit
 ^^^^^^^^^^^^^^^^
 
-TODO: This is here to allow the documentation tests to pass
+.. warning::
+
+   The Rose Edit GUI has not yet been reimplemented in Rose 2.
+
+   The old Rose 2019 (Python 2) GUI remains compatible with Rose 2
+   configurations.
 
 .. _command-rose-suite-run:
 
 rose suite-run
 ^^^^^^^^^^^^^^
 
-TODO: This is here to allow the documentation tests to pass
+This command has been replaced by ``cylc install ; cylc play``.
+
+.. TODO: This is here to allow the documentation tests to pass
 
 .. _command-rose-suite-restart:
 
 rose suite-restart
 ^^^^^^^^^^^^^^^^^^
 
-TODO: This is here to allow the documentation tests to pass
+This command has been replaced by ``cylc play``.
+
+.. TODO: This is here to allow the documentation tests to pass
+
+.. _command-rose-stem:
+
+rose stem
+^^^^^^^^^
+
+The ``rose stem`` command is now provided by :ref:`Cylc Rose`, see the
+:ref:`Cylc documentation <rose-stem>` for details.
 
 ----
 

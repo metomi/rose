@@ -94,6 +94,7 @@ CALENDAR MODE
 ENVIRONMENT VARIABLES
     In both cases the ROSE.* variable will over-ride the ISODATETIME variable
     if both are set to ensure legacy behaviour for Rose.
+
     ROSE_CYCLING_MODE/ISODATETIMECALENDAR=gregorian|360day|365day|366day
         Specify the calendar mode.
     ROSE_TASK_CYCLE_TIME/ISODATETIMEREF

@@ -143,11 +143,6 @@ Rosie provides commands for managing suites, including:
 
 .. nextslide::
 
-.. ifnotslides::
-
-   Rosie also provides a GUI called :ref:`command-rosie-go` which incorporates
-   the functionality of the above commands.
-
 .. figure:: img/rosie-go-annotated.png
    :align: center
    :width: 450px
@@ -256,35 +251,6 @@ Rosie provides commands for managing suites, including:
       suite.
 
       .. TODO - Note remove ?rev=xxxx to see latest revision?
-
-   #. **Find The Suite In Rosie Go.**
-
-      Open the :ref:`command-rosie-go` GUI::
-
-         rosie go &
-
-      Open the advanced search options by clicking the add (:guilabel:`+`)
-      button in the top right-hand corner of the window.
-
-      Search for suites which you have authored by selecting :guilabel:`author`
-      and filling in your username in the right-hand box:
-
-      .. image:: img/rosie-go-author-search.png
-         :align: center
-         :alt: rosie go advanced search for author screenshot
-
-      Press :guilabel:`Search`. You should see your suite appear with a home
-      icon next to it, meaning that you have a local copy checked out.
-
-      Right-click on the suite and then click :guilabel:`Info`. You should
-      see the information defined in the :rose:file:`rose-suite.info` file.
-
-      .. admonition:: Help
-         :class: tip
-
-         If your suite does not show up, select the menu item
-         :menuselection:`Edit --> Data Source` and ensure the repository you
-         committed to is checked.
 
    #. **Checkout The Suite.**
 
