@@ -54,7 +54,9 @@ INSTALL_REQUIRES = [
     "metomi-isodatetime",
     "requests",
     "sqlalchemy",
-    "tornado",
+    # TODO: rosie disco has been disabled due to the removal of WSGI support at
+    # Tornado 6.
+    # "tornado",
     'psutil>=5.6.0',
 ]
 EXTRAS_REQUIRE = {

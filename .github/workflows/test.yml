@@ -213,6 +213,7 @@ jobs:
       - name: install
         run: |
           pip install -e .[docs]
+          pip install git+https://github.com/cylc/cylc-flow.git
           pip install git+https://github.com/cylc/cylc-rose.git
 
       - name: build (html)
