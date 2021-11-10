@@ -38,7 +38,6 @@ from pathlib import Path
 import pwd
 import signal
 from time import sleep
-import wsgiref.simple_server
 
 import jinja2
 import pkg_resources

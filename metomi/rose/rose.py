@@ -320,5 +320,4 @@ def main(ns, desc):
     _check_dead_ends(ns, sub_cmd)
     ns, sub_cmd = _check_aliases(ns, sub_cmd)
 
-
     exec_sub_cmd(ns, sub_cmd, cmd_args)

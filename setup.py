@@ -19,7 +19,6 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 
 import codecs
-from glob import glob
 from os.path import abspath, dirname, join
 import re
 
