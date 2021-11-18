@@ -28,11 +28,16 @@ tests 12
 #-------------------------------------------------------------------------------
 # Basic.
 TEST_KEY=$TEST_KEY_BASE
-ROSE_HOME_BIN="$(rose version --long | sed 's/.*(\(.*\))/\1/')"
 ROSE_LAUNCHER_ULIMIT_OPTS='-a' \
     run_pass "$TEST_KEY" rose mpi-launch echo hello world
+ROSE_SCRIPT_PATH="$(python3 << __SCRIPT__
+from pathlib import Path
+import metomi.rose.scripts
+print(Path(metomi.rose.scripts.__file__).parent)
+__SCRIPT__
+)"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-[my-launcher] -n 1 $ROSE_HOME_BIN/rose-mpi-launch --inner $(which echo) hello world
+[my-launcher] -n 1 $ROSE_SCRIPT_PATH/rose-mpi-launch --inner $(which echo) hello world
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
