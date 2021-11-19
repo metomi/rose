@@ -136,6 +136,10 @@ def format_metadata_as_text(metadata, only_these_options=None):
 def main():
     """Implement the "rose config-diff" command."""
     opt_parser = metomi.rose.opt_parse.RoseOptionParser(
+        usage=(
+            'rose config-diff [OPTIONS] FILE1 FILE2'
+            ' [-- [DIFF_OPTIONS] [DIFF_ARGUMENTS]]'
+        ),
         description='''
 Display the metadata-annotated difference between two Rose config files.
 
