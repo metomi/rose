@@ -14,5 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-"""Rosie library.
-"""
+"""Rosie library."""
+
+from metomi.rose import __version__  # noqa: F401
