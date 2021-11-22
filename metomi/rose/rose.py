@@ -181,8 +181,8 @@ def _get_sub_cmds(ns):
             yield sub_cmd
 
 
-def get_arg_parser(description, sub_cmds):
-    epilog = 'Commands:\n  rose ' + '\n  rose '.join(sorted(sub_cmds))
+def get_arg_parser(description, sub_cmds, ns):
+    epilog = f'Commands:\n  {ns} ' + f'\n  {ns} '.join(sorted(sub_cmds))
     parser = argparse.ArgumentParser(
         add_help=False,
         description=description,
@@ -289,7 +289,7 @@ def _check_aliases(*key):  # (ns, sub_cmd)
 
 
 def main(ns, desc):
-    parser = get_arg_parser(desc, _get_sub_cmds(ns))
+    parser = get_arg_parser(desc, _get_sub_cmds(ns), ns)
     opts, cmd_args = parser.parse_known_args()
 
     if not cmd_args:
