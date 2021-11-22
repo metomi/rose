@@ -34,7 +34,7 @@ as a JSON list.
 
 EXAMPLES:
     # return the virtual memory and cpu usage
-    [["virual_memory"], ["cpu_percent"]]
+    [["virtual_memory"], ["cpu_percent"]]
 
     # return disk usage for the filesystem mounted at "/"
     [["disk_usage", "/"]]
