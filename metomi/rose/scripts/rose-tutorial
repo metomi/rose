@@ -31,7 +31,7 @@
 #-------------------------------------------------------------------------------
 set -eu
 
-if [[ $1 == '--help' ]]; then
+if [[ ${1:-} == '--help' ]]; then
     # shellcheck source=metomi/rose/etc/lib/bash/rose_usage
     . "$(rose resource lib/bash/rose_usage)"
     rose_help
@@ -40,16 +40,19 @@ fi
 
 mkdir -p "$HOME/cylc-run"
 
+API_KEYS="$(rose resource tutorial/api-keys)"
+TUT_DIR="$(dirname "${API_KEYS}")"
+
 usage () {
     echo 'rose tutorial SUITE [DIR]'
     echo
     echo 'Available tutorial suites:'
-    find "./etc/tutorial/" -maxdepth 1 -exec basename {} \; | sed 's/^/    /'
+    rose resource tutorial | sed -n 's/^  tutorial\/\(.*\)/\1/p; s/api-keys/api-key/'
 }
 
 api-key () {
     # Pick a Datapoint API key at random from the api-keys file.
-    sort -R "${ROSE_HOME}/etc/tutorial/api-keys" | head -n 1
+    sort -R "${API_KEYS}" | head -n 1
 }
 
 if [[ $# == 1 ]]; then
@@ -67,7 +70,7 @@ if [[ $1 == 'api-key' ]]; then
     exit 0
 fi
 
-SRC_PATH="${ROSE_HOME}/etc/tutorial/$1"
+SRC_PATH="${TUT_DIR}/$1"
 if [[ ! -d "${SRC_PATH}" ]]; then
     echo "Tutorial '$1' does not exist" >&2
     echo
@@ -94,7 +97,7 @@ fi
 echo -n "Copying tutorial files to ${DIRECTORY} ... "
 
 mkdir -p "$(dirname "${DIRECTORY}")"
-if run rsync -rLptgoD "${ROSE_HOME}/etc/tutorial/$1/" "${DIRECTORY}" \
+if rsync -rLptgoD "${TUT_DIR}/$1/" "${DIRECTORY}" \
     --exclude='.validate'; then
     find "${DIRECTORY}" -type f \
         -exec sed -i "s/DATAPOINT_API_KEY/$(api-key)/" {} \;
