@@ -29,6 +29,16 @@
 #     formatted like this one. If CODE is specified, exits the current shell
 #     with it. If CODE is 0, prints the usage to STDOUT. If code is not 0,
 #     prints the usage to STDERR.
+#
+# NAME
+#     rose_help
+#
+# SYNOPSIS
+#     rose_help
+#
+# DESCRIPTION
+#     Prints help information extracted from the header of $0.
+#     Suitable for use with the --help option.
 #-------------------------------------------------------------------------------
 function rose_usage() {
     local CODE=${1:-}
@@ -49,4 +59,8 @@ function rose_usage() {
     if [[ -n $CODE ]]; then
         exit "$CODE"
     fi
+}
+
+function rose_help() {
+    sed -n 's/^# //; s/^#//; /NAME/,/------/p' "$0" | head -n -1
 }

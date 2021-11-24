@@ -43,6 +43,25 @@ REC_COL_IN_FORMAT = re.compile(r"(?:^|[^%])%([\w-]+)")
 DATE_TIME_FORMAT = r"%FT%H:%M:%SZ"
 
 
+def cli(fcn):
+    """Launcher for the utility functions."""
+
+    def _inner():
+        nonlocal fcn
+        try:
+            sys.exit(fcn())
+        except KeyboardInterrupt:
+            pass
+        except (
+            RosieWSClientError,
+            RosieWSClientConfError,
+            UndefinedRosiePrefixWS,
+        ) as exc:
+            sys.exit(str(exc))
+
+    return _inner
+
+
 class URLEvent(Event):
 
     """Print query URL."""
@@ -99,22 +118,51 @@ class SuiteInfo(Event):
         return out
 
 
-def hello(argv):
+@cli
+def hello():
     """Set up connection to a Rosie web service."""
-    opt_parser = RoseOptionParser().add_my_options("prefixes")
-    opts = opt_parser.parse_args(argv)[0]
+    opt_parser = RoseOptionParser(
+        description=(
+            'Set up connection to one or more Rosie web service servers.'
+        ),
+    ).add_my_options("prefixes")
+    opts = opt_parser.parse_args()[0]
     report = Reporter(opts.verbosity - opts.quietness)
     ws_client = RosieWSClient(prefixes=opts.prefixes, event_handler=report)
     for response_data, response_url in ws_client.hello():
         report("%s: %s" % (response_url, response_data), level=0)
 
 
-def list_local_suites(argv):
+@cli
+def list_local_suites():
     """CLI command to list all the locally checked out suites"""
-    opt_parser = RoseOptionParser().add_my_options(
+    opt_parser = RoseOptionParser(
+        description='''
+List the local suites.
+
+Search for locally checked out suites and print their details.
+
+The default format includes a local working copy status field (`%local`)
+in the first column.
+A blank field means there is no related suite checked out.
+
+* `=` means that the suite is checked out at this branch and revision.
+* `<` means that the suite is checked out but at an older revision.
+* `>` means that the suite is checked out but at a newer revision.
+* `S` means that the suite is checked out but on a different branch.
+* `M` means that the suite is checked out and modified.
+* `X` means that the suite is checked out but is corrupted.
+        ''',
+    ).add_my_options(
         "no_headers", "prefixes", "print_format", "reverse", "sort", "user"
     )
-    opts = opt_parser.parse_args(argv)[0]
+    opt_parser.modify_option(
+        'verbosity',
+        help=(
+            'Display full info for each returned suite.'
+        ),
+    )
+    opts = opt_parser.parse_args()[0]
     report = Reporter(opts.verbosity - opts.quietness)
 
     if opts.user:
@@ -132,9 +180,43 @@ def list_local_suites(argv):
     _display_maps(opts, ws_client, ws_client.query_local_copies(opts.user))
 
 
-def lookup(argv):
+@cli
+def lookup():
     """CLI command to run the various search types"""
-    opt_parser = RoseOptionParser().add_my_options(
+    opt_parser = RoseOptionParser(
+        usage='rosie lookup [OPTIONS] LOOKUP-TEXT ...',
+        description='''
+Find suites in the suite discovery database.
+
+Search for suites using an address, a query or search words and display
+the information of the matching suites.
+
+Unless an option is used to specify the initial search type the argument
+is interpreted as follows:
+
+* A string beginning with "http": an address
+* A string not beginning with "http": search words
+
+An address URL may contain shell meta characters, so remember to put it
+in quotes.
+
+The default output format includes a local working copy status field
+(`%local`) in the first column.
+
+* A blank field means there is no related suite checked out.
+* `=` means that the suite is checked out at this branch and revision.
+* `<` means that the suite is checked out but at an older revision.
+* `>` means that the suite is checked out but at a newer revision.
+* `S` means that the suite is checked out but on a different branch.
+* `M` means that the suite is checked out and modified.
+* `X` means that the suite is checked out but is corrupted.
+
+Search strings may contain SQL wildcard characters. E.g:
+
+* `%` (percent) is a substitute for zero or more characters.
+* `_` (underscore) is a substitute for a single character.
+        ''',
+    ).add_my_options(
         "address_mode",
         "all_revs",
         "lookup_mode",
@@ -146,7 +228,7 @@ def lookup(argv):
         "search_mode",
         "sort",
     )
-    opts, args = opt_parser.parse_args(argv)
+    opts, args = opt_parser.parse_args()
     if not args:
         sys.exit(opt_parser.print_usage())
     if not opts.lookup_mode:
@@ -280,28 +362,3 @@ def _display_maps(opts, ws_client, dict_rows, url=None):
         report(SuiteInfo(dict_row), prefix="")
     if url is not None:
         report(URLEvent(url + "\n"), prefix="")
-
-
-def main():
-    """Launcher for the utility functions."""
-    argv = sys.argv[1:]
-    if not argv:
-        return sys.exit(1)
-    try:
-        func = globals()[argv[0]]  # Potentially bad.
-    except KeyError:
-        sys.exit("metomi.rosie.ws_client_cli: %s: incorrect usage" % argv[0])
-    try:
-        sys.exit(func(argv[1:]))
-    except KeyboardInterrupt:
-        pass
-    except (
-        RosieWSClientError,
-        RosieWSClientConfError,
-        UndefinedRosiePrefixWS,
-    ) as exc:
-        sys.exit(str(exc))
-
-
-if __name__ == "__main__":
-    main()

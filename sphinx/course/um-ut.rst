@@ -8,7 +8,7 @@ Practical Exercises
 
   * :ref:`Basic cycling <basic cycling practical>`
   * :ref:`Datetime cycling <datetime cycling practical>`
-  * :ref:`Runtime <tutorial-cylc-runtime-forecasting-suite>`
+  * :ref:`Runtime <tutorial-cylc-runtime-forecasting-workflow>`
   * Configuration Consolidation
 
     * :ref:`Families <cylc-tutorial-families-practical>`

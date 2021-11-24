@@ -141,8 +141,31 @@ def type_gen(value):
 
 
 def main():
-    opt_parser = metomi.rose.opt_parse.RoseOptionParser()
+    opt_parser = metomi.rose.opt_parse.RoseOptionParser(
+        usage='rose metadata-gen [OPTIONS] [PROPERTY=VALUE ...]',
+        description='''
+Automatically generate metadata from an application or suite
+configuration. An aid for metadata development.
+
+WARNING: May Contain Thorns.
+        ''',
+        epilog='''
+ARGUMENTS
+    PROPERTY[=VALUE] ...
+       One or more `key=value` pairs of properties to specify for
+       every setting e.g. `compulsory=true`. If `=VALUE` is missing,
+       the property will be set to a null string in each setting.
+        ''',
+    )
     opt_parser.add_my_options("auto_type", "conf_dir", "output_dir")
+    opt_parser.modify_option(
+        'output_dir',
+        help=(
+            'A directory to output the metadata to.'
+            '\nIf not specified, output to the application or suite metadata'
+            'directory.'
+        )
+    )
     opts, args = opt_parser.parse_args()
     metomi.rose.macro.add_meta_paths()
     if opts.conf_dir is None:

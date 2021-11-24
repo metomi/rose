@@ -125,6 +125,10 @@ ROSE_COMMAND=
 ROSE_COMMAND_FILE=
 while (($# > 0)); do
     case $1 in
+    --help)
+        rose_help
+        exit
+        :;;
     --command-file=*)
         ROSE_COMMAND_FILE=${1#*=}
         shift 1

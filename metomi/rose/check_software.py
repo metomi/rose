@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-#-----------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,7 +14,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-----------------------------------------------------------------------------
 """NAME
     rose check-software
 
@@ -135,7 +132,7 @@ def py_version(module, attr_name='__version__'):
     """
     try:
         imported_module = __import__(module)
-    except (ImportError, RuntimeError, ModuleNotFoundError):
+    except (ImportError, RuntimeError):
         return DEP_NOT_FOUND
     try:
         version = getattr(imported_module, attr_name)
@@ -236,15 +233,14 @@ def check(dependency, min_version=None, min_incompat_version=None, **kwargs):
 
     # Check version < min_incompat_version.
     version = version_tuple(version_string)
-    if min_incompat_version:
-        if version > min_incompat_version:
-            return(line + 'not ok (%s > %s)' % (
-                version_string, version_str(min_incompat_version)), False)
+    if min_incompat_version and version > min_incompat_version:
+        return(line + 'not ok (%s > %s)' % (
+            version_string, version_str(min_incompat_version)), False)
 
     # Check version >= min_version.
     if min_version:
         if version >= min_version:
-            return (line  + 'ok (%s)' % version_string, True)
+            return (line + 'ok (%s)' % version_string, True)
         else:
             return (line + 'not ok (%s < %s)' % (
                 version_string, version_str(min_version)), False)
@@ -281,7 +277,7 @@ def check_all(name, dep_list):
         print()
 
 
-def main(check=check):
+def check_software(check=check):
     """Check required and optional dependencies."""
     ret = check_all('Required Software', [
         check('python3', (3, 6), version_template=r'Python (.*)'),
@@ -325,7 +321,9 @@ def docs(check=check):
 
     check_all('Documentation Builder - Recommended Extras', [
         check('rsvg', version_template=r'rsvg version (.*)'),
-        check('py:sphinxcontrib.svg2pdfconverter <sphinxcontrib.rsvgconverter>')
+        check(
+            'py:sphinxcontrib.svg2pdfconverter <sphinxcontrib.rsvgconverter>'
+        )
     ])
 
     check_all('Documentation Builder - PDF Dependencies', [
@@ -351,15 +349,15 @@ def echo(dependency, min_version=None, min_incompat_version=None, **kwargs):
     return ret
 
 
-if __name__ == '__main__':
+def main():
     if '--help' in sys.argv:
         # Print help and exit.
         print(__doc__)
     elif '--rst' in sys.argv:
         # Print dependencies in RST format and exit.
-        sys.exit(0 if main(check=echo) else 1)
+        sys.exit(0 if check_software(check=echo) else 1)
     elif any(arg in sys.argv for arg in ['--doc', '--docs']):
         sys.exit(0 if docs() else 1)
     else:
         # Check software dependencies, report and exit.
-        main()
+        check_software()

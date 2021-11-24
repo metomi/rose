@@ -132,10 +132,44 @@ class TaskRunner(Runner):
 
 def main():
     """Launcher for the CLI."""
-    opt_parser = RoseOptionParser()
+    opt_parser = RoseOptionParser(
+        usage='rose task-run [OPTIONS] [--] [APP-COMMAND ...]',
+        description='''
+Provide an environment to run a suite task.
+
+Provides environment variables documented in `rose task-env`. It is worth
+noting that if the environment variables are already provided by
+`rose task-env`, this command will not override them.
+
+Normally, the suite task will select a Rose application configuration
+that has the same name as the task. This can be overridden by the
+`--app-key=KEY` option or the `ROSE_TASK_APP` environment variable.
+
+SHORT OPTIONS
+    All options of `rose app-run` and `rose task-env` are supported.
+    Additional options are:
+
+    --app-key=KEY
+        Specify a named application configuration.
+        ''',
+        epilog='''
+ENVIRONMENT VARIABLES
+    All environment variables of `rose app-run` and `rose task-env` are
+    supported. All environment variables documented in `rose task-env` are
+    passed to the application `rose task-run` runs.
+    The following environment variables are used by `rose task-run`:
+
+    ROSE_TASK_APP
+        Specify a named application configuration.
+
+SEE ALSO
+    * `rose app-run`
+    * `rose task-env`
+        ''',
+    )
     option_keys = TaskRunner.OPTIONS
     opt_parser.add_my_options(*option_keys)
-    opts, args = opt_parser.parse_args(sys.argv[1:])
+    opts, args = opt_parser.parse_args()
     event_handler = Reporter(opts.verbosity - opts.quietness)
     runner = TaskRunner(event_handler)
     try:

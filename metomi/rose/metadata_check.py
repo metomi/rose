@@ -395,8 +395,25 @@ def _import_err_handler(exception):
 
 
 def main():
-    opt_parser = metomi.rose.opt_parse.RoseOptionParser()
+    opt_parser = metomi.rose.opt_parse.RoseOptionParser(
+        usage='rose metadata-check [OPTIONS] [ID ...]',
+        description='Validate configuration metadata.',
+        epilog='''
+ARGUMENTS
+    ID
+       One or more sections (configuration IDs) to check in the
+       metadata e.g.`env=FOO` or `namelist:bar`. If specified, only
+       this section will be checked.
+       ''',
+    )
     opt_parser.add_my_options("conf_dir", "property")
+    opt_parser.modify_option(
+        'property',
+        help=(
+            "Only check a certain property e.g. trigger."
+            "\nThis can be specified more than once."
+        ),
+    )
     metomi.rose.macro.add_meta_paths()
     opts, args = opt_parser.parse_args()
     reporter = metomi.rose.reporter.Reporter(opts.verbosity - opts.quietness)

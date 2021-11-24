@@ -294,9 +294,46 @@ def main():
     """Run the metadata graphing from the command line."""
     _load_override_config()
     metomi.rose.macro.add_meta_paths()
-    opt_parser = metomi.rose.opt_parse.RoseOptionParser()
-    options = ["conf_dir", "meta_path", "output_dir", "property"]
-    opt_parser.add_my_options(*options)
+    opt_parser = metomi.rose.opt_parse.RoseOptionParser(
+        usage='rose metadata-graph [OPTIONS] [SECTION ...]',
+        description='Graph configuration metadata.',
+        epilog='''
+ARGUMENTS
+    SECTION
+        One or more configuration sections to graph. If
+        specified, only these sections will be checked.
+
+ENVIRONMENT VARIABLES
+    optional ROSE_META_PATH
+        Prepend `$ROSE_META_PATH` to the metadata search path.
+        ''',
+    )
+    opt_parser.add_my_options(
+        "conf_dir",
+        "meta_path",
+        "output_dir",
+        "property",
+    )
+    opt_parser.modify_option(
+        'conf_dir',
+        help=(
+            'The directory containing either the configuration or'
+            ' the configuration metadata.'
+            '\nIf the configuration is'
+            'given, the metadata will be looked up in the normal'
+            'way (see also `--meta-path`, `ROSE_META_PATH`). If the'
+            'configuration metadata is given, there will be no'
+            'configuration data used in the graphing.'
+            'If not specified, the current directory will be used.'
+        ),
+    )
+    opt_parser.modify_option(
+        'property',
+        help=(
+            'Graph a certain property e.g. `trigger`.'
+            '\nIf specified, only this property will be graphed.'
+        ),
+    )
     opts, args = opt_parser.parse_args()
     if opts.conf_dir:
         os.chdir(opts.conf_dir)

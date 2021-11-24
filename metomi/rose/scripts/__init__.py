@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-#-------------------------------------------------------------------------------
 # Copyright (C) British Crown (Met Office) & Contributors.
 #
 # This file is part of Rose, a framework for meteorological suites.
@@ -16,19 +14,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
-#-------------------------------------------------------------------------------
-# NAME
-#     rosie hello
-#
-# SYNOPSIS
-#     rosie hello [--prefix=PREIFX]
-#
-# DESCRIPTION
-#     Set up connection to one or more Rosie web service servers.
-#
-# OPTIONS
-#     --prefix=PREFIX
-#         Specify the name of one or more Rosie web service servers to use.
-#         This option can be used multiple times.
-#-------------------------------------------------------------------------------
-exec python3 -m metomi.rosie.ws_client_cli hello "$@"
+
+"""Non-Python rose/rosie/rosa sub commands.
+
+* Try to implement sub commands in Python where possible.
+* Try to stick to Bash for non Python sub commands.
+* Remember to list these scripts in metomi.rose.rose.
+
+"""

@@ -123,9 +123,16 @@ class ResourceLocator:
         return self.conf
 
     def get_synopsis(self):
-        """Return line 1 of SYNOPSIS in $ROSE_HOME_BIN/$ROSE_NS-$ROSE_UTIL."""
+        """Return line 1 of SYNOPSIS in $ROSE_HOME_BIN/$ROSE_NS-$ROSE_UTIL.
+
+        Note:
+            This is used for bash sub commands only.
+
+        """
         try:
             home_bin = os.getenv("ROSE_HOME_BIN")
+            if not home_bin:
+                return None
             path = os.path.join(home_bin, self.get_util_name("-"))
             in_synopsis = False
             for line in open(path):
@@ -224,9 +231,36 @@ def import_object(
 
 def main():
     """Launcher for the CLI."""
-    opt_parser = metomi.rose.opt_parse.RoseOptionParser()
+    opt_parser = metomi.rose.opt_parse.RoseOptionParser(
+        usage='rose resource RESOURCE_PATH',
+        description='''
+Display the path of resources in the Rose Python installation.
+
+* If the requested resource exists and is a file its path is printed.
+* If the requested resource exists and is a directory it is listed.
+
+Provide no arguments to see a list of top-level resources.
+
+EXAMPLES
+    # List top-level resources:
+    $ rose resource
+
+    # List the contents of the "syntax" directory:
+    $ rose resource syntax
+
+    # Extract the Rose syntax file for the Vim text editor:
+    $ rose resource syntax/rose-conf.vim
+        ''',
+        epilog='''
+ARGUMENTS
+    RESOURCE_PATH
+        Path of the resource to extract.
+
+        Run `rose resource` to see the list of resources.
+        ''',
+    )
     opt_parser.add_my_options()
-    opts, args = opt_parser.parse_args(sys.argv[1:])
+    opts, args = opt_parser.parse_args()
     reporter = Reporter(opts.verbosity - opts.quietness)
     is_top_level = False
     if len(args) > 1:

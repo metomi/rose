@@ -630,8 +630,59 @@ class FileSystemScorer(RandomScorer):
 
 def main():
     """Implement the "rose host-select" command."""
-    opt_parser = RoseOptionParser()
+    opt_parser = RoseOptionParser(
+        usage='rose host-select [OPTIONS] [GROUP/HOST ...]',
+        description='''
+Select a host from a set of groups or names by load, by free memory
+or by random.
+
+Print the selected host name.
+        ''',
+        epilog='''
+RANKING METHODS IN DETAIL (--rank-method):
+    `load`
+        Rank by average load as reported by `uptime` divided by
+        number of virtual processors.
+
+        If `METHOD-ARG` is specified, it must be `1`, `5` or `15`.
+        The default is to use the 15 minute load.
+    `fs`
+        Rank by % usage of a file system as reported by `df`.
+
+        `METHOD-ARG` must be a valid file system in all the given
+        hosts and host groups. The default is to use the `~`
+        directory.
+    `mem`
+        Rank by largest amount of free memory. Uses `free -m` to
+        return memory in Mb
+    `random`
+        No ranking is used.
+
+CONFIGURATION
+    The command reads its settings from the `[rose-host-select]` section in
+    the Rose configuration. All settings are optional. Type
+    `rose config rose-host-select` to print settings.
+
+    Valid settings are:
+
+    default = GROUP/HOST ...
+       The default arguments to use for this command.
+    group{NAME} = GROUP/HOST ...
+       Declare a named group of hosts.
+    method{NAME} = METHOD[:METHOD-ARG]
+       Declare the default ranking method for a group of hosts.
+    thresholds{NAME} = [METHOD[:METHOD-ARG]:]VALUE ...
+       Declare the default threshold(s) for a group of hosts.
+    timeout = FLOAT
+       Set the timeout in seconds of SSH commands to hosts.
+       (default=10.0)
+        '''
+    )
     opt_parser.add_my_options("choice", "rank_method", "thresholds", "timeout")
+    opt_parser.modify_option(
+        'timeout',
+        help='Set the timeout in seconds of SSH commands to hosts.',
+    )
     opts, args = opt_parser.parse_args()
     report = Reporter(opts.verbosity - opts.quietness)
     popen = RosePopener(event_handler=report)

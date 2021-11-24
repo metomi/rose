@@ -255,9 +255,28 @@ def print_graph(suite_data, filter_id, properties=None, max_distance=None):
 
 def main():
     """Provide the CLI interface."""
-    opt_parser = metomi.rose.opt_parse.RoseOptionParser()
+    opt_parser = metomi.rose.opt_parse.RoseOptionParser(
+        usage='rosie graph [OPTIONS] [ID]',
+        description='Graph suite copy ancestry.',
+        epilog='''
+ARGUMENTS
+    ID
+        A suite id to graph. If given, only the suites that are
+        connected to this id by copy history will be graphed.
+        '''
+    )
     opt_parser.add_my_options(
         "distance", "output_file", "prefix", "property", "text"
+    )
+    opt_parser.modify_option(
+        'output_file',
+        help=(
+            'The name of the file for dumping the output.'
+            '\nOtherwise, the output will go to a temporary file which will'
+            ' get tidied up.'
+            '\nThe extension of the filename determines the'
+            ' output format - see graphviz AGraph.draw documentation.'
+        ),
     )
     opts, args = opt_parser.parse_args()
     filter_id = None

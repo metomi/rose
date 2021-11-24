@@ -36,3 +36,7 @@ metomi/rosie/lib/html/static/js/livestamp.min.js
 metomi/rosie/lib/html/static/js/moment.min.js
 * Unmodified external software library released under the MIT license.
   See <http://momentjs.com/>
+
+metomi/rose/opt_parse.py
+* Contains modification of the Python 3.7 optparse source released under
+  the PSF license.

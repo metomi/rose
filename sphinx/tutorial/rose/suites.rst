@@ -300,7 +300,7 @@ See the :ref:`Cheat Sheet` for more information.
    #. **Create A New Suite.**
 
       Create a copy of the :ref:`weather-forecasting suite
-      <tutorial-cylc-runtime-forecasting-suite>` by running::
+      <tutorial-cylc-runtime-forecasting-workflow>` by running::
 
          rose tutorial rose-suite-tutorial ~/rose-tutorial/rose-suite-tutorial
          cd ~/rose-tutorial/rose-suite-tutorial
