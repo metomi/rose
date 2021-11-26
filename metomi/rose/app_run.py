@@ -18,6 +18,7 @@
 
 from glob import glob
 import os
+from pathlib import Path
 import shlex
 import sys
 from time import localtime, sleep, strftime, time
@@ -473,16 +474,19 @@ class AppRunner(Runner):
     @staticmethod
     def _prep_path(conf_tree):
         """Add bin directories to the PATH seen by the app command."""
+        os_path = os.getenv('PATH').replace(
+            f'{Path(os.getenv("CYLC_HOME", "")) / "bin/"}/:', ''
+        )
         paths = []
         for conf_dir in conf_tree.conf_dirs:
             conf_bin_dir = os.path.join(conf_dir, "bin")
             if os.path.isdir(conf_bin_dir):
                 paths.append(conf_bin_dir)
         if paths:
-            value = os.pathsep.join(paths + [os.getenv("PATH")])
+            value = os.pathsep.join(paths + [os_path])
             conf_tree.node.set(["env", "PATH"], value)
         else:
-            conf_tree.node.set(["env", "PATH"], os.getenv("PATH"))
+            conf_tree.node.set(["env", "PATH"], os_path)
 
     def _poll(self, conf_tree):
         """Run any configured file polling."""
