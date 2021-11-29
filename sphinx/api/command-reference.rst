@@ -41,7 +41,6 @@ This command has been replaced by ``cylc play``.
 
 .. TODO: This is here to allow the documentation tests to pass
 
-
 ----
 
 .. _command-rose-test-battery:
