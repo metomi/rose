@@ -114,7 +114,7 @@ class RosieSvnHook(object):
     def _svnlook(self, *args):
         """Return the standard output from "svnlook"."""
         command = ["svnlook", *args]
-        return self.popen(*command)[0].decode()
+        return self.popen(*command)[0]
 
     def _load_info(
         self,

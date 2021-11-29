@@ -188,9 +188,17 @@ class RosePopener:
             stdin = kwargs.get("stdin")
         stdout, stderr = proc.communicate(stdin)
         retcode = proc.wait()
-        if isinstance(retcode, bytes):
-            retcode = retcode.decode()
-        return retcode, stdout, stderr
+
+        def _decode_if_bytes(obj):
+            if isinstance(obj, bytes):
+                return obj.decode()
+            return obj
+
+        return (
+            _decode_if_bytes(retcode),
+            _decode_if_bytes(stdout),
+            _decode_if_bytes(stderr)
+        )
 
     def run_bg(self, *args, **kwargs):
         """Provide a Rose-friendly interface to subprocess.Popen.
@@ -259,7 +267,7 @@ class RosePopener:
         ret_code, stdout, stderr = self.run(*args, **kwargs)
         if ret_code:
             if stderr:
-                stderr = stderr.decode()
+                stderr = stderr
             else:
                 stderr = ''
             raise RosePopenError(
@@ -279,9 +287,6 @@ class RosePopener:
         stderr_level = kwargs.pop("stderr_level", None)
         stdout_level = kwargs.pop("stdout_level", None)
         ret_code, stdout, stderr = self.run(*args, **kwargs)
-        stderr, stdout = [
-            i.decode() if isinstance(i, bytes) else i for i in [stderr, stdout]
-        ]
         if stdout:
             self.handle_event(stdout, level=stdout_level)
         if ret_code:

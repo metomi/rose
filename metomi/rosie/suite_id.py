@@ -144,7 +144,7 @@ class SuiteId:
                 raise SuiteIdLatestError(prefix)
             dirs = [
                 line
-                for line in out.decode().splitlines()
+                for line in out.splitlines()
                 if line.endswith("/")
             ]
             # Note - 'R/O/S/I/E' sorts to top for lowercase initial idx letter

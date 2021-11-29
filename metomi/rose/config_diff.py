@@ -305,8 +305,8 @@ CONFIGURATION
     return_code = 1
     try:
         return_code, stdout, stderr = popener.run(*diff_cmd)
-        sys.stdout.buffer.write(stdout)
-        sys.stderr.buffer.write(stderr)
+        sys.stdout.buffer.write(stdout.encode())
+        sys.stderr.buffer.write(stderr.encode())
     finally:
         fs_util = metomi.rose.fs_util.FileSystemUtil()
         for path in output_filenames:
