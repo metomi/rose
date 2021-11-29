@@ -30,7 +30,7 @@ from sphinx.util.nodes import nested_parse_with_titles
 # RE_CMD = re.compile(r'^={5,}$\n^(.*)$\n^={5,}$')
 RE_CMD = re.compile(r'={5,}\n')
 RE_USAGE = re.compile(r'Usage: (.*)')
-RE_SECTION = re.compile(r'^([A-Z][A-Z: ]+)$')
+RE_SECTION = re.compile(r'^(([A-Z][A-Z: ]+)|Options:)$')
 
 RST_HEADINGS = ['=', '-', '^', '"']
 
@@ -204,6 +204,7 @@ def write(ns, cmds, _write):
             rst_body(content['DESCRIPTION'])
         )
         for key, text in content.items():
+            key = key.upper()
             if key in {'USAGE', 'DESCRIPTION'}:
                 continue
             _write(
