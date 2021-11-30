@@ -327,7 +327,6 @@ class CylcProcessor(SuiteEngineProcessor):
                         self.handle_event(exc, level=Reporter.WARN)
                     else:
                         for line in sorted(ssh_ls_out.splitlines()):
-                            line = line.decode()
                             event = FileSystemEvent(
                                 FileSystemEvent.DELETE,
                                 "%s:log/job/%s/" % (auth, line),
@@ -432,7 +431,7 @@ class CylcProcessor(SuiteEngineProcessor):
             user = None
         if host and ("`" in host or "$" in host):
             command = ["bash", "-ec", "H=" + host + "; echo $H"]
-            host = self.popen(*command)[0].strip().decode()
+            host = self.popen(*command)[0].strip()
         if host in ["None", self.host] or self.host_selector.is_local_host(
             host
         ):
