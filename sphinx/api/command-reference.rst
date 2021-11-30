@@ -41,13 +41,6 @@ This command has been replaced by ``cylc play``.
 
 .. TODO: This is here to allow the documentation tests to pass
 
-.. _command-rose-stem:
-
-rose stem
-^^^^^^^^^
-
-The ``rose stem`` command is now provided by :ref:`Cylc Rose`, see the
-:ref:`Cylc documentation <rose-stem>` for details.
 
 ----
 
