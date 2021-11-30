@@ -189,16 +189,7 @@ class RosePopener:
         stdout, stderr = proc.communicate(stdin)
         retcode = proc.wait()
 
-        def _decode_if_bytes(obj):
-            if isinstance(obj, bytes):
-                return obj.decode()
-            return obj
-
-        return (
-            _decode_if_bytes(retcode),
-            _decode_if_bytes(stdout),
-            _decode_if_bytes(stderr)
-        )
+        return retcode, stdout, stderr
 
     def run_bg(self, *args, **kwargs):
         """Provide a Rose-friendly interface to subprocess.Popen.
@@ -222,9 +213,9 @@ class RosePopener:
         sys.stdout.flush()
         try:
             if kwargs.get("shell"):
-                proc = Popen(args[0], **kwargs)
+                proc = Popen(args[0], text=True, **kwargs)
             else:
-                proc = Popen(args, **kwargs)
+                proc = Popen(args, text=True, **kwargs)
         except OSError as exc:
             if exc.filename is None and args:
                 exc.filename = args[0]
