@@ -141,7 +141,7 @@ Navigate to the top directory of your suite (where the ``flow.cylc`` and
 Your suite should run, launch the Cylc GUI and successfully run the ``lander``
 app.
 
-Once the suite has finished running and has shutdown, open Rose Bush to view
+Once the suite has finished running and has shutdown, open Cylc Review to view
 its output (note that you can close the Cylc GUI at this point)::
 
    rose suite-log
@@ -151,15 +151,15 @@ its output (note that you can close the Cylc GUI at this point)::
    You can quickly get to the relevant page by running
    ``cylc cat-log`` from within the :term:`suite directory`.
 
-In the Rose Bush jobs page for your suite you should be presented with a
+In the Cylc Review jobs page for your suite you should be presented with a
 page containing a single row for the ``lander`` task, from which you can
 access its output. In that row you should see something like this:
 
 .. image:: img/rose-bunch-bush-page.png
    :align: center
-   :alt: Rose Bush view of output
+   :alt: Cylc Review view of output
 
-In the Rose Bush entry you should see that the usual links are present for
+In the Cylc Review entry you should see that the usual links are present for
 the task such as ``job.out``, ``job.status`` etc. with the addition of
 two drop-down boxes: one for ``bunch.*.err`` and one for ``bunch.*.out``.
 Rather than mixing the outputs from the multiple command invocations being
@@ -185,8 +185,8 @@ following line under the :rose:conf:`rose_bunch[bunch]` section:
 
    names=BA123 Emirates345 BA007 PC456
 
-Re-run your suite and, once it has finished, open up Rose Bush and examine the
-job listing. In the drop-down ``bunch.*.err`` and ``bunch.*.out`` boxes you
+Re-run your suite and, once it has finished, open up Cylc Review and examine
+the job listing. In the drop-down ``bunch.*.err`` and ``bunch.*.out`` boxes you
 should now see entries for the names you've configured rather than the
 ``bunch.0.out ... bunch.3.out`` entries previously present.
 

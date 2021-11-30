@@ -667,17 +667,23 @@ Rose Applications In Rose Suite Configurations
 
       The ``cylc gui`` should open and the suite should run and complete.
 
-   #. **View Output In Rose Bush.**
+   #. **View Output In Cylc Review.**
 
-      Open the Rose Bush page in a browser by running the following command
+      .. note::
+
+         Cylc review replaces the Rose Bush utility. It can view Cylc 7 and
+         Cylc 8 suites.
+
+
+      Open the Cylc Review page in a browser by running the following command
       from within the suite directory::
 
-         rose suite-log
+         cylc review
 
       On this page you will see the tasks run by the suite, ordered from most
       to least recent. Near the top you should see an entry for the
       ``forecast`` task. On the right-hand side of the screen click
       :guilabel:`job-map.html`.
       
-      As this file has a ``.html`` extension Rose Bush will render it.
+      As this file has a ``.html`` extension Cylc Review will render it.
       The raw text would be displayed otherwise.
