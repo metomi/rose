@@ -104,7 +104,7 @@ def cmd_version(command, command_template='--version',
     if not isinstance(command_template, list):
         command_template = [command_template]
     output = Popen([command] + command_template, stdout=PIPE,
-                   stderr=PIPE).communicate()[outfile - 1].decode().strip()
+                   stderr=PIPE, text=True).communicate()[outfile - 1].strip()
     try:
         return re.search(version_template, output).groups()[0]
     except AttributeError:
@@ -112,7 +112,7 @@ def cmd_version(command, command_template='--version',
 
 
 def shell_command(_, shell=None, version_template=r'(.*)', outfile=1):
-    output = Popen(shell, stdout=PIPE).communicate()[outfile - 1].decode()
+    output = Popen(shell, stdout=PIPE, text=True).communicate()[outfile - 1]
     try:
         return re.search(version_template, output).groups()[0]
     except AttributeError:
