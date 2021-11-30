@@ -424,7 +424,7 @@ class HostSelector:
             proc = self.popen.run_bg(
                 *command, stdin=stdin, preexec_fn=os.setpgrp
             )
-            proc.stdin.write(stdin.encode('UTF-8'))
+            proc.stdin.write(stdin)
             proc.stdin.flush()
             host_proc_dict[host_name] = (proc, metrics)
 
