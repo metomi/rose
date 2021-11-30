@@ -377,51 +377,38 @@ class SuiteId:
 
         # Cylc8 run directory
         # TODO: extract version control information
-        loc = Path(location)
+        loc = Path(location).expanduser().resolve()
         sdrr = Path('~', suite_dir_rel_root).expanduser().resolve()
+        from ast import literal_eval
         try:
             loc.relative_to(sdrr)
         except ValueError:
             # Not an installed Cylc8 workflow run directory
             pass
         else:
-            if (loc / 'rose-suite.info').is_file():
-                # This is an installed workflow with a rose-suite.info file
-                # (most likely a Cylc8 run directory)
-
-                # TODO: extract version control information written by
-                # Cylc install, see:
-                # https://github.com/metomi/rose/issues/2432
-                # https://github.com/cylc/cylc-flow/issues/3849
-                raise SuiteIdLocationError(location)
-
-        # Cylc7 run directory
-        # Use a hacky way to read the "log/rose-suite-run.version" file
-        suite_dir_rel_root = getattr(
-            suite_engine_proc, "SUITE_DIR_REL_ROOT", None
-        )
-        if suite_dir_rel_root and "/" + suite_dir_rel_root + "/" in location:
-            loc = location
-            while "/" + suite_dir_rel_root + "/" in loc:
-                suite_version_file_name = os.path.join(
-                    loc, "log/rose-suite-run.version"
-                )
-                loc = os.path.dirname(loc)
+            # Cylc7 run directory
+            # Use a hacky way to read the "log/rose-suite-run.version" file
+            suite_dir_rel_root = getattr(
+                suite_engine_proc, "SUITE_DIR_REL_ROOT", None
+            )
+            while loc.relative_to(sdrr):
+                suite_version_file_name = loc / "log/version/vcs.conf"
+                loc = loc.parent
                 if not os.access(suite_version_file_name, os.F_OK | os.R_OK):
                     continue
-                state = None
+                vcsystem = None
                 url = None
                 rev = None
-                for line in open(suite_version_file_name):
+                for line in suite_version_file_name.read_text().split('\n'):
                     line = line.strip()
-                    if state is None:
-                        if line.startswith("# svn info"):
-                            state = line
-                    elif state.startswith("# svn info"):
-                        if line.startswith("URL:"):
-                            url = line.split(":", 1)[1].strip()
-                        elif line.startswith("Revision:"):
-                            rev = line.split(":", 1)[1].strip()
+                    if vcsystem is None:
+                        if line.startswith("version control system"):
+                            vcsystem = literal_eval(line.split('=', 1)[1].strip())
+                    elif 'svn' in vcsystem:
+                        if line.startswith("url"):
+                            url = literal_eval(line.split("=", 1)[1].strip())
+                        elif line.startswith("revision"):
+                            rev = literal_eval(line.split("=", 1)[1].strip())
                         elif not line:
                             break
                 if url and rev:
@@ -431,10 +418,12 @@ class SuiteId:
         # Assume location is a Subversion working copy of a Rosie suite
         info_parser = SvnInfoXMLParser()
         try:
-            info_entry = info_parser.parse(self.svn("info", "--xml", location))
+            x = self.svn("info", "--xml", location)
+            if isinstance(x, bytes):
+                x = x.decode()
+            info_entry = info_parser.parse(x)
         except RosePopenError:
             raise SuiteIdLocationError(location)
-
         if "url" not in info_entry:
             raise SuiteIdLocationError(location)
         root = info_entry["repository:root"]
