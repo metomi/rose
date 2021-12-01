@@ -33,15 +33,9 @@ jobs:
       matrix:
         os: ['ubuntu-latest']
         python-version: ['3.7', '3.8', '3.9']
-        # TODO: re-enable macos testing
-        # currently (in the absence of a wrapper script) rose cannot be run
-        # from within cylc jobs in situations where the output of the following
-        # commands differ:
-        #   bash -c 'which python'
-        #   bash -l -c 'which python'
-        # include:
-        #   - os: 'macos-latest'
-        #     python-version: '3.7'
+        include:
+          - os: 'macos-latest'
+            python-version: '3.7'
 
     steps:
       - name: Checkout
@@ -93,16 +87,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y shellcheck sqlite3 at
-
-      - name: MacOS DNS Patch
-        if: startsWith(matrix.os, 'macos')
-        run: |
-          # apply DNS patch
-          hostuserutil="$(python3 -c '
-          import cylc.flow.hostuserutil
-          print(cylc.flow.hostuserutil.__file__)
-          ')"
-          patch "${hostuserutil}" < rose/etc/conf/macos-patch
 
       - name: Install Rose
         working-directory: rose
