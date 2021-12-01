@@ -47,10 +47,7 @@ class RosePruneApp(BuiltinApp):
             return
 
         # Tar-gzip job logs on suite host
-        # Prune job logs on remote hosts and suite host
-        prune_remote_logs_cycles = self._get_conf(
-            app_runner, conf_tree, "prune-remote-logs-at"
-        )
+        # Prune job logs on suite host
         prune_server_logs_cycles = self._get_conf(
             app_runner, conf_tree, "prune-server-logs-at"
         )
@@ -58,28 +55,14 @@ class RosePruneApp(BuiltinApp):
             app_runner, conf_tree, "archive-logs-at"
         )
         if (
-            prune_remote_logs_cycles
-            or prune_server_logs_cycles
+            prune_server_logs_cycles
             or archive_logs_cycles
         ):
-            tmp_prune_remote_logs_cycles = []
-            for cycle in prune_remote_logs_cycles:
-                if cycle not in archive_logs_cycles:
-                    tmp_prune_remote_logs_cycles.append(cycle)
-            prune_remote_logs_cycles = tmp_prune_remote_logs_cycles
-
             tmp_prune_server_logs_cycles = []
             for cycle in prune_server_logs_cycles:
                 if cycle not in archive_logs_cycles:
                     tmp_prune_server_logs_cycles.append(cycle)
             prune_server_logs_cycles = tmp_prune_server_logs_cycles
-
-            if prune_remote_logs_cycles:
-                app_runner.suite_engine_proc.job_logs_pull_remote(
-                    suite_name,
-                    prune_remote_logs_cycles,
-                    prune_remote_mode=True,
-                )
 
             if prune_server_logs_cycles:
                 app_runner.suite_engine_proc.job_logs_remove_on_server(
