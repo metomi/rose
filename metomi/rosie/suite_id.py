@@ -419,7 +419,8 @@ class SuiteId:
             suite_engine_proc, "SUITE_DIR_REL_ROOT", None
         )
         loc = Path(location).expanduser().resolve()
-        sdrr = Path('~', suite_dir_rel_root).expanduser().resolve()
+        if suite_dir_rel_root:
+            sdrr = Path('~', suite_dir_rel_root).expanduser().resolve()
         try:
             loc.relative_to(sdrr)
         except ValueError:
@@ -431,7 +432,7 @@ class SuiteId:
                 vcfilepath = sdrr / loc / SuiteId.VC_FILENAME
                 if os.access(vcfilepath, os.F_OK | os.R_OK):
                     return vcfilepath
-            return None
+        return None
 
     @staticmethod
     def _parse_cylc_vc_file(fpath):
