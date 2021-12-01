@@ -421,17 +421,17 @@ class SuiteId:
         loc = Path(location).expanduser().resolve()
         if suite_dir_rel_root:
             sdrr = Path('~', suite_dir_rel_root).expanduser().resolve()
-        try:
-            loc.relative_to(sdrr)
-        except ValueError:
-            # Not an installed Cylc8 workflow run directory
-            pass
-        else:
-            # Slightly odd construction = loc + parents
-            for loc in (loc.relative_to(sdrr) / '_').parents:
-                vcfilepath = sdrr / loc / SuiteId.VC_FILENAME
-                if os.access(vcfilepath, os.F_OK | os.R_OK):
-                    return vcfilepath
+            try:
+                loc.relative_to(sdrr)
+            except ValueError:
+                # Not an installed Cylc8 workflow run directory
+                pass
+            else:
+                # Slightly odd construction = loc + parents
+                for loc in (loc.relative_to(sdrr) / '_').parents:
+                    vcfilepath = sdrr / loc / SuiteId.VC_FILENAME
+                    if os.access(vcfilepath, os.F_OK | os.R_OK):
+                        return vcfilepath
         return None
 
     @staticmethod
