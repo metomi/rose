@@ -24,5 +24,4 @@
 .. _metomi-vms: https://github.com/metomi/metomi-vms
 .. _Python: https://www.python.org/
 .. _Python Regular Expressions: https://docs.python.org/3/library/re.html#regular-expression-syntax
-.. _SRS: https://code.metoffice.gov.uk/
 .. _SVN: http://subversion.apache.org/

@@ -97,13 +97,11 @@ Suite Naming
    :rose:conf:`rose.conf[rosie-id]prefix-location.PREFIX` setting.
 
    Within the Rose user community the ``u`` prefix is typically configured to
-   point at the `SRS`_ repository.
+   point at the ``https://code.metoffice.gov.uk`` repository.
 
 .. ifslides::
 
-   :rose:conf:`rose.conf[rosie-id]prefix-location.PREFIX`
-
-   ``u`` = SRS
+   ``u = https://code.metoffice.gov.uk``
 
 
 The :rose:file:`rose-suite.info` File
