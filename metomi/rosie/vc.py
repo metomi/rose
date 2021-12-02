@@ -101,7 +101,7 @@ class LocalCopyStatusError(Exception):
         super(LocalCopyStatusError, self).__init__(id_, status)
 
     def __str__(self):
-        data = (str(self.id_), self.id_.to_local_copy(), self.status.decode())
+        data = (str(self.id_), self.id_.to_local_copy(), self.status)
         return "%s: %s: local copy has uncommitted changes:\n%s" % data
 
 
@@ -385,7 +385,7 @@ class RosieVCClient:
                 from_id.revision,
             )
             out_data = self.popen("svn", "cat", from_info_url)[0]
-            from_config = metomi.rose.config.load(StringIO(out_data.decode()))
+            from_config = metomi.rose.config.load(StringIO(out_data))
 
         res_loc = ResourceLocator.default()
         older_config = None

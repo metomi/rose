@@ -412,8 +412,6 @@ class RoseArchApp(BuiltinApp):
                 "target": app_runner.popen.list_to_shell_str([target.name]),
             }
             ret_code, out, err = app_runner.popen.run(command, shell=True)
-            if isinstance(out, bytes):
-                out, err = out.decode(), err.decode()
             times[2] = time()  # archived time
             if ret_code:
                 app_runner.handle_event(

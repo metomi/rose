@@ -424,7 +424,7 @@ class HostSelector:
             proc = self.popen.run_bg(
                 *command, stdin=stdin, preexec_fn=os.setpgrp
             )
-            proc.stdin.write(stdin.encode('UTF-8'))
+            proc.stdin.write(stdin)
             proc.stdin.flush()
             host_proc_dict[host_name] = (proc, metrics)
 
@@ -437,7 +437,7 @@ class HostSelector:
                 if proc.poll() is None:
                     score = None
                 elif proc.wait():
-                    stdout, stderr = (f.decode() for f in proc.communicate())
+                    stdout, stderr = proc.communicate()
                     self.handle_event(
                         HostSelectCommandFailedEvent(
                             proc.returncode, host_name
@@ -445,7 +445,7 @@ class HostSelector:
                     )
                     host_proc_dict.pop(host_name)
                 else:
-                    out = proc.communicate()[0].decode()
+                    out = proc.communicate()[0]
                     out = _deserialise(metrics, json.loads(out.strip()))
 
                     host_proc_dict.pop(host_name)

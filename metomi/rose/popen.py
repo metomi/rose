@@ -188,8 +188,7 @@ class RosePopener:
             stdin = kwargs.get("stdin")
         stdout, stderr = proc.communicate(stdin)
         retcode = proc.wait()
-        if isinstance(retcode, bytes):
-            retcode = retcode.decode()
+
         return retcode, stdout, stderr
 
     def run_bg(self, *args, **kwargs):
@@ -214,9 +213,9 @@ class RosePopener:
         sys.stdout.flush()
         try:
             if kwargs.get("shell"):
-                proc = Popen(args[0], **kwargs)
+                proc = Popen(args[0], text=True, **kwargs)
             else:
-                proc = Popen(args, **kwargs)
+                proc = Popen(args, text=True, **kwargs)
         except OSError as exc:
             if exc.filename is None and args:
                 exc.filename = args[0]
@@ -258,10 +257,6 @@ class RosePopener:
         """
         ret_code, stdout, stderr = self.run(*args, **kwargs)
         if ret_code:
-            if stderr:
-                stderr = stderr.decode()
-            else:
-                stderr = ''
             raise RosePopenError(
                 args, ret_code, stdout, stderr, kwargs.get("stdin")
             )
@@ -279,9 +274,6 @@ class RosePopener:
         stderr_level = kwargs.pop("stderr_level", None)
         stdout_level = kwargs.pop("stdout_level", None)
         ret_code, stdout, stderr = self.run(*args, **kwargs)
-        stderr, stdout = [
-            i.decode() if isinstance(i, bytes) else i for i in [stderr, stdout]
-        ]
         if stdout:
             self.handle_event(stdout, level=stdout_level)
         if ret_code:
