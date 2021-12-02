@@ -257,10 +257,6 @@ class RosePopener:
         """
         ret_code, stdout, stderr = self.run(*args, **kwargs)
         if ret_code:
-            if stderr:
-                stderr = stderr
-            else:
-                stderr = ''
             raise RosePopenError(
                 args, ret_code, stdout, stderr, kwargs.get("stdin")
             )
