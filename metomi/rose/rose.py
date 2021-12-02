@@ -42,6 +42,8 @@ Rose is a toolkit for writing, editing and running application configurations.
 DEAD_ENDS = {
     # messages to show for commands which have been removed or renamed
     # (ns, sub_cmd): message
+    ('rosa', 'rpmbuild'):
+        'Rosa RPM Builder has been removed.',
     ('rose', 'config-edit'):
         'The Rose configuration editor has been removed, use the Cylc GUI.',
     ('rose', 'edit'):
@@ -115,7 +117,6 @@ BASH_SUB_CMDS = {
     # NOTE: script must exist in the bin/ directory as `{ns}-{sub_cmd}`.
     # (ns, sub_cmd)
     ('rosa', 'db-create'),
-    ('rosa', 'rpmbuild'),
     ('rosa', 'svn-post-commit'),
     ('rosa', 'svn-pre-commit'),
     ('rosa', 'ws'),
