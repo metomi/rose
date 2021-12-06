@@ -2,7 +2,7 @@
 
 # You can set these variables from the command line:
 ROSE_VERSION = $(shell rose version)
-SPHINXOPTS    =
+SPHINXOPTS    = -n
 SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR      = ../doc/$(ROSE_VERSION)
