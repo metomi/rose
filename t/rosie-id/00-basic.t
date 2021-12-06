@@ -114,9 +114,6 @@ foo-aa000
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 
-# TODO: Cylc8 support for rosie id
-# https://github.com/metomi/rose/issues/2432
-
 TEST_KEY="${TEST_KEY_BASE}-run"
 get_reg
 svn co -q "${URL}/a/a/0/0/0/trunk" 'foo-aa000'
