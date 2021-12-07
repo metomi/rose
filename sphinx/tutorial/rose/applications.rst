@@ -173,7 +173,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
       * The ``lib/template/map.html`` HTML template.
 
       Rather than leaving these resources scattered throughout the
-      :term:`suite directory` we can encapsulate them into the
+      :term:`run directory` we can encapsulate them into the
       application directory.
 
       Install the ``forecast`` script and ``util.py`` library into the ``bin/``
@@ -222,7 +222,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
 
          rose tutorial test-data file/test-data
 
-   #. **Move environment variables defined in the** ``flow.cylc`` **file.** 
+   #. **Move environment variables defined in the** ``flow.cylc`` **file.**
 
       In the ``[runtime][forecast][environment]`` section of the ``flow.cylc``
       file in the
