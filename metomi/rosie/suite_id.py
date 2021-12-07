@@ -24,7 +24,7 @@ Functions:
     main - CLI interface function.
 
 """
-
+from ast import literal_eval
 import os
 from pathlib import Path
 import re
@@ -118,6 +118,7 @@ class SuiteId:
     REC_IDX = re.compile(r"\A(?:(\w+)-)?(\w+)(?:/([^\@/]+))?(?:@([^\@/]+))?\Z")
     BRANCH_TRUNK = "trunk"
     REV_HEAD = "HEAD"
+    VC_FILENAME = "log/version/vcs.conf"
     svn = SvnCaller()
 
     STATUS_CR = "X"
@@ -370,71 +371,18 @@ class SuiteId:
 
     def _from_location(self, location):
         """Return the ID of a location (origin URL or local copy path)."""
-        suite_engine_proc = SuiteEngineProcessor.get_processor()
-        suite_dir_rel_root = getattr(
-            suite_engine_proc, "SUITE_DIR_REL_ROOT", None
-        )
-
-        # Cylc8 run directory
-        # TODO: extract version control information
-        loc = Path(location)
-        sdrr = Path('~', suite_dir_rel_root).expanduser().resolve()
-        try:
-            loc.relative_to(sdrr)
-        except ValueError:
-            # Not an installed Cylc8 workflow run directory
-            pass
-        else:
-            if (loc / 'rose-suite.info').is_file():
-                # This is an installed workflow with a rose-suite.info file
-                # (most likely a Cylc8 run directory)
-
-                # TODO: extract version control information written by
-                # Cylc install, see:
-                # https://github.com/metomi/rose/issues/2432
-                # https://github.com/cylc/cylc-flow/issues/3849
-                raise SuiteIdLocationError(location)
-
-        # Cylc7 run directory
-        # Use a hacky way to read the "log/rose-suite-run.version" file
-        suite_dir_rel_root = getattr(
-            suite_engine_proc, "SUITE_DIR_REL_ROOT", None
-        )
-        if suite_dir_rel_root and "/" + suite_dir_rel_root + "/" in location:
-            loc = location
-            while "/" + suite_dir_rel_root + "/" in loc:
-                suite_version_file_name = os.path.join(
-                    loc, "log/rose-suite-run.version"
-                )
-                loc = os.path.dirname(loc)
-                if not os.access(suite_version_file_name, os.F_OK | os.R_OK):
-                    continue
-                state = None
-                url = None
-                rev = None
-                for line in open(suite_version_file_name):
-                    line = line.strip()
-                    if state is None:
-                        if line.startswith("# svn info"):
-                            state = line
-                    elif state.startswith("# svn info"):
-                        if line.startswith("URL:"):
-                            url = line.split(":", 1)[1].strip()
-                        elif line.startswith("Revision:"):
-                            rev = line.split(":", 1)[1].strip()
-                        elif not line:
-                            break
-                if url and rev:
-                    location = url + "@" + rev
-                break
+        # Get Version control file location and convert to a URL if rqd.
+        loc = self._find_vc_file_from_location(location)
+        if loc:
+            location = self._parse_cylc_vc_file(loc)
 
         # Assume location is a Subversion working copy of a Rosie suite
         info_parser = SvnInfoXMLParser()
         try:
-            info_entry = info_parser.parse(self.svn("info", "--xml", location))
+            info_entry = info_parser.parse(
+                self.svn("info", "--xml", location))
         except RosePopenError:
             raise SuiteIdLocationError(location)
-
         if "url" not in info_entry:
             raise SuiteIdLocationError(location)
         root = info_entry["repository:root"]
@@ -455,6 +403,78 @@ class SuiteId:
             self.branch = names[self.SID_LEN]
         if "commit:revision" in info_entry:
             self.revision = info_entry["commit:revision"]
+
+    @staticmethod
+    def _find_vc_file_from_location(location):
+        """Search a location and parents for a version control log file.
+
+        Args:
+            location: Path to search.
+
+        Returns:
+            If a file is found, a path, else None.
+        """
+        suite_engine_proc = SuiteEngineProcessor.get_processor()
+        suite_dir_rel_root = getattr(
+            suite_engine_proc, "SUITE_DIR_REL_ROOT", None
+        )
+        loc = Path(location).expanduser().resolve()
+        if suite_dir_rel_root:
+            sdrr = Path('~', suite_dir_rel_root).expanduser().resolve()
+            try:
+                loc.relative_to(sdrr)
+            except ValueError:
+                # Not an installed Cylc8 workflow run directory
+                pass
+            else:
+                # Slightly odd construction = loc + parents
+                for loc in (loc.relative_to(sdrr) / '_').parents:
+                    vcfilepath = sdrr / loc / SuiteId.VC_FILENAME
+                    if os.access(vcfilepath, os.F_OK | os.R_OK):
+                        return vcfilepath
+        return None
+
+    @staticmethod
+    def _parse_cylc_vc_file(fpath):
+        """Take a path to a Cylc VC file and returns an svn URL.
+
+        Args:
+            fpath: Location of Cylc Version Control log file.
+
+        Returns: SVN location, or None
+
+        Examples:
+            >>> class MockFpath():
+            ...     def read_text(self):
+            ...         return (
+            ...             'version control system="svn"\\n'
+            ...             'url="/a/b/c"\\n'
+            ...             'revision="4242"'
+            ...         )
+            >>> mypath = MockFpath()
+            >>> SuiteId.parse_cylc_vc_file(mypath)
+            '/a/b/c@4242'
+        """
+        location = None
+        vcsystem = None
+        url = None
+        rev = None
+        for line in fpath.read_text().split('\n'):
+            line = line.strip()
+            if vcsystem is None:
+                if line.startswith("version control system"):
+                    vcsystem = literal_eval(
+                        line.split('=', 1)[1].strip())
+            elif 'svn' in vcsystem:
+                if line.startswith("url"):
+                    url = literal_eval(line.split("=", 1)[1].strip())
+                elif line.startswith("revision"):
+                    rev = literal_eval(line.split("=", 1)[1].strip())
+                elif not line:
+                    break
+        if url and rev:
+            location = url + "@" + rev
+        return location
 
     def get_status(self, user=None, force_mode=False):
         """Determine and return local status for this suite.

@@ -21,7 +21,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
-tests 36
+tests 39
 #-------------------------------------------------------------------------------
 svnadmin create foo
 URL=file://$PWD/foo
@@ -114,31 +114,26 @@ foo-aa000
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 
-# TODO: Cylc8 support for rosie id
-# https://github.com/metomi/rose/issues/2432
-
-#TEST_KEY="${TEST_KEY_BASE}-run"
-#get_reg
-#svn co -q "${URL}/a/a/0/0/0/trunk" 'foo-aa000'
-#touch 'foo-aa000/rose-suite.conf'
-#cat >'foo-aa000/flow.cylc' <<'__SUITE_RC__'
-#[scheduling]
-#    [[dependencies]]
-#        graph='t1'
-#[runtime]
-#    [[t1]]
-#__SUITE_RC__
-#cylc install \
-#    -C "${PWD}/foo-aa000" \
-#    --flow-name="${FLOW}" \
-#    --no-run-name
-#run_pass "$TEST_KEY" rosie id "${HOME}/cylc-run/${FLOW}"
-#file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
-#foo-aa000
-#__OUT__
-#file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-#purge
-#rm -fr 'foo-aa000'
+TEST_KEY="${TEST_KEY_BASE}-run"
+get_reg
+svn co -q "${URL}/a/a/0/0/0/trunk" 'foo-aa000'
+touch 'foo-aa000/rose-suite.conf'
+cat >'foo-aa000/flow.cylc' <<'__SUITE_RC__'
+[scheduling]
+   [[dependencies]]
+       graph='t1'
+[runtime]
+   [[t1]]
+__SUITE_RC__
+cylc install \
+   -C "${PWD}/foo-aa000" \
+   --flow-name="${FLOW}" \
+   --no-run-name
+run_pass "$TEST_KEY" rosie id "${HOME}/cylc-run/${FLOW}"
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+foo-aa000
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 # Latest and next should still be correct if latest suite removed from HEAD
 TEST_KEY=$TEST_KEY_BASE-latest-not-at-head
@@ -155,4 +150,6 @@ foo-aa001
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
+purge
+rm -fr 'foo-aa000'
 exit 0
