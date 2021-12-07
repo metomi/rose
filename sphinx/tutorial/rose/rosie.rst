@@ -36,7 +36,9 @@ system.
    Rosie suites can be created by the command:
 
 :ref:`command-rosie-create`
-   Create a new suite or copy an existing one.
+   - Create a new suite.
+   - Create a new suite, starting with the content of another suite.
+     (`rosie copy` is an alias that extends `rosie create`)
 
 .. ifnotslides::
 
