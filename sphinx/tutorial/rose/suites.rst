@@ -12,13 +12,13 @@ can be used to encapsulate the environment and resources required by a Cylc
 :term:`task`.
 
 Similarly :term:`Rose suite configurations <Rose suite configuration>` can
-be used to do the same for a :term:`Cylc suite`.
+be used to do the same for a :term:`workflow`.
 
 
 Configuration Format
 --------------------
 
-A Rose suite configuration is a Cylc :term:`suite directory` containing a
+A Rose suite configuration is a Cylc :term:`run directory` containing a
 :rose:file:`rose-suite.conf` file.
 
 .. NOTE - The rose-suite.info is not mentioned here as it is really a rosie
@@ -80,7 +80,7 @@ A Rose suite configuration is a Cylc :term:`suite directory` containing a
 Suite Directory Vs Run Directory
 --------------------------------
 
-:term:`suite directory`
+:term:`run directory`
    The directory in which the suite is written. The ``flow.cylc`` and
    :rose:file:`rose-suite.conf` files live here.
 :term:`run directory`
@@ -91,11 +91,11 @@ Suite Directory Vs Run Directory
 
    Throughout the :ref:`Cylc Tutorial` we wrote suites in the ``cylc-run``
    directory. As Cylc runs suites in the ``cylc-run`` directory the
-   :term:`suite directory` is also the :term:`run directory` i.e. the suite runs
+   :term:`run directory` is also the :term:`run directory` i.e. the suite runs
    in the same directory in which it is written.
 
    With Rose we develop suites in a separate directory to the one in which they
-   run meaning that the :term:`suite directory` is different from the
+   run meaning that the :term:`run directory` is different from the
    :term:`run directory`. This helps keep the suite separate from its output and
    means that you can safely work on a suite and its resources whilst it is
    running.
@@ -105,18 +105,18 @@ Suite Directory Vs Run Directory
 .. ifslides::
 
    Cylc
-      * :term:`suite directory` = ``~/cylc-run/<suite>``
+      * :term:`run directory` = ``~/cylc-run/<suite>``
       * :term:`run directory` = ``~/cylc-run/<suite>``
    Rose
-      * :term:`suite directory` = ``/path/to/<suite>``
+      * :term:`run directory` = ``/path/to/<suite>``
       * :term:`run directory` = ``~/cylc-run/<suite>``
 
 .. note::
 
-   Using Cylc it is possible to separate the :term:`suite directory` and
+   Using Cylc it is possible to separate the :term:`run directory` and
    :term:`run directory` using the ``cylc register`` command. Note though
    that suite resources, e.g. scripts in the ``bin/`` directory, will remain
-   in the :term:`suite directory` so cannot safely be edited whilst the suite
+   in the :term:`run directory` so cannot safely be edited whilst the suite
    is running.
 
 
@@ -133,7 +133,7 @@ Running Rose Suite Configurations
 
 .. _rose-suite-run-stages:
 
-#. The :term:`suite directory` is copied into the ``cylc-run`` directory where
+#. The :term:`run directory` is copied into the ``cylc-run`` directory where
    it becomes the :term:`run directory`.
 #. Any files defined in the :rose:file:`rose-suite.conf` file are installed.
 #. Jinja2 variables defined in the :rose:file:`rose-suite.conf` file are added
@@ -425,7 +425,7 @@ See the :ref:`Cheat Sheet` for more information.
 
          ~/cylc-run/rose-suite-tutorial
 
-      You should find all the files contained in the :term:`suite directory`
+      You should find all the files contained in the :term:`run directory`
       as well as the :term:`run directory` folders ``log``, ``work`` and
       ``share``.
 
@@ -684,6 +684,6 @@ Rose Applications In Rose Suite Configurations
       to least recent. Near the top you should see an entry for the
       ``forecast`` task. On the right-hand side of the screen click
       :guilabel:`job-map.html`.
-      
+
       As this file has a ``.html`` extension Cylc Review will render it.
       The raw text would be displayed otherwise.

@@ -4,7 +4,7 @@ Cheat Sheet
 ===========
 
 This page outlines how to perform suite operations for "pure" :term:`Cylc
-suites <Cylc suite>` (*the Cylc way*) and those using
+workflows <workflow>` (*the Cylc way*) and those using
 :term:`Rose suite configurations <Rose suite configuration>` (*the Rose way*).
 
 .. Use the "sub" lexer as the default for this file.

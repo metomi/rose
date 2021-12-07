@@ -17,7 +17,7 @@ Rosie:
 .. ifnotslides::
 
    .. warning::
-      
+
       This tutorial does not require specific FCM knowledge but basic version
       control awareness is important. For more information on FCM version
       control see the `FCM User Guide`_.
@@ -52,7 +52,7 @@ system.
 Version Control
 ---------------
 
-In Rosie suites the :term:`suite directory` is added to `version control`_
+In Rosie suites the :term:`run directory` is added to `version control`_
 using `FCM`_.
 
 .. ifnotslides::
@@ -244,7 +244,7 @@ Rosie provides commands for managing suites, including:
       the Trac browser to see your suite::
 
          fcm browse
-      
+
       A web browser window will open, showing the Trac page for your Rosie
       suite.
 

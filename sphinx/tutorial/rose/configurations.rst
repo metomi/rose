@@ -26,7 +26,7 @@ behaviours such as:
    :term:`Rose application configuration`
       A runnable Rose configuration which executes a defined command.
    :term:`Rose suite configuration`
-      A Rose configuration designed to run :term:`Cylc suites <Cylc suite>`.
+      A Rose configuration designed to run :term:`Cylc workflows <workflow>`.
       For instance it may be used to define Jinja2 variables for use in the
       ``flow.cylc`` file.
 
