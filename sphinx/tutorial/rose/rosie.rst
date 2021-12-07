@@ -17,7 +17,7 @@ Rosie:
 .. ifnotslides::
 
    .. warning::
-      
+
       This tutorial does not require specific FCM knowledge but basic version
       control awareness is important. For more information on FCM version
       control see the `FCM User Guide`_.
@@ -36,7 +36,9 @@ system.
    Rosie suites can be created by the command:
 
 :ref:`command-rosie-create`
-   Create a new suite or copy an existing one.
+   - Create a new suite.
+   - Create a new suite, starting with the content of another suite,
+     command-rosie-create using the alias `rose copy`.
 
 .. ifnotslides::
 
@@ -244,7 +246,7 @@ Rosie provides commands for managing suites, including:
       the Trac browser to see your suite::
 
          fcm browse
-      
+
       A web browser window will open, showing the Trac page for your Rosie
       suite.
 
