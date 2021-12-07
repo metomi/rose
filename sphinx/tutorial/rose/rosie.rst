@@ -37,8 +37,8 @@ system.
 
 :ref:`command-rosie-create`
    - Create a new suite.
-   - Create a new suite, starting with the content of another suite,
-     `rosie copy` is an alias for `rosie create`
+   - Create a new suite, starting with the content of another suite.
+     (`rosie copy` is an alias for `rosie create`)
 
 .. ifnotslides::
 
