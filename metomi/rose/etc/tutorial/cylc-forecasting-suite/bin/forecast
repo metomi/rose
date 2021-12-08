@@ -175,10 +175,7 @@ def get_cyclepoint(offset_hours):
     Run the system call `cylc cyclepoint --offset-hours <offset_hours>`
     """
     return Popen(
-        [
-            'cylc', 'cyclepoint', '--color=never',
-            '--offset-hours', str(int(offset_hours))
-        ],
+        ['cylc', 'cyclepoint', '--offset-hours', str(int(offset_hours))],
         stdout=PIPE
     ).communicate()[0].strip().decode()
 
