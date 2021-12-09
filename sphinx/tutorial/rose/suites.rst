@@ -4,8 +4,25 @@
 
 .. _tutorial-rose-suites:
 
-Rose Suite Configurations
-=========================
+Rose Configurations for Workflows
+=================================
+
+.. note::
+
+   The following documentation reflects installing and running a Cylc
+   workflow, and assumes that you have Cylc and the
+   cylc-rose plugin installed.
+
+   To check:
+
+   .. code-block:: bash
+
+      $ cylc version --long
+      8.0.0 (/path/to/install)
+
+      Plugins:
+            cylc-rose       1.0.0   /net/home/h02/tpilling/metomi/cylc-rose
+      ...
 
 :term:`Rose application configurations <Rose application configuration>`
 can be used to encapsulate the environment and resources required by a Cylc
@@ -18,7 +35,7 @@ be used to do the same for a :term:`workflow`.
 Configuration Format
 --------------------
 
-A Rose suite configuration is a Cylc :term:`run directory` containing a
+A Rose suite configuration is a Cylc :term:`source directory` containing a
 :rose:file:`rose-suite.conf` file.
 
 .. NOTE - The rose-suite.info is not mentioned here as it is really a rosie
@@ -32,6 +49,8 @@ A Rose suite configuration is a Cylc :term:`run directory` containing a
 
    :rose:conf:`rose-suite.conf[env]`
       Environment variables for use by the whole suite.
+   :rose:conf:`rose-suite.conf[template variables]`
+      `Generic`_ variables for use in the ``flow.cylc`` file.
    :rose:conf:`rose-suite.conf[jinja2:suite.rc]`
       `Jinja2`_ variables for use in the ``flow.cylc`` file.
    :rose:conf:`rose-suite.conf[empy:suite.rc]`
@@ -40,10 +59,17 @@ A Rose suite configuration is a Cylc :term:`run directory` containing a
       Files and resources to be installed in the :term:`run directory` when the
       suite is run.
 
+   .. note::
+
+      At Rose 2/Cylc 8 setting a :rose:conf:`rose-suite.conf[template variables]`
+      section is the recommended way of working. Cylc will select a templating
+      language based on the hashbang line at the start of the the ``flow.cylc``
+      file if you use :rose:conf:`rose-suite.conf[template variables]`.
+
 .. ifslides::
 
    * :rose:conf:`rose-suite.conf[env]`
-   * :rose:conf:`rose-suite.conf[jinja2:suite.rc]`
+   * :rose:conf:`rose-suite.conf[template variables]`
    * :rose:conf:`rose-suite.conf[file:NAME]`
 
 .. nextslide::
@@ -51,7 +77,7 @@ A Rose suite configuration is a Cylc :term:`run directory` containing a
 .. ifnotslides::
 
    In the following example the environment variable ``GREETING`` and the
-   Jinja2 variable ``WORLD`` are both set in the :rose:file:`rose-suite.conf`
+   template variable ``WORLD`` are both set in the :rose:file:`rose-suite.conf`
    file. These variables can then be used in the ``flow.cylc`` file:
 
 .. code-block:: rose
@@ -60,221 +86,49 @@ A Rose suite configuration is a Cylc :term:`run directory` containing a
    [env]
    GREETING=Hello
 
-   [jinja2:suite.rc]
+   [template variables]
    WORLD=Earth
 
 .. code-block:: cylc
    :caption: flow.cylc
 
+   #!jinja2
    [scheduling]
-       [[dependencies]]
-           graph = hello_{{WORLD}}
+       [[graph]]
+           R1 = hello_{{WORLD}}
 
    [runtime]
        [[hello_{{WORLD}}]]
            script = echo "$GREETING {{WORLD}}"
 
-
-.. _Suite Directory Vs Run Directory:
-
-Suite Directory Vs Run Directory
---------------------------------
-
-:term:`run directory`
-   The directory in which the suite is written. The ``flow.cylc`` and
-   :rose:file:`rose-suite.conf` files live here.
-:term:`run directory`
-   The directory in which the suite runs. The ``work``, ``share`` and ``log``
-   directories live here.
-
-.. ifnotslides::
-
-   Throughout the :ref:`Cylc Tutorial` we wrote suites in the ``cylc-run``
-   directory. As Cylc runs suites in the ``cylc-run`` directory the
-   :term:`run directory` is also the :term:`run directory` i.e. the suite runs
-   in the same directory in which it is written.
-
-   With Rose we develop suites in a separate directory to the one in which they
-   run meaning that the :term:`run directory` is different from the
-   :term:`run directory`. This helps keep the suite separate from its output and
-   means that you can safely work on a suite and its resources whilst it is
-   running.
-
 .. nextslide::
 
-.. ifslides::
-
-   Cylc
-      * :term:`run directory` = ``~/cylc-run/<suite>``
-      * :term:`run directory` = ``~/cylc-run/<suite>``
-   Rose
-      * :term:`run directory` = ``/path/to/<suite>``
-      * :term:`run directory` = ``~/cylc-run/<suite>``
-
-.. note::
-
-   Using Cylc it is possible to separate the :term:`run directory` and
-   :term:`run directory` using the ``cylc register`` command. Note though
-   that suite resources, e.g. scripts in the ``bin/`` directory, will remain
-   in the :term:`run directory` so cannot safely be edited whilst the suite
-   is running.
-
-
-Running Rose Suite Configurations
----------------------------------
+Using a Rose workflow configuration with Cylc 8
+-----------------------------------------------
 
 .. ifnotslides::
 
-   Rose :ref:`Application Configurations <Application Configuration>` are
-   run using :ref:`command-rose-app-run`, Rose Suite Configurations are
-   run using :ref:`command-rose-suite-run`.
+   .. seealso::
 
-   When a suite configuration is run:
+      This section acts to demonstrate how Cylc 8 can be used to install Rose
+      configurations for Cylc workflows. It is not designed to comprehensively
+      explain the usage of Cylc.
 
-.. _rose-suite-run-stages:
+      - :ref:`cylc validate`
+      - :ref:`cylc install`
+      - :ref:`cylc play`
 
-#. The :term:`run directory` is copied into the ``cylc-run`` directory where
-   it becomes the :term:`run directory`.
-#. Any files defined in the :rose:file:`rose-suite.conf` file are installed.
-#. Jinja2 variables defined in the :rose:file:`rose-suite.conf` file are added
-   to the top of the ``flow.cylc`` file.
-#. The Cylc suite is validated.
-#. The Cylc suite is run.
-#. The Cylc GUI is launched.
+   Rose configurations are installed alongside Cylc workflows by
+   :ref:`cylc install`, if a ``rose-suite.conf`` file is present.
 
-.. nextslide::
+.. code-block:: bash
+   :caption: Using a Rose Configuration for a Cylc 8 workflow.
 
-.. _rose-suite-installation-diagram:
-
-.. digraph:: Example
-   :align: center
-
-    graph [rankdir="LR"]
-    node [shape="none"]
-    edge [color="blue"]
-
-    size="7,5"
-    ranksep=0.75
-
-    subgraph cluster_suite_directory {
-        label="Suite Directory"
-        fontsize=17
-        fontname="sanz bold"
-        style="dashed"
-        suite_rc_suite_dir [label="suite.rc"]
-        rose_suite_conf_suite_dir [label="rose-suite.conf"]
-        bin_suite_dir [label="bin/"]
-    }
-
-    subgraph cluster_run_directory {
-        label="Run Directory"
-        fontsize=17
-        fontname="sanz bold"
-        style="dashed"
-        suite_rc_run_dir [label="suite.rc"]
-        rose_suite_conf_run_dir [label="rose-suite.conf"]
-        files_run_dir [label="installed files"]
-        bin_run_dir [label="bin/"]
-        work [label="work/"]
-        share [label="share/"]
-        log [label="log/"]
-    }
-
-    jinja2 [label="Prepend Jinja2",
-            shape="box",
-            fontcolor="blue",
-            color="blue"]
-    install_files [label="Install Files",
-                   shape="box",
-                   fontcolor="blue",
-                   color="blue"]
-
-    suite_rc_suite_dir -> jinja2 -> suite_rc_run_dir
-    rose_suite_conf_suite_dir -> jinja2 [style="dashed", arrowhead="empty"]
-    rose_suite_conf_suite_dir -> rose_suite_conf_run_dir
-    rose_suite_conf_suite_dir -> install_files [style="dashed",
-                                                arrowhead="empty"]
-    install_files -> files_run_dir
-    bin_suite_dir -> bin_run_dir
-
-.. nextslide::
-
-.. ifnotslides::
-
-   Like :ref:`command-rose-app-run`, :ref:`command-rose-suite-run` will look
-   for a configuration to run in the current directory. The command can be run
-   from other locations using the ``-C`` argument::
-
-      rose suite-run -C /path/to/suite/configuration/
-
-   The ``--local-install-only`` command line option will cause the suite
-   to be installed (though only on your local machine, not on any job hosts) and
-   validated but not run (i.e. :ref:`steps 1-4 <rose-suite-run-stages>`).
-
-.. ifslides::
-
-   .. code-block:: bash
-
-      rose suite-run
-      rose suite-run -C /path/to/suite/configuration/
-      rose suite-run --local-install-only
-
-
-Start, Stop, Restart
---------------------
-
-.. ifnotslides::
-
-   Under Rose, suites will run using the name of the suite directory. For
-   instance if you run :ref:`command-rose-suite-run` on a suite in the directory
-   ``~/foo/bar`` then it will run with the name ``bar``.
-
-   The name can be overridden using the ``--name`` option i.e:
-
-.. code-block:: sub
-
-   rose suite-run --name <SUITE_NAME>
-
-.. ifnotslides::
-
-   :ref:`Starting Suites`
-      Suites must be run using the :ref:`command-rose-suite-run` command which
-      in turn calls the ``cylc play`` command.
-   :ref:`Stopping Suites`
-      Suites can be stopped using the ``cylc stop <SUITE_NAME>`` command,
-      as for regular Cylc suites.
-   :ref:`Restarting Suites`
-      There are two options for restarting:
-
-      * To pick up where the suite left off use
-        :ref:`command-rose-suite-restart`.
-        No changes will be made to the run directory. *This is usually the
-        recommended option.*
-      * To restart in a way that picks up changes made in the suite directory,
-        use the ``--restart`` option to the :ref:`command-rose-suite-run`
-        command.
-
-.. ifslides::
-
-   Starting Suites
-      ``rose suite-run`` which in turn calls ``cylc play``
-   Stopping Suites
-      ``cylc stop <SUITE_NAME>``
-   Restarting Suites
-      * ``rose suite-restart`` (just restart)
-      * ``rose suite-run --restart`` (re-install and restart)
-
-See the :ref:`Cheat Sheet` for more information.
-
-.. note::
-
-   :ref:`command-rose-suite-run` installs suites to the run directory
-   incrementally so if you change a file and restart the suite using
-   ``rose suite-run --restart`` only the changed file will be re-installed.
-   This process is strictly constructive i.e. any files deleted in the suite
-   directory will *not* be removed from the run directory. To force
-   :ref:`command-rose-suite-run` to perform a complete rebuild, use the
-   ``--new`` option.
+   # Assuming that the example above was developed in ~/cylc-src/my-workflow
+   cylc validate my-workflow    # Checks that the workflow + configuration are valid
+   cylc install my-workflow     # Installs workflow to ~/cylc-run/my-workflow
+   cylc play my-workflow        # Plays the workflow.
+   cylc config my-workflow      # Look at the workflow with template vars filled in.
 
 .. nextslide::
 
@@ -283,11 +137,6 @@ See the :ref:`Cheat Sheet` for more information.
    .. rubric:: In this tutorial we will create a Rose Suite Configuration for
       the
       :ref:`weather-forecasting suite<tutorial-datetime-cycling-practical>`.
-
-   Next Steps:
-
-   * Read through the :ref:`Cheat Sheet`
-
 
 .. _suites-practical:
 
@@ -302,8 +151,13 @@ See the :ref:`Cheat Sheet` for more information.
       Create a copy of the :ref:`weather-forecasting suite
       <tutorial-cylc-runtime-forecasting-workflow>` by running::
 
-         rose tutorial rose-suite-tutorial ~/rose-tutorial/rose-suite-tutorial
-         cd ~/rose-tutorial/rose-suite-tutorial
+         rose tutorial rose-suite-tutorial ~/cylc-src/rose-suite-tutorial
+         cd ~/cylc-src/rose-suite-tutorial
+
+      .. tip::
+
+         If you haven't ever used Cylc 8 you may need to create the
+         :ref:`cylc source` directory. (``mkdir ~/cylc-src``)
 
    #. **Create A Rose Suite Configuration.**
 
@@ -312,8 +166,7 @@ See the :ref:`Cheat Sheet` for more information.
          touch rose-suite.conf
 
       You now have a Rose suite configuration. A :rose:file:`rose-suite.conf`
-      file does not need to have anything in it but it is required to run
-      :ref:`command-rose-suite-run`.
+      file does not need to have anything in it.
 
       There are three things defined in the ``flow.cylc`` file which it might be
       useful to be able to configure:
@@ -330,14 +183,25 @@ See the :ref:`Cheat Sheet` for more information.
 
       .. code-block:: rose
 
-         [jinja2:suite.rc]
+         [template variables]
          station="camborne", "heathrow", "shetland", "belmullet"
 
          [env]
          RESOLUTION=0.2
          DOMAIN=-12,48,5,61
 
-      Note that `Jinja2`_ strings must be quoted.
+      Note that template variable strings must be quoted.
+
+   #. **Tell the workflow what language to use when templating**
+
+      Add a hashbang line to the flow.cylc file to tell it to use Jinja2 to
+      process template variables:
+
+      .. code-block:: diff
+
+         + #!jinja2
+         [cylc]
+             UTC mode = True
 
    #. **Write Suite Metadata.**
 
@@ -358,7 +222,7 @@ See the :ref:`Cheat Sheet` for more information.
 
          .. code-block:: rose
 
-            [jinja2:suite.rc=station]
+            [template variables=station]
             length=:
 
             [env=RESOLUTION]
@@ -374,7 +238,7 @@ See the :ref:`Cheat Sheet` for more information.
 
       Open the :ref:`command-rose-config-edit` GUI. You should see
       :guilabel:`suite conf` in the panel on the left-hand side of the window.
-      This will contain the environment and Jinja2 variables we have just
+      This will contain the environment and template variables we have just
       defined.
 
    #. **Use Suite Variables In The** ``flow.cylc`` **File.**
@@ -414,11 +278,14 @@ See the :ref:`Cheat Sheet` for more information.
    #. **Install The Suite.**
 
 
-      This suite is not ready to run yet but you can install it: Use the
-      ``--local-install-only`` command-line option to install the suite on
-      your local machine and validate it::
+      This workflow is not ready to play yet but you can check that it is
+      valid with :ref:`cylc validate` -
 
-         rose suite-run --local-install-only
+         cylc validate rose-suite-tutorial
+
+      You can then install the workflow with :ref:`cylc install` -
+
+         cylc install rose-suite-tutorial
 
       Inspect the installed suite, which you will find in
       the :term:`run directory`, i.e::
@@ -435,11 +302,11 @@ Rose Applications In Rose Suite Configurations
 
 .. ifnotslides::
 
-   In Cylc suites, Rose applications are placed in an ``app/`` directory which
+   In Cylc workflows, Rose applications are placed in an ``app/`` directory which
    is copied across to the :term:`run directory` with the rest of the suite by
-   :ref:`command-rose-suite-run` when the suite configuration is run.
+   :ref:`cylc install` when the suite configuration is run.
 
-   When we run Rose applications from within Cylc suites we use the
+   When we run Rose applications from within Cylc workflows we use the
    :ref:`command-rose-task-run` command rather than the
    :ref:`command-rose-app-run` command.
 
