@@ -203,9 +203,6 @@ Next Steps
    :ref:`Rose Further Topics`
       Tutorials going over some of the more specific aspects of Rose not
       covered in the main tutorial.
-   :ref:`Cheat Sheet`
-      A quick breakdown of the commands for running
-      and interacting with suites using Cylc and Rose.
    :ref:`Command Reference`
       Contains the command-line documentation
       (also obtainable by calling ``rose --help``).
