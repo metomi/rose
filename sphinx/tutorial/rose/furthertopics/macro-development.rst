@@ -90,16 +90,24 @@ Open ``planet.py`` in a text editor and paste in the following code:
 
 .. code-block:: python
 
-   #!/usr/bin/env python2
-   # -*- coding: utf-8 -*-
+   """
+   Rose validator macro for "planet".
 
+   Designed to be compatible with both Python 2 and 3 so that the Rose 2 macro
+   command will work, and so will the Rose 1 GUI.
+   """
    import re
    import subprocess
 
-   import metomi.rose.macro
+   try:
+       from metomi.rose.macro import MacroBase
+       PY_3 = True
+   except ImportError:
+       from rose.macro import MacroBase
+       PY_3 = False
 
 
-   class PlanetChecker(rose.macro.MacroBase):
+   class PlanetChecker(MacroBase):
 
        """Checks option values that refer to planets."""
 
@@ -146,6 +154,8 @@ Now add the method ``_get_allowed_planets`` to the class:
                       "http://www.heavens-above.com/planetsummary.aspx"]
        p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
        text = p.communicate()[0]
+       if ROSEV == 2:
+           text = text.decode()
        planets = re.findall("(\w+)</td>",
                             re.sub('(?s)^.*(tablehead.*?ascension).*$',
                                    r"\1", text))
@@ -171,7 +181,7 @@ at the top of the class, like this:
 
 .. code-block:: python
 
-   class PlanetChecker(rose.macro.MacroBase):
+   class PlanetChecker(MacroBase):
 
        """Checks option values that refer to planets."""
 
@@ -207,16 +217,24 @@ Your final macro should look like this:
 
 .. code-block:: python
 
-   #!/usr/bin/env python2
-   # -*- coding: utf-8 -*-
+   """
+   Rose validator macro for "planet".
 
+   Designed to be compatible with both Python 2 and 3 so that the Rose 2 macro
+   command will work, and so will the Rose 1 GUI.
+   """
    import re
    import subprocess
 
-   import metomi.rose.macro
+   try:
+       from metomi.rose.macro import MacroBase
+       PY_3 = True
+   except ImportError:
+       from rose.macro import MacroBase
+       PY_3 = False
 
 
-   class PlanetChecker(rose.macro.MacroBase):
+   class PlanetChecker(MacroBase):
 
        """Checks option values that refer to planets."""
 
@@ -240,6 +258,8 @@ Your final macro should look like this:
                           "http://www.heavens-above.com/planetsummary.aspx"]
            p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
            text = p.communicate()[0]
+           if PY_3:
+               text = text.decode()
            planets = re.findall("(\w+)</td>",
                                 re.sub(r'(?s)^.*(<thead.*?ascension).*$',
                                        r"\1", text))
@@ -259,41 +279,17 @@ Results
 
 Your validator macro is now ready to use.
 
-Run the config editor with the command::
+Modify the top level ``rose-app.conf`` such that ``WORLD=Jupiter``.
 
-   rose edit
+Run your macro from the command line::
 
-in the application directory. Navigate to the ``env`` page, and
-change the option ``env=WORLD`` to ``Jupiter``.
-
-To run the macro, select the menu
-:menuselection:`Metadata --> macro_tutorial_app -->
-planet.PlanetChecker.validate`.
-
-It should either return an "OK" dialog, or give an error dialog
-like the one below depending on the current Earth-Jupiter distance.
-
-.. image:: img/rose-macro-tutorial-app-fail.png
-   :width: 350px
-   :align: center
-   :alt: Screenshot of a Rose macro failure message.
-
-If there is an error, the variable should display an error icon on
-the ``env`` page, which you can hover-over to get the error text as in
-the screenshot below. You can remove the error by fixing the value and
-re-running your macro.
-
-.. image:: img/rose-edit-macro-fail.png
-   :width: 450px
-   :align: center
-   :alt: Screenshot of setting with an error detected by a Rose macro.
+   rose macro planet.PlanetChecker
 
 Try changing the value of ``env=WORLD`` to other solar system planets
 and re-running the macro.
 
-You can also run your macro from the command line::
-
-   rose macro planet.PlanetChecker
+Try changing the value of ``env=WORLD`` to other solar system planets
+and re-running the macro.
 
 Transformer Macro
 ^^^^^^^^^^^^^^^^^
@@ -305,7 +301,7 @@ Open ``planet.py`` in a text editor and append the following code:
 
 .. code-block:: python
 
-   class PlanetChanger(rose.macro.MacroBase):
+   class PlanetChanger(MacroBase):
 
        """Switch between planets."""
 
@@ -351,7 +347,7 @@ with:
        new_planet = self.planets[0]
    else:
        new_planet = self.planets[(index + 1) % len(self.planets)]
-   config.set([section, option], new_planet)   
+   config.set([section, option], new_planet)
 
 This changes the option ``env=WORLD`` to the next planet on the list.
 It will set it to the first planet on the list if it is something else.
@@ -380,7 +376,7 @@ Your class should now look like this:
 
 .. code-block:: python
 
-   class PlanetChanger(rose.macro.MacroBase):
+   class PlanetChanger(MacroBase):
 
        """Switch between planets."""
 
@@ -409,17 +405,7 @@ Your class should now look like this:
 
 Your transform macro is now ready to use.
 
-You can run it from :ref:`command-rose-config-edit` via the menu
-:menuselection:`metadata --> macro_tutorial_app --> planet.PlanetChanger.transform`.
-
-It should give a dialog explaining the changes it's made and asking
-for permission to apply them. If you click OK, the changes will be
-applied and the value of ``env=WORLD`` will be changed. You can Undo
-and Redo macro changes.
-
-Try running the macro once or twice more to see it change the configuration.
-
-You can also run your macro from the command line in the application
+You can run your macro from the command line in the application
 directory by invoking ``rose macro planet.PlanetChanger``.
 
 Reporter Macro
@@ -436,7 +422,7 @@ Open ``planet.py`` and paste in this text:
 
 .. code-block:: python
 
-   class PlanetReporter(rose.macro.MacroBase):
+   class PlanetReporter(MacroBase):
 
        """Creates a report on the value of env=WORLD."""
 
@@ -472,6 +458,8 @@ Open ``planet.py`` and paste in this text:
                           "http://www.heavens-above.com/planetsummary.aspx"]
            p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
            text = p.communicate()[0]
+           if PY_3:
+               text = text.decode()
            planets = re.findall("(\w+)</td>",
                                 re.sub(r'(?s)^.*(<thead.*?ascension).*$',
                                        r"\1", text))

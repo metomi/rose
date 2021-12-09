@@ -102,7 +102,7 @@ Let's add some trigger information.
 In the :rose:file:`rose-meta.conf` file, under
 ``[namelist:pizza_order=pizza_type]``, add:
 
-.. code-block:: cylc
+.. code-block:: rose
 
    trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
            namelist:pizza_order=pepperoni_multiple: 'Pepperoni', 'BBQ Chicken';
@@ -116,7 +116,7 @@ one value of ``pizza_type``.
 We should also make sure we don't order over our budget, especially
 by splashing out on truffles. Add the following to ``[env=BUDGET]``:
 
-.. code-block:: cylc
+.. code-block:: rose
 
    trigger=namelist:pizza_order=truffle: this > 25;
            namelist:side_order: this >= 10;
@@ -197,7 +197,7 @@ be relevant when ``namelist:pizza_order=no_mushrooms`` is ``.false.``.
 Open the metadata file in a text editor, and add the following to the
 ``[namelist:pizza_order=no_mushrooms]`` metadata section:
 
-.. code-block:: cylc
+.. code-block:: rose
 
    trigger=namelist:pizza_order=truffle: .false.
 
@@ -219,7 +219,7 @@ act in a cascade - A triggers B triggers C.
 
 We can see this by replacing the ``env=BUDGET`` trigger with:
 
-.. code-block:: cylc
+.. code-block:: rose
 
    trigger=namelist:pizza_order=truffle: this > 25;
            namelist:side_order: this >= 10;
@@ -234,7 +234,7 @@ We need to add ``no_mushrooms`` to the ``[namelist:pizza_order=pizza_type]``
 section so that it is ``trigger-ignored`` when no pizza can be ordered -
 replace the ``[namelist:pizza_order=pizza_type]`` trigger with:
 
-.. code-block:: cylc
+.. code-block:: rose
 
    trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
            namelist:pizza_order=pepperoni_multiple: 'Pepperoni', 'BBQ Chicken';
@@ -261,7 +261,7 @@ the syntax. Let's add an option that we can use.
 Add a new variable in the metadata by adding these lines to the metadata
 file:
 
-.. code-block:: cylc
+.. code-block:: rose
 
    [namelist:pizza_order=dip_type]
    values='Garlic','Sour Cream','Salsa','Brown Sauce','Mustard'
@@ -269,7 +269,7 @@ file:
 We should add a trigger expression as well - replace the
 ``[namelist:pizza_order=pizza_type]`` trigger with:
 
-.. code-block:: cylc
+.. code-block:: rose
 
    trigger=namelist:pizza_order=extra_chicken: 'BBQ Chicken';
            namelist:pizza_order=pepperoni_multiple: 'Pepperoni', 'BBQ Chicken';

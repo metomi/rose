@@ -222,17 +222,17 @@ Rose Environment Variables
 .. envvar:: ROSE_ORIG_HOST
 
    Description
-      The name of the host where the :ref:`command-rose-suite-run` command was
+      The name of the host where the :ref:`Cylc Rose` and :ref:`cylc install <Install-Workflow>`. command was
       invoked.
    Provided By
-      * :ref:`command-rose-suite-run`
+      * :ref:`Cylc Rose` and :ref:`cylc install <Install-Workflow>`.
 
 .. envvar:: ROSE_SITE
 
    Description
       The value of :rose:conf:`rose.conf|site` setting.
    Provided By
-      * :ref:`command-rose-suite-run`
+      * :ref:`Cylc Rose` and :ref:`cylc install <Install-Workflow>`.
 
 .. envvar:: ROSE_SUITE_DIR
 
@@ -263,7 +263,7 @@ Rose Environment Variables
       denote an optional configuration that can be missing. The configurations
       are applied in first-to-last order.
    Used By
-      * :ref:`command-rose-suite-run`
+      * :ref:`Cylc Rose` and :ref:`cylc install <Install-Workflow>`.
 
 .. envvar:: ROSE_TASK_APP
 
@@ -365,4 +365,4 @@ Rose Environment Variables
       The current version of Rose.
    Used and Provided By
       * ``rose``
-      * :ref:`command-rose-suite-run`
+      * :ref:`Cylc Rose` and :ref:`cylc install <Install-Workflow>`.
