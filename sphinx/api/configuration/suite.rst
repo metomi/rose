@@ -67,9 +67,21 @@ A suite directory may contain the following:
          run must match the specified version.
 
       .. rose:conf:: CYLC_VERSION=CYLC_VERSION_NUMBER
-         
+
          If specified for a Cylc suite, the Rose suite runner
          will attempt to use this version of cylc.
+
+   .. rose:conf:: template variables
+
+      .. rose:conf:: KEY=VALUE
+
+         Define a variable ``KEY`` with the value ``VALUE`` for use
+         in the ``flow.cylc`` file.
+
+         The assignment will be inserted after the hashbang line of the
+         installed ``flow.cylc`` file.
+
+         .. versionadded:: 2.0.0
 
    .. rose:conf:: jinja2:suite.rc
 
@@ -81,6 +93,11 @@ A suite directory may contain the following:
          The assignment will be inserted after the ``#!jinja2`` line of the
          installed ``flow.cylc`` file.
 
+         .. versionchanged:: 2.0.0
+
+            :rose:conf:`rose-suite.conf[template variables]`
+            are preferred at Rose 2.
+
    .. rose:conf:: empy:suite.rc
 
       .. rose:conf:: KEY=VALUE
@@ -90,6 +107,10 @@ A suite directory may contain the following:
 
          The assignment will be inserted after the ``#!empy`` line of the
          installed ``flow.cylc`` file.
+
+         .. versionchanged:: 2.0.0
+
+            :rose:conf:`rose-suite.conf[template variables]`
 
    .. rose:conf:: [file:NAME]
 
