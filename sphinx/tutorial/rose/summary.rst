@@ -33,7 +33,7 @@ So far we have covered:
     edge [style="invis"]
 
     subgraph cluster_1 {
-        label = "Cylc Suite"
+        label = "Cylc Workflow"
         fontsize = "20"
         fontcolor = "#5050aa"
         labelloc = "r"
@@ -64,7 +64,7 @@ So far we have covered:
 
 .. ifnotslides::
 
-   Cylc suites can have Rose applications. These are stored in an ``app``
+   Cylc workflows can have Rose applications. These are stored in an ``app``
    directory and are configured using a :rose:file:`rose-app.conf` file.
 
 .. ifslides::
@@ -117,43 +117,6 @@ Suite Commands
 
 .. nextslide::
 
-.. rubric:: We have learned the following Rose commands:
-
-.. ifnotslides::
-
-   :ref:`command-rose-app-run`
-      Runs a Rose application.
-   :ref:`command-rose-task-run`
-      Runs a Rose application from within a Cylc suite.
-   :ref:`command-rose-suite-run`
-      Runs a Rose suite.
-   :ref:`command-rose-suite-restart`
-      Runs a Rose suite, picking up where it left off from the previous run.
-
-.. ifslides::
-
-   * :ref:`command-rose-app-run`
-   * :ref:`command-rose-task-run`
-   * :ref:`command-rose-suite-run`
-   * :ref:`command-rose-suite-restart`
-
-.. nextslide::
-
-.. ifnotslides::
-
-   The Cylc commands do not know about the :rose:file:`rose-suite.conf` file
-   so for Rose suite configurations you will have to install the suite before
-   using commands such as ``cylc graph``, e.g:
-
-.. code-block:: sub
-
-   # install the suite on the local host only - don't run it.
-   rose suite-run --local-install-only
-
-   # run cylc graph using the installed version of the suite.
-   cylc graph <name>
-
-
 Rose Utilities
 --------------
 
@@ -176,38 +139,6 @@ Rose contains some utilities to make life easier:
       See the :ref:`date-time tutorial <rose-tutorial-datetime-manipulation>`
       for more information.
 
-   :ref:`command-rose-host-select`
-      A utility for selecting a host from a group with the ability to rank
-      choices based on server load or free memory.
-      
-      Groups are configured using the
-      :rose:conf:`rose.conf[rose-host-select]group{NAME}` setting.
-      For example to define a cluster called "mycluster" containing the hosts
-      "computer1", "computer2" and "computer3", you would write:
-
-      .. code-block:: rose
-
-         [rose-host-select]
-         group{mycluster}=computer1 computer2 computer3
-
-      Hosts can then be selected from the cluster on the command line:
-
-      .. code-block:: console
-
-         $ rose host-select mycluster
-         computer2
-
-      The :ref:`command-rose-host-select` command can by used within Cylc suites
-      to determine which host a task runs on:
-
-      .. code-block:: cylc
-
-         [runtime]
-             [[foo]]
-                 script = echo "Hello $(hostname)!"
-                 [[[remote]]]
-                     host = rose host-select mycluster
-
 .. ifslides::
 
    ``rose date``
@@ -219,14 +150,6 @@ Rose contains some utilities to make life easier:
 
       $ rose date $CYLC_TASK_CYCLE_POINT --format 'The month is %B.'
       The month is April.
-
-   ``rose host-select``
-
-   .. code-block:: console
-
-      $ rose host-select mycluster
-      computer2
-
 
 Rose Built-In Applications
 --------------------------
