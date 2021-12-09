@@ -117,6 +117,20 @@ Suite Commands
 
 .. nextslide::
 
+.. rubric:: We have learned the following Rose commands:
+
+.. ifnotslides::
+
+   :ref:`command-rose-app-run`
+      Runs a Rose application.
+   :ref:`command-rose-task-run`
+      Runs a Rose application from within a Cylc suite.
+
+.. ifslides::
+
+   * :ref:`command-rose-app-run`
+   * :ref:`command-rose-task-run`
+
 Rose Utilities
 --------------
 
