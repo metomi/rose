@@ -21,7 +21,7 @@ Rose Configurations for Workflows
       8.0.0 (/path/to/install)
 
       Plugins:
-            cylc-rose       1.0.0   /net/home/h02/tpilling/metomi/cylc-rose
+            cylc-rose       1.0.0   ~/cylc-rose
       ...
 
 :term:`Rose application configurations <Rose application configuration>`
