@@ -216,7 +216,6 @@ Next Steps
 .. ifslides::
 
    * :ref:`Rose Further Topics`
-   * :ref:`Cheat Sheet`
    * :ref:`Command Reference`
    * :ref:`Rose Configuration <rose-configuration>`
    * `Cylc Suite Design Guide`_
