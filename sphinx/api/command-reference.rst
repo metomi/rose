@@ -28,7 +28,7 @@ rose config-edit
 rose suite-run
 ^^^^^^^^^^^^^^
 
-This command has been replaced by ``cylc install ; cylc play``.
+This command has been replaced by ``cylc install; cylc validate ; cylc play``.
 
 .. TODO: This is here to allow the documentation tests to pass
 

@@ -111,6 +111,7 @@ A suite directory may contain the following:
          .. versionchanged:: 2.0.0
 
             :rose:conf:`rose-suite.conf[template variables]`
+            are preferred at Rose 2.
 
    .. rose:conf:: [file:NAME]
 
@@ -131,7 +132,7 @@ A suite directory may contain the following:
 .. rose:file:: rose-suite.info
 
    The suite information file :rose:file:`rose-suite.info` should contain the
-   information on identify and the purpose of the suite. It has no sections,
+   information on the identity and the purpose of the suite. It has no sections,
    only ``KEY=VALUE`` pairs. The ``owner``, ``project`` and ``title`` settings
    are compulsory. Otherwise, any ``KEY=VALUE`` pairs can appear in this
    file. If the name of a ``KEY`` ends with ``-list``, the value is expected
