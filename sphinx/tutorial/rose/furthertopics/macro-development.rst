@@ -95,7 +95,12 @@ Open ``planet.py`` in a text editor and paste in the following code:
    import re
    import subprocess
 
-   from metomi.rose.macro import MacroBase
+   try:
+       from metomi.rose.macro import MacroBase
+       ROSEV = 2
+   except ImportError:
+       from rose.macro import MacroBase
+       ROSEV = 1
 
 
    class PlanetChecker(MacroBase):
@@ -144,7 +149,9 @@ Now add the method ``_get_allowed_planets`` to the class:
        cmd_strings = ["curl", "-s",
                       "http://www.heavens-above.com/planetsummary.aspx"]
        p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
-       text = p.communicate()[0].decode()
+       text = p.communicate()[0]
+       if ROSEV == 2:
+           text = text.decode()
        planets = re.findall("(\w+)</td>",
                             re.sub('(?s)^.*(tablehead.*?ascension).*$',
                                    r"\1", text))
@@ -211,7 +218,12 @@ Your final macro should look like this:
    import re
    import subprocess
 
-   from metomi.rose.macro import MacroBase
+   try:
+       from metomi.rose.macro import MacroBase
+       ROSEV = 2
+   except ImportError:
+       from rose.macro import MacroBase
+       ROSEV = 1
 
 
    class PlanetChecker(MacroBase):
@@ -237,7 +249,9 @@ Your final macro should look like this:
            cmd_strings = ["curl", "-s",
                           "http://www.heavens-above.com/planetsummary.aspx"]
            p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
-           text = p.communicate()[0].decode()
+           text = p.communicate()[0]
+           if ROSEV == 2:
+               text = text.decode()
            planets = re.findall("(\w+)</td>",
                                 re.sub(r'(?s)^.*(<thead.*?ascension).*$',
                                        r"\1", text))
@@ -430,6 +444,8 @@ Open ``planet.py`` and paste in this text:
                           "http://www.heavens-above.com/planetsummary.aspx"]
            p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
            text = p.communicate()[0]
+           if ROSEV == 2:
+               text = text.decode()
            planets = re.findall("(\w+)</td>",
                                 re.sub(r'(?s)^.*(<thead.*?ascension).*$',
                                        r"\1", text))
