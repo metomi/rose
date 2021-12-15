@@ -182,7 +182,8 @@ def main():
     """Implement rose date."""
     if sys.stdin.isatty():
         print(
-            'WARNING: "rose date" is depreacted, use the "isodatetime" command.',
+            'WARNING: "rose date" is depreacted, use the "isodatetime" '
+            'command.',
             file=sys.stderr
         )
 
