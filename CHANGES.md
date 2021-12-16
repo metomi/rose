@@ -19,7 +19,7 @@ infrastructure.
 [#2514](https://github.com/metomi/rose/pull/2514) -
 Remove `rosa rpmbuild` tool.
 
-[#22531](https://github.com/metomi/rose/pull/2531) -
+[#2531](https://github.com/metomi/rose/pull/2531) -
 Rosie Graph disabled.
 
 [#2519](https://github.com/metomi/rose/pull/2519) -
