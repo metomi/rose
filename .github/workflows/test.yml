@@ -87,7 +87,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y shellcheck sqlite3 at
-          sudo apt install python3-pygraphviz
+          sudo apt install gcc
 
       - name: Install Rose
         working-directory: rose
