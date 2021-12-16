@@ -4,14 +4,14 @@
 
 .. _tutorial-rose-suites:
 
-Rose Configurations for Workflows
-=================================
+Rose Suite Configurations
+=========================
 
 .. note::
 
    The following documentation reflects installing and running a Cylc
-   workflow, and assumes that you have Cylc and the
-   cylc-rose plugin installed.
+   workflow, and assumes that you have `Cylc`_ and the
+   `Cylc Rose`_ plugin installed.
 
    To check:
 
@@ -51,10 +51,6 @@ A Rose suite configuration is a Cylc :term:`source directory` containing a
       Environment variables for use by the whole suite.
    :rose:conf:`rose-suite.conf[template variables]`
       Generic variables for use in the ``flow.cylc`` file.
-   :rose:conf:`rose-suite.conf[jinja2:suite.rc]`
-      `Jinja2`_ variables for use in the ``flow.cylc`` file.
-   :rose:conf:`rose-suite.conf[empy:suite.rc]`
-      `EmPy`_ variables for use in the ``flow.cylc`` file.
    :rose:conf:`rose-suite.conf[file:NAME]`
       Files and resources to be installed in the :term:`run directory` when the
       suite is run.
@@ -65,6 +61,11 @@ A Rose suite configuration is a Cylc :term:`source directory` containing a
       section is the recommended way of working. Cylc will select a templating
       language based on the hashbang line at the start of the the ``flow.cylc``
       file if you use :rose:conf:`rose-suite.conf[template variables]`.
+
+      At Rose 1/Cylc 7 these variables were instead set in sections called
+      :rose:conf:`rose-suite.conf[jinja2:suite.rc]` and
+      :rose:conf:`rose-suite.conf[empy:suite.rc]`. These are supported to
+      ease the transition to Rose 2, but should not be used for new suites.
 
 .. ifslides::
 
@@ -125,7 +126,7 @@ Using a Rose workflow configuration with Cylc 8
    :caption: Using a Rose Configuration for a Cylc 8 workflow.
 
    # Assuming that the example above was developed in ~/cylc-src/my-workflow
-   cylc validate my-workflow    # Checks that the workflow + configuration are valid
+   cylc validate my-workflow    # Checks that the workflow configuration is valid
    cylc install my-workflow     # Installs workflow to ~/cylc-run/my-workflow
    cylc play my-workflow        # Plays the workflow.
    cylc config my-workflow      # Look at the workflow with template vars filled in.
