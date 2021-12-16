@@ -57,6 +57,7 @@ INSTALL_REQUIRES = [
     # Tornado 6.
     # "tornado",
     'psutil>=5.6.0',
+    'pygraphviz',
 ]
 EXTRAS_REQUIRE = {
     'docs': [
