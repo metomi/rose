@@ -84,6 +84,8 @@ DEAD_ENDS = {
         'Rosie Disco has been disabled pending fixes at a later release.',
     ('rosie', 'go'):
         'This command has been removed pending re-implementation',
+    ('rosie', 'graph'):
+        'This command has been removed pending re-implementation',
 }
 
 
