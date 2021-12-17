@@ -10,7 +10,7 @@ updated. Only the first match gets replaced, so it's fine to leave the old
 ones in. -->
 --------------------------------------------------------------------------------
 
-## 2.0b2 (<span actions:bind='release-date'></span>)
+## 2.0rc1 (<span actions:bind='release-date'></span>)
 
 [#2510](https://github.com/metomi/rose/pull/2510) -
 Re-enable Rosie ID to work with Cylc 8 Version control recording
