@@ -181,7 +181,7 @@ from metomi.isodatetime.main import main as iso_main
 def main():
     """Implement rose date."""
     print(
-        'WARNING: "rose date" is depreacted, use the "isodatetime"'
+        'WARNING: "rose date" is deprecated, use the "isodatetime"'
         ' command.',
         file=sys.stderr
     )
