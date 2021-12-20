@@ -34,8 +34,6 @@ Rose prune.
 Rose Date only emits a warning if running in interactive mode.
 
 
-
-
 -------------------------------------------------------------------------------
 
 ## 2.0b3 (<span actions:bind='release-date'>Released 2021-11-10</span>)
