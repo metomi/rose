@@ -222,7 +222,7 @@ Rose Environment Variables
 .. envvar:: ROSE_ORIG_HOST
 
    Description
-      The name of the host where the :ref:`Cylc Rose` and :ref:`cylc install <Install-Workflow>`. command was
+      The name of the host where the :ref:`cylc install <Install-Workflow>` command was
       invoked.
    Provided By
       * :ref:`Cylc Rose` and :ref:`cylc install <Install-Workflow>`.

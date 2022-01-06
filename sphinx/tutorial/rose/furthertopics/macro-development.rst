@@ -154,7 +154,7 @@ Now add the method ``_get_allowed_planets`` to the class:
                       "http://www.heavens-above.com/planetsummary.aspx"]
        p = subprocess.Popen(cmd_strings, stdout=subprocess.PIPE)
        text = p.communicate()[0]
-       if ROSEV == 2:
+       if PY_3:
            text = text.decode()
        planets = re.findall("(\w+)</td>",
                             re.sub('(?s)^.*(tablehead.*?ascension).*$',
@@ -284,9 +284,6 @@ Modify the top level ``rose-app.conf`` such that ``WORLD=Jupiter``.
 Run your macro from the command line::
 
    rose macro planet.PlanetChecker
-
-Try changing the value of ``env=WORLD`` to other solar system planets
-and re-running the macro.
 
 Try changing the value of ``env=WORLD`` to other solar system planets
 and re-running the macro.
