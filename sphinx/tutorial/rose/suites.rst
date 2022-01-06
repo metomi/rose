@@ -269,12 +269,12 @@ Using a Rose workflow configuration with Cylc 8
 
           [scheduler]
               UTC mode = True
-              [[parameters]]
-                  # A list of the weather stations we will be fetching observations from.
-         -        station = camborne, heathrow, shetland, belmullet
-         +        station = {{ station | join(", ") }}
-                  # A list of the sites we will be generating forecasts for.
-                  site = exeter
+          [task parameters]
+             # A list of the weather stations we will be fetching observations from.
+         -   station = camborne, heathrow, shetland, belmullet
+         +   station = {{ station | join(", ") }}
+             # A list of the sites we will be generating forecasts for.
+             site = exeter
 
    #. **Install The Suite.**
 
