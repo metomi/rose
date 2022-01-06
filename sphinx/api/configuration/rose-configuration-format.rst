@@ -33,11 +33,11 @@ We have added the following conventions into the Rose configuration format:
      with a setting will re-appear before the setting when the file is
      re-dumped.
 
-#. Only the equal sign ``=`` is used to delimit a key-value pair - because the 
+#. Only the equal sign ``=`` is used to delimit a key-value pair - because the
    colon ``:`` may be used in keys of namelist declarations.
-#. A key-value pair declaration does not have to live under a section 
+#. A key-value pair declaration does not have to live under a section
    declaration. Such a declaration lives directly under the *root* level.
-#. Key-value pair declarations following a line with only ``[]`` are placed 
+#. Key-value pair declarations following a line with only ``[]`` are placed
    directly under the root level.
 #. Declarations are case sensitive. When dealing with case-insensitive
    inputs such as Fortran logicals or numbers in scientific notation,
@@ -48,7 +48,7 @@ We have added the following conventions into the Rose configuration format:
    * Each line is stripped of leading and trailing spaces.
    * A newline ``\n`` character is prefixed to each continuation line.
    * If a continuation line has a leading equal sign ``=`` character, it is
-     stripped from the line. This is useful for retaining leading white 
+     stripped from the line. This is useful for retaining leading white
      spaces in a continuation line.
 
 #. A single exclamation ``!`` or a double exclamation ``!!`` in front of a
@@ -163,7 +163,7 @@ run time program to load the relevant optional configurations in the ``opt/``
 sub-directory at run time. Individual Rose utilities may also read optional
 configuration keys from environment variables and/or command line options.
 
-Where multiple ``$KEY`` settings are given, the optional configurations are 
+Where multiple ``$KEY`` settings are given, the optional configurations are
 applied in that order - for example, a setting:
 
 .. code-block:: rose
@@ -184,7 +184,7 @@ then the optional configuration file is allowed to be missing. E.g.:
 
 In the above example, ``rose-app-mayonnaise.conf`` can be missing.
 
-Some Rose utilities (e.g. :ref:`command-rose-suite-run`,
+Some Rose utilities (e.g.
 :ref:`command-rose-task-run`, :ref:`command-rose-app-run`, etc) allow
 optional configurations to be selected at run time using:
 
@@ -240,7 +240,7 @@ so on) and inherit configuration and files from them if found.
 Re-define Configuration at Run Time
 -----------------------------------
 
-Some Rose utilities (e.g. :ref:`command-rose-suite-run`,
+Some Rose utilities (e.g.
 :ref:`command-rose-task-run`, :ref:`command-rose-app-run`, etc) allow you
 to re-define configuration settings at run time using the
 ``--define=[SECTION]NAME=VALUE`` or ``-D [SECTION]NAME=VALUE`` options on

@@ -48,7 +48,7 @@ in your ``flow.cylc``:
 
    [scheduling]
       # ...
-      [[dependencies]]
+      [[graph]]
           P1 = """
           all => the => tasks => rose_arch_archive
           """

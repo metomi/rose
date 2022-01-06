@@ -6,7 +6,7 @@ Optional Configurations
 Optional configurations are configuration files which can add or overwrite
 the default configuration. They can be used with :ref:`command-rose-app-run`
 for :term:`Rose application configurations <Rose application configuration>`
-and :ref:`command-rose-suite-run` for
+and :ref:`cylc install <Install-Workflow>` for
 :term:`Rose suite configurations <Rose suite configuration>`.
 
 
@@ -188,9 +188,9 @@ configurations.
 
 * Suites can have optional configurations that override
   :rose:file:`rose-suite.conf` settings, controlled through
-  :ref:`command-rose-suite-run`. Optional suite configurations
+  :ref:`Cylc install <Install-Workflow>`. Optional configurations
   can be used either using the ``--opt-conf-key`` option with
-  :ref:`command-rose-suite-run` or the :envvar:`ROSE_SUITE_OPT_CONF_KEYS`
+  :ref:`Cylc install <Install-Workflow>` or the :envvar:`ROSE_SUITE_OPT_CONF_KEYS`
   environment variable.
 * Metadata configurations can also have optional configurations, typically
   included via the :rose:conf:`rose-app.conf|opts` top-level setting.
