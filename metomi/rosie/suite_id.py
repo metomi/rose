@@ -24,7 +24,7 @@ Functions:
     main - CLI interface function.
 
 """
-from ast import literal_eval
+import json
 import os
 from pathlib import Path
 import re
@@ -32,6 +32,7 @@ import shlex
 import string
 import sys
 import traceback
+from typing import Optional
 import xml.parsers.expat
 
 import metomi.rose.env
@@ -118,7 +119,7 @@ class SuiteId:
     REC_IDX = re.compile(r"\A(?:(\w+)-)?(\w+)(?:/([^\@/]+))?(?:@([^\@/]+))?\Z")
     BRANCH_TRUNK = "trunk"
     REV_HEAD = "HEAD"
-    VC_FILENAME = "log/version/vcs.conf"
+    VC_FILENAME = "log/version/vcs.json"
     svn = SvnCaller()
 
     STATUS_CR = "X"
@@ -435,46 +436,22 @@ class SuiteId:
         return None
 
     @staticmethod
-    def _parse_cylc_vc_file(fpath):
+    def _parse_cylc_vc_file(fpath: str) -> Optional[str]:
         """Take a path to a Cylc VC file and returns an svn URL.
 
         Args:
             fpath: Location of Cylc Version Control log file.
 
-        Returns: SVN location, or None
-
-        Examples:
-            >>> class MockFpath():
-            ...     def read_text(self):
-            ...         return (
-            ...             'version control system="svn"\\n'
-            ...             'url="/a/b/c"\\n'
-            ...             'revision="4242"'
-            ...         )
-            >>> mypath = MockFpath()
-            >>> SuiteId.parse_cylc_vc_file(mypath)
-            '/a/b/c@4242'
+        Returns: SVN location, e.g. '/a/b/c@4242', or None if not SVN repo.
         """
-        location = None
-        vcsystem = None
-        url = None
-        rev = None
-        for line in fpath.read_text().split('\n'):
-            line = line.strip()
-            if vcsystem is None:
-                if line.startswith("version control system"):
-                    vcsystem = literal_eval(
-                        line.split('=', 1)[1].strip())
-            elif 'svn' in vcsystem:
-                if line.startswith("url"):
-                    url = literal_eval(line.split("=", 1)[1].strip())
-                elif line.startswith("revision"):
-                    rev = literal_eval(line.split("=", 1)[1].strip())
-                elif not line:
-                    break
-        if url and rev:
-            location = url + "@" + rev
-        return location
+        with open(fpath, 'r') as f:
+            info: dict = json.loads(f.read())
+        vcsystem = info['version control system']
+        url = info.get('url')
+        rev = info.get('revision')
+        if vcsystem == 'svn' and url and rev:
+            return url + "@" + rev
+        return None
 
     def get_status(self, user=None, force_mode=False):
         """Determine and return local status for this suite.

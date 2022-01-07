@@ -16,21 +16,21 @@ Example
 
 Create a new Rose suite configuration::
 
-   mkdir -p ~/rose-tutorial/rose-arch-tutorial
+   mkdir -p ~/cylc-src/rose-arch-tutorial
 
 Create a blank :rose:file:`rose-suite.conf` and a ``flow.cylc``
 file that looks like this:
 
 .. code-block:: cylc
 
-   [cylc]
+   [scheduler]
        UTC mode = True # Ignore DST
        [[events]]
-           abort on timeout = True
-           timeout = PT1H
+           abort on workflow timeout = True
+           workflow timeout = PT1H
    [scheduling]
-       [[dependencies]]
-           graph = make_files => archive_files_rsync => archive_files_scp
+       [[graph]]
+           R1 = make_files => archive_files_rsync => archive_files_scp
    [runtime]
        [[root]]
            env-script = eval $(rose task-env)
@@ -153,7 +153,9 @@ You have now created a suite that defines three tasks:
 
 Save your changes and run the suite::
 
-   rose suite-run
+   cylc validate rose-arch-tutorial
+   cylc install rose-arch-tutorial
+   cylc play rose-arch-tutorial
 
 View the suite output using ``cylc cat-log`` and inspect the
 output of the ``make_files``, ``archive_files_rsync`` and ``archive_files_scp``
@@ -216,7 +218,7 @@ The following should be returned:
 
 .. code-block:: none
 
-   1_1_file_list1 1_2_file_list2 1_3_file_list3 
+   1_1_file_list1 1_2_file_list2 1_3_file_list3
 
 These are the renamed files.
 

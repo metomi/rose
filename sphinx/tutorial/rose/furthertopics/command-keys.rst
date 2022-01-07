@@ -17,19 +17,19 @@ Example
 
 Create a new Rose suite configuration called ``command-keys``::
 
-   mkdir -p ~/rose-tutorial/command-keys
-   cd ~/rose-tutorial/command-keys
+   mkdir -p ~/cylc-src/command-keys
+   cd ~/cylc-src/command-keys
 
 Create a blank :rose:file:`rose-suite.conf` and a ``flow.cylc`` file that
 looks like this:
 
 .. code-block:: cylc
 
-   [cylc]
+   [scheduler]
        UTC mode = True # Ignore DST
    [scheduling]
-       [[dependencies]]
-           graph = gather_ingredients => breadmaker
+       [[graph]]
+           R1 = gather_ingredients => breadmaker
 
    [runtime]
        [[gather_ingredients]]
@@ -55,7 +55,12 @@ This sets up a simple suite that contains the following:
 * A ``gather_ingredients`` task
 * A ``breadmaker`` task that runs the ``breadmaker`` app
 
-Save your changes then run the suite using :ref:`command-rose-suite-run`.
+Save your changes then install and run the suite using
+:ref:`cylc install <Install-Workflow>` and :ref:`cylc play <WorkflowStartup>`::
+
+    cylc validate command-keys
+    cylc install command-keys
+    cylc play command-keys
 
 Once it has finished use ``cylc cat-log`` to view the suite log.
 In the page that appears, click the "out" link for the breadmaker task. In the

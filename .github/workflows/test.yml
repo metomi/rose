@@ -60,7 +60,14 @@ jobs:
         if: startsWith(matrix.os, 'macos')
         run: |
           # install system deps
-          brew install bash coreutils gnu-sed shellcheck sqlite3 subversion
+          brew install \
+            bash \
+            coreutils \
+            gnu-sed \
+            shellcheck \
+            sqlite3 \
+            subversion \
+            graphviz
 
           # add GNU coreutils and sed to the user PATH (for actions steps)
           # (see instructions in brew install output)
@@ -86,7 +93,7 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu')
         run: |
           sudo apt-get update
-          sudo apt-get install -y shellcheck sqlite3 at
+          sudo apt-get install -y shellcheck sqlite3 at graphviz graphviz-dev
 
       - name: Install Rose
         working-directory: rose
