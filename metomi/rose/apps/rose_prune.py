@@ -161,6 +161,7 @@ class RosePruneApp(BuiltinApp):
         are delimited by colons ":".
         E.g.:
 
+        prune-remote-logs-at=-PT6H -PT12H
         prune-server-logs-at=-P7D
         prune-datac-at=-PT6H:foo/* -PT12H:'bar/* baz/*' -P1D
         prune-work-at=-PT6H:t1*:*.tar -PT12H:t1*: -PT12H:*.gz -P1D

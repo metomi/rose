@@ -53,6 +53,7 @@ Example
 
    [prune]
    cycle-format{cycle_year_month}=CCYYMM
+   prune-remote-logs-at=-PT6H
    archive-logs-at=-P1D
    prune-server-logs-at=-P7D
    prune{work}=-PT6H:task_x* -PT12H:*/other*.dat -PT18H:task_y* -PT24H
@@ -79,6 +80,11 @@ Configuration
          The ``key`` can be any string that can be used in a ``%(key)s``
          substitution, and format should be a a valid :ref:`command-rose-date`
          print format.
+
+      .. rose:conf:: prune-remote-logs-at=cycle ...
+
+         Re-sync remote job logs at these cycles and remove them from
+         remote hosts.
 
       .. rose:conf:: prune-server-logs-at=cycle ...
 
