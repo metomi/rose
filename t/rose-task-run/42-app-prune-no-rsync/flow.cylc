@@ -1,0 +1,36 @@
+#!jinja2
+
+[scheduler]
+    UTC mode = True
+    [[events]]
+        abort on stall timeout = True
+        stall timeout = PT1M
+
+[scheduling]
+    initial cycle point = 20130101T0000Z
+    final cycle point = 20130101T1200Z
+    [[dependencies]]
+        [[[PT12H]]]
+            graph = """
+                my_task[-PT12H] => rose_prune
+                fake_log => my_task => rose_prune
+            """
+
+[runtime]
+    [[root]]
+        script = rose task-run
+        [[[job]]]
+            execution time limit = PT1M
+    [[my_task]]
+        script = echo "Hello World"
+        platform = {{HOST}}
+    [[fake_log]]
+        script = """
+            MYTASK_LOG="$CYLC_TASK_LOG_DIR/../../my_task/01/job.out"
+            mkdir -p $(dirname ${MYTASK_LOG})
+            echo "The coming of the great white handkerchief" > $MYTASK_LOG
+        """
+    [[rose_prune]]
+        script = """
+            rose task-run --debug | tee -a $CYLC_SUITE_RUN_DIR/prune.log
+        """
