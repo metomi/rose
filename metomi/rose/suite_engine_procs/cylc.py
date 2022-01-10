@@ -316,8 +316,8 @@ class CylcProcessor(SuiteEngineProcessor):
                             self.popen(*cmd)
                         except RosePopenError as exc:
                             self.handle_event(exc, level=Reporter.WARN)
-                        if not prune_remote_mode:
-                            continue
+                    if not prune_remote_mode:
+                        continue
                     try:
                         cmd = self.popen.get_cmd(
                             "ssh",
