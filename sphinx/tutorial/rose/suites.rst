@@ -48,7 +48,7 @@ A Rose suite configuration is a Cylc :term:`source directory` containing a
    :rose:file:`rose-app.conf` file. Its main configuration sections are:
 
    :rose:conf:`rose-suite.conf[env]`
-      Environment variables for use by the whole suite.
+      Environment variables for use by the workflow scheduler.
    :rose:conf:`rose-suite.conf[template variables]`
       Generic variables for use in the ``flow.cylc`` file.
    :rose:conf:`rose-suite.conf[file:NAME]`
