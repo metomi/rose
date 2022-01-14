@@ -50,7 +50,7 @@ run_pass "${TEST_KEY_BASE}-play" \
         --debug
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-logs-not-rsync'd"
-file_grep "${TEST_KEY}" "handkerchief" "${FLOW_RUN_DIR}/log/job/20130103T0000Z/my_task/NN/job.out"
+file_grep "${TEST_KEY}" "handkerchief" "${FLOW_RUN_DIR}/log/job/20130101T0000Z/my_task/NN/job.out"
 
 purge
 exit 0
