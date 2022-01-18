@@ -30,16 +30,23 @@ else
 fi
 tests 3
 
+cat > 'global.cylc' <<__HERE__
+[platforms]
+    [[test_platform]]
+        hosts = ${JOB_HOST}
+__HERE__
+
+export CYLC_CONF_PATH="${PWD}"
+
 export ROSE_CONF_PATH=
 TEST_KEY=$TEST_KEY_BASE
-#-------------------------------------------------------------------------------
+
 get_reg
 run_pass "${TEST_KEY_BASE}-install" \
     cylc install \
         -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
         --flow-name="$FLOW" \
-        --no-run-name \
-        -S "HOST='${JOB_HOST}'"
+        --no-run-name
 
 run_pass "${TEST_KEY_BASE}-play" \
     cylc play \
@@ -48,7 +55,7 @@ run_pass "${TEST_KEY_BASE}-play" \
         --host=localhost \
         --no-detach \
         --debug
-#-------------------------------------------------------------------------------
+
 TEST_KEY="${TEST_KEY_BASE}-logs-not-rsync'd"
 file_grep "${TEST_KEY}" "handkerchief" "${FLOW_RUN_DIR}/log/job/20130101T0000Z/my_task/NN/job.out"
 

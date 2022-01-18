@@ -23,7 +23,7 @@
             execution time limit = PT1M
     [[my_task]]
         script = echo "Hello World"
-        platform = {{HOST}}
+        platform = test_platform
     [[fake_log]]
         script = """
             MYTASK_LOG="$CYLC_TASK_LOG_DIR/../../my_task/01/job.out"

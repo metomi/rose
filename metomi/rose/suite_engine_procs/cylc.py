@@ -209,7 +209,7 @@ class CylcProcessor(SuiteEngineProcessor):
 
     def job_logs_pull_remote(
         self, suite_name, items, prune_remote_mode=False, force_mode=False,
-        rsync=False
+        rsync=True
     ):
         """Pull and housekeep the job logs on remote task hosts.
 
