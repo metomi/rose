@@ -80,7 +80,6 @@ class RosePruneApp(BuiltinApp):
                     suite_name,
                     prune_remote_logs_cycles,
                     prune_remote_mode=True,
-                    rsync=False
                 )
 
             if prune_server_logs_cycles:
