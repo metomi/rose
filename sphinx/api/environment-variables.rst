@@ -231,11 +231,10 @@ Rose Environment Variables
 
    .. deprecated:: 2.0.0
 
-      This variable is no longer available.
+      This variable is no longer available globally from Rose.
 
-      .. note::
-
-         :ref:`rose-stem` provides this variable.
+      However, the Cylc-Rose plugin's implementation of :ref:`rose-stem`
+      provides this variable.
 
 .. envvar:: ROSE_SUITE_DIR
 
