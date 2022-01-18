@@ -59,8 +59,8 @@ class RosePruneApp(BuiltinApp):
             app_runner, conf_tree, "archive-logs-at"
         )
         if (
-            prune_server_logs_cycles
-            or prune_remote_logs_cycles
+            prune_remote_logs_cycles
+            or prune_server_logs_cycles
             or archive_logs_cycles
         ):
             tmp_prune_remote_logs_cycles = []
