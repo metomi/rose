@@ -47,7 +47,7 @@ A suite directory may contain the following:
 
    .. rose:conf:: env
 
-       Specify the environment variables to export to the workflow :term:`scheduler`. The 
+      Specify the environment variables to export to the workflow :term:`scheduler`. The
       usual ``$NAME`` or ``${NAME}`` syntax can be used in values to reference
       environment variables that are already defined before the suite runner is
       invoked. However, it is unsafe to reference other environment variables
