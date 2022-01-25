@@ -83,8 +83,7 @@ Configuration
 
       .. rose:conf:: prune-remote-logs-at=cycle ...
 
-         Re-sync remote job logs at these cycles and remove them from
-         remote hosts.
+         Remove remote job logs at these cycles.
 
       .. rose:conf:: prune-server-logs-at=cycle ...
 

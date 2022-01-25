@@ -76,7 +76,7 @@ class RosePruneApp(BuiltinApp):
             prune_server_logs_cycles = tmp_prune_server_logs_cycles
 
             if prune_remote_logs_cycles:
-                app_runner.suite_engine_proc.job_logs_pull_remote(
+                app_runner.suite_engine_proc.job_logs_housekeep_remote(
                     suite_name,
                     prune_remote_logs_cycles,
                     prune_remote_mode=True,
