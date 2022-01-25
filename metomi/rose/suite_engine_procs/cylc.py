@@ -208,7 +208,7 @@ class CylcProcessor(SuiteEngineProcessor):
                 pass
 
     def job_logs_pull_remote(
-        self, suite_name, items, prune_remote_mode=False, force_mode=False
+        self, suite_name, items, prune_remote_mode=False, force_mode=False,
     ):
         """Pull and housekeep the job logs on remote task hosts.
 
@@ -302,18 +302,6 @@ class CylcProcessor(SuiteEngineProcessor):
                     ret_code, ssh_ls_out, _ = self.popen.run(*cmd)
                     if ret_code:
                         continue
-                    cmd_list = ["rsync"]
-                    for include in includes:
-                        cmd_list.append("--include=" + include)
-                    for exclude in excludes:
-                        cmd_list.append("--exclude=" + exclude)
-                    cmd_list.append("%(auth)s:%(log_dir_rel)s/" % data)
-                    cmd_list.append(log_dir)
-                    try:
-                        cmd = self.popen.get_cmd(*cmd_list)
-                        self.popen(*cmd)
-                    except RosePopenError as exc:
-                        self.handle_event(exc, level=Reporter.WARN)
                     if not prune_remote_mode:
                         continue
                     try:
