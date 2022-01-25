@@ -8,6 +8,32 @@ creating a new release entry be sure to copy & paste the span tag with the
 `actions:bind` attribute, which is used by a regex to find the text to be
 updated. Only the first match gets replaced, so it's fine to leave the old
 ones in. -->
+--------------------------------------------------------------------------------
+
+## 2.0rc1 (<span actions:bind='release-date'></span>)
+
+[#2510](https://github.com/metomi/rose/pull/2510) -
+Re-enable Rosie ID to work with Cylc 8 Version control recording
+infrastructure.
+
+[#2514](https://github.com/metomi/rose/pull/2514) -
+Remove `rosa rpmbuild` tool.
+
+[#2531](https://github.com/metomi/rose/pull/2531) -
+Rosie Graph disabled.
+
+[#2519](https://github.com/metomi/rose/pull/2519) -
+Updated the Rose documentation to describe using
+`cylc validate; cylc install; cylc play` instead of `rose suite-run`.
+
+[#2522](https://github.com/metomi/rose/pull/2522) -
+Removed the Rsync implied by the `prune-remote-logs-at` option of
+Rose prune.
+
+[#2528](https://github.com/metomi/rose/pull/2528) -
+Rose Date only emits a warning if running in interactive mode.
+
+
 -------------------------------------------------------------------------------
 
 ## 2.0b3 (<span actions:bind='release-date'>Released 2021-11-10</span>)
