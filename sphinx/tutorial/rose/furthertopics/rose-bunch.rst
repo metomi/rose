@@ -46,19 +46,19 @@ timings for each stage of the landing process.
 
 Create a new Rose suite configuration::
 
-   mkdir -p ~/rose-tutorial/rose-bunch
-   cd ~/rose-tutorial/rose-bunch
+   mkdir -p ~/cylc-src/rose-bunch
+   cd ~/cylc-src/rose-bunch
 
 Create a blank :rose:file:`rose-suite.conf` and a ``flow.cylc``
 file that looks like this:
 
 .. code-block:: cylc
 
-   [cylc]
+   [scheduler]
        UTC mode = True # Ignore DST
    [scheduling]
-       [[dependencies]]
-           graph = lander
+       [[graph]]
+           R1 = lander
    [runtime]
        [[root]]
            script = rose task-run
@@ -135,16 +135,18 @@ directory of the lander app and running::
    chmod +x land
 
 Navigate to the top directory of your suite (where the ``flow.cylc`` and
-:rose:file:`rose-suite.conf` files can be found) and run
-:ref:`command-rose-suite-run`.
+:rose:file:`rose-suite.conf` files can be found) and validate, install and run
+your suite::
 
-Your suite should run, launch the Cylc GUI and successfully run the ``lander``
-app.
+   cylc validate .
+   cylc install rose-bunch
+   cylc play rose-bunch
+   cylc gui
 
 Once the suite has finished running and has shutdown, open Cylc Review to view
 its output (note that you can close the Cylc GUI at this point)::
 
-   rose suite-log
+   cylc review
 
 .. note::
 
@@ -218,9 +220,10 @@ following line to the :rose:conf:`rose_bunch[bunch]` section:
 Run your suite again. Notice that this time round it takes longer for the task
 to run as it has been limited in the number of command variants it can run
 simultaneously. You can see the individual commands being started by viewing
-the task stdout in the Cylc GUI by right-clicking on the task and selecting
-:guilabel:`View` then :guilabel:`job stdout`. As an example, when the
-``BA007`` invocation starts running you should see the line:
+the task stdout in Cylc Review.
+
+As an example, when the ``BA007`` invocation starts running you should see
+the line:
 
 .. code-block:: none
 

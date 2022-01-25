@@ -51,6 +51,7 @@ class RosePruneApp(BuiltinApp):
         prune_remote_logs_cycles = self._get_conf(
             app_runner, conf_tree, "prune-remote-logs-at"
         )
+        # Prune job logs on suite host
         prune_server_logs_cycles = self._get_conf(
             app_runner, conf_tree, "prune-server-logs-at"
         )

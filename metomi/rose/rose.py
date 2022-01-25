@@ -20,7 +20,10 @@ import os
 from pathlib import Path
 import sys
 
-from pkg_resources import iter_entry_points
+from pkg_resources import (
+    DistributionNotFound,
+    iter_entry_points,
+)
 
 from metomi.rose import (
     __file__ as rose_init_file,
@@ -165,7 +168,7 @@ def _exec_bash(ns, sub_cmd, args):
 
 def _exec_python(ns, sub_cmd, entry_point, args):
     # load the entry point
-    fcn = entry_point.load()
+    fcn = load_entry_point(entry_point)
 
     # set the argv for the sub command
     sys.argv = [f'{ns}-{sub_cmd}', *args]
@@ -176,6 +179,22 @@ def _exec_python(ns, sub_cmd, entry_point, args):
     else:
         fcn()
     sys.exit(0)
+
+
+def load_entry_point(entry_point):
+    try:
+        return entry_point.load()
+    except DistributionNotFound:
+        print(
+            (
+                'This functionality requires optional dependencies:'
+                f' {", ".join(entry_point.extras)}'
+                '\n(e.g. pip install metomi-rose'
+                f' [{",".join(entry_point.extras)}])'
+            ),
+            file=sys.stderr
+        )
+        sys.exit(1)
 
 
 def _get_sub_cmds(ns):

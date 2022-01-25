@@ -52,7 +52,6 @@ applications. :ref:`What Is Cylc? <Cylc-introduction>`
    installation
    getting-started
    tutorial/rose/index
-   cheat-sheet
    glossary
 
 

@@ -15,19 +15,19 @@ Example
 
 Create a new Rose suite configuration::
 
-   mkdir -p ~/rose-tutorial/polling
-   cd ~/rose-tutorial/polling
+   mkdir -p ~/cylc-src/polling
+   cd ~/cylc-src/polling
 
 Create a blank :rose:file:`rose-suite.conf` and a ``flow.cylc``
 file that looks like this:
 
 .. code-block:: cylc
 
-   [cylc]
+   [scheduler]
        UTC mode = True # Ignore DST
    [scheduling]
-       [[dependencies]]
-           graph = """compose_letter => send_letter
+       [[graph]]
+           R1 = """compose_letter => send_letter
                       bob => read_letter"""
 
 This is a simple suite which consists of the following:
@@ -95,7 +95,12 @@ We now have an app that does the following:
    In practice, it may be preferable to have the ``[command]`` section at
    the top as that should contain the main command(s) being run by the app.
 
-Save your changes and run the suite using :ref:`command-rose-suite-run`.
+Save your changes and install and run the suite using
+:ref:`cylc install <Install-Workflow>` and :ref:`cylc play <WorkflowStartUp>`::
+
+   cylc install polling
+   cylc validate polling
+   cylc play polling
 
 The suite should now run.
 
