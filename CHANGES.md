@@ -19,9 +19,6 @@ infrastructure.
 [#2514](https://github.com/metomi/rose/pull/2514) -
 Remove `rosa rpmbuild` tool.
 
-[#2531](https://github.com/metomi/rose/pull/2531) -
-Rosie Graph disabled.
-
 [#2519](https://github.com/metomi/rose/pull/2519) -
 Updated the Rose documentation to describe using
 `cylc validate; cylc install; cylc play` instead of `rose suite-run`.
