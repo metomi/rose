@@ -172,7 +172,8 @@ class CylcProcessor(SuiteEngineProcessor):
                 cycle = self._parse_task_cycle_id(item)[0]
                 if cycle:
                     cycles.append(cycle)
-        self.job_logs_housekeep_remote(suite_name, cycles, prune_remote_mode=True)
+        self.job_logs_housekeep_remote(
+            suite_name, cycles, prune_remote_mode=True)
         cwd = os.getcwd()
         self.fs_util.chdir(self.get_suite_dir(suite_name))
         try:
