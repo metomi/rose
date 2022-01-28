@@ -225,14 +225,16 @@ Rose Environment Variables
       The name of the host where the :ref:`cylc install <Install-Workflow>` command was
       invoked.
    Provided By
-      * :ref:`Cylc Rose` and :ref:`cylc install <Install-Workflow>`.
+      * :ref:`Cylc Rose`.
 
 .. envvar:: ROSE_SITE
 
-   Description
-      The value of :rose:conf:`rose.conf|site` setting.
-   Provided By
-      * :ref:`Cylc Rose` and :ref:`cylc install <Install-Workflow>`.
+   .. deprecated:: 2.0.0
+
+      This variable is no longer available globally from Rose.
+
+      However, the Cylc-Rose plugin's implementation of :ref:`rose-stem`
+      provides this variable.
 
 .. envvar:: ROSE_SUITE_DIR
 
@@ -363,6 +365,5 @@ Rose Environment Variables
 
    Description
       The current version of Rose.
-   Used and Provided By
-      * ``rose``
-      * :ref:`Cylc Rose` and :ref:`cylc install <Install-Workflow>`.
+   Provided by
+      * :ref:`Cylc Rose`.
