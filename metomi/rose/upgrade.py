@@ -456,6 +456,9 @@ class MacroUpgrade(metomi.rose.macro.MacroBase):
     def enable_setting(self, config, keys, info=None):
         """Enable a setting in the configuration.
 
+        This will reset ignored and trigger ignored settings back to the
+        default state.
+
         Args:
             config (metomi.rose.config.ConfigNode): The application
                 configuration.
