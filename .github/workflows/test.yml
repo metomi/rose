@@ -199,11 +199,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y graphviz pkg-config libgraphviz-dev
-          pip install pygraphviz
 
       - name: install
         run: |
-          pip install -e .[docs]
+          pip install -e .[docs,graph]
           pip install git+https://github.com/cylc/cylc-flow.git
           pip install git+https://github.com/cylc/cylc-rose.git
 
