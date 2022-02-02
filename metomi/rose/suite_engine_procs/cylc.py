@@ -172,7 +172,8 @@ class CylcProcessor(SuiteEngineProcessor):
                 cycle = self._parse_task_cycle_id(item)[0]
                 if cycle:
                     cycles.append(cycle)
-        self.job_logs_pull_remote(suite_name, cycles, prune_remote_mode=True)
+        self.job_logs_housekeep_remote(
+            suite_name, cycles, prune_remote_mode=True)
         cwd = os.getcwd()
         self.fs_util.chdir(self.get_suite_dir(suite_name))
         try:
@@ -207,16 +208,15 @@ class CylcProcessor(SuiteEngineProcessor):
             except OSError:
                 pass
 
-    def job_logs_pull_remote(
+    def job_logs_housekeep_remote(
         self, suite_name, items, prune_remote_mode=False, force_mode=False,
     ):
-        """Pull and housekeep the job logs on remote task hosts.
+        """Housekeep the job logs on remote task hosts.
 
         suite_name -- The name of a suite.
         items -- A list of relevant items.
         prune_remote_mode -- Remove remote job logs after pulling them.
         force_mode -- Pull even if "job.out" already exists.
-
         """
         # Pull from remote.
         # Create a file with a uuid name, so system knows to do nothing on
