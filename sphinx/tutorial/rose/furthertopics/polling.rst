@@ -98,8 +98,8 @@ We now have an app that does the following:
 Save your changes and install and run the suite using
 :ref:`cylc install <Install-Workflow>` and :ref:`cylc play <WorkflowStartUp>`::
 
-   cylc install polling
-   cylc validate polling
+   cylc validate .
+   cylc install
    cylc play polling
 
 The suite should now run.
