@@ -99,6 +99,8 @@ In the ``app/lander/`` directory create a ``bin/`` directory::
 Using your editor of choice, create a file named ``land`` under the ``bin``
 directory and paste in these lines::
 
+.. code-block:: bash
+
    #!/usr/bin/env bash
 
    CLASS=$1
@@ -139,9 +141,8 @@ Navigate to the top directory of your suite (where the ``flow.cylc`` and
 your suite::
 
    cylc validate .
-   cylc install rose-bunch
+   cylc install
    cylc play rose-bunch
-   cylc gui
 
 Once the suite has finished running and has shutdown, open Cylc Review to view
 its output (note that you can close the Cylc GUI at this point)::
