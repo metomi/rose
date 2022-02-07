@@ -97,7 +97,7 @@ In the ``app/lander/`` directory create a ``bin/`` directory::
    mkdir bin
 
 Using your editor of choice, create a file named ``land`` under the ``bin``
-directory and paste in these lines::
+directory and paste in these lines:
 
 .. code-block:: bash
 
@@ -127,6 +127,7 @@ directory and paste in these lines::
    # Clear terminal
    sleep 10
    echo "[ $(rose date) ] Clear of terminal"
+
 
 This script captures the landing routine and expects two arguments: the plane
 type (its class) and the number of passengers it is carrying.

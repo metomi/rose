@@ -10,6 +10,10 @@ Rose Stem
 
    The Rose Stem command is provided by the `Cylc Rose`_ package.
 
+.. seealso::
+
+   :ref:`rose-stem` documentation.
+
 Rose Stem is a testing system for use with Rose. It provides a user-friendly
 way of defining source trees and tasks on the command line which are then
 passed by Rose Stem to the suite as Jinja2 variables.
