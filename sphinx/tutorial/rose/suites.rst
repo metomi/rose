@@ -538,7 +538,6 @@ Rose Applications In Rose Suite Configurations
          cylc install rose-suite-tutorial
          cylc validate rose-suite-tutorial
          cylc play rose-suite-tutorial
-         cylc tui
 
 
    #. **View Output In Cylc Review.**
