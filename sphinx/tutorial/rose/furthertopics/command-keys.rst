@@ -62,10 +62,11 @@ Save your changes then install and run the suite using
     cylc install
     cylc play command-keys
 
-Once it has finished use check that the app has worked:
+Once it has finished use check that the app has worked::
 
-``cylc cat-log command-keys//1/breadmaker``, should include the line
-"fresh bread".
+   cylc cat-log command-keys//1/breadmaker
+   
+The output should include the line "fresh bread".
 
 
 Adding Alternative Commands

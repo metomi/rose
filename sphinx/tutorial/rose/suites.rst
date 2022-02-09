@@ -533,7 +533,7 @@ Rose Applications In Rose Suite Configurations
 
    #. **Run The Suite.**
 
-      Install, validate and run and examine the suite::
+      Install, validate, run and examine the suite::
 
          cylc install rose-suite-tutorial
          cylc validate rose-suite-tutorial
