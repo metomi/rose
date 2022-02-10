@@ -1,5 +1,5 @@
 #!jinja2
-[cylc]
+[scheduler]
     UTC mode = True
 
 # This links a name specified on the command in rose-stem with a
@@ -20,8 +20,8 @@
 
 # This loops over all tasks specified in the RUN_NAMES Jinja2 variable
 [scheduling]
-    [[dependencies]]
-        graph = """
+    [[graph]]
+        R1 = """
 {#- Recursively add dependencies from RUN_NAMES, replacing groups with subgroups/tasks #}
 {%- set name_graphs_out = [] %}
 {%- set graphs_out = [] %}
@@ -51,8 +51,7 @@
         # Root, inherited by everything
         script = rose task-run --verbose
         env-script = eval $(rose task-env)
-        [[[job]]]
-            execution time limit = PT3H
+        execution time limit = PT3H
 
     [[fcm_make_spaceship]]
         [[[environment]]]
