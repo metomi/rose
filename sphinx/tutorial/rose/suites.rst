@@ -533,6 +533,8 @@ Rose Applications In Rose Suite Configurations
 
    #. **Run The Suite.**
 
+      .. TODO - Add links to Cylc GUI and TUI basics here.
+
       Install, validate, run and examine the suite::
 
          cylc install rose-suite-tutorial
