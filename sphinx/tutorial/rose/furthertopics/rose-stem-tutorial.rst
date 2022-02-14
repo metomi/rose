@@ -287,7 +287,7 @@ in which thrust is applied (by changing the acceleration to be subtracted
 from the velocity rather than added). Again, rerun ``rose stem``, and
 ``cylc play spaceship_working_copy/run3`` and see the failure.
 
-This time our ``job.err`` file will indicate 3 failed
+This time our ``job.err`` file will indicate 3 failed tests.
 
 In this way, you can monitor whether the behaviour of code is changed by
 any of the code alterations you have made.
