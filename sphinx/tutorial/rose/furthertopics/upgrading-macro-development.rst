@@ -234,20 +234,29 @@ Paste the following into your ``versions.py`` file:
 
 .. code-block:: python
 
-   import metomi.rose.upgrade
+   """
+   Designed to be compatible with both
+   Python 2 and 3 so that the Rose 2 macro
+   command will work, and so will the Rose 2019 GUI.
+   """
+
+   try:
+      from metomi.rose.upgrade import MacroUpgrade
+   except ImportError:
+      from rose.upgrade import MacroUpgrade
 
 
-   class MyFirstUpgradeMacro(rose.upgrade.MacroUpgrade):
+   class MyFirstUpgradeMacro(MacroUpgrade):
 
-       """Upgrade from 0.1 (Canonical Canoe) to 0.2 (Outrageous Outrigger)."""
+      """Upgrade from 0.1 (Canonical Canoe) to 0.2 (Outrageous Outrigger)."""
 
-       BEFORE_TAG = "0.1"
-       AFTER_TAG = "0.2"
+      BEFORE_TAG = "0.1"
+      AFTER_TAG = "0.2"
 
-       def upgrade(self, config, meta_config=None):
-           """Upgrade the boat!"""
-           # Some code doing something to config goes here.
-           return config, self.reports
+      def upgrade(self, config, meta_config=None):
+         """Upgrade the boat!"""
+         # Some code doing something to config goes here.
+         return config, self.reports
 
 This is already a functional upgrade macro - although it won't do anything.
 
@@ -374,7 +383,7 @@ code:
 
 .. code-block:: python
 
-   class MySecondUpgradeMacro(rose.upgrade.MacroUpgrade):
+   class MySecondUpgradeMacro(MacroUpgrade):
 
        """Upgrade from 0.2 (Outrageous Outrigger) to 0.3 (Amazing Ama)."""
 
@@ -467,7 +476,7 @@ We need to start with appending the following code to ``versions.py``:
 
 .. code-block:: python
 
-   class MyMoreComplexUpgradeMacro(rose.upgrade.MacroUpgrade):
+   class MyMoreComplexUpgradeMacro(MacroUpgrade):
 
        """Upgrade from 0.3 (Amazing Ama) to 1.0 (Tremendous Trimaran)."""
 

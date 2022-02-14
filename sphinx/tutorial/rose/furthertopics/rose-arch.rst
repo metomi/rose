@@ -153,8 +153,9 @@ You have now created a suite that defines three tasks:
 
 Save your changes and run the suite::
 
-   cylc validate rose-arch-tutorial
-   cylc install rose-arch-tutorial
+   cd ~/cylc-src/rose-arch-tutorial
+   cylc validate .
+   cylc install
    cylc play rose-arch-tutorial
 
 View the suite output using ``cylc cat-log`` and inspect the
@@ -169,7 +170,7 @@ Change to the ``$ROSE_DATA/ARCHIVING/`` directory of the suite i.e:
 
 .. code-block:: sub
 
-   cd ~/cylc-run/<name>/share/data/ARCHIVING/
+   cd ~/cylc-run/rose-arch-tutorial/runN/share/data/ARCHIVING/
 
 List the directory by typing::
 

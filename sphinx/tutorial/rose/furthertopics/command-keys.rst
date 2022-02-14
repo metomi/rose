@@ -58,13 +58,15 @@ This sets up a simple suite that contains the following:
 Save your changes then install and run the suite using
 :ref:`cylc install <Install-Workflow>` and :ref:`cylc play <WorkflowStartup>`::
 
-    cylc validate command-keys
-    cylc install command-keys
+    cylc validate .
+    cylc install
     cylc play command-keys
 
-Once it has finished use ``cylc cat-log`` to view the suite log.
-In the page that appears, click the "out" link for the breadmaker task. In the
-page you are taken to you should see a line saying "fresh bread".
+Once it has finished use check that the app has worked::
+
+   cylc cat-log command-keys//1/breadmaker
+   
+The output should include the line "fresh bread".
 
 
 Adding Alternative Commands
