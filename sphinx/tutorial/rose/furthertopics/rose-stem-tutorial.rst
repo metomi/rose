@@ -252,15 +252,20 @@ We use ``--group`` in preference to ``--task`` in this suite (both are
 synonymous) as we specify a group of tasks set up in the Jinja2 variable
 ``name_graphs``.
 
-Previously, the ``rose stem`` command ran the suite. At Cylc 8, it simply
-installs it. We must now use ``cylc play`` to start the workflow::
+.. admonition:: Change from Rose 1
+
+   Previously, the ``rose stem`` command ran the suite. At Cylc 8, it simply
+   installs it.
+
+We must now use ``cylc play`` to start the workflow::
 
    cylc play spaceship_working_copy
 
 
 
 This can be inspected as running successfully by opening Cylc Review in a
-browser and checking the jobs.
+browser and checking the jobs. Alternatively, use the Cylc GUI or Cylc TUI to
+view the result of the run.
 
 
 A failing test

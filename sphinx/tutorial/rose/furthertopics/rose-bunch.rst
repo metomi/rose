@@ -141,7 +141,6 @@ your suite::
    cylc validate .
    cylc install rose-bunch
    cylc play rose-bunch
-   cylc gui
 
 Once the suite has finished running and has shutdown, open Cylc Review to view
 its output (note that you can close the Cylc GUI at this point)::
@@ -195,7 +194,6 @@ We can now install and play this updated suite::
 
    cylc install rose-bunch
    cylc play rose-bunch
-   cylc gui
 
 Inspecting the job log directory for this latest run on Cylc Review, the
 ``bunch.*.err`` and ``bunch.*.out`` files now have the names you have
@@ -232,7 +230,6 @@ We can now install and play this updated suite::
 
    cylc install rose-bunch
    cylc play rose-bunch
-   cylc gui
 
 Notice that this time round it takes longer for the task to run as it has been
 limited in the number of command variants it can run simultaneously.
