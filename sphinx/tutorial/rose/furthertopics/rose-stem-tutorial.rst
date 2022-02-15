@@ -252,7 +252,7 @@ We use ``--group`` in preference to ``--task`` in this suite (both are
 synonymous) as we specify a group of tasks set up in the Jinja2 variable
 ``name_graphs``.
 
-.. admonition:: Change from Rose 1
+.. admonition:: Change from Rose 2019
 
    Previously, the ``rose stem`` command ran the suite. At Cylc 8, it simply
    installs it.

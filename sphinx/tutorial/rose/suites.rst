@@ -62,7 +62,7 @@ A Rose suite configuration is a Cylc :term:`source directory` containing a
       language based on the hashbang line at the start of the the ``flow.cylc``
       file if you use :rose:conf:`rose-suite.conf[template variables]`.
 
-      At Rose 1/Cylc 7 these variables were instead set in sections called
+      At Rose 2019/Cylc 7 these variables were instead set in sections called
       :rose:conf:`rose-suite.conf[jinja2:suite.rc]` and
       :rose:conf:`rose-suite.conf[empy:suite.rc]`. These are supported to
       ease the transition to Rose 2, but should not be used for new suites.
