@@ -241,23 +241,31 @@ to the prompts)*.
 Running the test suite
 ----------------------
 
-We should now be able to run the test suite. Simply type::
+We should now be able to install the test suite. Simply type::
 
    rose stem --group=command_spaceship
 
 anywhere in your working copy (the ``--source`` argument defaults to ``.``
 so it should automatically pick up your working copy as the source).
 
-.. note::
-
-   If your site uses a Cylc server, and your home directory is not shared
-   with the Cylc server, you will need to add the option::
-
-      --host=localhost
-
 We use ``--group`` in preference to ``--task`` in this suite (both are
 synonymous) as we specify a group of tasks set up in the Jinja2 variable
 ``name_graphs``.
+
+.. admonition:: Change from Rose 2019
+
+   Previously, the ``rose stem`` command ran the suite. At Cylc 8, it simply
+   installs it.
+
+We must now use ``cylc play`` to start the workflow::
+
+   cylc play spaceship_working_copy
+
+
+
+This can be inspected as running successfully by opening Cylc Review in a
+browser and checking the jobs. Alternatively, use the Cylc GUI or Cylc TUI to
+view the result of the run.
 
 
 A failing test
@@ -267,15 +275,24 @@ Now edit the file::
 
    rose-stem/app/spaceship/rose-app.conf
 
-and change one of the thrusts, then rerun ``rose stem``. You will find the
-``rose_ana_position`` task fails, as the results have changed.
+and change one of the thrusts, then rerun ``rose stem`` and
+``cylc play spaceship_working_copy/run2``.
 
-.. TODO - Do we need to reset previous changes?!
+
+You will find the ``rose_ana_position`` task fails, as the results have changed.
+
+Inspecting the ``job.err`` file::
+
+   cat $HOME/cylc-run/spaceship_working_copy/run2/log/job/1/rose_ana_position/01/job.err
+
+explains the reason for the failed task: 1 test did not pass.
 
 Try modifying the Fortran source code - for example, changing the direction
 in which thrust is applied (by changing the acceleration to be subtracted
-from the velocity rather than added). Again, rerun ``rose stem``, and see
-the failure.
+from the velocity rather than added). Again, rerun ``rose stem``, and
+``cylc play spaceship_working_copy/run3`` and see the failure.
+
+This time our ``job.err`` file will indicate 3 failed tests.
 
 In this way, you can monitor whether the behaviour of code is changed by
 any of the code alterations you have made.

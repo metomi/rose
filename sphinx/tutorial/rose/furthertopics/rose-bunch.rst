@@ -152,8 +152,8 @@ its output (note that you can close the Cylc GUI at this point)::
 
 .. note::
 
-   You can quickly get to the relevant page by running
-   ``cylc cat-log`` from within the :term:`run directory`.
+   You can quickly view the workflow log by running
+   ``cylc cat-log rose-bunch`` .
 
 In the Cylc Review jobs page for your suite you should be presented with a
 page containing a single row for the ``lander`` task, from which you can
@@ -182,6 +182,10 @@ to indexed files, it can sometimes be difficult to quickly identify which file
 to look in for output. To aid this, :rose:app:`rose_bunch` supports naming
 command instances via the :rose:conf:`rose_bunch[bunch]names=` option.
 
+Returning to our source directory::
+
+   cd ~/cylc-src/rose-bunch
+
 Open your app config (under ``app/lander/rose-app.conf``) and add the
 following line under the :rose:conf:`rose_bunch[bunch]` section:
 
@@ -189,10 +193,14 @@ following line under the :rose:conf:`rose_bunch[bunch]` section:
 
    names=BA123 Emirates345 BA007 PC456
 
-Re-run your suite and, once it has finished, open up Cylc Review and examine
-the job listing. In the drop-down ``bunch.*.err`` and ``bunch.*.out`` boxes you
-should now see entries for the names you've configured rather than the
-``bunch.0.out ... bunch.3.out`` entries previously present.
+We can now install and play this updated suite::
+
+   cylc install rose-bunch
+   cylc play rose-bunch
+
+Inspecting the job log directory for this latest run on Cylc Review, the
+``bunch.*.err`` and ``bunch.*.out`` files now have the names you have
+configured rather than the previous ``bunch.0.out ... bunch.3.out``.
 
 
 Limiting Concurrent Invocations
@@ -210,7 +218,9 @@ In the case of our simulated airport we will pretend we only have two runways
 available at a time on which our planes can land. As such we need to limit the
 number of planes landing. We do this using the
 :rose:conf:`rose_bunch[bunch]pool-size=` configuration option of the
-:rose:app:`rose_bunch` app.
+:rose:app:`rose_bunch` app::
+
+   cd ~/cylc-src/rose-bunch
 
 Open your app config (under ``app/lander/rose-app.conf``) and add the
 following line to the :rose:conf:`rose_bunch[bunch]` section:
@@ -219,10 +229,13 @@ following line to the :rose:conf:`rose_bunch[bunch]` section:
 
    pool-size=2
 
-Run your suite again. Notice that this time round it takes longer for the task
-to run as it has been limited in the number of command variants it can run
-simultaneously. You can see the individual commands being started by viewing
-the task stdout in Cylc Review.
+We can now install and play this updated suite::
+
+   cylc install rose-bunch
+   cylc play rose-bunch
+
+Notice that this time round it takes longer for the task to run as it has been
+limited in the number of command variants it can run simultaneously.
 
 As an example, when the ``BA007`` invocation starts running you should see
 the line:

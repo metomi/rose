@@ -1,4 +1,4 @@
-[cylc]
+[scheduler]
     UTC mode = True
     [[parameters]]
         # A list of the weather stations we will be fetching observations from.

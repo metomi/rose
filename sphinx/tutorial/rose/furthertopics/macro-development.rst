@@ -221,7 +221,7 @@ Your final macro should look like this:
    Rose validator macro for "planet".
 
    Designed to be compatible with both Python 2 and 3 so that the Rose 2 macro
-   command will work, and so will the Rose 1 GUI.
+   command will work, and so will the 2019 GUI.
    """
    import re
    import subprocess
