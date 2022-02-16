@@ -9,13 +9,20 @@ Rose: a framework for managing and running meteorological suites.
 
 ### Python 2 or Python 3 ?
 
-Currently in the source code repository:
- - **master branch:** Python 3, **no GUI** - **Rose-2/Cylc-8 Work In Progress**
- - **2019.01.x branch:** Python 2, PyGTK GUI - **Rose-1/Cylc-7 Maintenance**
+#### Rose 2019
 
-The first official Rose-2/Cylc-8 release (with a new web UI) is not expected
-until late 2019. Until then we recommend the latest rose-2019.01.x/cylc-7.8.x
-release for production use.
+- Production ready
+- Python 2
+- PyGTK GUI
+- `2019.01.x` branch in the source code
+
+#### Rose 2
+
+- Release candidate
+- Python 3
+- No GUIs
+- Web-based GUIs will follow in later Rose 2 releases
+- `master` branch in the source code
 
 [Installation](http://metomi.github.io/rose/doc/html/installation.html) |
 [User Guide](http://metomi.github.io/rose/) |
