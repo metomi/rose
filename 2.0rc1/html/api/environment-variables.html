@@ -1,0 +1,786 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rose Environment Variables &mdash; Rose Documentation 2.0rc1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/diff_selector.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/grid_table.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/hieroglyph_theme_addons.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/tutorial.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/addons.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/rose-favicon.png"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/js/diff_selector.js"></script>
+        <script src="../_static/js/minicylc.js"></script>
+        <script src="../_static/js/spoiler.js"></script>
+        <script src="../_static/js/addons.js"></script>
+        <script src="../_static/js/versioning.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Other Python API Docs" href="other.html" />
+    <link rel="prev" title="Command Reference" href="command-reference.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html">
+            <img src="../_static/rose-logo-crop.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                2.0rc1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/rose/index.html">Rose Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rose API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="configuration/index.html">Rose Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command-reference.html">Command Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="other.html">Other Python API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rose-built-in-applications.html">Rose Built-In Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../terms.html">Rose Terms Of Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../course/um-ut.html">UM User Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Rose Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Rose Environment Variables</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rose-environment-variables">
+<h1>Rose Environment Variables<a class="headerlink" href="#rose-environment-variables" title="Permalink to this headline"></a></h1>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-COMMAND_INSTANCES">
+<span class="sig-name descname"><span class="pre">COMMAND_INSTANCES</span></span><a class="headerlink" href="#envvar-COMMAND_INSTANCES" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>Environment variable provided to Rose Bunch instances at runtime to
+identify the command instance being run.</p>
+</dd>
+<dt>Provided At Runtime By</dt><dd><ul class="simple">
+<li><p>Rose Bunch</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-NPROC">
+<span class="sig-name descname"><span class="pre">NPROC</span></span><a class="headerlink" href="#envvar-NPROC" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>Specifies the number of processors to run on. Default is 1.</p>
+</dd>
+<dt>Used By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-mpi-launch"><span class="std std-ref">rose mpi-launch</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_APP_COMMAND_KEY">
+<span class="sig-name descname"><span class="pre">ROSE_APP_COMMAND_KEY</span></span><a class="headerlink" href="#envvar-ROSE_APP_COMMAND_KEY" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>Can be set to define which command in an app config to use.</p>
+</dd>
+<dt>Used By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a></p></li>
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_APP_MODE">
+<span class="sig-name descname"><span class="pre">ROSE_APP_MODE</span></span><a class="headerlink" href="#envvar-ROSE_APP_MODE" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>Can be set to define which built-in app to run.</p>
+</dd>
+<dt>Used By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a></p></li>
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_APP_OPT_CONF_KEYS">
+<span class="sig-name descname"><span class="pre">ROSE_APP_OPT_CONF_KEYS</span></span><a class="headerlink" href="#envvar-ROSE_APP_OPT_CONF_KEYS" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>Each <code class="docutils literal notranslate"><span class="pre">KEY</span></code> in this space delimited list switches on an optional
+configuration in an application. The <code class="docutils literal notranslate"><span class="pre">(KEY)</span></code> syntax can be used to
+denote an optional configuration that can be missing. The configurations
+are applied in first-to-last order.</p>
+</dd>
+<dt>Used By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a></p></li>
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_BUNCH_LOG_PREFIX">
+<span class="sig-name descname"><span class="pre">ROSE_BUNCH_LOG_PREFIX</span></span><a class="headerlink" href="#envvar-ROSE_BUNCH_LOG_PREFIX" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>Environment variable provided to Rose Bunch instances at runtime to
+identify the log prefix that will be used for output e.g. for a bunch
+instance named  <code class="docutils literal notranslate"><span class="pre">foo</span></code> then <code class="docutils literal notranslate"><span class="pre">ROSE_BUNCH_LOG_PREFIX=foo</span></code>.</p>
+</dd>
+<dt>Provided At Runtime By</dt><dd><ul class="simple">
+<li><p>Rose Bunch</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_CONF_PATH">
+<span class="sig-name descname"><span class="pre">ROSE_CONF_PATH</span></span><a class="headerlink" href="#envvar-ROSE_CONF_PATH" title="Permalink to this definition"></a></dt>
+<dd><dl>
+<dt>Description</dt><dd><p>If defined this will override the default configuration search path.</p>
+<p>Provide a colon (<code class="docutils literal notranslate"><span class="pre">:</span></code>) separated list of paths to search for
+<code class="docutils literal notranslate"><span class="pre">rose.conf</span></code> files.</p>
+<p>If set to an empty string no config files will be loaded.</p>
+</dd>
+<dt>Used By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-test-battery"><span class="std std-ref">etc/bin/rose-test-battery</span></a></p></li>
+</ul>
+</dd>
+<dt>See also</dt><dd><ul class="simple">
+<li><p><span class="target" id="index-0"></span><a class="reference internal" href="#envvar-ROSE_SITE_CONF_PATH"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_SITE_CONF_PATH</span></code></a></p></li>
+<li><p><a class="reference internal" href="configuration/site-and-user.html#rose:file:rose.conf" title="rose:file:rose.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose.conf</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_SITE_CONF_PATH">
+<span class="sig-name descname"><span class="pre">ROSE_SITE_CONF_PATH</span></span><a class="headerlink" href="#envvar-ROSE_SITE_CONF_PATH" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>Defines the location of the “site” configuration. Configurations defined
+here can be overridden by the “user” configuration.</p>
+</dd>
+<dt>See also</dt><dd><ul class="simple">
+<li><p><span class="target" id="index-1"></span><a class="reference internal" href="#envvar-ROSE_CONF_PATH"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_CONF_PATH</span></code></a></p></li>
+<li><p><a class="reference internal" href="configuration/site-and-user.html#rose:file:rose.conf" title="rose:file:rose.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose.conf</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_CYCLING_MODE">
+<span class="sig-name descname"><span class="pre">ROSE_CYCLING_MODE</span></span><a class="headerlink" href="#envvar-ROSE_CYCLING_MODE" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>The cycling mode to use when manipulating dates. Can be either <code class="docutils literal notranslate"><span class="pre">360day</span></code>
+or <code class="docutils literal notranslate"><span class="pre">gregorian</span></code>.</p>
+</dd>
+<dt>Used By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-date"><span class="std std-ref">rose date</span></a></p></li>
+</ul>
+</dd>
+<dt>Provided By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_DATA">
+<span class="sig-name descname"><span class="pre">ROSE_DATA</span></span><a class="headerlink" href="#envvar-ROSE_DATA" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>The path to the data directory of the running suite.</p>
+</dd>
+<dt>Provided By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_DATAC">
+<span class="sig-name descname"><span class="pre">ROSE_DATAC</span></span><a class="headerlink" href="#envvar-ROSE_DATAC" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>The path to the data directory of this cycle time in the running suite.</p>
+</dd>
+<dt>Provided By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-0">
+<span id="envvar-ROSE_DATAC????"></span><span class="sig-name descname"><span class="pre">ROSE_DATAC????</span></span><a class="headerlink" href="#envvar-0" title="Permalink to this definition"></a></dt>
+<dd><dl>
+<dt>Description</dt><dd><p>The path to the data directory of the cycle time with an offset relative
+to the current cycle time. <code class="docutils literal notranslate"><span class="pre">????</span></code> is a duration:</p>
+<ul class="simple">
+<li><p>A <code class="docutils literal notranslate"><span class="pre">__</span></code> (double underscore) prefix denotes a cycle time in the
+future. Otherwise, it is a cycle time in the past.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PnM</span></code> denotes <em>n</em> months.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PnW</span></code> denotes <em>n</em> weeks.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PnD</span></code> or <code class="docutils literal notranslate"><span class="pre">nD</span></code> denotes <em>n</em> days.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PTnH</span></code> or <code class="docutils literal notranslate"><span class="pre">TnH</span></code> denotes <em>n</em> hours.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PTnM</span></code> denotes <em>n</em> minutes.</p></li>
+</ul>
+<p>E.g. <code class="docutils literal notranslate"><span class="pre">ROSE_DATACPT6H</span></code> is the data directory of 6 hours before the
+current cycle time.</p>
+<p>E.g. <code class="docutils literal notranslate"><span class="pre">ROSE_DATACP1D</span></code> and <code class="docutils literal notranslate"><span class="pre">ROSE_DATACPT24H</span></code> are both the data directory
+of 1 day before the current cycle time.</p>
+</dd>
+<dt>Provided By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_ETC">
+<span class="sig-name descname"><span class="pre">ROSE_ETC</span></span><a class="headerlink" href="#envvar-ROSE_ETC" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>The path to the <code class="docutils literal notranslate"><span class="pre">etc</span></code> directory of the running suite.</p>
+</dd>
+<dt>Provided By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_FILE_INSTALL_ROOT">
+<span class="sig-name descname"><span class="pre">ROSE_FILE_INSTALL_ROOT</span></span><a class="headerlink" href="#envvar-ROSE_FILE_INSTALL_ROOT" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>If specified, change to the specified directory to install files.</p>
+</dd>
+<dt>Used By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a></p></li>
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_LAUNCHER">
+<span class="sig-name descname"><span class="pre">ROSE_LAUNCHER</span></span><a class="headerlink" href="#envvar-ROSE_LAUNCHER" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>Specifies the launcher program to run the prog.</p>
+</dd>
+<dt>Used By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-mpi-launch"><span class="std std-ref">rose mpi-launch</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_LAUNCHER_FILEOPTS">
+<span class="sig-name descname"><span class="pre">ROSE_LAUNCHER_FILEOPTS</span></span><a class="headerlink" href="#envvar-ROSE_LAUNCHER_FILEOPTS" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>Override <code class="docutils literal notranslate"><span class="pre">[rose-mpi-launch]launcher-fileopts.LAUNCHER</span></code> setting for the
+selected <span class="target" id="index-2"></span><a class="reference internal" href="#envvar-ROSE_LAUNCHER"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_LAUNCHER</span></code></a>.</p>
+</dd>
+<dt>Used By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-mpi-launch"><span class="std std-ref">rose mpi-launch</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_LAUNCHER_LIST">
+<span class="sig-name descname"><span class="pre">ROSE_LAUNCHER_LIST</span></span><a class="headerlink" href="#envvar-ROSE_LAUNCHER_LIST" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>Specifies an alternative list of launchers.</p>
+</dd>
+<dt>Used By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-mpi-launch"><span class="std std-ref">rose mpi-launch</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_LAUNCHER_PREOPTS">
+<span class="sig-name descname"><span class="pre">ROSE_LAUNCHER_PREOPTS</span></span><a class="headerlink" href="#envvar-ROSE_LAUNCHER_PREOPTS" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>Override <code class="docutils literal notranslate"><span class="pre">[rose-mpi-launch]launcher-preopts.LAUNCHER</span></code> setting for the
+selected <span class="target" id="index-3"></span><a class="reference internal" href="#envvar-ROSE_LAUNCHER"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_LAUNCHER</span></code></a>.</p>
+</dd>
+<dt>Used By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-mpi-launch"><span class="std std-ref">rose mpi-launch</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_LAUNCHER_POSTOPTS">
+<span class="sig-name descname"><span class="pre">ROSE_LAUNCHER_POSTOPTS</span></span><a class="headerlink" href="#envvar-ROSE_LAUNCHER_POSTOPTS" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>Override <code class="docutils literal notranslate"><span class="pre">[rose-mpi-launch]launcher-postopts.LAUNCHER</span></code> setting for the
+selected <span class="target" id="index-4"></span><a class="reference internal" href="#envvar-ROSE_LAUNCHER"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_LAUNCHER</span></code></a>.</p>
+</dd>
+<dt>Used By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-mpi-launch"><span class="std std-ref">rose mpi-launch</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_LAUNCHER_ULIMIT_OPTS">
+<span class="sig-name descname"><span class="pre">ROSE_LAUNCHER_ULIMIT_OPTS</span></span><a class="headerlink" href="#envvar-ROSE_LAUNCHER_ULIMIT_OPTS" title="Permalink to this definition"></a></dt>
+<dd><dl>
+<dt>Description</dt><dd><p>Tell launcher to run:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>rose mpi-launch --inner $@
+</pre></div>
+</div>
+<p>Specify the arguments to <code class="docutils literal notranslate"><span class="pre">ulimit</span></code>. E.g. Setting this variable to:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>-a -s unlimited -d unlimited -a
+</pre></div>
+</div>
+<p>results in:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>ulimit -a; ulimit -s unlimited; ulimit -d unlimited; ulimit -a
+</pre></div>
+</div>
+</dd>
+<dt>Used By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-mpi-launch"><span class="std std-ref">rose mpi-launch</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_META_PATH">
+<span class="sig-name descname"><span class="pre">ROSE_META_PATH</span></span><a class="headerlink" href="#envvar-ROSE_META_PATH" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>Defines a metadata search path, colon-separated for multiple paths.</p>
+</dd>
+<dt>Used by</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a></p></li>
+<li><p><a class="reference internal" href="command-reference.html#command-rose-macro"><span class="std std-ref">rose macro</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_NS">
+<span class="sig-name descname"><span class="pre">ROSE_NS</span></span><a class="headerlink" href="#envvar-ROSE_NS" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>Defines the rose namespace. Used to identify if a utility belongs to
+<code class="docutils literal notranslate"><span class="pre">rose</span></code> or <code class="docutils literal notranslate"><span class="pre">rosie</span></code>.</p>
+</dd>
+<dt>Used and Provided By</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rose</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_ORIG_HOST">
+<span class="sig-name descname"><span class="pre">ROSE_ORIG_HOST</span></span><a class="headerlink" href="#envvar-ROSE_ORIG_HOST" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>The name of the host where the <a class="reference external" href="https://cylc.github.io/cylc-doc/8.0b2/html/user-guide/installing-workflows.html#install-workflow" title="(in Cylc v8.0b2)"><span class="xref std std-ref">cylc install</span></a> command was
+invoked.</p>
+</dd>
+<dt>Provided By</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://cylc.github.io/cylc-doc/8.0b2/html/plugins/cylc-rose.html#cylc-rose" title="(in Cylc v8.0b2)"><span>Cylc Rose</span></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_SITE">
+<span class="sig-name descname"><span class="pre">ROSE_SITE</span></span><a class="headerlink" href="#envvar-ROSE_SITE" title="Permalink to this definition"></a></dt>
+<dd><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 2.0.0: </span>This variable is no longer available globally from Rose.</p>
+<p>However, the Cylc-Rose plugin’s implementation of <a class="reference external" href="https://cylc.github.io/cylc-doc/8.0b2/html/plugins/cylc-rose.html#rose-stem" title="(in Cylc v8.0b2)"><span>Rose Stem</span></a>
+provides this variable.</p>
+</div>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_SUITE_DIR">
+<span class="sig-name descname"><span class="pre">ROSE_SUITE_DIR</span></span><a class="headerlink" href="#envvar-ROSE_SUITE_DIR" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>The path to the root directory of the running suite.</p>
+</dd>
+<dt>Provided By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_SUITE_DIR_REL">
+<span class="sig-name descname"><span class="pre">ROSE_SUITE_DIR_REL</span></span><a class="headerlink" href="#envvar-ROSE_SUITE_DIR_REL" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>The path to the root directory of the running suite relative to <code class="docutils literal notranslate"><span class="pre">$HOME</span></code>.</p>
+</dd>
+<dt>Provided By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_SUITE_NAME">
+<span class="sig-name descname"><span class="pre">ROSE_SUITE_NAME</span></span><a class="headerlink" href="#envvar-ROSE_SUITE_NAME" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>The name of the running suite.</p>
+</dd>
+<dt>Provided By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_SUITE_OPT_CONF_KEYS">
+<span class="sig-name descname"><span class="pre">ROSE_SUITE_OPT_CONF_KEYS</span></span><a class="headerlink" href="#envvar-ROSE_SUITE_OPT_CONF_KEYS" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>Each <code class="docutils literal notranslate"><span class="pre">KEY</span></code> in this space delimited list switches on an optional
+configuration when installing a suite. The <code class="docutils literal notranslate"><span class="pre">(KEY)</span></code> syntax can be used to
+denote an optional configuration that can be missing. The configurations
+are applied in first-to-last order.</p>
+</dd>
+<dt>Used By</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://cylc.github.io/cylc-doc/8.0b2/html/plugins/cylc-rose.html#cylc-rose" title="(in Cylc v8.0b2)"><span>Cylc Rose</span></a> and <a class="reference external" href="https://cylc.github.io/cylc-doc/8.0b2/html/user-guide/installing-workflows.html#install-workflow" title="(in Cylc v8.0b2)"><span class="xref std std-ref">cylc install</span></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_TASK_APP">
+<span class="sig-name descname"><span class="pre">ROSE_TASK_APP</span></span><a class="headerlink" href="#envvar-ROSE_TASK_APP" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>Specify a named application configuration.</p>
+</dd>
+<dt>Used By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_TASK_CYCLE_TIME">
+<span class="sig-name descname"><span class="pre">ROSE_TASK_CYCLE_TIME</span></span><a class="headerlink" href="#envvar-ROSE_TASK_CYCLE_TIME" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>The cycle time of the suite task, if there is one.</p>
+</dd>
+<dt>Provided By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_TASK_LOG_DIR">
+<span class="sig-name descname"><span class="pre">ROSE_TASK_LOG_DIR</span></span><a class="headerlink" href="#envvar-ROSE_TASK_LOG_DIR" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>The directory for log files of the suite task.</p>
+</dd>
+<dt>Provided By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_TASK_LOG_ROOT">
+<span class="sig-name descname"><span class="pre">ROSE_TASK_LOG_ROOT</span></span><a class="headerlink" href="#envvar-ROSE_TASK_LOG_ROOT" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>The root path for log files of the suite task.</p>
+</dd>
+<dt>Provided By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_TASK_N_JOBS">
+<span class="sig-name descname"><span class="pre">ROSE_TASK_N_JOBS</span></span><a class="headerlink" href="#envvar-ROSE_TASK_N_JOBS" title="Permalink to this definition"></a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>(Deprecated) Use the <code class="docutils literal notranslate"><span class="pre">opt.jobs</span></code> setting in the application configuration
+instead.</p>
+</div>
+<dl class="simple">
+<dt>Description</dt><dd><p>The number of jobs to run in parallel in <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code> (<code class="docutils literal notranslate"><span class="pre">default=4</span></code>).</p>
+</dd>
+<dt>Used By</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">fcm_make</span></code> built-in application</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fcm_make2</span></code> built-in application</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_TASK_MIRROR_TARGET">
+<span class="sig-name descname"><span class="pre">ROSE_TASK_MIRROR_TARGET</span></span><a class="headerlink" href="#envvar-ROSE_TASK_MIRROR_TARGET" title="Permalink to this definition"></a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>(Deprecated)</p>
+</div>
+<dl class="simple">
+<dt>Description</dt><dd><p>The mirror target for the mirror step in the <code class="docutils literal notranslate"><span class="pre">fcm-make.cfg</span></code>
+configuration.</p>
+</dd>
+<dt>Provided By</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">fcm_make</span></code> built-in application</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_TASK_NAME">
+<span class="sig-name descname"><span class="pre">ROSE_TASK_NAME</span></span><a class="headerlink" href="#envvar-ROSE_TASK_NAME" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>The name of the suite task.</p>
+</dd>
+<dt>Provided By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a></p></li>
+</ul>
+</dd>
+<dt>Used By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_TASK_OPTIONS">
+<span class="sig-name descname"><span class="pre">ROSE_TASK_OPTIONS</span></span><a class="headerlink" href="#envvar-ROSE_TASK_OPTIONS" title="Permalink to this definition"></a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>(Deprecated) Use the <code class="docutils literal notranslate"><span class="pre">args</span></code> setting in the application configuration
+instead.</p>
+</div>
+<dl class="simple">
+<dt>Description</dt><dd><p>Additional options and arguments for <code class="docutils literal notranslate"><span class="pre">fcm</span> <span class="pre">make</span></code> or
+<a class="reference internal" href="command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a>.</p>
+</dd>
+<dt>Used By</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">fcm_make</span></code> built-in application</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fcm_make2</span></code> built-in application</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_TASK_PREFIX">
+<span class="sig-name descname"><span class="pre">ROSE_TASK_PREFIX</span></span><a class="headerlink" href="#envvar-ROSE_TASK_PREFIX" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>The prefix in the task name.</p>
+</dd>
+<dt>Provided By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_TASK_SUFFIX">
+<span class="sig-name descname"><span class="pre">ROSE_TASK_SUFFIX</span></span><a class="headerlink" href="#envvar-ROSE_TASK_SUFFIX" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>The suffix in the task name.</p>
+</dd>
+<dt>Provided By</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_UTIL">
+<span class="sig-name descname"><span class="pre">ROSE_UTIL</span></span><a class="headerlink" href="#envvar-ROSE_UTIL" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>Used to identify which <code class="docutils literal notranslate"><span class="pre">rose</span></code> or <code class="docutils literal notranslate"><span class="pre">rosie</span></code> utility is being run.</p>
+</dd>
+<dt>Used and Provided By</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rose</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-ROSE_VERSION">
+<span class="sig-name descname"><span class="pre">ROSE_VERSION</span></span><a class="headerlink" href="#envvar-ROSE_VERSION" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description</dt><dd><p>The current version of Rose.</p>
+</dd>
+<dt>Provided by</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://cylc.github.io/cylc-doc/8.0b2/html/plugins/cylc-rose.html#cylc-rose" title="(in Cylc v8.0b2)"><span>Cylc Rose</span></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="command-reference.html" class="btn btn-neutral float-left" title="Command Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="other.html" class="btn btn-neutral float-right" title="Other Python API Docs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright : Copyright (C) British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2.0rc1
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2.0rc1";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "api/environment-variables";
+    </script>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+
+
+</body>
+</html>

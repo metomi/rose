@@ -6,5 +6,6 @@
     "2019.01.0": ["html", "pdf", "slides"],
     "2019.01.2": ["html", "slides"],
     "2.0b1": ["html", "slides"],
-    "2.0b2": ["html", "slides"]
+    "2.0b2": ["html", "slides"],
+    "2.0rc1": ["html", "slides"]
 }
