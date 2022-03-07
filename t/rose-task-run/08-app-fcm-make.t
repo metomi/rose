@@ -65,6 +65,7 @@ if [[ -n $JOB_HOST ]]; then
     file_cmp "$TEST_KEY" "$TEST_KEY" <<'__DB__'
 fcm_make2_t5|succeeded
 fcm_make_t1|succeeded
+fcm_make_t1_remote|succeeded
 fcm_make_t2|succeeded
 fcm_make_t3|succeeded
 fcm_make_t4|succeeded
