@@ -16,14 +16,14 @@
 # -----------------------------------------------------------------------------
 """Wraps Python's subprocess.Popen."""
 
+import asyncio
 import os
 import re
 import select
 import shlex
 from subprocess import PIPE, Popen
 import sys
-
-import asyncio
+from typing import Iterable, List
 
 from metomi.rose.reporter import Event
 from metomi.rose.resource import ResourceLocator
@@ -67,7 +67,7 @@ class RosePopenEvent(Event):
         if isinstance(command, str):
             ret = command
         else:
-            ret = RosePopener.list_to_shell_str(self.command)
+            ret = RosePopener.shlex_join(self.command)
 
         try:
             # real file or real stream
@@ -128,11 +128,47 @@ class RosePopener:
     }
     ENVS_OF_CMDS = {"editor": ["VISUAL", "EDITOR"]}
 
-    @classmethod
-    def list_to_shell_str(cls, args):
-        if not args:
-            return ""
-        return " ".join([re.sub(r"([\"'\s])", r"\\\1", arg) for arg in args])
+    @staticmethod
+    def shlex_join(args: Iterable[str]) -> str:
+        """Convert a list of strings into a shell command, safely quoting
+        when the strings contain whitespace and special chars.
+
+        Basically a back-port of shlex.join(), needed for py 3.7.
+
+        Examples:
+        >>> RosePopener.shlex_join([])
+        ''
+        >>> RosePopener.shlex_join(["echo", "-n", "Multiple words"])
+        "echo -n 'Multiple words'"
+        >>> RosePopener.shlex_join(["ls", "my_dir;foiled_injection"])
+        "ls 'my_dir;foiled_injection'"
+        >>> RosePopener.shlex_join(["what", "about", "globs*"])
+        "what about 'globs*'"
+        """
+        return " ".join(shlex.quote(arg) for arg in args)
+
+    @staticmethod
+    def list_to_shell_str(args: Iterable[str]) -> str:
+        """Convert a list of strings into a shell command, escaping whitespace
+        and quotes, but otherwise allowing special chars so user defined
+        commands can run without sanitisation.
+
+        Examples:
+        >>> RosePopener.list_to_shell_str([])
+        ''
+        >>> _ = RosePopener.list_to_shell_str(["it's"])
+        >>> print(_)
+        it\\'s
+        >>> _
+        "it\\\\'s"
+        >>> RosePopener.list_to_shell_str(["echo", "-n", "Multiple words"])
+        'echo -n Multiple\\\\ words'
+        >>> RosePopener.list_to_shell_str(["ls", "my_dir;allow_this"])
+        'ls my_dir;allow_this'
+        >>> RosePopener.list_to_shell_str(["what", "about", "globs*"])
+        'what about globs*'
+        """
+        return " ".join(re.sub(r"([\"'\s])", r"\\\1", arg) for arg in args)
 
     def __init__(self, event_handler=None):
         self.event_handler = event_handler
@@ -143,7 +179,7 @@ class RosePopener:
         if callable(self.event_handler):
             return self.event_handler(*args, **kwargs)
 
-    def get_cmd(self, key, *args):
+    def get_cmd(self, key: str, *args: str) -> List[str]:
         """Return default options and arguments of a known command as a list.
 
         If a setting [external] <key> is defined in the site/user
@@ -167,8 +203,9 @@ class RosePopener:
                 self.cmds[key] = shlex.split(node.value)
         if key not in self.cmds:
             for name in self.ENVS_OF_CMDS.get(key, []):
-                if os.getenv(name):  # not None, not null str
-                    self.cmds[key] = shlex.split(os.getenv(name))
+                env_var = os.getenv(name)
+                if env_var:  # not None, not null str
+                    self.cmds[key] = shlex.split(env_var)
                     break
         if key not in self.cmds:
             self.cmds[key] = self.CMDS[key]

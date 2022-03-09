@@ -33,12 +33,12 @@ from socket import (
 import sys
 from time import sleep, time
 import traceback
+from typing import List, Optional
 
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.popen import RosePopener
 from metomi.rose.reporter import Event, Reporter
 from metomi.rose.resource import ResourceLocator
-from typing import Optional
 
 
 class NoHostError(Exception):
@@ -276,6 +276,18 @@ class HostSelector:
 
         return host_names, rank_method, thresholds
 
+    @staticmethod
+    def _bash_login_cmd(cmd: List[str]) -> List[str]:
+        """Return the given command as a bash login shell command.
+
+        This allows users to set env vars.
+
+        Example:
+        >>> HostSelector._bash_login_cmd(["echo", "-n", "Multiple words"])
+        ['bash', '-l', '-c', "echo -n 'Multiple words'"]
+        """
+        return ['bash', '-l', '-c', RosePopener.shlex_join(cmd)]
+
     def select(
         self,
         names=None,
@@ -391,13 +403,9 @@ class HostSelector:
         host_proc_dict = {}
         for host_name in sorted(host_names):
             # build host-select-client command
-            command = []
-            if not self.is_local_host(host_name):
-                command_args = []
-                command_args.append(host_name)
-                command = self.popen.get_cmd("ssh", *command_args)
+            command: List[str] = []
 
-            # pass through CYLC_VERSION to support use of cylc wrapperf script
+            # pass through CYLC_VERSION to support use of cylc wrapper script
             try:
                 import cylc.flow
             except ModuleNotFoundError:
@@ -405,10 +413,15 @@ class HostSelector:
             else:
                 command.extend([
                     'env',
-                    f'CYLC_VERSION={cylc.flow.__version__}'
+                    f'CYLC_VERSION={cylc.flow.__version__}',
                 ])
+                cylc_env_name = os.getenv('CYLC_ENV_NAME')
+                if cylc_env_name:
+                    command.append(f'CYLC_ENV_NAME={cylc_env_name}')
 
-            command.extend(["rose", "host-select-client"])
+            command.extend(
+                self._bash_login_cmd(['rose', 'host-select-client'])
+            )
 
             # build list of metrics to obtain for each host
             metrics = rank_conf.get_command()
@@ -420,6 +433,11 @@ class HostSelector:
             # convert metrics list to JSON stdin
             stdin = '\n***start**\n' + json.dumps(metrics) + '\n**end**\n'
 
+            if not self.is_local_host(host_name):
+                command = [
+                    *self.popen.get_cmd('ssh', host_name),
+                    RosePopener.shlex_join(command)
+                ]
             # fire off host-select-client processes
             proc = self.popen.run_bg(
                 *command, stdin=stdin, preexec_fn=os.setpgrp

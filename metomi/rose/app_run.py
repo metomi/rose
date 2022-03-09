@@ -297,12 +297,12 @@ class Poller:
         # Return any remaining test-failing files.
         return poll_test, poll_any_files, poll_all_files
 
-    def _poll_file(self, file_, poll_file_test):
+    def _poll_file(self, file_: str, poll_file_test: str) -> bool:
         """Poll for existence of a file."""
         is_done = False
         if poll_file_test:
             test = poll_file_test.replace(
-                "{}", self.popen.list_to_shell_str([file_])
+                r'{}', self.popen.list_to_shell_str([file_])
             )
             is_done = (
                 self.popen.run(
