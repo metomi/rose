@@ -147,7 +147,7 @@ jobs:
       - name: MyPy
         working-directory: rose
         run: |
-          mypy --explicit-package-bases
+          mypy
 
       - name: Unit Tests
         working-directory: rose
