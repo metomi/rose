@@ -112,7 +112,6 @@ else
 
     TEST_KEY="$TEST_KEY_BASE-t5-part-2"
     # TODO: this test relies on "retrieve job logs = True".
-    #rose suite-log -q --name=$FLOW --update fcm_make2_t5
     file_grep "$TEST_KEY.out" \
         "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -C .*/cylc-run/${FLOW}/share/fcm_make_t5 -n 2 -j 4" \
         $FLOW_RUN_DIR/log/job/1/fcm_make2_t5/01/job.out

@@ -40,7 +40,7 @@ from metomi.rose.suite_engine_procs.cylc import CylcProcessor
     ],
 )
 def test_get_task_auth(monkeypatch, platform, expect):
-    def fake_get_platform(*_):
+    def fake_get_platform(*_, quiet=False):
         if platform is None:
             raise KeyError
         else:

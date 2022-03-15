@@ -16,6 +16,7 @@
 # ----------------------------------------------------------------------------
 """Builtin application: run "fcm make"."""
 
+from contextlib import suppress
 import os
 from pipes import quote
 import shlex
@@ -29,7 +30,10 @@ from metomi.rose.env import (
     env_var_process,
 )
 from metomi.rose.fs_util import FileSystemEvent
-from metomi.rose.popen import RosePopenError
+from metomi.rose.popen import (
+    RosePopenError,
+    WorkflowFileNotFoundError
+)
 
 ORIG = 0
 CONT = 1
@@ -209,9 +213,11 @@ class FCMMakeApp(BuiltinApp):
         task_name_cont = task.task_name.replace(
             orig_cont_map[ORIG], orig_cont_map[CONT]
         )
-        auth = app_runner.suite_engine_proc.get_task_auth(
-            task.suite_name, task_name_cont
-        )
+        auth = None
+        with suppress(WorkflowFileNotFoundError):
+            auth = app_runner.suite_engine_proc.get_task_auth(
+                task.suite_name, task_name_cont
+            )
         if auth is not None:
             dest_cont = _conf_value(conf_tree, ["dest-cont"])
             if dest_cont is None:
