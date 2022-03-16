@@ -54,11 +54,15 @@ run_pass "${TEST_KEY}" \
         --no-detach
 
 TEST_KEY="${TEST_KEY_BASE}-prune.log"
+
+# Pull out lines referring to ssh-ing to JOB_HOST_1 and 2 from prun log
 grep \
     "ssh .* \\(${JOB_HOST_1}\\|${JOB_HOST_2}\\) .* share/cycle/19700101T0000Z;" \
     "${FLOW_RUN_DIR}/prune.log" >'prune-ssh.log'
-run_pass "${TEST_KEY}-prune-ssh-wc-l" test "$(wc -l <'prune-ssh.log')" -eq 2
+run_pass "${TEST_KEY}-prune-ssh-wc-l" test "$(wc -l <'prune-ssh.log')" -eq 1
 
+# Check that Rose has only cleaned on one of the job hosts
+# with a shared file system.
 if head -n 1 'prune-ssh.log' | grep ".* ${JOB_HOST_1} .*"; then
     run_pass "${TEST_KEY}-delete-1" \
         grep -q "delete: ${JOB_HOST_1}:share/cycle/19700101T0000Z" \

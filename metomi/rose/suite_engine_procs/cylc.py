@@ -67,34 +67,45 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         return os.path.join(cls.SUITE_DIR_REL_ROOT, suite_name, *paths)
 
+    @staticmethod
     def get_suite_jobs_auths(
-        self, suite_name: str, cycle_name_tuples: Tuple[Any] = None
+        suite_name: str, cycle_name_tuples: Tuple[Any] = None
     ) -> List[str]:
         """Get hosts of jobs from a Cylc workflow database.
 
-        returns: list of hostname strings.
+        returns: list of hostname strings used by tasks for given cycles.
+
+        Example:
+            (Can't work as a doc-test because this function requires a
+            workflow databse)
+            this('remote-eg/run3', [('10660101T0000Z', None)])
+            returns
+            ['host1', 'host2']
         """
         # n.b. Imports inside function to avoid dependency on Cylc and
         # Cylc-Rose is Rose is being used with a different workflow engine.
         from cylc.flow.platforms import get_host_from_platform
         from cylc.rose.platform_utils import get_platforms_from_task_jobs
 
+        # Get a list of task platforms for the tasks at this cycle point.
         task_platforms = {}
         if cycle_name_tuples is not None:
             for cycle, name in cycle_name_tuples:
                 new_platforms = get_platforms_from_task_jobs(suite_name, cycle)
                 task_platforms[cycle] = new_platforms
 
-        # For each platform get a list of hosts.
+        # For each platform get a list of install targets.
         hosts = []
         for cycle, tasks in task_platforms.items():
             for platform in tasks.values():
-                hosts.append(get_host_from_platform(platform))
+                if platform['install target'] is not None:
+                    hosts.append(platform['install target'])
         hosts = list(set(hosts))
         return hosts
 
+    @staticmethod
     def get_task_auth(
-        self, suite_name: str, task_name: str
+        suite_name: str, task_name: str
     ) -> Union[str, None]:
         """Get host for a remote task from a Cylc workflow definition.
 
