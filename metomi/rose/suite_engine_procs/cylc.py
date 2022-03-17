@@ -23,7 +23,6 @@ from random import shuffle
 import re
 import socket
 import sqlite3
-import subprocess
 import tarfile
 from time import sleep
 from typing import Any, List, Tuple, Union
