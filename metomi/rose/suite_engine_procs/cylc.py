@@ -107,15 +107,10 @@ class CylcProcessor(SuiteEngineProcessor):
         # Cylc-Rose is Rose is being used with a different workflow engine.
         from cylc.flow.exceptions import WorkflowFilesError
         from cylc.flow.hostuserutil import is_remote_platform
-        from cylc.flow.platforms import (
-            get_host_from_platform,
-            platform_from_name
-        )
+        from cylc.flow.platforms import get_host_from_platform
         from cylc.rose.platform_utils import get_platform_from_task_def
         try:
-            platform = get_platform_from_task_def(
-                suite_name, task_name, quiet=True
-            )
+            platform = get_platform_from_task_def(suite_name, task_name)
         except KeyError:
             return None
         except (WorkflowFilesError):
@@ -123,24 +118,11 @@ class CylcProcessor(SuiteEngineProcessor):
         else:
             if platform is None:
                 return 'localhost'
-            elif isinstance(platform, str):
-                platform_evaluated = self.eval_subshell(platform)
-                platform = platform_from_name(platform_evaluated)
             # If task has been defined return host:
             if is_remote_platform(platform):
                 return get_host_from_platform(platform)
             else:
                 return None
-
-    @staticmethod
-    def eval_subshell(platform):
-        """Evaluates platforms/hosts"""
-        from cylc.flow.platforms import HOST_REC_COMMAND
-        match = HOST_REC_COMMAND.match(platform)
-        output = subprocess.run(
-            ['bash', '-c', f" {match[2]}"], capture_output=True
-        )
-        return output.stdout.strip().decode()
 
     def get_task_props_from_env(self):
         """Get attributes of a suite task from environment variables.
