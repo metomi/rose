@@ -10,6 +10,20 @@ updated. Only the first match gets replaced, so it's fine to leave the old
 ones in. -->
 --------------------------------------------------------------------------------
 
+## 2.0rc2 (<span actions:bind='release-date'>Upcoming</span>)
+
+### Enhancements
+
+[#2555](https://github.com/metomi/rose/pull/2555) - `rose host-select` now
+passes through `$CYLC_ENV_NAME` and the user's login env vars.
+
+### Fixes
+
+[#2548](https://github.com/metomi/rose/pull/2548) - Added back the
+`rose-conf.vim` syntax highlighting file for ViM that was accidentally removed.
+
+--------------------------------------------------------------------------------
+
 ## 2.0rc1 (<span actions:bind='release-date'>Released 2022-02-17</span>)
 
 [#2510](https://github.com/metomi/rose/pull/2510) -
