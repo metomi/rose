@@ -31,14 +31,15 @@ from socket import (
     gethostname,
 )
 import sys
+import textwrap
 from time import sleep, time
 import traceback
+from typing import List, Optional
 
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.popen import RosePopener
 from metomi.rose.reporter import Event, Reporter
 from metomi.rose.resource import ResourceLocator
-from typing import Optional
 
 
 class NoHostError(Exception):
@@ -63,17 +64,22 @@ class HostSelectCommandFailedEvent(Event):
 
     KIND = Event.KIND_ERR
 
-    def __init__(self, return_code: int, host: str):
-        self.return_code = return_code
+    def __init__(
+        self, host: str, return_code: int, stderr: Optional[str] = None
+    ):
         self.host = host
+        self.return_code = return_code
+        self.stderr = stderr
         Event.__init__(self)
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.return_code == 255:
             msg = 'ssh failed'
         else:
-            msg = f'failed {self.return_code}'
-        return f'{self.host}: ({msg})'
+            msg = f"failed ({self.return_code})"
+            if self.stderr is not None:
+                msg += f"\n{textwrap.indent(self.stderr, '    ')}"
+        return f"{self.host}: {msg}"
 
 
 class HostThresholdNotMetEvent(Event):
@@ -276,6 +282,18 @@ class HostSelector:
 
         return host_names, rank_method, thresholds
 
+    @staticmethod
+    def _bash_login_cmd(cmd: List[str]) -> List[str]:
+        """Return the given command as a bash login shell command.
+
+        This allows users to set env vars.
+
+        Example:
+        >>> HostSelector._bash_login_cmd(["echo", "-n", "Multiple words"])
+        ['bash', '-l', '-c', "echo -n 'Multiple words'"]
+        """
+        return ['bash', '-l', '-c', RosePopener.shlex_join(cmd)]
+
     def select(
         self,
         names=None,
@@ -379,7 +397,7 @@ class HostSelector:
                 elif proc.wait():
                     self.handle_event(
                         HostSelectCommandFailedEvent(
-                            proc.returncode, host_name
+                            host_name, proc.returncode
                         )
                     )
                 else:
@@ -391,13 +409,9 @@ class HostSelector:
         host_proc_dict = {}
         for host_name in sorted(host_names):
             # build host-select-client command
-            command = []
-            if not self.is_local_host(host_name):
-                command_args = []
-                command_args.append(host_name)
-                command = self.popen.get_cmd("ssh", *command_args)
+            command: List[str] = []
 
-            # pass through CYLC_VERSION to support use of cylc wrapperf script
+            # pass through CYLC_VERSION to support use of cylc wrapper script
             try:
                 import cylc.flow
             except ModuleNotFoundError:
@@ -405,10 +419,15 @@ class HostSelector:
             else:
                 command.extend([
                     'env',
-                    f'CYLC_VERSION={cylc.flow.__version__}'
+                    f'CYLC_VERSION={cylc.flow.__version__}',
                 ])
+                cylc_env_name = os.getenv('CYLC_ENV_NAME')
+                if cylc_env_name:
+                    command.append(f'CYLC_ENV_NAME={cylc_env_name}')
 
-            command.extend(["rose", "host-select-client"])
+            command.extend(
+                self._bash_login_cmd(['rose', 'host-select-client'])
+            )
 
             # build list of metrics to obtain for each host
             metrics = rank_conf.get_command()
@@ -420,6 +439,11 @@ class HostSelector:
             # convert metrics list to JSON stdin
             stdin = '\n***start**\n' + json.dumps(metrics) + '\n**end**\n'
 
+            if not self.is_local_host(host_name):
+                command = [
+                    *self.popen.get_cmd('ssh', host_name),
+                    RosePopener.shlex_join(command)
+                ]
             # fire off host-select-client processes
             proc = self.popen.run_bg(
                 *command, stdin=stdin, preexec_fn=os.setpgrp
@@ -434,19 +458,18 @@ class HostSelector:
         while host_proc_dict:
             sleep(self.SSH_CMD_POLL_DELAY)
             for host_name, (proc, metrics) in list(host_proc_dict.items()):
-                if proc.poll() is None:
-                    score = None
-                elif proc.wait():
-                    stdout, stderr = proc.communicate()
+                if proc.poll() is None:  # still running
+                    continue
+                stdout, stderr = proc.communicate()
+                if proc.returncode:
                     self.handle_event(
                         HostSelectCommandFailedEvent(
-                            proc.returncode, host_name
+                            host_name, proc.returncode, stderr
                         )
                     )
                     host_proc_dict.pop(host_name)
                 else:
-                    out = proc.communicate()[0]
-                    out = _deserialise(metrics, json.loads(out.strip()))
+                    out = _deserialise(metrics, json.loads(stdout.strip()))
 
                     host_proc_dict.pop(host_name)
                     for threshold_conf in threshold_confs:

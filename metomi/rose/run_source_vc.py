@@ -62,12 +62,12 @@ def write_source_vc_info(run_source_dir, output=None, popen=None):
         os.chdir(run_source_dir)
         try:
             for args in args_list:
-                cmd = [vcs] + args
+                cmd = [vcs, *args]
                 ret_code, out, _ = popen.run(*cmd, env=environ)
                 if out:
                     write_safely(("#" * 80 + "\n"), handle)
                     write_safely(
-                        ("# %s\n" % popen.list_to_shell_str(cmd)), handle
+                        ("# %s\n" % popen.shlex_join(cmd)), handle
                     )
                     write_safely(("#" * 80 + "\n"), handle)
                     write_safely(out, handle)

@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-"""Logic specific to the Cylc suite engine."""
+"""Logic specific to the Cylc workflow engine."""
 
 from glob import glob
 import os
@@ -39,7 +39,7 @@ from metomi.rose.suite_engine_proc import (
 
 class CylcProcessor(SuiteEngineProcessor):
 
-    """Logic specific to the cylc suite engine."""
+    """Logic specific to the Cylc workflow engine."""
 
     REC_CYCLE_TIME = re.compile(
         r"\A[\+\-]?\d+(?:W\d+)?(?:T\d+(?:Z|[+-]\d+)?)?\Z"

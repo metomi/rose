@@ -36,7 +36,7 @@ TEST_KEY="${TEST_KEY_BASE}-ssh-fail"
 run_fail "${TEST_KEY}" rose 'host-select' 'electric-monkey-eggs'
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" </dev/null
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<__HERE__
-[WARN] electric-monkey-eggs: (ssh failed)
+[WARN] electric-monkey-eggs: ssh failed
 [FAIL] No hosts selected.
 __HERE__
 #-------------------------------------------------------------------------------

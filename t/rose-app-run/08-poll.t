@@ -61,9 +61,9 @@ run_fail "$TEST_KEY" rose app-run --config=../config -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_grep "$TEST_KEY.err.0" \
     '\[FAIL\] ....-..-..T..:..:....* poll timeout after PT..*S' "$TEST_KEY.err"
-file_grep "$TEST_KEY.err.1" '* test' "$TEST_KEY.err"
-file_grep "$TEST_KEY.err.2" '* any-files' "$TEST_KEY.err"
-file_grep "$TEST_KEY.err.3" '* all-files:file0\* file1 file2' "$TEST_KEY.err"
+file_grep "$TEST_KEY.err.1" '\* test' "$TEST_KEY.err"
+file_grep "$TEST_KEY.err.2" '\* any-files' "$TEST_KEY.err"
+file_grep "$TEST_KEY.err.3" "\* all-files:file0\* file1 file2" "$TEST_KEY.err"
 test_teardown
 #-------------------------------------------------------------------------------
 # Timeout test 2. Missing a file in all-files.
