@@ -17,9 +17,13 @@
 """Tests for functions in the cylc suite engine proc.
 """
 
-import cylc.rose.platform_utils
 import pytest
 from pytest import param
+
+try:
+    import cylc.rose.platform_utils
+except ImportError:
+    pytestmark = pytest.mark.skip(reason="cylc-rose not found")
 
 from metomi.rose.suite_engine_procs.cylc import CylcProcessor
 

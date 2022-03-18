@@ -45,9 +45,8 @@ tests "$(($(wc -w <<<"${HOSTS}") + 2))"
 run_pass "${TEST_KEY_BASE}" rose 'host-select' -v -v ${HOSTS}
 
 # 1 bash command
-file_grep \
-    "${TEST_KEY_BASE}.out" \
-    "rose host-select-client <<'__STDIN__'" \
+file_grep "${TEST_KEY_BASE}.out-grep" \
+    "bash -l -c 'rose host-select-client' <<'__STDIN__'" \
     "${TEST_KEY_BASE}.out"
 
 # 0 ssh LOCAL_HOST command
