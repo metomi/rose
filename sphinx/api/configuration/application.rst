@@ -34,7 +34,7 @@ contain the following:
      ``[!file:hello.txt]``, then the file will not be installed at all.
 
 * ``bin/`` directory for e.g. scripts and executables used by the application
-  at run time. If a ``bin/`` exists in the application configuration, it will 
+  at run time. If a ``bin/`` exists in the application configuration, it will
   prepended to the ``PATH`` environment variable at run time.
 * ``meta/`` directory for the metadata of the application.
 * ``opt/`` directory (see :ref:`Optional Configuration`).
@@ -98,7 +98,7 @@ E.g. The application configuration directory may look like:
          which can be selected at runtime.
 
          See the :ref:`rose-tutorial-command-keys` tutorial.
-  
+
    .. rose:conf:: env
 
       Specify environment variables to be provided to the
@@ -120,12 +120,12 @@ E.g. The application configuration directory may look like:
          Define an environment variable ``KEY`` with the value ``VALUE``.
 
       .. rose:conf:: UNDEF
-      
+
          A special variable that is always undefined at run time.
 
          Reference to it will cause a failure at run time. It can be used to
          indicate that a value must be overridden at run time.
-  
+
    .. rose:conf:: [etc]
 
       Specify misc. settings.
@@ -186,23 +186,29 @@ E.g. The application configuration directory may look like:
       .. rose:conf:: all-files
 
          A list of space delimited list of file paths. This test
-         passes only if all file paths in the list exist.
+         passes only if all file paths in the list exist. Accepts globs.
 
       .. rose:conf:: any-files
 
          A list of space delimited list of file paths. This test
-         passes if any file path in the list exists.
+         passes if any file path in the list exists. Accepts globs.
 
       .. rose:conf:: test
 
          A shell command. This test passes if the command returns a 0
          (zero) return code.
 
-         Normally, the :rose:conf:`all-files` and :rose:conf:`any-files`
-         tests both test for the existence of file paths.
+         This test is run in addition to
+         the :rose:conf:`all-files` and :rose:conf:`any-files`
+         tests for the existence of file paths.
 
       .. rose:conf:: file-test
-     
+
+         A shell command run for each file path, where ``{}`` is substituted
+         for the file path at runtime. This test passes if the command returns
+         a 0 (zero) return code for all paths in ``all-files``
+         and any path in ``any-files``.
+
          If :rose:conf:`test` is not enough, e.g. you want to test for the
          existence of a string in each file, you can specify a
          :rose:conf:`file-test` to do a ``grep``. E.g.:
@@ -212,10 +218,17 @@ E.g. The application configuration directory may look like:
             all-files=file1 file2
             file-test=test -e {} && grep -q 'hello' {}
 
-         At runtime, any ``{}`` pattern in the above would be replaced
-         with the name of the file. The above make sure that both
+         At runtime, any ``{}`` in the command is replaced
+         with the name of the file (or glob pattern).
+         The example above tests that both
          ``file1`` and ``file2`` exist and that they both contain the
-         string ``hello``.
+         string ``hello``. It is run for each path/pattern, so the
+         example above would be equivalent to:
+
+         .. code-block:: bash
+
+            test -e file1 && grep -q 'hello' file1
+            test -e file2 && grep -q 'hello' file2
 
       .. rose:conf:: delays
 
