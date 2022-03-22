@@ -29,7 +29,7 @@ from typing import Any, List, Tuple, Union
 from uuid import uuid4
 
 from metomi.rose.fs_util import FileSystemEvent
-from metomi.rose.popen import RosePopenError
+from metomi.rose.popen import WorkflowFileNotFoundError, RosePopenError
 from metomi.rose.reporter import Reporter
 from metomi.rose.suite_engine_proc import (
     SuiteEngineProcessor,
@@ -104,16 +104,19 @@ class CylcProcessor(SuiteEngineProcessor):
         """
         # n.b. Imports inside function to avoid dependency on Cylc and
         # Cylc-Rose is Rose is being used with a different workflow engine.
-        from cylc.flow.platforms import get_host_from_platform
+        from cylc.flow.exceptions import WorkflowFilesError
         from cylc.flow.hostuserutil import is_remote_platform
+        from cylc.flow.platforms import get_host_from_platform
         from cylc.rose.platform_utils import get_platform_from_task_def
-
-        # Check whether task has been defined.
         try:
             platform = get_platform_from_task_def(suite_name, task_name)
         except KeyError:
             return None
+        except (WorkflowFilesError):
+            raise WorkflowFileNotFoundError
         else:
+            if platform is None:
+                return 'localhost'
             # If task has been defined return host:
             if is_remote_platform(platform):
                 return get_host_from_platform(platform)

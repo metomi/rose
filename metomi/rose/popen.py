@@ -29,6 +29,18 @@ from metomi.rose.reporter import Event
 from metomi.rose.resource import ResourceLocator
 
 
+class WorkflowFileNotFoundError(Exception):
+
+    """Error: Workflow file not found.
+
+    Expected error for fcm_make remote where the flow.cylc is
+    not included in the file installation.
+    """
+
+    def __str__(self):
+        return "No workflow file found."
+
+
 class RosePopenError(Exception):
 
     """An error raised when a shell command call fails."""

@@ -13,6 +13,7 @@ fcm_make_t3 # opt.jobs
 fcm_make_t4 # args
 {% if HOST is defined %}
 fcm_make_t5 => fcm_make2_t5 # mirror
+fcm_make_t1_remote # basic remote
 {% endif %}
 """
 [runtime]
@@ -23,6 +24,11 @@ fcm_make_t5 => fcm_make2_t5 # mirror
     [[fcm_make_t5]]
     [[fcm_make2_t5]]
         [[[remote]]]
-            host={{HOST}}
+            host=$(echo {{HOST}})
             retrieve job logs = true
+    [[fcm_make_t1_remote]]
+        [[[environment]]]
+            ROSE_TASK_APP = fcm_make_t1
+        [[[remote]]]
+            host=$(echo {{HOST}})
 {% endif %}
