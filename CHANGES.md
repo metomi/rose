@@ -19,7 +19,8 @@ passes through `$CYLC_ENV_NAME` and the user's login env vars.
 
 ### Fixes
 
-[#2557](https://github.com/metomi/rose/pull/2557) - Fcm make now works
+[#2557](https://github.com/metomi/rose/pull/2557) -
+[FCM Make](https://github.com/metomi/fcm) now works
 correctly with remote tasks and tasks which have their platform or host defined
 as a subshell.
 
