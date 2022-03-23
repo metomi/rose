@@ -1,3 +1,5 @@
+.. _builtin.fcm_make:
+
 ``fcm_make``
 ============
 

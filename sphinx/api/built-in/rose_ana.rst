@@ -1,3 +1,5 @@
+.. _builtin.rose_ana:
+
 ``rose_ana``
 ============
 

@@ -1,3 +1,5 @@
+.. _builtin.rose_bunch:
+
 ``rose_bunch``
 ==============
 
