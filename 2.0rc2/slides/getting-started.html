@@ -1,0 +1,163 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Getting Started &mdash; Rose Documentation 2.0rc2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/diff_selector.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/grid_table.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/hieroglyph_theme_addons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/tutorial.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/addons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0rc2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/js/diff_selector.js"></script>
+    <script type="text/javascript" src="_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="_static/js/addons.js"></script>
+    <script type="text/javascript" src="_static/js/versioning.js"></script>
+    <script type="text/javascript" src="_static/common.js"></script>
+    
+    <script type="text/javascript" src="_static/slides.js"></script>
+    <script type="text/javascript" src="_static/sync.js"></script>
+    <script type="text/javascript" src="_static/controller.js"></script>
+    <script type="text/javascript" src="_static/init.js"></script>
+    
+    
+    <link rel="shortcut icon" href="_static/rose-favicon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Rose Documentation 2.0rc2 documentation" href="index.html" />
+    <link rel="next" title="Rose Tutorial" href="tutorial/rose/index.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="getting-started">
+
+<h1>Getting Started<a class="headerlink" href="../html/getting-started.html#getting-started" title="View HTML">§</a></h1>
+
+<p>If you are working with a new installation of Rose you should look at the
+<a class="reference internal" href="api/configuration/site-and-user.html#site-and-user-configuration"><span class="std std-ref">Site And User Configuration</span></a>.</p>
+<p>Rose combines the settings in the site configuration and the user configuration
+at run time. You can view the resultant configuration by issuing the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">config</span>
+</pre></div>
+</div>
+<p>Rose should work out of the box if it is configured correctly at your site.</p>
+
+
+
+
+</article>
+<article class="slide level-2" id="text-editor">
+
+<h2>Text Editor<a class="headerlink" href="../html/getting-started.html#text-editor" title="View HTML">§</a></h2>
+
+<ul class="simple">
+<li>The default external text editor used by <em>GUIs</em> is <code class="docutils literal notranslate"><span class="pre">gedit</span></code>.</li>
+<li>The default external text editor used by <em>CLI</em> commands is the value of
+the <code class="docutils literal notranslate"><span class="pre">VISUAL</span></code> or <code class="docutils literal notranslate"><span class="pre">EDITOR</span></code> environment variable, or <code class="docutils literal notranslate"><span class="pre">vi</span></code> if neither
+environment variable is set.</li>
+</ul>
+<p>To change the default editor change the following settings in the user
+configuration file <code class="docutils literal notranslate"><span class="pre">~/.metomi/rose.conf</span></code>:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">[external]geditor</span></code></dt><dd>The external text editor used by GUIs</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">[external]editor</span></code></dt><dd>The external text editor used by CLI commands</dd>
+</dl>
+<p>For emacs and most text editors, you can do something like:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[external]</span>
+<span class="nv">editor</span><span class="o">=</span><span class="s">emacs</span>
+<span class="nv">geditor</span><span class="o">=</span><span class="s">emacs</span>
+</pre></div>
+</div>
+<p>For any text editor command that normally forks and detaches from the shell
+it is started in, you should use an option to ensure that the text editor
+runs in the foreground to allow Rose to wait for the edit session to
+finish. E.g. for <code class="docutils literal notranslate"><span class="pre">gvim</span></code>, you will do:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[external]</span>
+<span class="nv">editor</span><span class="o">=</span><span class="s">gvim -f</span>
+<span class="nv">geditor</span><span class="o">=</span><span class="s">gvim -f</span>
+</pre></div>
+</div>
+
+
+
+
+</article>
+<article class="slide level-2" id="editor-syntax-highlighting">
+
+<h2>Editor Syntax Highlighting<a class="headerlink" href="../html/getting-started.html#editor-syntax-highlighting" title="View HTML">§</a></h2>
+
+<p>There are <code class="docutils literal notranslate"><span class="pre">gedit</span></code>, <code class="docutils literal notranslate"><span class="pre">kate</span></code>, <code class="docutils literal notranslate"><span class="pre">vim</span></code>, and <code class="docutils literal notranslate"><span class="pre">emacs</span></code> plugins for syntax
+highlighting of Rose configuration files, located within the Rose installation.</p>
+<p>Run the following command to see the available syntax files and their
+locations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ rose resource syntax
+</pre></div>
+</div>
+<p>Each file contains setup instructions within.</p>
+<p>Additionally there is a <a class="reference external" href="https://pygments.org">Pygments</a> lexer located
+<a class="reference external" href="https://github.com/metomi/rose/blob/master/sphinx/ext/rose_lang.py">in the source code</a></p>
+
+
+
+
+</article>
+<article class="slide level-2" id="configuring-cylc">
+
+<h2>Configuring Cylc<a class="headerlink" href="../html/getting-started.html#configuring-cylc" title="View HTML">§</a></h2>
+
+<p>See the “Installation” and “User Config File” sections of the
+<a class="reference external" href="https://cylc.github.io/cylc-doc/latest/html/user-guide/index.html">Cylc User Guide</a>.</p>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>
