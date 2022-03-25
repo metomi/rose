@@ -1,0 +1,387 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rose_bunch &mdash; Rose Documentation 2.0rc2 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/diff_selector.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/grid_table.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/hieroglyph_theme_addons.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/tutorial.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/addons.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/rose-favicon.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/js/diff_selector.js"></script>
+        <script src="../../_static/js/minicylc.js"></script>
+        <script src="../../_static/js/spoiler.js"></script>
+        <script src="../../_static/js/addons.js"></script>
+        <script src="../../_static/js/versioning.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="rose_prune" href="rose_prune.html" />
+    <link rel="prev" title="rose_arch" href="rose_arch.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html">
+            <img src="../../_static/rose-logo-crop.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                2.0rc2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/rose/index.html">Rose Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rose API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Rose Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../other.html">Other Python API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../rose-built-in-applications.html">Rose Built-In Applications</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="fcm_make.html"><code class="docutils literal notranslate"><span class="pre">fcm_make</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rose_ana.html"><code class="docutils literal notranslate"><span class="pre">rose_ana</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rose_arch.html"><code class="docutils literal notranslate"><span class="pre">rose_arch</span></code></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">rose_bunch</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rose_prune.html"><code class="docutils literal notranslate"><span class="pre">rose_prune</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../terms.html">Rose Terms Of Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../course/um-ut.html">UM User Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Rose Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../rose-built-in-applications.html">Rose Built-In Applications</a> &raquo;</li>
+      <li><code class="docutils literal notranslate"><span class="pre">rose_bunch</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rose-bunch">
+<span id="builtin-rose-bunch"></span><h1><code class="docutils literal notranslate"><span class="pre">rose_bunch</span></code><a class="headerlink" href="#rose-bunch" title="Permalink to this headline"></a></h1>
+<p>For the running of multiple command variants in parallel under a single
+job, as defined by the application configuration.</p>
+<p>Each variant of the command is run in the same working directory with
+its output directed to separate <code class="docutils literal notranslate"><span class="pre">.out</span></code> and <code class="docutils literal notranslate"><span class="pre">.err</span></code> files of the form:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>bunch.<span class="s">&lt;name&gt;</span>.out
+</pre></div>
+</div>
+<p>Should you need separate working directories you should configure your
+command to create the appropriate subdirectory for working in.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Under load balancing systems such as PBS or Slurm, you will need to
+set resource requests to reflect the resources required by running
+multiple commands at once e.g. if one command would require 1GB
+memory and you have configured your app to run up to four commands at
+once then you will need to request 4GB of memory.</p>
+</div>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline"></a></h2>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">meta</span><span class="o">=</span><span class="s">rose_bunch</span>
+<span class="nv">mode</span><span class="o">=</span><span class="s">rose_bunch</span>
+
+<span class="nt">[bunch]</span>
+<span class="nv">command-format</span><span class="o">=</span><span class="s">echo arg1: %(arg1)s, arg2: %(arg2)s, command-instance: %(command-instances)s</span>
+<span class="nv">command-instances </span><span class="o">=</span> <span class="s">4</span>
+<span class="nv">fail-handle </span><span class="o">=</span> <span class="s">abort</span>
+<span class="nv">incremental </span><span class="o">=</span> <span class="s">True</span>
+<span class="nv">names </span><span class="o">=</span> <span class="s">foo1 bar2 baz3 qux4</span>
+<span class="nv">pool-size</span><span class="o">=</span><span class="s">2</span>
+
+<span class="nt">[bunch-args]</span>
+<span class="nv">arg1</span><span class="o">=</span><span class="s">1 2 3 4</span>
+<span class="nv">arg2</span><span class="o">=</span><span class="s">foo bar baz qux</span>
+</pre></div>
+</div>
+</section>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline"></a></h2>
+<p>The application is normally configured in the
+<a class="reference internal" href="#rose:conf:rose_bunch[bunch]" title="rose:conf:rose_bunch[bunch]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose_bunch[bunch]</span></code></a> and <a class="reference internal" href="#rose:conf:rose_bunch[bunch-args]" title="rose:conf:rose_bunch[bunch-args]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose_bunch[bunch-args]</span></code></a>
+sections of the <a class="reference internal" href="../configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file, but
+<a class="reference internal" href="../configuration/application.html#rose:conf:rose-app.conf[command]" title="rose:conf:rose-app.conf[command]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-app.conf[command]</span></code></a> can be used too, see below for details.</p>
+<dl class="rose app">
+<dt class="sig sig-object rose" id="rose:app:rose_bunch">
+<em class="property"><span class="pre">Rose</span> <span class="pre">App</span> </em><span class="sig-name descname"><span class="pre">rose_bunch</span></span><a class="headerlink" href="#rose:app:rose_bunch" title="Permalink to this definition"></a></dt>
+<dd><dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_bunch[bunch]">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">[bunch]</span></span><a class="headerlink" href="#rose:conf:rose_bunch[bunch]" title="Permalink to this definition"></a></dt>
+<dd><dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_bunch[bunch]command-format">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">command-format</span></span><em class="property"><span class="pre">=</span> <span class="pre">FORMAT</span></em><a class="headerlink" href="#rose:conf:rose_bunch[bunch]command-format" title="Permalink to this definition"></a></dt>
+<dd><p>A Pythonic <code class="docutils literal notranslate"><span class="pre">printf</span></code>-style format string to construct the commands
+to run. Insert placeholders <code class="docutils literal notranslate"><span class="pre">%(argname)s</span></code> for substitution of the
+arguments specified under <a class="reference internal" href="#rose:conf:rose_bunch[bunch-args]" title="rose:conf:rose_bunch[bunch-args]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">[bunch-args]</span></code></a> to the invoked
+command. The placeholder <code class="docutils literal notranslate"><span class="pre">%(command-instances)s</span></code> is reserved for
+inserting an automatically generated index for the command
+invocation when using the command-instances setting. If not specified
+then the command to run is determined following the <code class="docutils literal notranslate"><span class="pre">mode=command</span></code>
+logic, see <a class="reference internal" href="../command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a> for details, and arguments
+are made accessible to the command as environment variables.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_bunch[bunch]command-instances">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">command-instances</span></span><em class="property"><span class="pre">=</span> <span class="pre">N</span></em><a class="headerlink" href="#rose:conf:rose_bunch[bunch]command-instances" title="Permalink to this definition"></a></dt>
+<dd><p>Allows the user to specify an integer value for the number of
+instances of a command they want to run. This generates the values
+used by the <code class="docutils literal notranslate"><span class="pre">%(command-instances)s</span></code> value in command-format.
+If <cite>[bunch]command-format</cite> is not specified then the command instance
+is passed as the <span class="target" id="index-0"></span><a class="reference internal" href="../environment-variables.html#envvar-COMMAND_INSTANCES"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">COMMAND_INSTANCES</span></code></a> environment variable
+instead. This is useful for cases where the only difference between
+invocations would be an index number e.g. ensemble members. Note
+indexes start at <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_bunch[bunch]pool-size">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">pool-size</span></span><em class="property"><span class="pre">=</span> <span class="pre">N</span></em><a class="headerlink" href="#rose:conf:rose_bunch[bunch]pool-size" title="Permalink to this definition"></a></dt>
+<dd><p>Allows the user to limit the number of concurrently running commands.
+If not specified then all command variations will be run at the same
+time.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_bunch[bunch]fail-mode">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">fail-mode</span></span><em class="property"><span class="pre">=</span> <span class="pre">continue|abort</span></em><a class="headerlink" href="#rose:conf:rose_bunch[bunch]fail-mode" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>continue</p>
+</dd>
+</dl>
+<p>Specify what action you want the job to take on the failure of a
+command that it is trying to run. If set to continue all command
+variants will be run by the job and the job will return a non-zero
+exit code upon completion e.g. if three commands are to be run and
+the second one fails, all three will be run and the job will exit
+with a return code of <code class="docutils literal notranslate"><span class="pre">1</span></code>. Alternatively, if <a class="reference internal" href="#rose:conf:rose_bunch[bunch]fail-mode" title="rose:conf:rose_bunch[bunch]fail-mode"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">fail-mode</span></code></a>
+is set to abort then on failure of any one of the command variants
+it will stop trying to run any further variants N.B. the job will
+wait for any already running commands to finish before exiting.
+Commands that won’t be run due to aborting will be reported in the
+job output with a <code class="docutils literal notranslate"><span class="pre">[SKIP]</span></code> prefix when running in verbose mode.
+For example in the case of three command variants with a
+<a class="reference internal" href="#rose:conf:rose_bunch[bunch]pool-size" title="rose:conf:rose_bunch[bunch]pool-size"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">pool-size</span></code></a> of <code class="docutils literal notranslate"><span class="pre">1</span></code> and <a class="reference internal" href="#rose:conf:rose_bunch[bunch]fail-mode" title="rose:conf:rose_bunch[bunch]fail-mode"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">fail-mode=abort</span></code></a>,
+if the second variant failed then the job would exit with a
+non-zero error code without having run the third variant.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_bunch[bunch]incremental">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">incremental</span></span><em class="property"><span class="pre">=</span> <span class="pre">true|false</span></em><a class="headerlink" href="#rose:conf:rose_bunch[bunch]incremental" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>true</p>
+</dd>
+</dl>
+<p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code> then only failed commands will be re-run on
+retrying running of the job. If any changes are made to the
+configuration being run then all variants will be re-run. Similarly,
+running the app with the <code class="docutils literal notranslate"><span class="pre">--new</span></code> option to
+<a class="reference internal" href="../command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a>
+will result in all commands being run. In verbose mode the app
+will report commands that won’t be run due to previous successes
+in the job output with a <code class="docutils literal notranslate"><span class="pre">[PASS]</span></code> prefix.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_bunch[bunch]names">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">names</span></span><em class="property"><span class="pre">=</span> <span class="pre">name1</span> <span class="pre">name2</span> <span class="pre">...</span></em><a class="headerlink" href="#rose:conf:rose_bunch[bunch]names" title="Permalink to this definition"></a></dt>
+<dd><p>Allows defining names for each of the command variants to be run,
+facilitating identification in logs. If not set then commands will
+be identified by their index. The number of entries in the names
+must be the same as the number of entries in each of the args to
+be used.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_bunch[bunch]argument-mode">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">argument-mode</span></span><em class="property"><span class="pre">=</span> <span class="pre">Default|zip</span> <span class="pre">or</span> <span class="pre">izip|zip_longest</span> <span class="pre">or</span> <span class="pre">izip_longest|product</span></em><a class="headerlink" href="#rose:conf:rose_bunch[bunch]argument-mode" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Default</dt>
+<dd class="field-odd"><p>Default</p>
+</dd>
+</dl>
+<p>If set to a value other than <code class="docutils literal notranslate"><span class="pre">Default</span></code> then the values for each
+bunch-arg will be manipulated:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">zip</span></code> or <code class="docutils literal notranslate"><span class="pre">izip</span></code> will shrink all values so all have the same
+length as the shortest bunch-arg.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zip_longest</span></code> or <code class="docutils literal notranslate"><span class="pre">izip_longest</span></code> will pad out values for each
+bunch-arg with an empty string so that each bunch-arg is the same
+length as the longest one.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">product</span></code> will expand all provided bunch-args to create each
+possible combination.</p></li>
+</ul>
+<p>See the <code class="docutils literal notranslate"><span class="pre">itertools</span></code> <a class="reference external" href="https://docs.python.org/3.7/library/itertools.html">documentation</a> in Python for more information.
+<code class="docutils literal notranslate"><span class="pre">zip</span></code> and <code class="docutils literal notranslate"><span class="pre">zip_longest</span></code> are preferred to <code class="docutils literal notranslate"><span class="pre">izip</span></code> and
+<code class="docutils literal notranslate"><span class="pre">izip_longest</span></code> which are provided to maintain compatibility with
+older rose bunch tasks.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_bunch[bunch-args]">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">[bunch-args]</span></span><a class="headerlink" href="#rose:conf:rose_bunch[bunch-args]" title="Permalink to this definition"></a></dt>
+<dd><p>This section is used to specify the various combinations of args to be
+passed to the command specified under <a class="reference internal" href="#rose:conf:rose_bunch[bunch]command-format" title="rose:conf:rose_bunch[bunch]command-format"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">[bunch]command-format</span></code></a>,
+if defined, or <a class="reference internal" href="../configuration/application.html#rose:conf:rose-app.conf[command]" title="rose:conf:rose-app.conf[command]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-app.conf[command]</span></code></a> otherwise.</p>
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_bunch[bunch-args]argname">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">argname</span></span><em class="property"><span class="pre">=</span> <span class="pre">val1</span> <span class="pre">val2</span> <span class="pre">...</span></em><a class="headerlink" href="#rose:conf:rose_bunch[bunch-args]argname" title="Permalink to this definition"></a></dt>
+<dd><p>Allows defining named lists of argument values to pass to
+the commands being run. Multiple named sets of arguments can be
+defined. Each <cite>argname</cite> can be referenced  using <code class="docutils literal notranslate"><span class="pre">%(argname)s</span></code> in
+<a class="reference internal" href="#rose:conf:rose_bunch[bunch]command-format" title="rose:conf:rose_bunch[bunch]command-format"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">[bunch]command-format</span></code></a>, if specified, or <code class="docutils literal notranslate"><span class="pre">${argname}</span></code>
+environment variable otherwise. The only disallowed names are
+<code class="docutils literal notranslate"><span class="pre">command-instances</span></code> and <code class="docutils literal notranslate"><span class="pre">COMMAND_INSTANCES</span></code>, which are reserved
+for the auto-generated list of instances when the
+<a class="reference internal" href="#rose:conf:rose_bunch[bunch]command-instances" title="rose:conf:rose_bunch[bunch]command-instances"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">[bunch]command-instances=N</span></code></a> option is used.</p>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rose_arch.html" class="btn btn-neutral float-left" title="rose_arch" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rose_prune.html" class="btn btn-neutral float-right" title="rose_prune" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright : Copyright (C) British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2.0rc2
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2.0rc2";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "api/built-in/rose_bunch";
+    </script>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+
+
+</body>
+</html>

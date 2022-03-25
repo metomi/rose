@@ -1,0 +1,191 @@
+
+
+<!DOCTYPE html>
+
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Glossary &mdash; Rose Documentation 2.0rc2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/styles.css" type="text/css" />
+    <link rel="stylesheet" href="_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <link rel="stylesheet" href="_static/css/slides-custom.css" type="text/css" />
+    
+    
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/single.css" type="text/css" />
+    <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/diff_selector.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/grid_table.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/hieroglyph_theme_addons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/tutorial.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/addons.css" type="text/css" />
+    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0rc2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/js/diff_selector.js"></script>
+    <script type="text/javascript" src="_static/js/minicylc.js"></script>
+    <script type="text/javascript" src="_static/js/spoiler.js"></script>
+    <script type="text/javascript" src="_static/js/addons.js"></script>
+    <script type="text/javascript" src="_static/js/versioning.js"></script>
+    <script type="text/javascript" src="_static/common.js"></script>
+    
+    <script type="text/javascript" src="_static/slides.js"></script>
+    <script type="text/javascript" src="_static/sync.js"></script>
+    <script type="text/javascript" src="_static/controller.js"></script>
+    <script type="text/javascript" src="_static/init.js"></script>
+    
+    
+    <link rel="shortcut icon" href="_static/rose-favicon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Rose Documentation 2.0rc2 documentation" href="index.html" />
+    <link rel="next" title="Rose Configuration" href="api/configuration/index.html" />
+    <link rel="prev" title="Upgrading Macro Development" href="tutorial/rose/furthertopics/upgrading-macro-development.html" /> 
+  </head>
+  <body>
+
+<section
+   id="slide_container"
+   class='slides layout-regular'>
+
+
+  
+<article class="slide level-1" id="glossary">
+
+<h1>Glossary<a class="headerlink" href="../html/glossary.html#glossary" title="View HTML">§</a></h1>
+
+<dl class="glossary docutils">
+<dt id="term-application-directory">application directory</dt><dd>The application directory is the folder in which the
+<a class="reference internal" href="api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file is located in a <a class="reference internal" href="#term-Rose-application-configuration"><span class="xref std std-term">Rose application
+configuration</span></a>.</dd>
+<dt id="term-metadata">metadata</dt><dt id="term-Rose-metadata">Rose metadata</dt><dd><p>Rose metadata provides information about settings in
+<a class="reference internal" href="#term-Rose-application-configuration"><span class="xref std std-term">Rose application configurations</span></a>
+and <a class="reference internal" href="#term-Rose-suite-configuration"><span class="xref std std-term">Rose suite configurations</span></a>. This
+information is stored in a <a class="reference internal" href="api/configuration/metadata.html#rose:file:rose-meta.conf" title="rose:file:rose-meta.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-meta.conf</span></code></a> file in a
+<code class="docutils literal notranslate"><span class="pre">meta/</span></code> directory alongside the configuration it applies to.</p>
+<p>This information can include:</p>
+<ul class="simple">
+<li>Documentation and help text, e.g.
+<a class="reference internal" href="api/configuration/metadata.html#rose:conf:rose-meta.conf[SETTING]title" title="rose:conf:rose-meta.conf[SETTING]title"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-meta.conf[SETTING]title</span></code></a>
+provides a short title to describe a setting.</li>
+<li>Information about permitted values for the setting, e.g.
+<a class="reference internal" href="api/configuration/metadata.html#rose:conf:rose-meta.conf[SETTING]type" title="rose:conf:rose-meta.conf[SETTING]type"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-meta.conf[SETTING]type</span></code></a> can be used to specify the
+data type a setting requires (integer, string, boolean, etc).</li>
+<li>Settings affecting how the configurations are displayed in
+<a class="reference internal" href="api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> (e.g.
+<a class="reference internal" href="api/configuration/metadata.html#rose:conf:rose-meta.conf[SETTING]sort-key" title="rose:conf:rose-meta.conf[SETTING]sort-key"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-meta.conf[SETTING]sort-key</span></code></a>).</li>
+<li>Metadata which defines how settings should behave in different states
+(e.g. <a class="reference internal" href="api/configuration/metadata.html#rose:conf:rose-meta.conf[SETTING]trigger" title="rose:conf:rose-meta.conf[SETTING]trigger"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-meta.conf[SETTING]trigger</span></code></a>).</li>
+</ul>
+<p>This information is used for:</p>
+<ul class="simple">
+<li>Presentation and validation in the <a class="reference internal" href="api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a>
+GUI.</li>
+<li>Validation using the <a class="reference internal" href="api/command-reference.html#command-rose-macro"><span class="std std-ref">rose macro</span></a> command.</li>
+</ul>
+<p>Metadata does not affect the running of an
+<a class="reference internal" href="#term-Rose-app"><span class="xref std std-term">application</span></a> or <a class="reference external" href="https://cylc.github.io/cylc-doc/latest/html/glossary.html#term-workflow" title="(in Cylc v8.0rc1)"><span class="xref std std-term">workflow</span></a>.</p>
+<p>See also:</p>
+<ul class="simple">
+<li><a class="reference internal" href="api/configuration/metadata.html#metadata"><span class="std std-ref">Configuration Metadata</span></a></li>
+</ul>
+</dd>
+<dt id="term-Rose-app">Rose app</dt><dt id="term-Rose-application">Rose application</dt><dt id="term-Rose-application-configuration">Rose application configuration</dt><dd><p>A Rose application configuration (or Rose app) is a directory containing
+a <a class="reference internal" href="api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file along with some other optional files
+and directories.</p>
+<p>An application can configure:</p>
+<ul class="simple">
+<li>The command to run (<a class="reference internal" href="api/configuration/application.html#rose:conf:rose-app.conf[command]" title="rose:conf:rose-app.conf[command]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-app.conf[command]</span></code></a>).</li>
+<li>Any environment variables to provide it with
+(<a class="reference internal" href="api/configuration/application.html#rose:conf:rose-app.conf[env]" title="rose:conf:rose-app.conf[env]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-app.conf[env]</span></code></a>)</li>
+<li>Input files e.g. namelists (<a class="reference internal" href="api/configuration/application.html#rose:conf:rose-app.conf[namelist:NAME]" title="rose:conf:rose-app.conf[namelist:NAME]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-app.conf[namelist:NAME]</span></code></a>)</li>
+<li>Metadata for the application (<a class="reference internal" href="api/configuration/metadata.html#rose:file:rose-meta.conf" title="rose:file:rose-meta.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-meta.conf</span></code></a>).</li>
+</ul>
+<p>See also:</p>
+<ul class="simple">
+<li><a class="reference internal" href="api/configuration/application.html#rose-applications"><span class="std std-ref">Application Configuration</span></a></li>
+</ul>
+</dd>
+<dt id="term-Rose-built-in-application">Rose built-in application</dt><dd><p>A Rose built-in application is a generic <a class="reference internal" href="#term-Rose-application"><span class="xref std std-term">Rose application</span></a>
+providing common functionality which is provided in the Rose installation.</p>
+<p>See also:</p>
+<ul class="simple">
+<li><a class="reference internal" href="api/rose-built-in-applications.html#rose-built-in-applications"><span class="std std-ref">Rose Built-In Applications</span></a></li>
+</ul>
+</dd>
+<dt id="term-Rose-configuration">Rose configuration</dt><dd><p>Rose configurations are directories containing a Rose configuration
+file along with other optional files and directories.</p>
+<p>The two types of Rose configuration relevant to Cylc suites are:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#term-Rose-application-configuration"><span class="xref std std-term">Rose application configuration</span></a></li>
+<li><a class="reference internal" href="#term-Rose-suite-configuration"><span class="xref std std-term">Rose suite configuration</span></a></li>
+</ul>
+<p>See also:</p>
+<ul class="simple">
+<li><a class="reference internal" href="api/configuration/rose-configuration-format.html#rose-configuration-format"><span class="std std-ref">Rose Configuration Format</span></a></li>
+<li><a class="reference internal" href="tutorial/rose/configurations.html#tutorial-rose-configurations"><span class="std std-ref">Rose Configuration Tutorial</span></a></li>
+<li><a class="reference internal" href="tutorial/rose/furthertopics/optional-configurations.html#rose-tutorial-optional-configurations"><span class="std std-ref">Optional Configuration Tutorial</span></a></li>
+</ul>
+</dd>
+<dt id="term-Rose-suite-configuration">Rose suite configuration</dt><dd><p>A Rose suite configuration is a <a class="reference internal" href="api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> file along
+with other optional files and directories which configure the way in
+which a <a class="reference external" href="https://cylc.github.io/cylc-doc/latest/html/glossary.html#term-workflow" title="(in Cylc v8.0rc1)"><span class="xref std std-term">workflow</span></a> is run. E.g:</p>
+<ul class="simple">
+<li>Jinja2 variables to be passed into the <code class="docutils literal notranslate"><span class="pre">flow.cylc</span></code> file (
+<a class="reference internal" href="api/configuration/suite.html#rose:conf:rose-suite.conf[jinja2:suite.rc]" title="rose:conf:rose-suite.conf[jinja2:suite.rc]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-suite.conf[jinja2:suite.rc]</span></code></a>).</li>
+<li>Environment variables to be provided to <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">play</span></code> (
+<a class="reference internal" href="api/configuration/suite.html#rose:conf:rose-suite.conf[env]" title="rose:conf:rose-suite.conf[env]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-suite.conf[env]</span></code></a>).</li>
+<li>Installation configuration (e.g.
+<a class="reference internal" href="api/configuration/suite.html#rose:conf:rose-suite.conf[file:NAME]" title="rose:conf:rose-suite.conf[file:NAME]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-suite.conf[file:NAME]</span></code></a>).</li>
+</ul>
+<p>See also:</p>
+<ul class="simple">
+<li><a class="reference internal" href="api/configuration/suite.html#rose-suites"><span class="std std-ref">Suite Configuration</span></a></li>
+</ul>
+</dd>
+<dt id="term-Rosie-Suite">Rosie Suite</dt><dd><p>A Rosie suite is a <a class="reference internal" href="#term-Rose-suite-configuration"><span class="xref std std-term">Rose suite configuration</span></a> which is managed
+using the Rosie system.</p>
+<p>When a suite is managed using Rosie:</p>
+<ul class="simple">
+<li>The <a class="reference external" href="https://cylc.github.io/cylc-doc/latest/html/glossary.html#term-run-directory" title="(in Cylc v8.0rc1)"><span class="xref std std-term">run directory</span></a> is added to version control.</li>
+<li>The suite is registered in a database.</li>
+</ul>
+<p>See also:</p>
+<ul class="simple">
+<li><a class="reference internal" href="tutorial/rose/rosie.html#tutorial-rosie"><span class="std std-ref">Rosie Tutorial</span></a></li>
+</ul>
+</dd>
+</dl>
+
+
+
+
+</article>
+
+</section>
+
+<section id="slide_notes">
+
+</section>
+
+  </body>
+</html>

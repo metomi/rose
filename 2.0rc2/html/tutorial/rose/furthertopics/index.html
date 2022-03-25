@@ -1,0 +1,231 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Further Topics &mdash; Rose Documentation 2.0rc2 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/diff_selector.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/grid_table.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/hieroglyph_theme_addons.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/tutorial.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/addons.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="../../../_static/rose-favicon.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/js/diff_selector.js"></script>
+        <script src="../../../_static/js/minicylc.js"></script>
+        <script src="../../../_static/js/spoiler.js"></script>
+        <script src="../../../_static/js/addons.js"></script>
+        <script src="../../../_static/js/versioning.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Command Keys" href="command-keys.html" />
+    <link rel="prev" title="Summary" href="../summary.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html">
+            <img src="../../../_static/rose-logo-crop.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                2.0rc2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Rose Tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../configurations.html">Rose Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../applications.html">Rose Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../metadata.html">Rose Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../suites.html">Rose Suite Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rosie.html">Rosie</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../summary.html">Summary</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Further Topics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="command-keys.html">Command Keys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="date-time-manipulation.html">Date and Time Manipulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="failif-warnif.html">Fail-If, Warn-If</a></li>
+<li class="toctree-l3"><a class="reference internal" href="macro-development.html">Custom Macros</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optional-configurations.html">Optional Configurations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="polling.html">Polling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rose-arch.html">Rose Arch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rose-bunch.html">Rose Bunch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rose-stem.html">Rose Stem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rose-stem-tutorial.html">Rose Stem Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="trigger.html">Trigger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upgrading.html">Upgrading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upgrading-macro-development.html">Upgrading Macro Development</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rose API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/configuration/index.html">Rose Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/other.html">Other Python API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-built-in-applications.html">Rose Built-In Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../terms.html">Rose Terms Of Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../course/um-ut.html">UM User Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Rose Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Rose Tutorial</a> &raquo;</li>
+      <li>Further Topics</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="further-topics">
+<span id="rose-further-topics"></span><h1>Further Topics<a class="headerlink" href="#further-topics" title="Permalink to this headline"></a></h1>
+<p>This section goes into detail in additional Rose topics.</p>
+<div class="toctree-wrapper compound" id="id1">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="command-keys.html">Command Keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="date-time-manipulation.html">Date and Time Manipulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="failif-warnif.html">Fail-If, Warn-If</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macro-development.html">Custom Macros</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optional-configurations.html">Optional Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="polling.html">Polling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rose-arch.html">Rose Arch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rose-bunch.html">Rose Bunch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rose-stem.html">Rose Stem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rose-stem-tutorial.html">Rose Stem Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="trigger.html">Trigger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="upgrading.html">Upgrading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="upgrading-macro-development.html">Upgrading Macro Development</a></li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../summary.html" class="btn btn-neutral float-left" title="Summary" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="command-keys.html" class="btn btn-neutral float-right" title="Command Keys" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright : Copyright (C) British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2.0rc2
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../../../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2.0rc2";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "tutorial/rose/furthertopics/index";
+    </script>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+
+
+</body>
+</html>
