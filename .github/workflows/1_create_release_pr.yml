@@ -20,7 +20,7 @@ jobs:
         uses: cylc/release-actions/stage-1/sanitize-inputs@v1
 
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ env.BASE_REF }}
           fetch-depth: 0  # need to fetch all commits to check contributors
@@ -29,7 +29,7 @@ jobs:
         uses: cylc/release-actions/check-shortlog@v1
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           # return to 3.x once cylc-flow is compatible with 3.10+ (pyuv)
           python-version: '3.9'
@@ -56,3 +56,5 @@ jobs:
         uses: cylc/release-actions/stage-1/create-release-pr@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          test-workflows: test.yml
