@@ -3,7 +3,7 @@
 Go to https://github.com/metomi/rose/milestones?state=closed
 for a full listing of issues for each release.
 
-## 2019.01.5 (2022-03-29)
+## 2019.01.6 (2022-03-29)
 
 ### Fixes
 
