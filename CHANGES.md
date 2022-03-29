@@ -3,13 +3,6 @@
 Go to https://github.com/metomi/rose/milestones?state=closed
 for a full listing of issues for each release.
 
-## 2019.01.5 (2022-03-29)
-
-### Fixes
-
-[#2485](https://github.com/metomi/rose/pull/2486) - Prevent Rose 2019
-modifying Cylc 8 workflows.
-
 ## 2019.01.5 (2021-03-19)
 
 Rose release 62. This maintenance release is expected to be used with:
