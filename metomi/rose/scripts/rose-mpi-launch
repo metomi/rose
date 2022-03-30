@@ -237,9 +237,14 @@ fi
 ROSE_LAUNCHER_BASE=
 if [[ -n $ROSE_LAUNCHER ]]; then
     # Path
-    if ! ROSE_LAUNCHER_PATH="$(type -P "$ROSE_LAUNCHER")"; then
-        err "ROSE_LAUNCHER: $ROSE_LAUNCHER: command not found"
-    fi
+    ROSE_LAUNCHER_PATH=""
+    for command in ${ROSE_LAUNCHER}; do
+        if  command="$(type -P "$command")"; then
+            ROSE_LAUNCHER_PATH="${ROSE_LAUNCHER_PATH} ${command}"
+        else
+            err "ROSE_LAUNCHER: $ROSE_LAUNCHER: command not found"
+        fi
+    done
     ROSE_LAUNCHER=$ROSE_LAUNCHER_PATH
     ROSE_LAUNCHER_BASE="$(basename "$ROSE_LAUNCHER")"
 fi
@@ -247,6 +252,7 @@ fi
 #-------------------------------------------------------------------------------
 # 3. Launch the program.
 #-------------------------------------------------------------------------------
+
 if [[ -n $ROSE_COMMAND_FILE ]]; then
     if [[ -z $ROSE_LAUNCHER_BASE ]]; then
         err "ROSE_LAUNCHER not defined, command file not supported."
