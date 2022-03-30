@@ -35,7 +35,7 @@ time_path=$(which time)
 # Control - test that having one command in "ROSE_LAUNCHER" still works.
 TEST_NAME="${TEST_KEY_BASE}-check-single-path"
 export ROSE_LAUNCHER="ls"
-run_pass ${TEST_NAME} rose mpi-launch -v true
+run_pass "${TEST_NAME}" rose mpi-launch -v true
 file_grep \
     "${TEST_NAME}-output" \
     "exec ${ls_path} ${true_path}"\
@@ -44,7 +44,7 @@ file_grep \
 # Test - test having multiple commands in "ROSE_LAUNCHER".
 TEST_NAME="${TEST_KEY_BASE}-check-multiple-paths"
 export ROSE_LAUNCHER="time ls"
-run_pass ${TEST_NAME} rose mpi-launch -v true
+run_pass "${TEST_NAME}" rose mpi-launch -v true
 
 file_grep \
     "${TEST_NAME}-output" \
