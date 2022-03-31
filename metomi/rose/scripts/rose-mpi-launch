@@ -239,7 +239,7 @@ if [[ -n $ROSE_LAUNCHER ]]; then
     # Path
     ROSE_LAUNCHER_PATH=""
     for command in ${ROSE_LAUNCHER}; do
-        if  command="$(type -P "$command")"; then
+        if  command="$(type -P $command)"; then
             ROSE_LAUNCHER_PATH="${ROSE_LAUNCHER_PATH} ${command}"
         else
             err "ROSE_LAUNCHER: $ROSE_LAUNCHER: command not found"
