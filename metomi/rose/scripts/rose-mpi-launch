@@ -237,6 +237,7 @@ fi
 ROSE_LAUNCHER_BASE=
 if [[ -n $ROSE_LAUNCHER ]]; then
     # Path
+    # shellcheck disable=SC2086
     if ! ROSE_LAUNCHER_PATH="$(type -P $ROSE_LAUNCHER)"; then
         err "ROSE_LAUNCHER: $ROSE_LAUNCHER: command not found"
     fi
