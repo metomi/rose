@@ -236,8 +236,11 @@ fi
 #-------------------------------------------------------------------------------
 ROSE_LAUNCHER_BASE=
 if [[ -n $ROSE_LAUNCHER ]]; then
-    # Path
-    if ! ROSE_LAUNCHER_PATH="$(type -P "$ROSE_LAUNCHER")"; then
+    # ROSE_LAUNCHER should be able to contain multiple commands.
+    # Each command should be handled separately by `type -P` so we must
+    # allow word splitting.
+    # shellcheck disable=SC2086
+    if ! ROSE_LAUNCHER_PATH="$(type -P $ROSE_LAUNCHER)"; then
         err "ROSE_LAUNCHER: $ROSE_LAUNCHER: command not found"
     fi
     ROSE_LAUNCHER=$ROSE_LAUNCHER_PATH
