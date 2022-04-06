@@ -10,6 +10,16 @@ updated. Only the first match gets replaced, so it's fine to leave the old
 ones in. -->
 --------------------------------------------------------------------------------
 
+## 2.0rc3 (<span actions:bind='release-date'>Awaiting Release</span>)
+
+### Fixes
+
+[#2574](https://github.com/metomi/rose/pull/2574) -
+fix bug in rose mpi-launch that caused it to fail if the configured command
+contained spaces.
+
+--------------------------------------------------------------------------------
+
 ## 2.0rc2 (<span actions:bind='release-date'>Released 2022-03-24</span>)
 
 ### Enhancements
