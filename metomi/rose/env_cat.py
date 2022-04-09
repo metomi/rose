@@ -30,12 +30,18 @@ def rose_env_cat(args, opts):
     if not opts.output_file or opts.output_file == "-":
         out_handle = sys.stdout
     else:
-        out_handle = open(opts.output_file, "wb")
+        out_handle = open(opts.output_file, "w")
     for arg in args:
         if arg == "-":
             in_handle = sys.stdin
         else:
-            in_handle = open(arg)
+            try:
+                in_handle = open(arg)
+            except FileNotFoundError as exc:
+                Reporter().report(exc)
+                if opts.debug_mode:
+                    raise exc
+                return
         line_num = 0
         while True:
             line_num += 1
