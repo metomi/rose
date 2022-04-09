@@ -19,8 +19,42 @@
 
 import sys
 
+from metomi.rose.reporter import Reporter
 from metomi.rose.env import UnboundEnvironmentVariableError, env_var_process
 from metomi.rose.opt_parse import RoseOptionParser
+
+
+def rose_env_cat(args, opts):
+    if not args:
+        args = ["-"]
+    if not opts.output_file or opts.output_file == "-":
+        out_handle = sys.stdout
+    else:
+        out_handle = open(opts.output_file, "wb")
+    for arg in args:
+        if arg == "-":
+            in_handle = sys.stdin
+        else:
+            in_handle = open(arg)
+        line_num = 0
+        while True:
+            line_num += 1
+            line = in_handle.readline()
+            if not line:
+                break
+            try:
+                out_handle.write(
+                    env_var_process(
+                        line, opts.unbound, opts.match_mode
+                    )
+                )
+            except UnboundEnvironmentVariableError as exc:
+                name = arg
+                if arg == "-":
+                    name = "<STDIN>"
+                sys.exit("%s:%s: %s" % (name, line_num, str(exc)))
+        in_handle.close()
+    out_handle.close()
 
 
 def main():
@@ -54,34 +88,7 @@ EXAMPLES
         ),
     )
     opts, args = opt_parser.parse_args()
-    if not args:
-        args = ["-"]
-    if not opts.output_file or opts.output_file == "-":
-        out_handle = sys.stdout
-    else:
-        out_handle = open(opts.output_file, "wb")
-    for arg in args:
-        if arg == "-":
-            in_handle = sys.stdin
-        else:
-            in_handle = open(arg)
-        line_num = 0
-        while True:
-            line_num += 1
-            line = in_handle.readline()
-            if not line:
-                break
-            try:
-                out_handle.write(
-                    env_var_process(line, opts.unbound, opts.match_mode)
-                )
-            except UnboundEnvironmentVariableError as exc:
-                name = arg
-                if arg == "-":
-                    name = "<STDIN>"
-                sys.exit("%s:%s: %s" % (name, line_num, str(exc)))
-        in_handle.close()
-    out_handle.close()
+    rose_env_cat(args, opts)
 
 
 if __name__ == "__main__":
