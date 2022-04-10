@@ -146,7 +146,7 @@ class RoseDateTimeOperator:
             time_point_str = self.ref_point_str
         if time_point_str is None or time_point_str == self.STR_NOW:
             time_point = get_timepoint_for_now()
-            time_point.set_time_zone_to_local()
+            time_point.to_local_time_zone()
             if self.utc_mode or time_point.get_time_zone_utc():  # is in UTC
                 parse_format = self.CURRENT_TIME_DUMP_FORMAT_Z
             else:
@@ -177,7 +177,7 @@ class RoseDateTimeOperator:
                 )
                 parse_format = time_point.dump_format
         if self.utc_mode:
-            time_point.set_time_zone_to_utc()
+            time_point.to_utc()
         return time_point, parse_format
 
     def date_shift(self, time_point=None, offset=None):
