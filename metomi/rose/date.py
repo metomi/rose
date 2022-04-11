@@ -29,6 +29,9 @@ from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.reporter import Reporter
 
 
+LEGACY_OFFSET = re.compile(r'(?P<value>\d+)(?P<unit>[wdhms])')
+
+
 class OffsetValueError(ValueError):
 
     """Bad offset value."""
@@ -425,6 +428,56 @@ def _convert_duration(date_time_oper, opts, args):
             + '(hours, minutes, seconds)'
         )
         sys.exit(1)
+
+
+def upgrade_offset(offset: str) -> str:
+    """Convert offset values in the legacy format
+
+    Args:
+        offset: offset matching [0-9]+[wdhms]
+
+    Returns: Offset in isodate compatible format.
+
+    URL:
+        https://github.com/metomi/rose/issues/2577
+
+    Examples:
+        # Convert weeks to days:
+        >>> upgrade_offset('1w')
+        'P7DT0H0M0S'
+        # Convert weeks, days, and times:
+        >>> upgrade_offset('1w1d1h')
+        'P8DT1H0M0S'
+        # Ignore input order:
+        >>> upgrade_offset('1h1d')
+        'P1DT1H0M0S'
+    """
+    Reporter().report(
+        'This offset syntax is deprecated.',
+        prefix=Reporter.PREFIX_WARN, level=Reporter.WARN
+    )
+    offsets = LEGACY_OFFSET.findall(offset)
+    offsets = {i.upper(): j for j, i in offsets}
+
+    # Rose 2019 did not make any distinction between 1s1m and 1m1s,
+    # so we do an implicit sort here:
+    weeks, days, hours, minutes, seconds = [0 for _ in range(5)]
+    for unit, value in offsets.items():
+        if unit == 'W':
+            weeks = int(value)
+        if unit == 'D':
+            days = int(value)
+        if unit == 'H':
+            hours = int(value)
+        if unit == 'M':
+            minutes = int(value)
+        if unit == 'S':
+            seconds = int(value)
+
+    # Week is not a built-in type:
+    days = days + weeks * 7
+
+    return f'P{days}DT{hours}H{minutes}M{seconds}S'
 
 
 if __name__ == "__main__":

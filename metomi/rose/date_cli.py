@@ -177,6 +177,8 @@ import os
 
 from metomi.isodatetime.main import main as iso_main
 
+from metomi.rose.date import LEGACY_OFFSET, upgrade_offset
+
 
 def main():
     """Implement rose date."""
@@ -190,6 +192,15 @@ def main():
     if '--help' in sys.argv:
         print('\n' + __doc__)
         sys.exit()
+
+    # Handle Legacy Rose date --offset values:
+    # https://github.com/metomi/rose/issues/2577
+    for index in range(len(sys.argv)):
+        if (
+            sys.argv[index] in ('--offset', '-s')
+            and LEGACY_OFFSET.match(sys.argv[index + 1])
+        ):
+            sys.argv[index + 1] = upgrade_offset(sys.argv[index + 1])
 
     # Handle Legacy Rose-date -c functionality
     if '-c' in sys.argv or '--use-task-cycle-time' in sys.argv:
