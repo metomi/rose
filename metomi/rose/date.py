@@ -301,8 +301,7 @@ class RoseDateTimeOperator:
     @classmethod
     def get_datetime_strftime(cls, time_point, print_format):
         """Use the datetime library's strftime as a fallback."""
-        calendar_date = time_point.copy().to_calendar_date()
-        year, month, day = calendar_date.get_calendar_date()
+        year, month, day = time_point.get_calendar_date()
         hour, minute, second = time_point.get_hour_minute_second()
         microsecond = int(1.0e6 * (second - int(second)))
         hour = int(hour)
