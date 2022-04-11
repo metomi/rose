@@ -146,7 +146,6 @@ class RoseDateTimeOperator:
             time_point_str = self.ref_point_str
         if time_point_str is None or time_point_str == self.STR_NOW:
             time_point = get_timepoint_for_now()
-            time_point.to_local_time_zone()
             if self.utc_mode or time_point.get_time_zone_utc():  # is in UTC
                 parse_format = self.CURRENT_TIME_DUMP_FORMAT_Z
             else:
