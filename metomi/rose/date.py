@@ -176,7 +176,7 @@ class RoseDateTimeOperator:
                 )
                 parse_format = time_point.dump_format
         if self.utc_mode:
-            time_point.to_utc()
+            time_point = time_point.to_utc()
         return time_point, parse_format
 
     def date_shift(self, time_point=None, offset=None):
