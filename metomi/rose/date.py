@@ -472,7 +472,6 @@ def upgrade_offset(offset: str) -> str:
         if unit == 'S':
             seconds = int(value)
 
-    # Week is not a built-in type:
     days = days + weeks * 7
 
     result = f'{sign}P{days}DT{hours}H{minutes}M{seconds}S'

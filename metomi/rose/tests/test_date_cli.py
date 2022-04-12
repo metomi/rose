@@ -17,7 +17,6 @@
 """Test the CLI for Rose Date
 """
 import pytest
-import re
 
 from metomi.rose.date_cli import _handle_old_offsets
 
@@ -87,7 +86,7 @@ param = pytest.param
             'rose-date 2000 -s= 1d',
             'rose-date 2000 -s P1DT0H0M0S',
             '[WARN] This offset syntax 1d is deprecated: Using P1DT0H0M0S\n',
-            id='it copes with -s=\s\d[wdhms]'
+            id=r'it copes with -s=\s\d[wdhms]'
         ),
     ]
 )
