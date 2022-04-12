@@ -194,8 +194,7 @@ def _handle_old_offsets(args: list) -> list:
     [WARN] This offset syntax is deprecated.
     ['rose-date', '-s', 'P1DT0H0M1S']
     """
-    for index in range(len(args)):
-        arg = args[index]
+    for index, arg in enumerate(args):
         if '--offset' in arg or '-s' in arg:
             # Case: --offset=<offset> is a single item in args list:
             if (
