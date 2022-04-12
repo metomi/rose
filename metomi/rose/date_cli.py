@@ -195,7 +195,7 @@ def _handle_old_offsets(args: list) -> list:
     ['rose-date', '-s', 'P1DT0H0M1S']
     """
     for index, arg in enumerate(args):
-        if '--offset' in arg or '-s' in arg:
+        if arg.startswith(('--offset', '-s')):
             # Case: --offset=<offset> is a single item in args list:
             if (
                 '=' in arg
