@@ -188,10 +188,10 @@ def _handle_old_offsets(args: list) -> list:
 
     Examples:
     >>> _handle_old_offsets(['rose-date', '--offset=1d1s'])
-    [WARN] This offset syntax is deprecated.
+    [WARN] This offset syntax 1d1s is deprecated: Using P1DT0H0M1S
     ['rose-date', '--offset=P1DT0H0M1S']
     >>> _handle_old_offsets(['rose-date', '-s', '1d1s'])
-    [WARN] This offset syntax is deprecated.
+    [WARN] This offset syntax 1d1s is deprecated: Using P1DT0H0M1S
     ['rose-date', '-s', 'P1DT0H0M1S']
     """
     for index in range(len(args)):
