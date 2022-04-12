@@ -77,6 +77,18 @@ param = pytest.param
             '[WARN] This offset syntax -1d is deprecated: Using -P1DT0H0M0S\n',
             id='it copes with negative offsets'
         ),
+        param(
+            'rose-date 2000 -s=',
+            'rose-date 2000 -s=',
+            False,
+            id='it copes with unfilled opts'
+        ),,
+        param(
+            'rose-date 2000 -s= 1d',
+            'rose-date 2000 -s P1D',
+            '[WARN] This offset syntax 1d is deprecated: Using P1DT0H0M0S\n',
+            id='it copes with -s=\s\d[wdhms]'
+        ),
     ]
 )
 def test__handle_old_offsets(args, expect, warn, capsys):

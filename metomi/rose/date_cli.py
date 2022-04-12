@@ -205,8 +205,10 @@ def _handle_old_offsets(args: list) -> list:
                 args[index] = f'{arg.split("=")[0]}={offset}'
             # Case: --offset <offset> is two items in args list:
             elif (
-                LEGACY_OFFSET.match(args[index + 1])
+                index + 1 < len(args)
+                and LEGACY_OFFSET.match(args[index + 1])
             ):
+                args[index] = args[index].replace('=', '')
                 args[index + 1] = upgrade_offset(args[index + 1])
     return args
 
