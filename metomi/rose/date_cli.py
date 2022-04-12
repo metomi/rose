@@ -199,7 +199,7 @@ def _handle_old_offsets(args: list) -> list:
         if '--offset' in arg or '-s' in arg:
             # Case: --offset=<offset> is a single item in args list:
             if (
-                len(arg.split('=')) > 1
+                '=' in arg
                 and LEGACY_OFFSET.match(arg.split('=')[1])
             ):
                 offset = upgrade_offset(arg.split("=")[1])
