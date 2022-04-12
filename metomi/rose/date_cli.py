@@ -194,12 +194,11 @@ def _handle_old_offsets(args: list) -> list:
     [WARN] This offset syntax 1d1s is deprecated: Using P1DT0H0M1S
     ['rose-date', '-s', 'P1DT0H0M1S']
     """
-    for index in range(len(args)):
-        arg = args[index]
+    for index, arg in enumerate(args):
         if '--offset' in arg or '-s' in arg:
             # Case: --offset=<offset> is a single item in args list:
             if (
-                len(arg.split('=')) > 1
+                '=' in arg
                 and LEGACY_OFFSET.match(arg.split('=')[1])
             ):
                 offset = upgrade_offset(arg.split("=")[1])
