@@ -29,7 +29,7 @@ from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.reporter import Reporter
 
 
-LEGACY_OFFSET = re.compile(r'(?P<value>\d+)(?P<unit>[wdhms])')
+LEGACY_OFFSET = re.compile(r'-?(?P<value>\d+)(?P<unit>[wdhms])')
 
 
 class OffsetValueError(ValueError):
@@ -442,20 +442,21 @@ def upgrade_offset(offset: str) -> str:
         https://github.com/metomi/rose/issues/2577
 
     Examples:
-        # Convert weeks to days:
         >>> upgrade_offset('1w')
+        [WARN] This offset syntax is deprecated.
         'P7DT0H0M0S'
-        # Convert weeks, days, and times:
         >>> upgrade_offset('1w1d1h')
+        [WARN] This offset syntax is deprecated.
         'P8DT1H0M0S'
-        # Ignore input order:
         >>> upgrade_offset('1h1d')
+        [WARN] This offset syntax is deprecated.
         'P1DT1H0M0S'
     """
     Reporter().report(
         'This offset syntax is deprecated.',
         prefix=Reporter.PREFIX_WARN, level=Reporter.WARN
     )
+    sign = '-' if offset[0] == '-' else ''
     offsets = LEGACY_OFFSET.findall(offset)
     offsets = {i.upper(): j for j, i in offsets}
 
@@ -477,7 +478,7 @@ def upgrade_offset(offset: str) -> str:
     # Week is not a built-in type:
     days = days + weeks * 7
 
-    return f'P{days}DT{hours}H{minutes}M{seconds}S'
+    return f'{sign}P{days}DT{hours}H{minutes}M{seconds}S'
 
 
 if __name__ == "__main__":

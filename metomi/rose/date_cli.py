@@ -180,6 +180,38 @@ from metomi.isodatetime.main import main as iso_main
 from metomi.rose.date import LEGACY_OFFSET, upgrade_offset
 
 
+def _handle_old_offsets(args: list) -> list:
+    """Handle Legacy Rose date --offset values:
+
+    # https://github.com/metomi/rose/issues/2577
+
+
+    Examples:
+    >>> _handle_old_offsets(['rose-date', '--offset=1d1s'])
+    [WARN] This offset syntax is deprecated.
+    ['rose-date', '--offset=P1DT0H0M1S']
+    >>> _handle_old_offsets(['rose-date', '-s', '1d1s'])
+    [WARN] This offset syntax is deprecated.
+    ['rose-date', '-s', 'P1DT0H0M1S']
+    """
+    for index in range(len(args)):
+        arg = args[index]
+        if '--offset' in arg or '-s' in arg:
+            # Case: --offset=<offset> is a single item in args list:
+            if (
+                len(arg.split('=')) > 1
+                and LEGACY_OFFSET.match(arg.split('=')[1])
+            ):
+                offset = upgrade_offset(arg.split("=")[1])
+                args[index] = f'{arg.split("=")[0]}={offset}'
+            # Case: --offset <offset> is two items in args list:
+            elif (
+                LEGACY_OFFSET.match(args[index + 1])
+            ):
+                args[index + 1] = upgrade_offset(args[index + 1])
+    return args
+
+
 def main():
     """Implement rose date."""
     if sys.stdin.isatty():
@@ -193,14 +225,7 @@ def main():
         print('\n' + __doc__)
         sys.exit()
 
-    # Handle Legacy Rose date --offset values:
-    # https://github.com/metomi/rose/issues/2577
-    for index in range(len(sys.argv)):
-        if (
-            sys.argv[index] in ('--offset', '-s')
-            and LEGACY_OFFSET.match(sys.argv[index + 1])
-        ):
-            sys.argv[index + 1] = upgrade_offset(sys.argv[index + 1])
+    sys.argv = _handle_old_offsets(sys.argv)
 
     # Handle Legacy Rose-date -c functionality
     if '-c' in sys.argv or '--use-task-cycle-time' in sys.argv:
