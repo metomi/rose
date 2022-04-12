@@ -455,7 +455,7 @@ def upgrade_offset(offset: str) -> str:
 
     sign = '-' if offset[0] == '-' else ''
     offsets = LEGACY_OFFSET.findall(offset)
-    offsets = {i.upper(): j for j, i in offsets}
+    offsets = {unit.upper(): number for number, unit in offsets}
 
     # Rose 2019 did not make any distinction between 1s1m and 1m1s,
     # so we do an implicit sort here:

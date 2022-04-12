@@ -82,10 +82,10 @@ param = pytest.param
             'rose-date 2000 -s=',
             False,
             id='it copes with unfilled opts'
-        ),,
+        ),
         param(
             'rose-date 2000 -s= 1d',
-            'rose-date 2000 -s P1D',
+            'rose-date 2000 -s P1DT0H0M0S',
             '[WARN] This offset syntax 1d is deprecated: Using P1DT0H0M0S\n',
             id='it copes with -s=\s\d[wdhms]'
         ),
