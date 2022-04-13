@@ -29,6 +29,9 @@ from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.reporter import Reporter
 
 
+LEGACY_OFFSET = re.compile(r'-?(?P<value>\d+)(?P<unit>[wdhms])')
+
+
 class OffsetValueError(ValueError):
 
     """Bad offset value."""
@@ -423,6 +426,60 @@ def _convert_duration(date_time_oper, opts, args):
             + '(hours, minutes, seconds)'
         )
         sys.exit(1)
+
+
+def upgrade_offset(offset: str) -> str:
+    """Convert offset values in the legacy format
+
+    Args:
+        offset: offset matching [0-9]+[wdhms]
+
+    Returns: Offset in isodate compatible format.
+
+    URL:
+        https://github.com/metomi/rose/issues/2577
+
+    Examples:
+        >>> upgrade_offset('1w')
+        [WARN] This offset syntax 1w is deprecated: Using P7DT0H0M0S
+        'P7DT0H0M0S'
+        >>> upgrade_offset('1w1d1h')
+        [WARN] This offset syntax 1w1d1h is deprecated: Using P8DT1H0M0S
+        'P8DT1H0M0S'
+        >>> upgrade_offset('1h1d')
+        [WARN] This offset syntax 1h1d is deprecated: Using P1DT1H0M0S
+        'P1DT1H0M0S'
+    """
+
+    sign = '-' if offset[0] == '-' else ''
+    offsets = LEGACY_OFFSET.findall(offset)
+    offsets = {unit.upper(): number for number, unit in offsets}
+
+    # Rose 2019 did not make any distinction between 1s1m and 1m1s,
+    # so we do an implicit sort here:
+    weeks, days, hours, minutes, seconds = [0 for _ in range(5)]
+    for unit, value in offsets.items():
+        if unit == 'W':
+            weeks = int(value)
+        if unit == 'D':
+            days = int(value)
+        if unit == 'H':
+            hours = int(value)
+        if unit == 'M':
+            minutes = int(value)
+        if unit == 'S':
+            seconds = int(value)
+
+    days = days + weeks * 7
+
+    result = f'{sign}P{days}DT{hours}H{minutes}M{seconds}S'
+
+    Reporter().report(
+        f'This offset syntax {offset} is deprecated: Using {result}',
+        prefix=Reporter.PREFIX_WARN, level=Reporter.WARN
+    )
+
+    return result
 
 
 if __name__ == "__main__":

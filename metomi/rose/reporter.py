@@ -17,6 +17,7 @@
 """Reporter for diagnostic messages."""
 
 
+import doctest
 import sys
 import time
 from typing import Optional
@@ -238,13 +239,17 @@ class ReporterContext:
 
     def write(self, message):
         """Write the message to the context's handle."""
-        try:
-            ret_code = self.handle.buffer.write(message.encode("utf-8"))
-        except TypeError:
+        if isinstance(self.handle, doctest._SpoofOut):
+            # If context is a doctest:
             ret_code = self.handle.write(message)
-        except AttributeError:
-            ret_code = self.handle.write(message.encode('UTF-8'))
-        self.handle.flush()
+        else:
+            try:
+                ret_code = self.handle.buffer.write(message.encode("utf-8"))
+            except TypeError:
+                ret_code = self.handle.write(message)
+            except AttributeError:
+                ret_code = self.handle.write(message.encode('UTF-8'))
+            self.handle.flush()
         return ret_code
 
     def _tty_colour_err(self, str_):
