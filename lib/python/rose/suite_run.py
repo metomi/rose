@@ -499,7 +499,7 @@ class SuiteRunner(Runner):
         # Checking through the children of the destination path to a maximum
         # depth of max_depth.
         patterns = [
-            destpath + '{}/'.format("/*"*i) + banned_file
+            destpath + '{_}/'.format(_="/*"*i) + banned_file
             for i in range(scan_depth)
             for banned_file in ['_cylc-install', 'flow.cylc']
         ]
