@@ -3,6 +3,13 @@
 Go to https://github.com/metomi/rose/milestones?state=closed
 for a full listing of issues for each release.
 
+## 2019.01.7 ()
+
+### Fixes
+
+[#2488](https://github.com/metomi/rose/pull/2582) - Fix Python 2.6 bug
+in [#2486](https://github.com/metomi/rose/pull/2486)
+
 ## 2019.01.6 (2022-03-29)
 
 ### Fixes
