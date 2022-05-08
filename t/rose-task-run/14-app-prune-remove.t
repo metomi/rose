@@ -32,7 +32,7 @@ get_reg
 TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "$TEST_KEY" \
     cylc install \
-        -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
+        "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
         --flow-name="$FLOW" \
         --no-run-name
 TEST_KEY="${TEST_KEY_BASE}-play"
