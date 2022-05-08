@@ -30,8 +30,8 @@ tests 9
 get_reg
 run_pass "${TEST_KEY_BASE}-install" \
     cylc install \
-        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
-        --flow-name="${FLOW}" \
+        "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --workflow-name="${FLOW}" \
         --no-run-name
 run_pass "${TEST_KEY_BASE}-play" \
     cylc play \

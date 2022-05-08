@@ -127,7 +127,7 @@ cat >'foo-aa000/flow.cylc' <<'__SUITE_RC__'
 __SUITE_RC__
 cylc install \
    -C "${PWD}/foo-aa000" \
-   --flow-name="${FLOW}" \
+   --workflow-name="${FLOW}" \
    --no-run-name
 run_pass "$TEST_KEY" rosie id "${HOME}/cylc-run/${FLOW}"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__

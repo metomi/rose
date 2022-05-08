@@ -37,7 +37,7 @@ fi
 export ROSE_CONF_PATH=
 get_reg
 OPTS=(
-    "--flow-name=$FLOW"
+    "--workflow-name=$FLOW"
     --no-run-name
 )
 if [[ -n ${JOB_HOST:-} ]]; then
@@ -48,7 +48,7 @@ fi
 TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "${TEST_KEY}" \
     cylc install \
-        -C "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
+        "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
         "${OPTS[@]}"
 TEST_KEY="${TEST_KEY_BASE}-play"
 run_pass "${TEST_KEY}" \
