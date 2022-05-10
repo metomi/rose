@@ -19,6 +19,8 @@ on:
       cylc_repo:
         description: The Cylc repo to test against
         required: false
+  schedule:
+  - cron: '37 04 * * 1-5' # 03:37, Monday-Friday
 
 defaults:
   run:
