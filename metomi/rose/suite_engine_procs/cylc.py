@@ -109,7 +109,7 @@ class CylcProcessor(SuiteEngineProcessor):
         from cylc.flow.platforms import get_host_from_platform
         try:
             from cylc.rose.platform_utils import get_platform_from_task_def
-        except:
+        except ModuleImportError:
             # Allow single stage fcm_make app to work without requiring
             # cylc.rose
             return None 
