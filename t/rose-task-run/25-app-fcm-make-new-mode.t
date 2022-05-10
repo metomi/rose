@@ -38,8 +38,8 @@ export ROSE_CONF_PATH=
 get_reg
 run_pass "${TEST_KEY_BASE}-install" \
     cylc install \
-        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
-        --flow-name="${FLOW}" \
+        "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --workflow-name="${FLOW}" \
         --no-run-name
 
 # Add some garbage before running the suite

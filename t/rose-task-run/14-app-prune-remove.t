@@ -33,7 +33,7 @@ TEST_KEY="${TEST_KEY_BASE}-install"
 run_pass "$TEST_KEY" \
     cylc install \
         "$TEST_SOURCE_DIR/$TEST_KEY_BASE" \
-        --flow-name="$FLOW" \
+        --workflow-name="$FLOW" \
         --no-run-name
 TEST_KEY="${TEST_KEY_BASE}-play"
 run_pass "$TEST_KEY" \

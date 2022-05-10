@@ -49,7 +49,7 @@ get_reg
 
 run_pass "${TEST_KEY_BASE}-install" \
     cylc install \
-        --flow-name="${FLOW}" \
+        --workflow-name="${FLOW}" \
         --no-run-name \
         -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
         -S "HOST='${JOB_HOST}'"

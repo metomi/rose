@@ -41,8 +41,8 @@ MTIME_OF_FAST_BEFORE=$(stat '-c%y' 'fast')
 get_reg
 run_pass "${TEST_KEY_BASE}-install" \
     cylc install \
-        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
-        --flow-name="${FLOW}" \
+        "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
+        --workflow-name="${FLOW}" \
         --no-run-name \
         -S "FAST_DEST_ROOT='${PWD}/fast'"
 run_pass "${TEST_KEY_BASE}-play" \
