@@ -441,13 +441,10 @@ def upgrade_offset(offset: str) -> str:
 
     Examples:
         >>> upgrade_offset('1w')
-        [WARN] This offset syntax 1w is deprecated: Using P7DT0H0M0S
         'P7DT0H0M0S'
         >>> upgrade_offset('1w1d1h')
-        [WARN] This offset syntax 1w1d1h is deprecated: Using P8DT1H0M0S
         'P8DT1H0M0S'
         >>> upgrade_offset('1h1d')
-        [WARN] This offset syntax 1h1d is deprecated: Using P1DT1H0M0S
         'P1DT1H0M0S'
     """
 
