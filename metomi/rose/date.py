@@ -491,7 +491,6 @@ def upgrade_cylc5_datetime(datetime: str) -> str:
 
     Examples:
         >>> upgrade_cylc5_datetime('2022010101')
-        [WARN] This datetime syntax 2022010101 is deprecated: Using 20220101T01
         '20220101T01'
     """
     upgraded = f'{datetime[:-2]}T{datetime[-2:]}'
@@ -510,7 +509,6 @@ def upgrade_unix_datetime(datetime_str: str) -> str:
 
     Examples:
         >>> upgrade_unix_datetime('Tue May 10 22:09:01 GMT 2022')
-        [WARN] This datetime syntax Tue May ... Using 2022-05-10T22:09:01
         '2022-05-10T22:09:01'
 
     Note:
