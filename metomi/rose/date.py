@@ -32,7 +32,7 @@ from metomi.rose.reporter import Reporter
 LEGACY_OFFSET = re.compile(r'-?(?P<value>\d+)(?P<unit>[wdhms])')
 CYLC5_FORMAT = re.compile(r'\d{10}')
 UNIX_FORMAT = re.compile(
-    r'\w{3} \w{3} \d\d \d\d:\d\d:\d\d (?P<timezone>\w*\/?\w*) \d{4}'
+    r'\w{3} \w{3} \d{1,2} \d\d:\d\d:\d\d (?P<timezone>\w*\/?\w*) \d{4}'
 )
 
 
@@ -508,7 +508,7 @@ def upgrade_unix_datetime(datetime_str: str) -> str:
     """Replace a Unix Style Datetime string with an ISO8601 Datetime String.
 
     Examples:
-        >>> upgrade_unix_datetime('Tue May 10 22:09:01 BST 2022')
+        >>> upgrade_unix_datetime('Tue May 10 22:09:01 GMT 2022')
         [WARN] This datetime syntax Tue May ... Using 2022-05-10T22:09:01
         '2022-05-10T22:09:01'
 
