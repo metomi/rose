@@ -200,7 +200,7 @@ def test__handle_old_datetimes(args, expect, warn, capsys):
 
     # Check warning message:
     if warn:
-        assert warn in capsys.readouterr().out
+        assert warn in capsys.readouterr().err
 
 
 @pytest.mark.parametrize(

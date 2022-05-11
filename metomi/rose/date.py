@@ -496,9 +496,9 @@ def upgrade_cylc5_datetime(datetime: str) -> str:
     """
     upgraded = f'{datetime[:-2]}T{datetime[-2:]}'
 
-    Reporter().report(
-        f'This datetime syntax {datetime} is deprecated: Using {upgraded}',
-        prefix=Reporter.PREFIX_WARN, level=Reporter.WARN
+    print(
+        f'[WARN] This datetime syntax {datetime} is deprecated: Using {upgraded}',
+        file=sys.stderr
     )
 
     return upgraded
@@ -520,9 +520,10 @@ def upgrade_unix_datetime(datetime_str: str) -> str:
         datetime_str, "%a %b %d %H:%M:%S %Z %Y"
     ).strftime("%Y-%m-%dT%H:%M:%S%z")
 
-    Reporter().report(
-        f'This datetime syntax {datetime_str} is deprecated: Using {upgraded}',
-        prefix=Reporter.PREFIX_WARN, level=Reporter.WARN
+    print(
+        f'[WARN] This datetime syntax {datetime_str} '
+        f'is deprecated: Using {upgraded}',
+        file=sys.stderr
     )
 
     return upgraded
