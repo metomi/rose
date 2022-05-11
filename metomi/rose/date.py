@@ -30,6 +30,10 @@ from metomi.rose.reporter import Reporter
 
 
 LEGACY_OFFSET = re.compile(r'-?(?P<value>\d+)(?P<unit>[wdhms])')
+CYLC5_FORMAT = re.compile(r'\d{10}')
+UNIX_FORMAT = re.compile(
+    r'\w{3} \w{3} \d\d \d\d:\d\d:\d\d (?P<timezone>\w*\/?\w*) \d{4}'
+)
 
 
 class OffsetValueError(ValueError):
@@ -480,6 +484,48 @@ def upgrade_offset(offset: str) -> str:
     )
 
     return result
+
+
+def upgrade_cylc5_datetime(datetime: str) -> str:
+    """Replace a Cylc 5 style (%Y%m%d%h) datetime with a ISO8601 datetime.
+
+    Examples:
+        >>> upgrade_cylc5_datetime('2022010101')
+        [WARN] This datetime syntax 2022010101 is deprecated: Using 20220101T01
+        '20220101T01'
+    """
+    upgraded = f'{datetime[:-2]}T{datetime[-2:]}'
+
+    Reporter().report(
+        f'This datetime syntax {datetime} is deprecated: Using {upgraded}',
+        prefix=Reporter.PREFIX_WARN, level=Reporter.WARN
+    )
+
+    return upgraded
+
+
+def upgrade_unix_datetime(datetime_str: str) -> str:
+    """Replace a Unix Style Datetime string with an ISO8601 Datetime String.
+
+    Examples:
+        >>> upgrade_unix_datetime('Tue May 10 22:09:01 BST 2022')
+        [WARN] This datetime syntax Tue May ... Using 2022-05-10T22:09:01
+        '2022-05-10T22:09:01'
+
+    Note:
+        Support of Timezones seems to be dependent on system setup and
+        may be very variable.
+    """
+    upgraded = datetime.strptime(
+        datetime_str, "%a %b %d %H:%M:%S %Z %Y"
+    ).strftime("%Y-%m-%dT%H:%M:%S%z")
+
+    Reporter().report(
+        f'This datetime syntax {datetime_str} is deprecated: Using {upgraded}',
+        prefix=Reporter.PREFIX_WARN, level=Reporter.WARN
+    )
+
+    return upgraded
 
 
 if __name__ == "__main__":
