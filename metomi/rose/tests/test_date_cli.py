@@ -95,4 +95,4 @@ def test__handle_old_offsets(args, expect, warn, capsys):
     """
     assert _handle_old_offsets(args.split(' ')) == expect.split(' ')
     if warn:
-        assert capsys.readouterr().out == warn
+        assert capsys.readouterr().err == warn
