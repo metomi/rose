@@ -474,9 +474,9 @@ def upgrade_offset(offset: str) -> str:
 
     result = f'{sign}P{days}DT{hours}H{minutes}M{seconds}S'
 
-    Reporter().report(
-        f'This offset syntax {offset} is deprecated: Using {result}',
-        prefix=Reporter.PREFIX_WARN, level=Reporter.WARN
+    print(
+        f'[WARN] This offset syntax {offset} is deprecated: Using {result}',
+        file=sys.stderr,
     )
 
     return result
