@@ -248,7 +248,7 @@ EXAMPLES
     # List the contents of the "syntax" directory:
     $ rose resource syntax
 
-    # Extract the Rose syntax file for the Vim text editor:
+    # Locate the Rose syntax file for the Vim text editor:
     $ rose resource syntax/rose-conf.vim
         ''',
         epilog='''
