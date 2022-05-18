@@ -225,18 +225,18 @@ def _handle_old_datetimes(args: list) -> list:
     Examples
 
     """
-    for i, arg in enumerate(args[1:]):
+    for i, arg in enumerate(args[1:], start=1):
         if (
             not (
-                args[i].startswith('--')
-                and '=' not in args[i]
+                args[i - 1].startswith('--')
+                and '=' not in args[i - 1]
             )
             and not arg.startswith('--')
         ):
             if CYLC5_FORMAT.match(arg):
-                args[i + 1] = upgrade_cylc5_datetime(arg)
+                args[i] = upgrade_cylc5_datetime(arg)
             elif UNIX_FORMAT.match(arg):
-                args[i + 1] = upgrade_unix_datetime(arg)
+                args[i] = upgrade_unix_datetime(arg)
     return args
 
 
