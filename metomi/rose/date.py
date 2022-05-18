@@ -497,7 +497,7 @@ def upgrade_cylc5_datetime(datetime: str) -> str:
 
     print(
         f'[WARN] This datetime syntax {datetime}'
-        f' is deprecated: Using {upgraded}',
+        f' is deprecated. Use {upgraded} instead',
         file=sys.stderr
     )
 
