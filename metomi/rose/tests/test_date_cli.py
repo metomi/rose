@@ -17,8 +17,11 @@
 """Test the CLI for Rose Date
 """
 import pytest
+import sys
 
-from metomi.rose.date_cli import _handle_old_offsets
+from metomi.rose.date_cli import (
+    _handle_old_offsets, _handle_old_datetimes, main
+)
 
 
 param = pytest.param
@@ -96,3 +99,159 @@ def test__handle_old_offsets(args, expect, warn, capsys):
     assert _handle_old_offsets(args.split(' ')) == expect.split(' ')
     if warn:
         assert capsys.readouterr().err == warn
+
+
+@pytest.mark.parametrize(
+    'args, expect, warn',
+    [
+        param(
+            'rose-date 20200101T00',
+            'rose-date 20200101T00',
+            False,
+            id='(control) it doesn\'t modify ISO8601 %Y%m%dT%H'
+        ),
+        param(
+            'rose-date Wed_May_11_09:22:00_2022',
+            'rose-date Wed_May_11_09:22:00_2022',
+            False,
+            id='(control) it doesn\'t modify ctime %a %b %d %H:%M:%S %Y'
+        ),
+        param(
+            'rose-date 12150615T1400+05',
+            'rose-date 12150615T1400+05',
+            False,
+            id='(control) it doesn\'t modify ISO8601 %Y%m%dT%H:%M:%S%Z'
+        ),
+        param(
+            'rose-date 2020010100',
+            'rose-date 20200101T00',
+            (
+                '[WARN] This datetime syntax 2020010100 is'
+                ' deprecated. Use 20200101T00 instead\n'
+            ),
+            id='it replaces Cylc5 date'
+        ),
+        param(
+            'rose-date --offset P1D 2020010100',
+            'rose-date --offset P1D 20200101T00',
+            (
+                '[WARN] This datetime syntax 2020010100 is'
+                ' deprecated. Use 20200101T00 instead\n'
+            ),
+            id='it replaces Cylc5 date, offset first'
+        ),
+        param(
+            'rose-date 2020010100 --offset P1D',
+            'rose-date 20200101T00 --offset P1D',
+            (
+                '[WARN] This datetime syntax 2020010100 is'
+                ' deprecated. Use 20200101T00 instead\n'
+            ),
+            id='it replaces Cylc5 date, offset after'
+        ),
+        param(
+            'rose-date --offset=P1D 2020010100',
+            'rose-date --offset=P1D 20200101T00',
+            (
+                '[WARN] This datetime syntax 2020010100 is'
+                ' deprecated. Use 20200101T00 instead\n'
+            ),
+            id='it replaces Cylc5 date, offset before uses ='
+        ),
+        param(
+            'rose-date 2020010100 2021010100',
+            'rose-date 20200101T00 20210101T00',
+            (
+                '[WARN] This datetime syntax 2020010100 is'
+                ' deprecated. Use 20200101T00 instead\n'
+            ),
+            id='it replaces Cylc5 date with 2 date args'
+        ),
+        param(
+            'rose-date Wed_May_11_09:22:00_UTC_2022',
+            'rose-date 2022-05-11T09:22:00',
+            (
+                '[WARN] This datetime syntax Wed May 11 09:22:00 UTC 2022 is'
+                ' deprecated. Use 2022-05-11T09:22:00 instead\n'
+            ),
+            id='it upgrades unix style times'
+        ),
+
+    ]
+)
+def test__handle_old_datetimes(args, expect, warn, capsys):
+    """It Identifies dates from Rose 2019 parse formats and turns it into an
+    ISO8601 Datetime if required.
+
+    Formats converted:
+
+    - ("%a %b %d %H:%M:%S %Z %Y", True),  # Unix "date"
+    - ("%Y%m%d%H", False)                 # Cylc (pre Cylc 5)
+    """
+    # Parse the input strings:
+    args = [arg.replace('_', ' ') for arg in args.split(' ')]
+    expect = [i.replace('_', ' ') for i in expect.split()]
+
+    # Run function:
+    result = _handle_old_datetimes(args)
+
+    # Check results:
+    assert result == expect
+
+    # Check warning message:
+    if warn:
+        assert warn in capsys.readouterr().err
+
+
+@pytest.mark.parametrize(
+    'args, expect',
+    [
+        param(
+            ['rose-date', 'Mon Jun 6 23:30:12 2022'],
+            'Mon Jun 06 23:30:12 2022',
+            id='it works on ctime %a %b %d %H:%M:%S %Y'
+        ),
+        param(
+            ['rose-date', 'Mon Jun 6 23:30:12 UTC 2022'],
+            '2022-06-06T23:30:12',
+            id='it works on Unix date %a %b %d %H:%M:%S %Z %Y'
+        ),
+        param(
+            ['rose-date', '14900618T1440Z'],
+            '14900618T1440Z',
+            id='it works on ISO8601 %Y-%m-%dT%H:%M%z'
+        ),
+        param(
+            ['rose-date', '1490-06-18T14:40:30'],
+            '1490-06-18T14:40:30',
+            id='it works on ISO8601 %Y-%m-%dT%H:%M:%S%z'
+        ),
+        param(
+            ['rose-date', '1490061814'],
+            '14900618T14',
+            id='it works on pre Cylc 5 datetimes %Y%m%d%H'
+        ),
+    ]
+)
+def test_main(monkeypatch, capsys, args, expect):
+    """Test that Rose Date can handle all formats described in Rose 2019
+
+    For information, possible formats from Rose 2019:
+
+        # strptime formats and their compatibility with the ISO 8601 parser.
+        PARSE_FORMATS = [
+            ("%a %b %d %H:%M:%S %Y", True),     # ctime
+            ("%a %b %d %H:%M:%S %Z %Y", True),  # Unix "date"
+            ("%Y-%m-%dT%H:%M:%S", False),       # ISO8601, extended
+            ("%Y%m%dT%H%M%S", False),           # ISO8601, basic
+            ("%Y%m%d%H", False)                 # Cylc (current[sic])
+        ]
+    """
+
+    def fake_exit(myfunc):
+        return myfunc
+
+    monkeypatch.setattr(sys, 'argv', args)
+    monkeypatch.setattr(sys, 'exit', fake_exit)
+    main()
+    assert capsys.readouterr().out.split('\n')[-2] == expect

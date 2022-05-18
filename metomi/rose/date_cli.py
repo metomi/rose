@@ -135,7 +135,7 @@ PARSE FORMAT
     * ctime: `%a %b %d %H:%M:%S %Y`
     * Unix date: `%a %b %d %H:%M:%S %Z %Y`
     * Basic ISO8601: `%Y-%m-%dT%H:%M:%S`, `%Y%m%dT%H%M%S`
-    * Cylc: `%Y%m%d%H`
+    * Cylc 5: `%Y%m%d%H` (deprecated)
 
     If none of these match, the date time point will be parsed according to
     the full ISO 8601 date/time standard.
@@ -177,7 +177,11 @@ import os
 
 from metomi.isodatetime.main import main as iso_main
 
-from metomi.rose.date import LEGACY_OFFSET, upgrade_offset
+from metomi.rose.date import (
+    LEGACY_OFFSET, upgrade_offset,
+    CYLC5_FORMAT, upgrade_cylc5_datetime,
+    UNIX_FORMAT, upgrade_unix_datetime
+)
 
 
 def _handle_old_offsets(args: list) -> list:
@@ -211,6 +215,29 @@ def _handle_old_offsets(args: list) -> list:
     return args
 
 
+def _handle_old_datetimes(args: list) -> list:
+    """Handle Legacy Rose date formats
+
+    # https://github.com/metomi/rose/issues/2589
+
+    Examples
+
+    """
+    for i, arg in enumerate(args[1:], start=1):
+        if (
+            not (
+                args[i - 1].startswith('--')
+                and '=' not in args[i - 1]
+            )
+            and not arg.startswith('--')
+        ):
+            if CYLC5_FORMAT.match(arg):
+                args[i] = upgrade_cylc5_datetime(arg)
+            elif UNIX_FORMAT.match(arg):
+                args[i] = upgrade_unix_datetime(arg)
+    return args
+
+
 def main():
     """Implement rose date."""
     if sys.stdin.isatty():
@@ -224,6 +251,7 @@ def main():
         print('\n' + __doc__)
         sys.exit()
 
+    sys.argv = _handle_old_datetimes(sys.argv)
     sys.argv = _handle_old_offsets(sys.argv)
 
     # Handle Legacy Rose-date -c functionality
