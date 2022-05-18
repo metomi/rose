@@ -98,9 +98,16 @@ class CylcProcessor(SuiteEngineProcessor):
     ) -> Union[str, None]:
         """Get host for a remote task from a Cylc workflow definition.
 
-        Returns: Hostname or None if:
+        Returns: Hostname, or None if:
           - task does not run remotely.
           - task has not been defined.
+          - cylc-rose is not installed(*)
+
+        (*) This function is only used by the fcm_make built-in app. Returning
+        None is equivalent to there being no fcm_make2 task found or no
+        workflow file found which is fine - 2 stage fcm_make is only supported
+        on the localhost install target (the workflow files aren't mirrored).
+
         """
         # n.b. Imports inside function to avoid dependency on Cylc and
         # Cylc-Rose is Rose is being used with a different workflow engine.
