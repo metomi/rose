@@ -521,7 +521,7 @@ def upgrade_unix_datetime(datetime_str: str) -> str:
 
     print(
         f'[WARN] This datetime syntax {datetime_str} '
-        f'is deprecated: Using {upgraded}',
+        f'is deprecated. Use {upgraded} instead',
         file=sys.stderr
     )
 
