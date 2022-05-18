@@ -98,7 +98,7 @@ def test__handle_old_offsets(args, expect, warn, capsys):
     """
     assert _handle_old_offsets(args.split(' ')) == expect.split(' ')
     if warn:
-        assert capsys.readouterr().out == warn
+        assert capsys.readouterr().err == warn
 
 
 @pytest.mark.parametrize(
@@ -127,7 +127,7 @@ def test__handle_old_offsets(args, expect, warn, capsys):
             'rose-date 20200101T00',
             (
                 '[WARN] This datetime syntax 2020010100 is'
-                ' deprecated: Using 20200101T00\n'
+                ' deprecated. Use 20200101T00 instead\n'
             ),
             id='it replaces Cylc5 date'
         ),
@@ -136,7 +136,7 @@ def test__handle_old_offsets(args, expect, warn, capsys):
             'rose-date --offset P1D 20200101T00',
             (
                 '[WARN] This datetime syntax 2020010100 is'
-                ' deprecated: Using 20200101T00\n'
+                ' deprecated. Use 20200101T00 instead\n'
             ),
             id='it replaces Cylc5 date, offset first'
         ),
@@ -145,7 +145,7 @@ def test__handle_old_offsets(args, expect, warn, capsys):
             'rose-date 20200101T00 --offset P1D',
             (
                 '[WARN] This datetime syntax 2020010100 is'
-                ' deprecated: Using 20200101T00\n'
+                ' deprecated. Use 20200101T00 instead\n'
             ),
             id='it replaces Cylc5 date, offset after'
         ),
@@ -154,7 +154,7 @@ def test__handle_old_offsets(args, expect, warn, capsys):
             'rose-date --offset=P1D 20200101T00',
             (
                 '[WARN] This datetime syntax 2020010100 is'
-                ' deprecated: Using 20200101T00\n'
+                ' deprecated. Use 20200101T00 instead\n'
             ),
             id='it replaces Cylc5 date, offset before uses ='
         ),
@@ -163,7 +163,7 @@ def test__handle_old_offsets(args, expect, warn, capsys):
             'rose-date 20200101T00 20210101T00',
             (
                 '[WARN] This datetime syntax 2020010100 is'
-                ' deprecated: Using 20200101T00\n'
+                ' deprecated. Use 20200101T00 instead\n'
             ),
             id='it replaces Cylc5 date with 2 date args'
         ),
@@ -172,7 +172,7 @@ def test__handle_old_offsets(args, expect, warn, capsys):
             'rose-date 2022-05-11T09:22:00',
             (
                 '[WARN] This datetime syntax Wed May 11 09:22:00 UTC 2022 is'
-                ' deprecated: Using 2022-05-11T09:22:00\n'
+                ' deprecated. Use 2022-05-11T09:22:00 instead\n'
             ),
             id='it upgrades unix style times'
         ),
