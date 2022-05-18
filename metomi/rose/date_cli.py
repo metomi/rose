@@ -135,7 +135,7 @@ PARSE FORMAT
     * ctime: `%a %b %d %H:%M:%S %Y`
     * Unix date: `%a %b %d %H:%M:%S %Z %Y`
     * Basic ISO8601: `%Y-%m-%dT%H:%M:%S`, `%Y%m%dT%H%M%S`
-    * Cylc: `%Y%m%d%H` (deprecated)
+    * Cylc 5: `%Y%m%d%H` (deprecated)
 
     If none of these match, the date time point will be parsed according to
     the full ISO 8601 date/time standard.
