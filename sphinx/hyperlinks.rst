@@ -12,8 +12,8 @@
 .. _Cylc: https://cylc.github.io/
 .. _Cylc Flow: https://github.com/cylc/cylc-flow
 .. _Cylc Rose: https://github.com/cylc/cylc-rose
-.. _Cylc User Guide: https://cylc.github.io/cylc-doc/latest/html/user-guide/index.html
-.. _Cylc Suite Design Guide: https://cylc.github.io/cylc-doc/stable/html/suite-design-guide/suite-design-guide-master.html
+.. _Cylc User Guide: https://cylc.github.io/cylc-doc/stable/html/user-guide/index.html
+.. _Cylc Workflow Design Guide: https://cylc.github.io/cylc-doc/stable/html/workflow-design-guide/index.html
 
 .. _EmPy: http://www.alcyone.com/software/empy/
 .. _extglob pattern matching: https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html#Pattern-Matching

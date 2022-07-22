@@ -11,7 +11,7 @@ Glossary
       Rose configurations are directories containing a Rose configuration
       file along with other optional files and directories.
 
-      The two types of Rose configuration relevant to Cylc suites are:
+      The two types of Rose configuration relevant to Cylc workflows are:
 
       * :term:`Rose application configuration`
       * :term:`Rose suite configuration`
