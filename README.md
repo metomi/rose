@@ -11,14 +11,12 @@ Rose: a framework for managing and running meteorological suites.
 
 #### Rose 2019
 
-- Production ready
 - Python 2
 - PyGTK GUI
 - `2019.01.x` branch in the source code
 
 #### Rose 2
 
-- Release candidate
 - Python 3
 - No GUIs
 - Web-based GUIs will follow in later Rose 2 releases
