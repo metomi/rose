@@ -47,7 +47,7 @@ Rose Configuration Format
    along with other optional files and directories.
 
    All Rose configuration files use the same format which is based on the
-   `INI`_ file format. *Like* the file format for :ref:`Cylc suites
+   `INI`_ file format. *Like* the file format for :ref:`Cylc workflows
    <Cylc file format>`:
 
 .. ifslides::
@@ -63,7 +63,7 @@ Rose Configuration Format
 .. ifnotslides::
 
    However, there are also key differences, and *unlike* the file format for
-   :ref:`Cylc suites <Cylc file format>`:
+   :ref:`Cylc workflows <Cylc file format>`:
 
 .. ifslides::
 

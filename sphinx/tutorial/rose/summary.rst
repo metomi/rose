@@ -13,7 +13,7 @@ Suite Structure
 
 So far we have covered:
 
-* Cylc suites.
+* Cylc workflows.
 * Rose suite configurations.
 * Rosie suites.
 
@@ -124,7 +124,7 @@ Suite Commands
    :ref:`command-rose-app-run`
       Runs a Rose application.
    :ref:`command-rose-task-run`
-      Runs a Rose application from within a Cylc suite.
+      Runs a Rose application from within a Cylc workflow.
 
 .. ifslides::
 
@@ -209,7 +209,7 @@ Next Steps
    :ref:`Rose Configuration <rose-configuration>`
       The possible settings which can be used in the different Rose
       configuration files.
-   `Cylc Suite Design Guide`_
+   `Cylc workflow Design Guide`_
       Contains recommended best practice for the style and structure of Cylc
       suites.
 
@@ -218,7 +218,7 @@ Next Steps
    * :ref:`Rose Further Topics`
    * :ref:`Command Reference`
    * :ref:`Rose Configuration <rose-configuration>`
-   * `Cylc Suite Design Guide`_
+   * `Cylc workflow Design Guide`_
 
 .. TODO - write some JS or python extension for representing definition
           lists as bullet lists for the slides builder.

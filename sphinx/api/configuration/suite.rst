@@ -29,7 +29,7 @@ A suite directory may contain the following:
 * A ``meta/`` directory containing the suite's configuration metadata.
 * ``opt/`` directory. For detail, see :ref:`Optional Configuration`.
 * Other items, as long as they do not clash with the scheduler's working
-  directories. E.g. for a Cylc suite, ``log*/``, ``share/``, ``state/`` and
+  directories. E.g. for a Cylc workflow, ``log*/``, ``share/``, ``state/`` and
   ``work/`` should be avoided.
 
 .. rose:file:: rose-suite.conf
@@ -68,8 +68,8 @@ A suite directory may contain the following:
 
       .. rose:conf:: CYLC_VERSION=CYLC_VERSION_NUMBER
 
-         If specified for a Cylc suite, the Rose suite runner
-         will attempt to use this version of cylc.
+         If specified for a Cylc workflow, the Rose suite runner
+         will attempt to use this version of Cylc.
 
    .. rose:conf:: template variables
 
