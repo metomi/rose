@@ -82,7 +82,7 @@ fi
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-t1" # normal
 file_grep "$TEST_KEY.out" \
-    "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -f .*$FLOW_RUN_DIR/work/1/fcm_make_t1/fcm-make.cfg -C .*$FLOW_RUN_DIR/share/fcm_make_t1 -j 4" \
+    "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -f .*$FLOW/work/1/fcm_make_t1/fcm-make.cfg -C .*$FLOW/share/fcm_make_t1 -j 4" \
     $FLOW_RUN_DIR/log/job/1/fcm_make_t1/01/job.out
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-t2" # use-pwd
@@ -91,12 +91,12 @@ file_grep "$TEST_KEY.out" "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-t3" # opt.jobs
 file_grep "$TEST_KEY.out" \
-    "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -f .*$FLOW_RUN_DIR/work/1/fcm_make_t3/fcm-make.cfg -C .*$FLOW_RUN_DIR/share/fcm_make_t3 -j 1" \
+    "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -f .*$FLOW/work/1/fcm_make_t3/fcm-make.cfg -C .*$FLOW/share/fcm_make_t3 -j 1" \
     $FLOW_RUN_DIR/log/job/1/fcm_make_t3/01/job.out
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-t4" # args
 file_grep "$TEST_KEY.out" \
-    "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -f .*$FLOW_RUN_DIR/work/1/fcm_make_t4/fcm-make.cfg -C .*$FLOW_RUN_DIR/share/fcm_make_t4 -j 4 -v -v" \
+    "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -f .*$FLOW/work/1/fcm_make_t4/fcm-make.cfg -C .*$FLOW/share/fcm_make_t4 -j 4 -v -v" \
     $FLOW_RUN_DIR/log/job/1/fcm_make_t4/01/job.out
 #-------------------------------------------------------------------------------
 if [[ -z $JOB_HOST ]]; then
@@ -107,7 +107,7 @@ else
         "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* export ROSE_TASK_MIRROR_TARGET=$JOB_HOST:cylc-run/$FLOW/share/fcm_make_t5" \
         $FLOW_RUN_DIR/log/job/1/fcm_make_t5/01/job.out
     file_grep "$TEST_KEY.out.cmd" \
-        "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -f .*$FLOW_RUN_DIR/work/1/fcm_make_t5/fcm-make.cfg -C .*$FLOW_RUN_DIR/share/fcm_make_t5 -j 4 mirror\\.target=${JOB_HOST}:cylc-run/${FLOW}/share/fcm_make_t5" \
+        "\\[INFO\\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]* fcm make -f .*$FLOW/work/1/fcm_make_t5/fcm-make.cfg -C .*$FLOW/share/fcm_make_t5 -j 4 mirror\\.target=${JOB_HOST}:cylc-run/${FLOW}/share/fcm_make_t5" \
         $FLOW_RUN_DIR/log/job/1/fcm_make_t5/01/job.out
 
     TEST_KEY="$TEST_KEY_BASE-t5-part-2"
