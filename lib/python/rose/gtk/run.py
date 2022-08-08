@@ -20,8 +20,9 @@
 """Miscellaneous gtk mini-applications."""
 
 import multiprocessing
+from subprocess import check_output
 
-from rose.gtk.dialog import DialogProcess
+from rose.gtk.dialog import DialogProcess, run_dialog, DIALOG_TYPE_WARNING
 from rose.opt_parse import RoseOptionParser
 from rose.suite_run import SuiteRunner
 from rose.reporter import Reporter, ReporterContextQueue
@@ -29,6 +30,17 @@ from rose.reporter import Reporter, ReporterContextQueue
 
 def run_suite(*args):
     """Run "rose suite-run [args]" with a GTK dialog."""
+
+    # Check that we are not using Cylc 8: Else return a helpful message:
+    cylc_version = check_output(['cylc', 'version'])
+    if cylc_version[0] == '8':
+        run_dialog(
+            DIALOG_TYPE_WARNING,
+            '`rose suite-run` does not work with Cylc 8 workflows: '
+            'Use `cylc install`.',
+            'Cylc Version == 8'
+        )
+        return None
 
     # Set up reporter
     queue = multiprocessing.Manager().Queue()
