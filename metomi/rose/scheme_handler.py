@@ -20,6 +20,7 @@
 from glob import glob
 import inspect
 import os
+from pathlib import Path
 import sys
 
 
@@ -124,3 +125,15 @@ class SchemeHandlersManager:
             can_handle = getattr(handler, self.can_handle, None)
             if callable(can_handle) and can_handle(item):
                 return handler
+
+    @staticmethod
+    def get_rose_path():
+        """Get path where rose handlers can be found.
+
+        n.b. At Python 3 there is no requirement to have a __init__ file
+        in a module, and therefore we need to get metomi.rose's path (where
+        there is an __init__.py) and not just metomi.
+        """
+        path = str(
+            Path(sys.modules["metomi.rose"].__file__).parent.parent.parent)
+        return path
