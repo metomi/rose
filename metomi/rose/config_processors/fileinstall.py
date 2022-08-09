@@ -824,11 +824,10 @@ class PullableLocHandlersManager(SchemeHandlersManager):
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
-        path = os.path.dirname(os.path.dirname(sys.modules["rose"].__file__))
         SchemeHandlersManager.__init__(
             self,
-            [path],
-            ns="rose.loc_handlers",
+            [self.get_rose_path()],
+            ns="metomi.rose.loc_handlers",
             attrs=["parse", "pull"],
             can_handle="can_pull",
         )

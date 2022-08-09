@@ -108,11 +108,11 @@ class ConfigProcessorsManager(SchemeHandlersManager):
         if fs_util is None:
             fs_util = FileSystemUtil(event_handler)
         self.fs_util = fs_util
-        path = os.path.dirname(
-            os.path.dirname(sys.modules["metomi.rose"].__file__)
-        )
         SchemeHandlersManager.__init__(
-            self, [path], "rose.config_processors", ["process"]
+            self,
+            [self.get_rose_path()],
+            "metomi.rose.config_processors",
+            ["process"]
         )
 
     def handle_event(self, *args, **kwargs):
