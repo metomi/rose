@@ -16,8 +16,6 @@
 # -----------------------------------------------------------------------------
 """Process named settings in metomi.rose.config.ConfigTree."""
 
-import os
-import sys
 from typing import Optional
 
 from metomi.rose.env import UnboundEnvironmentVariableError
