@@ -24,7 +24,6 @@ import os
 import shlex
 from shutil import rmtree
 import sqlite3
-import sys
 from tempfile import mkdtemp
 from typing import Any, Optional
 from urllib.parse import urlparse
