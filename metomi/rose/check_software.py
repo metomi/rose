@@ -234,7 +234,7 @@ def check(dependency, min_version=None, min_incompat_version=None, **kwargs):
     # Check version < min_incompat_version.
     version = version_tuple(version_string)
     if min_incompat_version and version > min_incompat_version:
-        return(line + 'not ok (%s > %s)' % (
+        return (line + 'not ok (%s > %s)' % (
             version_string, version_str(min_incompat_version)), False)
 
     # Check version >= min_version.
