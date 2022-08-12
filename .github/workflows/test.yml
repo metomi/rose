@@ -56,7 +56,7 @@ jobs:
           cylc_repo: ${{ github.event.inputs.cylc_repo || 'cylc/cylc-flow' }}
           cylc_branch: ${{ github.event.inputs.cylc_ref || 'master' }}
         run: |
-          pip install "git+https://github.com/${cylc_repo}@${cylc_branch}"
+          pip install -e "git+https://github.com/${cylc_repo}@${cylc_branch}"
 
       - name: Brew Install
         if: startsWith(matrix.os, 'macos')
@@ -100,8 +100,8 @@ jobs:
       - name: Install Rose
         working-directory: rose
         run: |
-          pip install ."[all]"
-          pip install git+https://github.com/cylc/cylc-rose.git
+          pip install -e ."[all]"
+          pip install -e git+https://github.com/cylc/cylc-rose.git
           yarn install
 
       - name: Checkout FCM
@@ -205,8 +205,8 @@ jobs:
       - name: install
         run: |
           pip install -e .[docs,graph]
-          pip install git+https://github.com/cylc/cylc-flow.git
-          pip install git+https://github.com/cylc/cylc-rose.git
+          pip install -e git+https://github.com/cylc/cylc-flow.git
+          pip install -e git+https://github.com/cylc/cylc-rose.git
 
       - name: build (html)
         run: |
