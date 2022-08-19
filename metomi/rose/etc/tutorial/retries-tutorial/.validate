@@ -17,4 +17,4 @@
 
 set -eux
 
-cylc validate . --icp=2000
+cylc validate --check-circular . --icp=2000

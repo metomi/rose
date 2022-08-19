@@ -1,10 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# Copyright (C) British Crown (Met Office) & Contributors - GNU V3+.
+# THIS FILE IS PART OF THE CYLC WORKFLOW ENGINE.
+# Copyright (C) NIWA & British Crown (Met Office) & Contributors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# -----------------------------------------------------------------------------
 # This is illustrative code developed for tutorial purposes, it is not
 # intended for scientific use and is not guarantied to be accurate or correct.
-# -----------------------------------------------------------------------------
 """
 Usage:
     get-rainfall
@@ -12,8 +26,8 @@ Usage:
 Environment Variables:
     API_KEY: The DataPoint API key, required for getting live weather data.
         If un-specified then get-observations will fall back to archive data
-        from the suite directory.
-    DOMIAN: The area in which to generate forecasts for in the format
+        from the workflow directory.
+    DOMAIN: The area in which to generate forecasts for in the format
         (lng1, lat1, lng2, lat2).
     RESOLUTION: The length/width of each grid cell in degrees.
 
@@ -23,10 +37,16 @@ from datetime import datetime
 import math
 import os
 import shutil
-import urllib.request
 
-import PIL.Image
-from mecator import get_offset, get_scale, coord_to_pos, pos_to_coord
+import requests
+
+try:
+    from PIL import Image
+except ModuleNotFoundError:
+    # not all PIL installations are created equal
+    # sometimes we must import like this
+    import Image
+from mercator import get_offset, get_scale, pos_to_coord
 import util
 
 
@@ -34,7 +54,7 @@ URL = ('http://datapoint.metoffice.gov.uk/public/data/layer/wxobs/'
        'RADAR_UK_Composite_Highres/png?TIME={time}&key={api_key}')
 
 
-class Rainfall:
+class Rainfall(object):
     """Class for holding rainfall data.
 
     Args:
@@ -56,8 +76,10 @@ class Rainfall:
         self.resolution = resolution
         self.domain = domain
 
-        rows = int(math.ceil(abs(domain['lat1'] - domain['lat2']) / resolution))
-        cols = int(math.ceil(abs(domain['lng1'] - domain['lng2']) / resolution))
+        rows = int(
+            math.ceil(abs(domain['lat1'] - domain['lat2']) / resolution))
+        cols = int(
+            math.ceil(abs(domain['lng1'] - domain['lng2']) / resolution))
 
         self.data = []
         for itt_y in range(rows):
@@ -71,7 +93,7 @@ class Rainfall:
         Args:
             lng (float): The longitude for this reading.
             lat (float): The latitude fo this reading.
-            value (float): The value of the reading.
+            value (tuple): The value of the reading.
 
         """
         itt_x, itt_y = util.get_grid_coordinates(lng, lat, self.domain,
@@ -97,38 +119,40 @@ def get_datapoint_radar_image(filename, time, api_key):
 
     Args:
         filename (str): The path to write the image file to.
-        time (str): The date-time of the image to reteieve in ISO8601 format.
+        time (str): The datetime of the image to retrieve in ISO8601 format.
         api_key (str): Datapoint API key.
 
     """
-    time = datetime.strptime(time, '%Y%m%dT%H%MZ'
-                            ).strftime('%Y-%m-%dT%H:%M:%SZ')
+    time = datetime.strptime(time, '%Y%m%dT%H%MZ').strftime(
+        '%Y-%m-%dT%H:%M:%SZ')
     url = URL.format(time=time, api_key=api_key)
-    print('Opening URL: %s' % url)
-    out = urllib.request.urlopen(url).read()
-    with open(filename, 'bw+') as png_file:
-        png_file.write(out)
+    req = requests.get(url)
+    if req.status_code != 200:
+        raise Exception(f'{url} returned exit code {req.status_code}')
+    with open(filename, 'bw') as png_file:
+        png_file.write(req.content)
 
 
 def get_archived_radar_image(filename, time):
-    """Retrieve a png image from the archived data in the suite directory.
+    """Retrieve a png image from the archived data in the workflow directory.
 
     Args:
         filename (str): The path to write the image file to.
-        time (str): The date-time of the image to reteieve in ISO8601 format.
+        time (str): The datetime of the image to retrieve in ISO8601 format.
 
     """
     shutil.copyfile(
-        os.path.join(os.environ['CYLC_SUITE_DEF_PATH'], 'data', time, filename),
+        os.path.join(os.environ['CYLC_WORKFLOW_RUN_DIR'], 'data', time,
+                     filename),
         filename)
 
 
 def process_rainfall_data(filename, resolution, domain):
-    """Generate a 2D matric of data from the rainfall data in the image.
+    """Generate a 2D matrix of data from the rainfall data in the image.
 
     Args:
         filename (str): Path to the png image to process.
-        resolution (float): The length/wieght of each grid cell in degrees.
+        resolution (float): The length/weight of each grid cell in degrees.
         domain (dict): The bounds of the domain as returned by
             util.parse_domain.
 
@@ -138,7 +162,7 @@ def process_rainfall_data(filename, resolution, domain):
     """
     rainfall = Rainfall(domain, resolution)
 
-    image = PIL.Image.open(filename)
+    image = Image.open(filename)
     scale = get_scale(domain, image.width)
     offset = get_offset(domain, scale)
 
@@ -163,7 +187,7 @@ def main():
         print('Attempting to get weather data from the DataPoint service.')
         get_datapoint_radar_image('rainfall-radar.png', time, api_key)
     else:
-        print('No API key provided, falling back to arhived data')
+        print('No API key provided, falling back to archived data')
         get_archived_radar_image('rainfall-radar.png', time)
 
     data = process_rainfall_data('rainfall-radar.png', resolution, domain)

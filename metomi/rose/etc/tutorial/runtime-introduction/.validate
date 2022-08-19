@@ -14,7 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 set -eux
-
-cylc validate . --icp=2000
+FLOW_NAME="$(< /dev/urandom tr -dc A-Za-z | head -c6)"
+SRC=$(cylc get-resources tutorial 2>&1 | head -n1 | awk '{print $NF}')
+cylc install "${SRC}/runtime-introduction" --workflow-name "$FLOW_NAME" --no-run-name
+cylc validate --check-circular --icp=2000 "$FLOW_NAME"
+cylc play --no-detach --abort-if-any-task-fails "$FLOW_NAME"
+cylc clean "$FLOW_NAME"
