@@ -43,9 +43,6 @@ Rose Configuration Format
 
 .. ifnotslides::
 
-   Rose configurations are directories containing a Rose configuration file
-   along with other optional files and directories.
-
    All Rose configuration files use the same format which is based on the
    `INI`_ file format. *Like* the file format for :ref:`Cylc workflows
    <Cylc file format>`:
@@ -93,7 +90,7 @@ For example:
 
 .. hint::
 
-   In Rose configuration files settings do not normally require quotation.
+   In Rose configuration files, settings do not normally require quotation.
 
 .. nextslide::
 
