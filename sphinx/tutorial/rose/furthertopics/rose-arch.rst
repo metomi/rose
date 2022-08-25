@@ -49,7 +49,7 @@ file that looks like this:
        [[archive_files_rsync]]
        [[archive_files_scp]]
 
-In the suite directory create an ``app/`` directory::
+In the source directory create an ``app/`` directory::
 
    mkdir app
 
@@ -151,14 +151,14 @@ You have now created a suite that defines three tasks:
    "Archives" (``scp``'s) the renamed files and moves them to the ``ARCHIVING/``
    folder in the ``$ROSE_DATA/`` directory.
 
-Save your changes and run the suite::
+Save your changes and run the workflow::
 
    cd ~/cylc-src/rose-arch-tutorial
    cylc validate .
    cylc install
    cylc play rose-arch-tutorial
 
-View the suite output using ``cylc cat-log`` and inspect the
+View the workflow output using ``cylc cat-log`` and inspect the
 output of the ``make_files``, ``archive_files_rsync`` and ``archive_files_scp``
 tasks.
 
@@ -166,7 +166,7 @@ tasks.
 Results Of "Archiving"
 ----------------------
 
-Change to the ``$ROSE_DATA/ARCHIVING/`` directory of the suite i.e:
+Change to the ``$ROSE_DATA/ARCHIVING/`` directory of the workflow i.e:
 
 .. code-block:: sub
 

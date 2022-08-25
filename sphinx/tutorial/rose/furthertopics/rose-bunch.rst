@@ -64,7 +64,7 @@ file that looks like this:
            script = rose task-run
        [[lander]]
 
-In the suite directory create an ``app/`` directory::
+In the source directory create an ``app/`` directory::
 
    mkdir app
 
@@ -137,15 +137,15 @@ directory of the lander app and running::
 
    chmod +x land
 
-Navigate to the top directory of your suite (where the ``flow.cylc`` and
+Navigate to the top directory of your source workflow (where the ``flow.cylc`` and
 :rose:file:`rose-suite.conf` files can be found) and validate, install and run
-your suite::
+the workflow::
 
    cylc validate .
    cylc install
    cylc play rose-bunch
 
-Once the suite has finished running and has shutdown, open Cylc Review to view
+Once the workflow has finished running and has shutdown, open Cylc Review to view
 its output (note that you can close the Cylc GUI at this point)::
 
    cylc review
@@ -155,7 +155,7 @@ its output (note that you can close the Cylc GUI at this point)::
    You can quickly view the workflow log by running
    ``cylc cat-log rose-bunch`` .
 
-In the Cylc Review jobs page for your suite you should be presented with a
+In the Cylc Review jobs page for your workflow you should be presented with a
 page containing a single row for the ``lander`` task, from which you can
 access its output. In that row you should see something like this:
 
@@ -195,6 +195,7 @@ following line under the :rose:conf:`rose_bunch[bunch]` section:
 
 We can now install and play this updated suite::
 
+   cylc validate ~/cylc-src/rose-bunch
    cylc install rose-bunch
    cylc play rose-bunch
 
@@ -231,6 +232,7 @@ following line to the :rose:conf:`rose_bunch[bunch]` section:
 
 We can now install and play this updated suite::
 
+   cylc validate ~/cylc-src/rose-bunch
    cylc install rose-bunch
    cylc play rose-bunch
 
