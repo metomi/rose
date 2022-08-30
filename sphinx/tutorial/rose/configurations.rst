@@ -38,6 +38,31 @@ behaviours such as:
    * :term:`Rose suite configuration`
 
 
+Why Use Rose Configurations?
+----------------------------
+
+.. ifnotslides::
+
+   With Rose configurations the inputs and environment required for a
+   particular purpose can be encapsulated in a simple human-readable
+   configuration.
+
+   Configuration settings can have metadata associated with them which may be
+   used for multiple purposes including automatic checking and transforming.
+
+   Rose configurations can be edited either using a text editor or with
+   the :ref:`command-rose-config-edit` GUI which makes use of metadata for
+   display and on-the-fly validation purposes.
+
+.. ifslides::
+
+   * Encapsulation
+   * Validation
+   * Editing
+
+.. nextslide::
+
+
 Rose Configuration Format
 -------------------------
 
@@ -88,12 +113,6 @@ For example:
 
 .. nextslide::
 
-.. hint::
-
-   In Rose configuration files, settings do not normally require quotation.
-
-.. nextslide::
-
 Throughout this tutorial we will refer to settings in the following format:
 
 * ``file`` - will refer to a Rose configuration *file*.
@@ -102,31 +121,8 @@ Throughout this tutorial we will refer to settings in the following format:
 * ``file[section]setting`` - will refer to a *setting in a section* in a Rose
   configuration file.
 
-
-Why Use Rose Configurations?
-----------------------------
-
-.. ifnotslides::
-
-   With Rose configurations the inputs and environment required for a
-   particular purpose can be encapsulated in a simple human-readable
-   configuration.
-
-   Configuration settings can have metadata associated with them which may be
-   used for multiple purposes including automatic checking and transforming.
-
-   Rose configurations can be edited either using a text editor or with
-   the :ref:`command-rose-config-edit` GUI which makes use of metadata for
-   display and on-the-fly validation purposes.
-
 .. ifslides::
-
-   * Encapsulation
-   * Validation
-   * Editing
 
    .. nextslide::
 
    Next section: :ref:`tutorial-rose-applications`
-
-.. TODO - add rose edit screenshot.
