@@ -3,7 +3,8 @@ name: test rsync remote check
 on:
   pull_request:
   workflow_dispatch:
-    rose_ref:
+    inputs:
+      rose_ref:
         description: The Rose branch to test against
         required: true
       fcm_ref:
