@@ -20,7 +20,6 @@ on:
         description: The Cylc repo to test against
         required: false
 
-
 defaults:
   run:
     shell: bash  # macos default shell is zsh
