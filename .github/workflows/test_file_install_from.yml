@@ -53,4 +53,5 @@ jobs:
       - name: Check Rsync Remote
         working-directory: rose
         run: |
+          pip install pytest
           pytest metomi/rose/tests/test_loc_handlers_rsync_remote_check.py
