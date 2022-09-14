@@ -61,7 +61,7 @@ class RsyncLocHandler:
         # Attempt to obtain the checksum(s) via "ssh"
         host, path = loc.name.split(":", 1)
         cmd = self.manager.popen.get_cmd(
-            "ssh", host, "python3", "-", path, loc.TYPE_BLOB, loc.TYPE_TREE
+            "ssh", host, "python", "-", path, loc.TYPE_BLOB, loc.TYPE_TREE
         )
         with open(rsync_remote_check_file, 'r') as stdin:
             out = self.manager.popen(*cmd, stdin=stdin)[0]

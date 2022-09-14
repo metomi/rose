@@ -25,9 +25,10 @@ to avoid reliance on remote platforms having rose installed.
 Warning:
     This script will not necessarily be run in the Rose Python environment.
     It should not have any dependencies outside of the stdlib and should be
-    compatible with as wide a range of Python3 versions as possible.
+    compatible with as wide a range of Python versions as possible.
 
 """
+from __future__ import print_function
 import os
 import sys
 
@@ -35,10 +36,16 @@ import sys
 def main(path, str_blob, str_tree):
     """Check file exists and print some info:
 
-    1. Octal protection bits.
-    2. Last modified time.
-    3. Filesize.
-    4. Path, which has been checked.
+    Args:
+        path (str): Path to a file or directory.
+        str_blob: return this string if path is a file. Default='blob'
+        str_tree: return this string if path is a directory. Default='tree'
+
+    Prints:
+        1. Access Mode information.
+        2. Last modified time.
+        3. Filesize.
+        4. Path, which has been checked.
     """
     if os.path.isdir(path):
         print(str_tree)
