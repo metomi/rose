@@ -1,0 +1,2441 @@
+---
+generation: 182
+last_run_time: 1660054376.43509
+tests:
+  "./t/docs/02-tutorial-suites.t":
+    elapsed: 0.0218219757080078
+    gen: 182
+    last_pass_time: 1660054126.08931
+    last_result: 0
+    last_run_time: 1660054126.08931
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1194
+    total_passes: 5
+  "./t/rosa-db-create/00-basic.t":
+    elapsed: 26.3714418411255
+    gen: 182
+    last_pass_time: 1660053403.42256
+    last_result: 0
+    last_run_time: 1660053403.42256
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1057
+    total_passes: 5
+  "./t/rosa-svn-post-commit/00-basic.t":
+    elapsed: 36.2375631332397
+    gen: 182
+    last_pass_time: 1660054093.01022
+    last_result: 0
+    last_run_time: 1660054093.01022
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1179
+    total_passes: 5
+  "./t/rosa-svn-post-commit/01-mail-passwd.t":
+    elapsed: 30.078871011734
+    gen: 182
+    last_pass_time: 1660054055.02624
+    last_result: 0
+    last_run_time: 1660054055.02624
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1174
+    total_passes: 5
+  "./t/rosa-svn-post-commit/02-mail-owner-passwd.t":
+    elapsed: 33.7367420196533
+    gen: 182
+    last_pass_time: 1660054338.07642
+    last_result: 0
+    last_run_time: 1660054338.07642
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1237
+    total_passes: 5
+  "./t/rosa-svn-post-commit/03-unicode.t":
+    elapsed: 6.72437787055969
+    gen: 182
+    last_pass_time: 1660053587.71146
+    last_result: 0
+    last_run_time: 1660053587.71146
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1102
+    total_passes: 5
+  "./t/rosa-svn-pre-commit/00-basic.t":
+    elapsed: 65.91663813591
+    gen: 182
+    last_pass_time: 1660054291.48119
+    last_result: 0
+    last_run_time: 1660054291.48119
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1223
+    total_passes: 5
+  "./t/rosa-svn-pre-commit/01-rosie-create.t":
+    elapsed: 20.8997390270233
+    gen: 182
+    last_pass_time: 1660053673.18339
+    last_result: 0
+    last_run_time: 1660053673.18339
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1114
+    total_passes: 5
+  "./t/rosa-svn-pre-commit/02-passwd.t":
+    elapsed: 12.6682648658752
+    gen: 182
+    last_pass_time: 1660054029.96591
+    last_result: 0
+    last_run_time: 1660054029.96591
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1172
+    total_passes: 5
+  "./t/rosa-svn-pre-commit/03-meta.t":
+    elapsed: 6.9938440322876
+    gen: 182
+    last_pass_time: 1660053565.93649
+    last_result: 0
+    last_run_time: 1660053565.93649
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1095
+    total_passes: 5
+  "./t/rosa-svn-pre-commit/04-unicode.t":
+    elapsed: 1.63963508605957
+    gen: 182
+    last_pass_time: 1660053554.96372
+    last_result: 0
+    last_run_time: 1660053554.96372
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1093
+    total_passes: 5
+  "./t/rose-ana/00-run-basic.t":
+    elapsed: 70.7884318828583
+    gen: 182
+    last_fail_time: 1660053476.9943
+    last_pass_time: 1647553272.15895
+    last_result: 18
+    last_run_time: 1660053476.9943
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1076
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-ana/01-run-basic-v1.t":
+    elapsed: 34.216560125351
+    gen: 182
+    last_pass_time: 1660054320.72979
+    last_result: 0
+    last_run_time: 1660054320.72979
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1232
+    total_passes: 5
+  "./t/rose-app-run/00-null.t":
+    elapsed: 4.82320284843445
+    gen: 182
+    last_fail_time: 1660054115.7621
+    last_pass_time: 1647552284.23739
+    last_result: 4
+    last_run_time: 1660054115.7621
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1189
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/01-basic.t":
+    elapsed: 9.56552290916443
+    gen: 182
+    last_fail_time: 1660053487.97107
+    last_pass_time: 1647553265.12922
+    last_result: 8
+    last_run_time: 1660053487.97107
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1078
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/02-command.t":
+    elapsed: 6.49907803535461
+    gen: 182
+    last_fail_time: 1660053495.51163
+    last_pass_time: 1647552962.4059
+    last_result: 6
+    last_run_time: 1660053495.51163
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1082
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/03-env.t":
+    elapsed: 8.0633909702301
+    gen: 182
+    last_fail_time: 1660054098.86936
+    last_pass_time: 1647552230.88413
+    last_result: 9
+    last_run_time: 1660054098.86936
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1182
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/04-stdin.t":
+    elapsed: 19.9316470623016
+    gen: 182
+    last_fail_time: 1660053391.44198
+    last_pass_time: 1647552928.82549
+    last_result: 9
+    last_run_time: 1660053391.44198
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1055
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/05-file.t":
+    elapsed: 22.6693930625916
+    gen: 182
+    last_fail_time: 1660053986.86937
+    last_pass_time: 1647552939.33605
+    last_result: 17
+    last_run_time: 1660053986.86937
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1159
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/06-namelist.t":
+    elapsed: 5.58408522605896
+    gen: 182
+    last_fail_time: 1660054215.64064
+    last_pass_time: 1647552948.95996
+    last_result: 6
+    last_run_time: 1660054215.64064
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1203
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/07-opt.t":
+    elapsed: 10.7409429550171
+    gen: 182
+    last_fail_time: 1660053651.08674
+    last_pass_time: 1647552582.47793
+    last_result: 11
+    last_run_time: 1660053651.08674
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1110
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/08-poll.t":
+    elapsed: 19.5745332241058
+    gen: 182
+    last_fail_time: 1660053453.15844
+    last_pass_time: 1647552843.86632
+    last_result: 10
+    last_run_time: 1660053453.15844
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1064
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/09-file-incr-0.t":
+    elapsed: 10.6532890796661
+    gen: 182
+    last_pass_time: 1660053744.55725
+    last_result: 0
+    last_run_time: 1660053744.55725
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1128
+    total_passes: 5
+  "./t/rose-app-run/10-file-incr-1.t":
+    elapsed: 2.89972996711731
+    gen: 182
+    last_pass_time: 1660054312.23752
+    last_result: 0
+    last_run_time: 1660054312.23752
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1231
+    total_passes: 5
+  "./t/rose-app-run/11-file-incr-2.t":
+    elapsed: 99.0734419822693
+    gen: 182
+    last_pass_time: 1660054224.03989
+    last_result: 0
+    last_run_time: 1660054224.03989
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1206
+    total_passes: 5
+  "./t/rose-app-run/12-file-incr-3.t":
+    elapsed: 2.15474891662598
+    gen: 182
+    last_fail_time: 1660053751.29841
+    last_pass_time: 1647552583.45994
+    last_result: 1
+    last_run_time: 1660053751.29841
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1130
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/13-file-source-tilde.t":
+    elapsed: 2.60432100296021
+    gen: 182
+    last_pass_time: 1660053404.72686
+    last_result: 0
+    last_run_time: 1660053404.72686
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1058
+    total_passes: 5
+  "./t/rose-app-run/14-file-source-optional.t":
+    elapsed: 15.4814460277557
+    gen: 182
+    last_pass_time: 1660053386.98663
+    last_result: 0
+    last_run_time: 1660053386.98663
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1054
+    total_passes: 5
+  "./t/rose-app-run/15-file-permission.t":
+    elapsed: 5.19162702560425
+    gen: 182
+    last_fail_time: 1660054305.7084
+    last_pass_time: 1647552878.67973
+    last_result: 5
+    last_run_time: 1660054305.7084
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1229
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/16-file-mode-bad.t":
+    elapsed: 1.56245899200439
+    gen: 182
+    last_fail_time: 1660053747.25486
+    last_pass_time: 1647552280.91491
+    last_result: 2
+    last_run_time: 1660053747.25486
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1129
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/17-file-db-bad.t":
+    elapsed: 1.69210386276245
+    gen: 182
+    last_pass_time: 1660053702.03245
+    last_result: 0
+    last_run_time: 1660053702.03245
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1124
+    total_passes: 5
+  "./t/rose-app-run/18-access-mode-change.t":
+    elapsed: 2.501384973526
+    gen: 182
+    last_fail_time: 1660053472.82934
+    last_pass_time: 1647552585.33579
+    last_result: 2
+    last_run_time: 1660053472.82934
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1074
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/19-file-unchanged.t":
+    elapsed: 5.74968910217285
+    gen: 182
+    last_pass_time: 1660054298.15634
+    last_result: 0
+    last_run_time: 1660054298.15634
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1226
+    total_passes: 5
+  "./t/rose-app-run/20-file-symlink-no-source.t":
+    elapsed: 1.18554306030273
+    gen: 182
+    last_fail_time: 1660053664.15423
+    last_pass_time: 1647552775.00612
+    last_result: 2
+    last_run_time: 1660053664.15423
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1112
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/21-run-config-load-event.t":
+    elapsed: 3.21872210502625
+    gen: 182
+    last_fail_time: 1660053848.22199
+    last_pass_time: 1647552560.12326
+    last_result: 3
+    last_run_time: 1660053848.22199
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1145
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/22-opt-conf-key-missing.t":
+    elapsed: 3.01072001457214
+    gen: 182
+    last_fail_time: 1660053708.51237
+    last_pass_time: 1647552588.09858
+    last_result: 3
+    last_run_time: 1660053708.51237
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1126
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/23-file-both.t":
+    elapsed: 1.47623085975647
+    gen: 182
+    last_pass_time: 1660054009.99247
+    last_result: 0
+    last_run_time: 1660054009.99247
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1166
+    total_passes: 5
+  "./t/rose-app-run/24-app-unicode.t":
+    elapsed: 1.46261286735535
+    gen: 182
+    last_fail_time: 1660053675.40648
+    last_pass_time: 1647552313.58791
+    last_result: 2
+    last_run_time: 1660053675.40648
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1115
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/25-file-symlink-plus.t":
+    elapsed: 2.63538002967834
+    gen: 182
+    last_fail_time: 1660054261.51647
+    last_pass_time: 1647552233.93555
+    last_result: 3
+    last_run_time: 1660054261.51647
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1219
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/26-define-overrides.t":
+    elapsed: 4.82509994506836
+    gen: 182
+    last_fail_time: 1660054245.65159
+    last_pass_time: 1647553211.25787
+    last_result: 3
+    last_run_time: 1660054245.65159
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1212
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-app-run/27-fileinstall-when-sourcelist-changed.t":
+    elapsed: 4.87009906768799
+    gen: 182
+    last_pass_time: 1660053679.13575
+    last_result: 0
+    last_run_time: 1660053679.13575
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1116
+    total_passes: 5
+  "./t/rose-app-upgrade/00-null.t":
+    elapsed: 14.0373528003693
+    gen: 182
+    last_pass_time: 1660053810.24027
+    last_result: 0
+    last_run_time: 1660053810.24027
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1138
+    total_passes: 5
+  "./t/rose-app-upgrade/01-upgrade-basic.t":
+    elapsed: 30.3924508094788
+    gen: 182
+    last_pass_time: 1660053550.58625
+    last_result: 0
+    last_run_time: 1660053550.58625
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1091
+    total_passes: 5
+  "./t/rose-app-upgrade/02-downgrade-basic.t":
+    elapsed: 22.1198160648346
+    gen: 182
+    last_pass_time: 1660054285.66728
+    last_result: 0
+    last_run_time: 1660054285.66728
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1221
+    total_passes: 5
+  "./t/rose-app-upgrade/03-complex.t":
+    elapsed: 2.73320484161377
+    gen: 182
+    last_pass_time: 1660053428.72362
+    last_result: 0
+    last_run_time: 1660053428.72362
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1060
+    total_passes: 5
+  "./t/rose-app-upgrade/04-upgrade-trigger.t":
+    elapsed: 3.34007716178894
+    gen: 182
+    last_pass_time: 1660054192.10627
+    last_result: 0
+    last_run_time: 1660054192.10627
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1201
+    total_passes: 5
+  "./t/rose-app-upgrade/05-cwd.t":
+    elapsed: 0.936062097549438
+    gen: 182
+    last_pass_time: 1660053571.73799
+    last_result: 0
+    last_run_time: 1660053571.73799
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1097
+    total_passes: 5
+  "./t/rose-app-upgrade/06-broken.t":
+    elapsed: 4.65360498428345
+    gen: 182
+    last_pass_time: 1660053886.30921
+    last_result: 0
+    last_run_time: 1660053886.30921
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1149
+    total_passes: 5
+  "./t/rose-app-upgrade/07-add-existing.t":
+    elapsed: 1.12404489517212
+    gen: 182
+    last_pass_time: 1660054247.82114
+    last_result: 0
+    last_run_time: 1660054247.82114
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1213
+    total_passes: 5
+  "./t/rose-app-upgrade/08-category-is-package.t":
+    elapsed: 0.989448070526123
+    gen: 182
+    last_pass_time: 1660053645.42983
+    last_result: 0
+    last_run_time: 1660053645.42983
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1108
+    total_passes: 5
+  "./t/rose-app-upgrade/09-opt.t":
+    elapsed: 1.27372312545776
+    gen: 182
+    last_pass_time: 1660054258.02049
+    last_result: 0
+    last_run_time: 1660054258.02049
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1218
+    total_passes: 5
+  "./t/rose-app-upgrade/10-prettify-trigger-bug.t":
+    elapsed: 1.39593386650085
+    gen: 182
+    last_pass_time: 1660054250.21971
+    last_result: 0
+    last_run_time: 1660054250.21971
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1214
+    total_passes: 5
+  "./t/rose-app-upgrade/11-upgrade-basic-tree.t":
+    elapsed: 25.8469860553741
+    gen: 182
+    last_pass_time: 1660053990.3962
+    last_result: 0
+    last_run_time: 1660053990.3962
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1161
+    total_passes: 5
+  "./t/rose-app-upgrade/12-downgrade-basic-tree.t":
+    elapsed: 29.4637660980225
+    gen: 182
+    last_pass_time: 1660053552.01602
+    last_result: 0
+    last_run_time: 1660053552.01602
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1092
+    total_passes: 5
+  "./t/rose-app-upgrade/13-bad-upgrade-macro.t":
+    elapsed: 0.955185890197754
+    gen: 182
+    last_pass_time: 1660054241.06839
+    last_result: 0
+    last_run_time: 1660054241.06839
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1211
+    total_passes: 5
+  "./t/rose-config-diff/00-basic.t":
+    elapsed: 14.1194159984589
+    gen: 182
+    last_pass_time: 1660054004.39948
+    last_result: 0
+    last_run_time: 1660054004.39948
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1164
+    total_passes: 5
+  "./t/rose-config-dump/00-basic.t":
+    elapsed: 7.22344303131104
+    gen: 182
+    last_pass_time: 1660053503.63041
+    last_result: 0
+    last_run_time: 1660053503.63041
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1083
+    total_passes: 5
+  "./t/rose-config-dump/01-indices.t":
+    elapsed: 0.858728885650635
+    gen: 182
+    last_pass_time: 1660053573.46647
+    last_result: 0
+    last_run_time: 1660053573.46647
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1098
+    total_passes: 5
+  "./t/rose-config-dump/02-files.t":
+    elapsed: 4.39695906639099
+    gen: 182
+    last_pass_time: 1660053832.29769
+    last_result: 0
+    last_run_time: 1660053832.29769
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1140
+    total_passes: 5
+  "./t/rose-config-dump/03-prettyprint.t":
+    elapsed: 2.58399295806885
+    gen: 182
+    last_pass_time: 1660053993.80261
+    last_result: 0
+    last_run_time: 1660053993.80261
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1162
+    total_passes: 5
+  "./t/rose-config/00-basic.t":
+    elapsed: 25.2007608413696
+    gen: 182
+    last_pass_time: 1660054324.74976
+    last_result: 0
+    last_run_time: 1660054324.74976
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1234
+    total_passes: 5
+  "./t/rose-config/01-opt.t":
+    elapsed: 0.721555233001709
+    gen: 182
+    last_pass_time: 1660053961.1767
+    last_result: 0
+    last_run_time: 1660053961.1767
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1156
+    total_passes: 5
+  "./t/rose-config/03-syntax-error.t":
+    elapsed: 19.8205959796906
+    gen: 182
+    last_pass_time: 1660053608.62739
+    last_result: 0
+    last_run_time: 1660053608.62739
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1103
+    total_passes: 5
+  "./t/rose-config/04-meta.t":
+    elapsed: 8.47660708427429
+    gen: 182
+    last_pass_time: 1660054321.67208
+    last_result: 0
+    last_run_time: 1660054321.67208
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1233
+    total_passes: 5
+  "./t/rose-config/05-opt-opt.t":
+    elapsed: 18.0163309574127
+    gen: 182
+    last_pass_time: 1660054093.22522
+    last_result: 0
+    last_run_time: 1660054093.22522
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1180
+    total_passes: 5
+  "./t/rose-env-cat/00-null.t":
+    elapsed: 2.09401702880859
+    gen: 182
+    last_pass_time: 1660054016.21199
+    last_result: 0
+    last_run_time: 1660054016.21199
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1168
+    total_passes: 5
+  "./t/rose-env-cat/01-basic.t":
+    elapsed: 6.09093308448792
+    gen: 182
+    last_pass_time: 1660054033.73741
+    last_result: 0
+    last_run_time: 1660054033.73741
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1173
+    total_passes: 5
+  "./t/rose-env-cat/02-braced.t":
+    elapsed: 6.73291802406311
+    gen: 182
+    last_pass_time: 1660054012.75042
+    last_result: 0
+    last_run_time: 1660054012.75042
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1167
+    total_passes: 5
+  "./t/rose-help/00-alias.t":
+    elapsed: 4.55577802658081
+    gen: 182
+    last_pass_time: 1660054114.58649
+    last_result: 0
+    last_run_time: 1660054114.58649
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1188
+    total_passes: 5
+  "./t/rose-host-select/00-basic.t":
+    elapsed: 13.3412079811096
+    gen: 182
+    last_pass_time: 1660053826.31991
+    last_result: 0
+    last_run_time: 1660053826.31991
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1139
+    total_passes: 5
+  "./t/rose-host-select/01-timeout.t":
+    elapsed: 2.48907589912415
+    gen: 182
+    last_pass_time: 1660054089.9372
+    last_result: 0
+    last_run_time: 1660054089.9372
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1178
+    total_passes: 5
+  "./t/rose-host-select/02-localhost.t":
+    elapsed: 7.79597401618958
+    gen: 182
+    last_fail_time: 1660053662.03641
+    last_pass_time: 1647552907.56135
+    last_result: 2
+    last_run_time: 1660053662.03641
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1111
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-macro/00-null.t":
+    elapsed: 14.1639850139618
+    gen: 182
+    last_pass_time: 1660053487.92147
+    last_result: 0
+    last_run_time: 1660053487.92147
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1077
+    total_passes: 5
+  "./t/rose-macro/01-value-type-check-ok.t":
+    elapsed: 15.4431228637695
+    gen: 182
+    last_pass_time: 1660053520.9376
+    last_result: 0
+    last_run_time: 1660053520.9376
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1089
+    total_passes: 5
+  "./t/rose-macro/02-value-type-check-err.t":
+    elapsed: 22.1688618659973
+    gen: 182
+    last_pass_time: 1660053732.94336
+    last_result: 0
+    last_run_time: 1660053732.94336
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1127
+    total_passes: 5
+  "./t/rose-macro/03-value-range-check-ok.t":
+    elapsed: 6.40739703178406
+    gen: 182
+    last_pass_time: 1660053786.69304
+    last_result: 0
+    last_run_time: 1660053786.69304
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1133
+    total_passes: 5
+  "./t/rose-macro/04-value-range-check-err.t":
+    elapsed: 6.76190710067749
+    gen: 182
+    last_pass_time: 1660054328.48937
+    last_result: 0
+    last_run_time: 1660054328.48937
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1235
+    total_passes: 5
+  "./t/rose-macro/05-value-values-check.t":
+    elapsed: 8.87591600418091
+    gen: 182
+    last_pass_time: 1660054225.61577
+    last_result: 0
+    last_run_time: 1660054225.61577
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1208
+    total_passes: 5
+  "./t/rose-macro/06-value-pattern-check.t":
+    elapsed: 1.81847882270813
+    gen: 182
+    last_pass_time: 1660053989.4846
+    last_result: 0
+    last_run_time: 1660053989.4846
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1160
+    total_passes: 5
+  "./t/rose-macro/07-value-change.t":
+    elapsed: 1.12251996994019
+    gen: 182
+    last_pass_time: 1660053704.56422
+    last_result: 0
+    last_run_time: 1660053704.56422
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1125
+    total_passes: 5
+  "./t/rose-macro/08-compulsory-check.t":
+    elapsed: 8.21777296066284
+    gen: 182
+    last_pass_time: 1660053695.35543
+    last_result: 0
+    last_run_time: 1660053695.35543
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1121
+    total_passes: 5
+  "./t/rose-macro/09-rule-check.t":
+    elapsed: 2.24760699272156
+    gen: 182
+    last_pass_time: 1660053799.91946
+    last_result: 0
+    last_run_time: 1660053799.91946
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1136
+    total_passes: 5
+  "./t/rose-macro/10-trigger-check.t":
+    elapsed: 9.91482496261597
+    gen: 182
+    last_pass_time: 1660053515.08909
+    last_result: 0
+    last_run_time: 1660053515.08909
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1088
+    total_passes: 5
+  "./t/rose-macro/11-trigger-change.t":
+    elapsed: 2.65158486366272
+    gen: 182
+    last_pass_time: 1660054255.70905
+    last_result: 0
+    last_run_time: 1660054255.70905
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1217
+    total_passes: 5
+  "./t/rose-macro/12-custom-change.t":
+    elapsed: 2.89618587493896
+    gen: 182
+    last_pass_time: 1660053699.34266
+    last_result: 0
+    last_run_time: 1660053699.34266
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1123
+    total_passes: 5
+  "./t/rose-macro/13-custom-check.t":
+    elapsed: 2.86197090148926
+    gen: 182
+    last_pass_time: 1660053569.66039
+    last_result: 0
+    last_run_time: 1660053569.66039
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1096
+    total_passes: 5
+  "./t/rose-macro/14-duplicate-check.t":
+    elapsed: 2.0559229850769
+    gen: 182
+    last_pass_time: 1660053679.67229
+    last_result: 0
+    last_run_time: 1660053679.67229
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1117
+    total_passes: 5
+  "./t/rose-macro/15-bad-custom-change.t":
+    elapsed: 6.93312406539917
+    gen: 182
+    last_pass_time: 1660054332.86876
+    last_result: 0
+    last_run_time: 1660054332.86876
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1236
+    total_passes: 5
+  "./t/rose-macro/16-cwd.t":
+    elapsed: 1.7498619556427
+    gen: 182
+    last_pass_time: 1660053457.40304
+    last_result: 0
+    last_run_time: 1660053457.40304
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1065
+    total_passes: 5
+  "./t/rose-macro/17-import.t":
+    elapsed: 5.78913712501526
+    gen: 182
+    last_pass_time: 1660054186.99966
+    last_result: 0
+    last_run_time: 1660054186.99966
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1199
+    total_passes: 5
+  "./t/rose-macro/18-opt-conf-check.t":
+    elapsed: 4.71542000770569
+    gen: 182
+    last_pass_time: 1660053464.72339
+    last_result: 0
+    last_run_time: 1660053464.72339
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1070
+    total_passes: 5
+  "./t/rose-macro/19-opt-conf-change-add.t":
+    elapsed: 3.53232288360596
+    gen: 182
+    last_pass_time: 1660054110.14211
+    last_result: 0
+    last_run_time: 1660054110.14211
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1187
+    total_passes: 5
+  "./t/rose-macro/20-opt-conf-change-modify.t":
+    elapsed: 9.10607695579529
+    gen: 182
+    last_pass_time: 1660053505.92364
+    last_result: 0
+    last_run_time: 1660053505.92364
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1085
+    total_passes: 5
+  "./t/rose-macro/21-opt-conf-change-remove.t":
+    elapsed: 0.854870080947876
+    gen: 182
+    last_pass_time: 1660053935.84487
+    last_result: 0
+    last_run_time: 1660053935.84487
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1154
+    total_passes: 5
+  "./t/rose-macro/22-repeats.t":
+    elapsed: 0.90080189704895
+    gen: 182
+    last_pass_time: 1660053468.76516
+    last_result: 0
+    last_run_time: 1660053468.76516
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1072
+    total_passes: 5
+  "./t/rose-macro/23-import-tree.t":
+    elapsed: 4.87451386451721
+    gen: 182
+    last_pass_time: 1660053511.64644
+    last_result: 0
+    last_run_time: 1660053511.64644
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1087
+    total_passes: 5
+  "./t/rose-macro/24-optional-config-name.t":
+    elapsed: 1.34421110153198
+    gen: 182
+    last_pass_time: 1660054022.27426
+    last_result: 0
+    last_run_time: 1660054022.27426
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1170
+    total_passes: 5
+  "./t/rose-macro/25-suite-level.t":
+    elapsed: 11.3230240345001
+    gen: 182
+    last_pass_time: 1660053445.24414
+    last_result: 0
+    last_run_time: 1660053445.24414
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1063
+    total_passes: 5
+  "./t/rose-macro/26-optional-config-name-2.t":
+    elapsed: 2.17307806015015
+    gen: 182
+    last_pass_time: 1660054188.95134
+    last_result: 0
+    last_run_time: 1660054188.95134
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1200
+    total_passes: 5
+  "./t/rose-metadata-check/00-null.t":
+    elapsed: 2.94873690605164
+    gen: 182
+    last_pass_time: 1660054153.7119
+    last_result: 0
+    last_run_time: 1660054153.7119
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1196
+    total_passes: 5
+  "./t/rose-metadata-check/01-type-length.t":
+    elapsed: 12.2377121448517
+    gen: 182
+    last_pass_time: 1660053503.99337
+    last_result: 0
+    last_run_time: 1660053503.99337
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1084
+    total_passes: 5
+  "./t/rose-metadata-check/02-range.t":
+    elapsed: 1.71001291275024
+    gen: 182
+    last_pass_time: 1660054101.53991
+    last_result: 0
+    last_run_time: 1660054101.53991
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1183
+    total_passes: 5
+  "./t/rose-metadata-check/03-values.t":
+    elapsed: 3.92089605331421
+    gen: 182
+    last_pass_time: 1660054119.73386
+    last_result: 0
+    last_run_time: 1660054119.73386
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1190
+    total_passes: 5
+  "./t/rose-metadata-check/04-pattern.t":
+    elapsed: 2.53304100036621
+    gen: 182
+    last_pass_time: 1660053375.41641
+    last_result: 0
+    last_run_time: 1660053375.41641
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1053
+    total_passes: 5
+  "./t/rose-metadata-check/05-compulsory.t":
+    elapsed: 1.84664702415466
+    gen: 182
+    last_pass_time: 1660053643.52825
+    last_result: 0
+    last_run_time: 1660053643.52825
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1107
+    total_passes: 5
+  "./t/rose-metadata-check/06-rule.t":
+    elapsed: 3.24092197418213
+    gen: 182
+    last_pass_time: 1660053473.51861
+    last_result: 0
+    last_run_time: 1660053473.51861
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1075
+    total_passes: 5
+  "./t/rose-metadata-check/07-trigger.t":
+    elapsed: 7.41608691215515
+    gen: 182
+    last_pass_time: 1660053688.0222
+    last_result: 0
+    last_run_time: 1660053688.0222
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1120
+    total_passes: 5
+  "./t/rose-metadata-check/08-duplicate.t":
+    elapsed: 1.78782987594604
+    gen: 182
+    last_pass_time: 1660054125.19934
+    last_result: 0
+    last_run_time: 1660054125.19934
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1193
+    total_passes: 5
+  "./t/rose-metadata-check/09-custom-macro.t":
+    elapsed: 6.42771601676941
+    gen: 182
+    last_pass_time: 1660053558.03233
+    last_result: 0
+    last_run_time: 1660053558.03233
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1094
+    total_passes: 5
+  "./t/rose-metadata-check/11-invalid-settings.t":
+    elapsed: 0.783535957336426
+    gen: 182
+    last_pass_time: 1660053459.27081
+    last_result: 0
+    last_run_time: 1660053459.27081
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1066
+    total_passes: 5
+  "./t/rose-metadata-gen/00-null.t":
+    elapsed: 2.73547911643982
+    gen: 182
+    last_pass_time: 1660054108.52222
+    last_result: 0
+    last_run_time: 1660054108.52222
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1186
+    total_passes: 5
+  "./t/rose-metadata-gen/01-basic.t":
+    elapsed: 2.82608819007874
+    gen: 182
+    last_pass_time: 1660054299.50857
+    last_result: 0
+    last_run_time: 1660054299.50857
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1227
+    total_passes: 5
+  "./t/rose-metadata-gen/02-autotype.t":
+    elapsed: 0.866204977035522
+    gen: 182
+    last_pass_time: 1660053462.88849
+    last_result: 0
+    last_run_time: 1660053462.88849
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1069
+    total_passes: 5
+  "./t/rose-metadata-gen/03-propset.t":
+    elapsed: 3.06088995933533
+    gen: 182
+    last_pass_time: 1660053466.94429
+    last_result: 0
+    last_run_time: 1660053466.94429
+    last_todo: 0
+    mtime: 1648583206
+    seq: 1071
+    total_passes: 5
+  "./t/rose-mpi-launch/00-command.t":
+    elapsed: 37.0604767799377
+    gen: 182
+    last_pass_time: 1660054068.29083
+    last_result: 0
+    last_run_time: 1660054068.29083
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1175
+    total_passes: 5
+  "./t/rose-mpi-launch/01-command-inner.t":
+    elapsed: 17.284854888916
+    gen: 182
+    last_fail_time: 1645184595.75604
+    last_pass_time: 1660054239.70546
+    last_result: 0
+    last_run_time: 1660054239.70546
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1210
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-mpi-launch/02-file.t":
+    elapsed: 25.1894199848175
+    gen: 182
+    last_pass_time: 1660054252.06538
+    last_result: 0
+    last_run_time: 1660054252.06538
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1215
+    total_passes: 5
+  "./t/rose-mpi-launch/03-commands.t":
+    elapsed: 10.7060341835022
+    gen: 182
+    last_pass_time: 1660053585.03279
+    last_result: 0
+    last_run_time: 1660053585.03279
+    last_todo: 0
+    seq: 1101
+    total_passes: 1
+  "./t/rose-namelist-dump/00-null.t":
+    elapsed: 8.51570010185242
+    gen: 182
+    last_pass_time: 1660053401.25313
+    last_result: 0
+    last_run_time: 1660053401.25313
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1056
+    total_passes: 5
+  "./t/rose-namelist-dump/01-empty.t":
+    elapsed: 5.53717017173767
+    gen: 182
+    last_pass_time: 1660053685.73847
+    last_result: 0
+    last_run_time: 1660053685.73847
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1119
+    total_passes: 5
+  "./t/rose-namelist-dump/02-type.t":
+    elapsed: 1.32492113113403
+    gen: 182
+    last_pass_time: 1660053490.34156
+    last_result: 0
+    last_run_time: 1660053490.34156
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1080
+    total_passes: 5
+  "./t/rose-task-env/00-non-cycle.t":
+    elapsed: 16.6928589344025
+    gen: 182
+    last_pass_time: 1660054238.64599
+    last_result: 0
+    last_run_time: 1660054238.64599
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1209
+    total_passes: 5
+  "./t/rose-task-env/01-integer-cycling.t":
+    elapsed: 33.5517730712891
+    gen: 182
+    last_fail_time: 1647524233.01519
+    last_pass_time: 1660053699.29147
+    last_result: 0
+    last_run_time: 1660053699.29147
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1122
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-task-env/02-360day-cycling.t":
+    elapsed: 54.7252769470215
+    gen: 182
+    last_pass_time: 1660053640.71207
+    last_result: 0
+    last_run_time: 1660053640.71207
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1106
+    total_passes: 5
+  "./t/rose-task-run/00-run-basic.t":
+    elapsed: 15.5685591697693
+    gen: 182
+    last_pass_time: 1660053865.08135
+    last_result: 0
+    last_run_time: 1660053865.08135
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1146
+    total_passes: 5
+  "./t/rose-task-run/01-run-basic-iso.t":
+    elapsed: 14.7572448253632
+    gen: 182
+    last_pass_time: 1660053935.73328
+    last_result: 0
+    last_run_time: 1660053935.73328
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1153
+    total_passes: 5
+  "./t/rose-task-run/02-env-basic.t":
+    elapsed: 15.1789059638977
+    gen: 182
+    last_pass_time: 1660053461.18956
+    last_result: 0
+    last_run_time: 1660053461.18956
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1068
+    total_passes: 5
+  "./t/rose-task-run/03-env-basic-iso.t":
+    elapsed: 18.0546178817749
+    gen: 182
+    last_pass_time: 1660053508.37263
+    last_result: 0
+    last_run_time: 1660053508.37263
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1086
+    total_passes: 5
+  "./t/rose-task-run/04-run-path-empty.t":
+    elapsed: 26.564521074295
+    gen: 182
+    last_pass_time: 1660053672.8935
+    last_result: 0
+    last_run_time: 1660053672.8935
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1113
+    total_passes: 5
+  "./t/rose-task-run/06-app-prune-iso.t":
+    elapsed: 61.4480159282684
+    gen: 182
+    last_fail_time: 1660053584.08192
+    last_pass_time: 1647553256.82532
+    last_result: 3
+    last_run_time: 1660053584.08192
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1100
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-task-run/07-app-arch.t":
+    elapsed: 79.1158199310303
+    gen: 182
+    last_pass_time: 1660053779.42129
+    last_result: 0
+    last_run_time: 1660053779.42129
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1131
+    total_passes: 5
+  "./t/rose-task-run/08-app-fcm-make.t":
+    elapsed: 22.7381360530853
+    gen: 182
+    last_fail_time: 1660053959.58296
+    last_pass_time: 1647552919.41362
+    last_result: 4
+    last_run_time: 1660053959.58296
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1155
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-task-run/09-app-prune-work.t":
+    elapsed: 67.0285859107971
+    gen: 182
+    last_pass_time: 1660054221.51239
+    last_result: 0
+    last_run_time: 1660054221.51239
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1205
+    total_passes: 5
+  "./t/rose-task-run/10-specify-cycle.t":
+    elapsed: 14.6301410198212
+    gen: 182
+    last_pass_time: 1660053488.92871
+    last_result: 0
+    last_run_time: 1660053488.92871
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1079
+    total_passes: 5
+  "./t/rose-task-run/11-specify-cycle-iso.t":
+    elapsed: 17.0232100486755
+    gen: 182
+    last_pass_time: 1660054086.39143
+    last_result: 0
+    last_run_time: 1660054086.39143
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1177
+    total_passes: 5
+  "./t/rose-task-run/12-app-prune-integer.t":
+    elapsed: 42.3488659858704
+    gen: 182
+    last_fail_time: 1660054376.4295
+    last_pass_time: 1647552381.02404
+    last_result: 1
+    last_run_time: 1660054376.4295
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1239
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-task-run/13-app-arch-cmd-out.t":
+    elapsed: 15.0008699893951
+    gen: 182
+    last_pass_time: 1660054026.34851
+    last_result: 0
+    last_run_time: 1660054026.34851
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1171
+    total_passes: 5
+  "./t/rose-task-run/14-app-prune-remove.t":
+    elapsed: 100.304687023163
+    gen: 182
+    last_pass_time: 1660053782.26195
+    last_result: 0
+    last_run_time: 1660053782.26195
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1132
+    total_passes: 5
+  "./t/rose-task-run/15-app-prune-extglob.t":
+    elapsed: 48.8907828330994
+    gen: 182
+    last_pass_time: 1660053916.32773
+    last_result: 0
+    last_run_time: 1660053916.32773
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1150
+    total_passes: 5
+  "./t/rose-task-run/16-app-prune-point.t":
+    elapsed: 23.0792591571808
+    gen: 182
+    last_pass_time: 1660054149.94951
+    last_result: 0
+    last_run_time: 1660054149.94951
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1195
+    total_passes: 5
+  "./t/rose-task-run/17-app-prune-glob-as-cycle-fmt.t":
+    elapsed: 23.59743309021
+    gen: 182
+    last_pass_time: 1660054296.42541
+    last_result: 0
+    last_run_time: 1660054296.42541
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1225
+    total_passes: 5
+  "./t/rose-task-run/18-app-fcm-make-ctx-name.t":
+    elapsed: 0.0431149005889893
+    gen: 182
+    last_pass_time: 1660054301.72813
+    last_result: 0
+    last_run_time: 1660054301.72813
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1228
+    total_passes: 5
+  "./t/rose-task-run/19-app-fcm-make-ctx-name-with-share.t":
+    elapsed: 40.0121178627014
+    gen: 182
+    last_pass_time: 1660053796.48426
+    last_result: 0
+    last_run_time: 1660053796.48426
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1135
+    total_passes: 5
+  "./t/rose-task-run/20-app-fcm-make-dest.t":
+    elapsed: 0.097999095916748
+    gen: 182
+    last_pass_time: 1660053468.915
+    last_result: 0
+    last_run_time: 1660053468.915
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1073
+    total_passes: 5
+  "./t/rose-task-run/21-app-fcm-make-dest-with-share.t":
+    elapsed: 41.18803191185
+    gen: 182
+    last_pass_time: 1660054007.65119
+    last_result: 0
+    last_run_time: 1660054007.65119
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1165
+    total_passes: 5
+  "./t/rose-task-run/22-app-fcm-make-dest-cont-alt.t":
+    elapsed: 0.0525479316711426
+    gen: 182
+    last_pass_time: 1660053432.49367
+    last_result: 0
+    last_run_time: 1660053432.49367
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1061
+    total_passes: 5
+  "./t/rose-task-run/23-app-fcm-make-dest-cont-alt-with-share.t":
+    elapsed: 60.5734758377075
+    gen: 182
+    last_pass_time: 1660053620.39037
+    last_result: 0
+    last_run_time: 1660053620.39037
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1104
+    total_passes: 5
+  "./t/rose-task-run/24-app-fcm-make-fast.t":
+    elapsed: 32.9464190006256
+    gen: 182
+    last_pass_time: 1660053495.05417
+    last_result: 0
+    last_run_time: 1660053495.05417
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1081
+    total_passes: 5
+  "./t/rose-task-run/25-app-fcm-make-new-mode.t":
+    elapsed: 27.7268180847168
+    gen: 182
+    last_pass_time: 1660053432.97519
+    last_result: 0
+    last_run_time: 1660053432.97519
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1062
+    total_passes: 5
+  "./t/rose-task-run/26-app-fcm-make-new-mode-with-cont.t":
+    elapsed: 0.0500061511993408
+    gen: 182
+    last_pass_time: 1660054123.9059
+    last_result: 0
+    last_run_time: 1660054123.9059
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1192
+    total_passes: 5
+  "./t/rose-task-run/27-app-fcm-make-new-mode-with-cont-with-share.t":
+    elapsed: 6.70089602470398
+    gen: 182
+    last_fail_time: 1660053521.61672
+    last_pass_time: 1647552496.26583
+    last_result: 5
+    last_run_time: 1660053521.61672
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1090
+    total_failures: 1
+    total_passes: 4
+  "./t/rose-task-run/28-env-path-run-path.t":
+    elapsed: 15.730199098587
+    gen: 182
+    last_pass_time: 1660054208.66514
+    last_result: 0
+    last_run_time: 1660054208.66514
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1202
+    total_passes: 5
+  "./t/rose-task-run/29-app-prune-extglob-remote.t":
+    elapsed: 0.0287790298461914
+    gen: 182
+    last_pass_time: 1660054295.13811
+    last_result: 0
+    last_run_time: 1660054295.13811
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1224
+    total_passes: 5
+  "./t/rose-task-run/30-app-arch-opt-source.t":
+    elapsed: 22.8601639270782
+    gen: 182
+    last_pass_time: 1660054019.62968
+    last_result: 0
+    last_run_time: 1660054019.62968
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1169
+    total_passes: 5
+  "./t/rose-task-run/31-app-bunch.t":
+    elapsed: 53.0699610710144
+    gen: 182
+    last_pass_time: 1660053424.5759
+    last_result: 0
+    last_run_time: 1660053424.5759
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1059
+    total_passes: 5
+  "./t/rose-task-run/32-app-arch-compressed.t":
+    elapsed: 16.6517748832703
+    gen: 182
+    last_pass_time: 1660054339.21081
+    last_result: 0
+    last_run_time: 1660054339.21081
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1238
+    total_passes: 5
+  "./t/rose-task-run/33-app-prune-cycle-format.t":
+    elapsed: 37.1779470443726
+    gen: 182
+    last_pass_time: 1660054290.14272
+    last_result: 0
+    last_run_time: 1660054290.14272
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1222
+    total_passes: 5
+  "./t/rose-task-run/34-app-prune-hosts-sharing-fs.t":
+    elapsed: 29.8883500099182
+    gen: 182
+    last_fail_time: 1660054221.07035
+    last_pass_time: 1645184464.61157
+    last_result: 2
+    last_run_time: 1660054221.07035
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1204
+    total_failures: 3
+    total_passes: 2
+  "./t/rose-task-run/35-app-prune-log-on-hosts-sharing-fs.t":
+    elapsed: 32.2444958686829
+    gen: 182
+    last_fail_time: 1660053834.22407
+    last_pass_time: 1645184306.02167
+    last_result: 3
+    last_run_time: 1660053834.22407
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1141
+    total_failures: 3
+    total_passes: 2
+  "./t/rose-task-run/36-app-arch-interrupted.t":
+    elapsed: 38.4770879745483
+    gen: 182
+    last_pass_time: 1660053880.62438
+    last_result: 0
+    last_run_time: 1660053880.62438
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1148
+    total_passes: 5
+  "./t/rose-task-run/37-app-bunch-rm-old.t":
+    elapsed: 26.7594420909882
+    gen: 182
+    last_pass_time: 1660053809.95422
+    last_result: 0
+    last_run_time: 1660053809.95422
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1137
+    total_passes: 5
+  "./t/rose-task-run/38-app-bunch-counts.t":
+    elapsed: 32.3607859611511
+    gen: 182
+    last_pass_time: 1660053843.51018
+    last_result: 0
+    last_run_time: 1660053843.51018
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1143
+    total_passes: 5
+  "./t/rose-task-run/39-app-prune-cycle-host.t":
+    elapsed: 0.00245809555053711
+    gen: 182
+    last_pass_time: 1660054308.06919
+    last_result: 0
+    last_run_time: 1660054308.06919
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1230
+    total_passes: 5
+  "./t/rose-task-run/40-app-arch-duplicate.t":
+    elapsed: 16.868506193161
+    gen: 182
+    last_pass_time: 1660053933.96583
+    last_result: 0
+    last_run_time: 1660053933.96583
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1152
+    total_passes: 5
+  "./t/rose-task-run/41-app-bunch-default-command.t":
+    elapsed: 26.7886250019073
+    gen: 182
+    last_pass_time: 1660054122.47902
+    last_result: 0
+    last_run_time: 1660054122.47902
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1191
+    total_passes: 5
+  "./t/rose-task-run/42-app-prune-no-rsync.t":
+    elapsed: 80.9253370761871
+    gen: 182
+    last_fail_time: 1660053919.388
+    last_pass_time: 1647552346.11212
+    last_result: 2
+    last_run_time: 1660053919.388
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1151
+    total_failures: 1
+    total_passes: 4
+  "./t/rose.c3/00-self.t":
+    elapsed: 0.00337791442871094
+    gen: 182
+    last_pass_time: 1660054224.22149
+    last_result: 0
+    last_run_time: 1660054224.22149
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1207
+    total_passes: 5
+  "./t/rose.config_tree/00-self.t":
+    elapsed: 0.00902390480041504
+    gen: 182
+    last_pass_time: 1660053843.8173
+    last_result: 0
+    last_run_time: 1660053843.8173
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1144
+    total_passes: 5
+  "./t/rose.env/00-export.t":
+    elapsed: 0.152234077453613
+    gen: 182
+    last_pass_time: 1660053371.65797
+    last_result: 0
+    last_run_time: 1660053371.65797
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1052
+    total_passes: 5
+  "./t/rose.popen/00-self.t":
+    elapsed: 0.366801023483276
+    gen: 182
+    last_pass_time: 1660053866.52224
+    last_result: 0
+    last_run_time: 1660053866.52224
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1147
+    total_passes: 5
+  "./t/rose.variable/00-trigger.t":
+    elapsed: 1.18565893173218
+    gen: 182
+    last_pass_time: 1660054252.2314
+    last_result: 0
+    last_run_time: 1660054252.2314
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1216
+    total_passes: 5
+  "./t/rose.variable/01-array-split.t":
+    elapsed: 0.837586164474487
+    gen: 182
+    last_pass_time: 1660054094.83597
+    last_result: 0
+    last_run_time: 1660054094.83597
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1181
+    total_passes: 5
+  "./t/rosie-checkout/00-basic.t":
+    elapsed: 17.9496638774872
+    gen: 182
+    last_pass_time: 1660053639.28756
+    last_result: 0
+    last_run_time: 1660053639.28756
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1105
+    total_passes: 5
+  "./t/rosie-create/00-basic.t":
+    elapsed: 29.6087601184845
+    gen: 182
+    last_pass_time: 1660054271.96955
+    last_result: 0
+    last_run_time: 1660054271.96955
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1220
+    total_passes: 5
+  "./t/rosie-create/01-suite-info-meta.t":
+    elapsed: 7.73273801803589
+    gen: 182
+    last_pass_time: 1660053795.33164
+    last_result: 0
+    last_run_time: 1660053795.33164
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1134
+    total_passes: 5
+  "./t/rosie-create/02-copy-inter.t":
+    elapsed: 9.96956992149353
+    gen: 182
+    last_pass_time: 1660054104.03675
+    last_result: 0
+    last_run_time: 1660054104.03675
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1184
+    total_passes: 5
+  "./t/rosie-delete/00-basic.t":
+    elapsed: 38.9206171035767
+    gen: 182
+    last_pass_time: 1660054074.04783
+    last_result: 0
+    last_run_time: 1660054074.04783
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1176
+    total_passes: 5
+  "./t/rosie-disco/00-basic.t":
+    elapsed: 65.5655760765076
+    gen: 182
+    last_fail_time: 1660053461.10033
+    last_result: 2
+    last_run_time: 1660053461.10033
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1067
+    total_failures: 5
+  "./t/rosie-graph/00-basic.t":
+    elapsed: 75.2450799942017
+    gen: 182
+    last_fail_time: 1660053962.9211
+    last_result: 1
+    last_run_time: 1660053962.9211
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1157
+    total_failures: 5
+  "./t/rosie-hello/00-null.t":
+    elapsed: 2.70065689086914
+    gen: 182
+    last_pass_time: 1660054105.81644
+    last_result: 0
+    last_run_time: 1660054105.81644
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1185
+    total_passes: 5
+  "./t/rosie-id/00-basic.t":
+    elapsed: 26.6863369941711
+    gen: 182
+    last_pass_time: 1660053963.22347
+    last_result: 0
+    last_run_time: 1660053963.22347
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1158
+    total_passes: 5
+  "./t/rosie-id/01-final.t":
+    elapsed: 1.1485698223114
+    gen: 182
+    last_pass_time: 1660053995.94191
+    last_result: 0
+    last_run_time: 1660053995.94191
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1163
+    total_passes: 5
+  "./t/rosie-lookup/00-basic.t":
+    elapsed: 69.9104940891266
+    gen: 182
+    last_fail_time: 1660053679.92916
+    last_result: 1
+    last_run_time: 1660053679.92916
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1118
+    total_failures: 5
+  "./t/rosie-lookup/01-multi.t":
+    elapsed: 65.6270480155945
+    gen: 182
+    last_fail_time: 1660053579.12477
+    last_result: 1
+    last_run_time: 1660053579.12477
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1099
+    total_failures: 5
+  "./t/rosie-lookup/02-unicode.t":
+    elapsed: 63.6432468891144
+    gen: 182
+    last_fail_time: 1660053649.3773
+    last_result: 1
+    last_run_time: 1660053649.3773
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1109
+    total_failures: 5
+  "./t/rosie-ls/00-basic.t":
+    elapsed: 68.1025719642639
+    gen: 182
+    last_fail_time: 1660054185.63394
+    last_result: 1
+    last_run_time: 1660054185.63394
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1198
+    total_failures: 5
+  "./t/rosie-ls/01-many.t":
+    elapsed: 486.006608009338
+    gen: 182
+    last_fail_time: 1660054176.32376
+    last_result: 1
+    last_run_time: 1660054176.32376
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1197
+    total_failures: 5
+  "./t/rosie.db/00-query.t":
+    elapsed: 6.63911318778992
+    gen: 182
+    last_pass_time: 1660053840.63469
+    last_result: 0
+    last_run_time: 1660053840.63469
+    last_todo: 0
+    mtime: 1648583207
+    seq: 1142
+    total_passes: 5
+  t/rose-task-env/01-integer-cycling.t:
+    elapsed: 87.9223480224609
+    gen: 165
+    last_pass_time: 1647526799.06731
+    last_result: 0
+    last_run_time: 1647526799.06731
+    last_todo: 0
+    mtime: 1653651205
+    seq: 808
+    total_passes: 2
+  t/rose-task-run/00-run-basic.t:
+    elapsed: 19.6545569896698
+    gen: 175
+    last_pass_time: 1647544826.61236
+    last_result: 0
+    last_run_time: 1647544826.61236
+    last_todo: 0
+    mtime: 1653651205
+    seq: 838
+    total_passes: 3
+  t/rose-task-run/01-run-basic-iso.t:
+    elapsed: 19.9523389339447
+    gen: 175
+    last_pass_time: 1647544831.37043
+    last_result: 0
+    last_run_time: 1647544831.37043
+    last_todo: 0
+    mtime: 1653651205
+    seq: 839
+    total_passes: 3
+  t/rose-task-run/02-env-basic.t:
+    elapsed: 17.2439198493958
+    gen: 175
+    last_pass_time: 1647545001.96504
+    last_result: 0
+    last_run_time: 1647545001.96504
+    last_todo: 0
+    mtime: 1653651205
+    seq: 849
+    total_passes: 3
+  t/rose-task-run/03-env-basic-iso.t:
+    elapsed: 20.3436298370361
+    gen: 175
+    last_pass_time: 1647545087.76298
+    last_result: 0
+    last_run_time: 1647545087.76298
+    last_todo: 0
+    mtime: 1653651205
+    seq: 857
+    total_passes: 3
+  t/rose-task-run/04-run-path-empty.t:
+    elapsed: 32.3066999912262
+    gen: 175
+    last_pass_time: 1647544642.23104
+    last_result: 0
+    last_run_time: 1647544642.23104
+    last_todo: 0
+    mtime: 1653651205
+    seq: 819
+    total_passes: 3
+  t/rose-task-run/06-app-prune-iso.t:
+    elapsed: 80.0783998966217
+    gen: 175
+    last_pass_time: 1647545141.85732
+    last_result: 0
+    last_run_time: 1647545141.85732
+    last_todo: 0
+    mtime: 1653651205
+    seq: 859
+    total_passes: 3
+  t/rose-task-run/07-app-arch.t:
+    elapsed: 98.5302088260651
+    gen: 175
+    last_pass_time: 1647544984.02854
+    last_result: 0
+    last_run_time: 1647544984.02854
+    last_todo: 0
+    mtime: 1653651205
+    seq: 847
+    total_passes: 3
+  t/rose-task-run/08-app-fcm-make.t:
+    elapsed: 43.5488660335541
+    gen: 181
+    last_fail_time: 1647533793.8165
+    last_pass_time: 1647875534.74016
+    last_result: 0
+    last_run_time: 1647875534.74016
+    last_todo: 0
+    mtime: 1653651205
+    seq: 1051
+    total_failures: 137
+    total_passes: 19
+  t/rose-task-run/09-app-prune-work.t:
+    elapsed: 82.4744870662689
+    gen: 175
+    last_pass_time: 1647544967.97353
+    last_result: 0
+    last_run_time: 1647544967.97353
+    last_todo: 0
+    mtime: 1653651205
+    seq: 844
+    total_passes: 3
+  t/rose-task-run/10-specify-cycle.t:
+    elapsed: 12.6659557819366
+    gen: 175
+    last_pass_time: 1647545043.18525
+    last_result: 0
+    last_run_time: 1647545043.18525
+    last_todo: 0
+    mtime: 1653651205
+    seq: 852
+    total_passes: 3
+  t/rose-task-run/11-specify-cycle-iso.t:
+    elapsed: 68.8380239009857
+    gen: 175
+    last_pass_time: 1647544884.60031
+    last_result: 0
+    last_run_time: 1647544884.60031
+    last_todo: 0
+    mtime: 1653651205
+    seq: 840
+    total_passes: 3
+  t/rose-task-run/12-app-prune-integer.t:
+    elapsed: 89.0572371482849
+    gen: 175
+    last_pass_time: 1647544921.66636
+    last_result: 0
+    last_run_time: 1647544921.66636
+    last_todo: 0
+    mtime: 1653651205
+    seq: 843
+    total_passes: 3
+  t/rose-task-run/13-app-arch-cmd-out.t:
+    elapsed: 15.2906200885773
+    gen: 175
+    last_pass_time: 1647545059.10431
+    last_result: 0
+    last_run_time: 1647545059.10431
+    last_todo: 0
+    mtime: 1653651205
+    seq: 854
+    total_passes: 3
+  t/rose-task-run/14-app-prune-remove.t:
+    elapsed: 92.6002099514008
+    gen: 175
+    last_pass_time: 1647545065.7237
+    last_result: 0
+    last_run_time: 1647545065.7237
+    last_todo: 0
+    mtime: 1653651205
+    seq: 855
+    total_passes: 3
+  t/rose-task-run/15-app-prune-extglob.t:
+    elapsed: 67.7428469657898
+    gen: 175
+    last_pass_time: 1647544826.17088
+    last_result: 0
+    last_run_time: 1647544826.17088
+    last_todo: 0
+    mtime: 1653651205
+    seq: 837
+    total_passes: 3
+  t/rose-task-run/16-app-prune-point.t:
+    elapsed: 27.9719789028168
+    gen: 175
+    last_pass_time: 1647544757.7182
+    last_result: 0
+    last_run_time: 1647544757.7182
+    last_todo: 0
+    mtime: 1653651205
+    seq: 831
+    total_passes: 3
+  t/rose-task-run/17-app-prune-glob-as-cycle-fmt.t:
+    elapsed: 25.4411840438843
+    gen: 175
+    last_pass_time: 1647544712.982
+    last_result: 0
+    last_run_time: 1647544712.982
+    last_todo: 0
+    mtime: 1653651205
+    seq: 825
+    total_passes: 3
+  t/rose-task-run/18-app-fcm-make-ctx-name.t:
+    elapsed: 44.9380588531494
+    gen: 175
+    last_pass_time: 1647545051.294
+    last_result: 0
+    last_run_time: 1647545051.294
+    last_todo: 0
+    mtime: 1653651205
+    seq: 853
+    total_passes: 3
+  t/rose-task-run/19-app-fcm-make-ctx-name-with-share.t:
+    elapsed: 37.4025378227234
+    gen: 175
+    last_pass_time: 1647544686.90182
+    last_result: 0
+    last_run_time: 1647544686.90182
+    last_todo: 0
+    mtime: 1653651205
+    seq: 821
+    total_passes: 3
+  t/rose-task-run/20-app-fcm-make-dest.t:
+    elapsed: 53.3534300327301
+    gen: 175
+    last_pass_time: 1647544693.12875
+    last_result: 0
+    last_run_time: 1647544693.12875
+    last_todo: 0
+    mtime: 1653651205
+    seq: 822
+    total_passes: 3
+  t/rose-task-run/21-app-fcm-make-dest-with-share.t:
+    elapsed: 43.7361159324646
+    gen: 175
+    last_pass_time: 1647545100.6829
+    last_result: 0
+    last_run_time: 1647545100.6829
+    last_todo: 0
+    mtime: 1653651205
+    seq: 858
+    total_passes: 3
+  t/rose-task-run/22-app-fcm-make-dest-cont-alt.t:
+    elapsed: 46.9598729610443
+    gen: 175
+    last_pass_time: 1647544768.35644
+    last_result: 0
+    last_run_time: 1647544768.35644
+    last_todo: 0
+    mtime: 1653651205
+    seq: 833
+    total_passes: 3
+  t/rose-task-run/23-app-fcm-make-dest-cont-alt-with-share.t:
+    elapsed: 35.3111119270325
+    gen: 175
+    last_pass_time: 1647544694.26811
+    last_result: 0
+    last_run_time: 1647544694.26811
+    last_todo: 0
+    mtime: 1653651205
+    seq: 824
+    total_passes: 3
+  t/rose-task-run/24-app-fcm-make-fast.t:
+    elapsed: 44.5238900184631
+    gen: 175
+    last_pass_time: 1647544813.9188
+    last_result: 0
+    last_run_time: 1647544813.9188
+    last_todo: 0
+    mtime: 1653651205
+    seq: 836
+    total_passes: 4
+  t/rose-task-run/25-app-fcm-make-new-mode.t:
+    elapsed: 26.223552942276
+    gen: 175
+    last_pass_time: 1647544995.0526
+    last_result: 0
+    last_run_time: 1647544995.0526
+    last_todo: 0
+    mtime: 1653651205
+    seq: 848
+    total_passes: 4
+  t/rose-task-run/26-app-fcm-make-new-mode-with-cont.t:
+    elapsed: 58.7792248725891
+    gen: 175
+    last_pass_time: 1647544891.35687
+    last_result: 0
+    last_run_time: 1647544891.35687
+    last_todo: 0
+    mtime: 1653651205
+    seq: 842
+    total_passes: 4
+  t/rose-task-run/27-app-fcm-make-new-mode-with-cont-with-share.t:
+    elapsed: 38.5551080703735
+    gen: 175
+    last_pass_time: 1647544970.82781
+    last_result: 0
+    last_run_time: 1647544970.82781
+    last_todo: 0
+    mtime: 1653651205
+    seq: 846
+    total_passes: 3
+  t/rose-task-run/28-env-path-run-path.t:
+    elapsed: 14.8573729991913
+    gen: 175
+    last_pass_time: 1647544732.5485
+    last_result: 0
+    last_run_time: 1647544732.5485
+    last_todo: 0
+    mtime: 1653651205
+    seq: 829
+    total_passes: 3
+  t/rose-task-run/29-app-prune-extglob-remote.t:
+    elapsed: 79.5348429679871
+    gen: 175
+    last_pass_time: 1647544693.99042
+    last_result: 0
+    last_run_time: 1647544693.99042
+    last_todo: 0
+    mtime: 1653651205
+    seq: 823
+    total_passes: 3
+  t/rose-task-run/30-app-arch-opt-source.t:
+    elapsed: 21.9056639671326
+    gen: 175
+    last_pass_time: 1647544765.46705
+    last_result: 0
+    last_run_time: 1647544765.46705
+    last_todo: 0
+    mtime: 1653651205
+    seq: 832
+    total_passes: 3
+  t/rose-task-run/31-app-bunch.t:
+    elapsed: 43.9628939628601
+    gen: 175
+    last_pass_time: 1647544810.22567
+    last_result: 0
+    last_run_time: 1647544810.22567
+    last_todo: 0
+    mtime: 1653651205
+    seq: 835
+    total_passes: 3
+  t/rose-task-run/32-app-arch-compressed.t:
+    elapsed: 17.8572800159454
+    gen: 175
+    last_pass_time: 1647544713.28875
+    last_result: 0
+    last_run_time: 1647544713.28875
+    last_todo: 0
+    mtime: 1653651205
+    seq: 826
+    total_passes: 3
+  t/rose-task-run/33-app-prune-cycle-format.t:
+    elapsed: 44.6413471698761
+    gen: 175
+    last_pass_time: 1647544654.56534
+    last_result: 0
+    last_run_time: 1647544654.56534
+    last_todo: 0
+    mtime: 1653651205
+    seq: 820
+    total_passes: 3
+  t/rose-task-run/34-app-prune-hosts-sharing-fs.t:
+    elapsed: 73.6310880184174
+    gen: 175
+    last_fail_time: 1647545043.05853
+    last_pass_time: 1647443142.29289
+    last_result: 4
+    last_run_time: 1647545043.05853
+    last_todo: 0
+    mtime: 1653651205
+    seq: 851
+    total_failures: 4
+    total_passes: 3
+  t/rose-task-run/35-app-prune-log-on-hosts-sharing-fs.t:
+    elapsed: 71.9178009033203
+    gen: 175
+    last_fail_time: 1647544806.0553
+    last_pass_time: 1646831471.96822
+    last_result: 4
+    last_run_time: 1647544806.0553
+    last_todo: 0
+    mtime: 1653651205
+    seq: 834
+    total_failures: 6
+    total_passes: 2
+  t/rose-task-run/36-app-arch-interrupted.t:
+    elapsed: 75.7108578681946
+    gen: 175
+    last_pass_time: 1647544967.99313
+    last_result: 0
+    last_run_time: 1647544967.99313
+    last_todo: 0
+    mtime: 1653651205
+    seq: 845
+    total_passes: 3
+  t/rose-task-run/37-app-bunch-rm-old.t:
+    elapsed: 35.1104459762573
+    gen: 175
+    last_pass_time: 1647544728.96127
+    last_result: 0
+    last_run_time: 1647544728.96127
+    last_todo: 0
+    mtime: 1653651205
+    seq: 828
+    total_passes: 3
+  t/rose-task-run/38-app-bunch-counts.t:
+    elapsed: 33.886923789978
+    gen: 175
+    last_pass_time: 1647545029.74588
+    last_result: 0
+    last_run_time: 1647545029.74588
+    last_todo: 0
+    mtime: 1653651205
+    seq: 850
+    total_passes: 3
+  t/rose-task-run/39-app-prune-cycle-host.t:
+    elapsed: 0.0022580623626709
+    gen: 175
+    last_pass_time: 1647544716.3737
+    last_result: 0
+    last_run_time: 1647544716.3737
+    last_todo: 0
+    mtime: 1653651205
+    seq: 827
+    total_passes: 3
+  t/rose-task-run/40-app-arch-duplicate.t:
+    elapsed: 22.9408819675446
+    gen: 175
+    last_pass_time: 1647544632.8654
+    last_result: 0
+    last_run_time: 1647544632.8654
+    last_todo: 0
+    mtime: 1653651205
+    seq: 818
+    total_passes: 3
+  t/rose-task-run/41-app-bunch-default-command.t:
+    elapsed: 36.1063010692596
+    gen: 175
+    last_pass_time: 1647545079.98026
+    last_result: 0
+    last_run_time: 1647545079.98026
+    last_todo: 0
+    mtime: 1653651205
+    seq: 856
+    total_passes: 3
+  t/rose-task-run/42-app-prune-no-rsync.t:
+    elapsed: 0.0140109062194824
+    gen: 175
+    last_pass_time: 1647544884.61357
+    last_result: 0
+    last_run_time: 1647544884.61357
+    last_todo: 0
+    mtime: 1653651205
+    seq: 841
+    total_passes: 3
+  t/rosie-disco/00-basic.t:
+    elapsed: 65.421070098877
+    gen: 163
+    last_fail_time: 1647525245.32412
+    last_result: 2
+    last_run_time: 1647525245.32412
+    last_todo: 0
+    mtime: 1648583207
+    seq: 805
+    total_failures: 1
+  t/rosie-lookup/00-basic.t:
+    elapsed: 80.8695681095123
+    gen: 162
+    last_fail_time: 1647525123.45703
+    last_result: 1
+    last_run_time: 1647525123.45703
+    last_todo: 0
+    mtime: 1648583207
+    seq: 804
+    total_failures: 1
+  t/rosie-lookup/01-multi.t:
+    elapsed: 71.0347511768341
+    gen: 162
+    last_fail_time: 1647525113.61932
+    last_result: 1
+    last_run_time: 1647525113.61932
+    last_todo: 0
+    mtime: 1648583207
+    seq: 803
+    total_failures: 1
+  t/rosie-lookup/02-unicode.t:
+    elapsed: 68.1613221168518
+    gen: 162
+    last_fail_time: 1647525110.78406
+    last_result: 1
+    last_run_time: 1647525110.78406
+    last_todo: 0
+    mtime: 1648583207
+    seq: 802
+    total_failures: 1
+  t/rosie-ls/00-basic.t:
+    elapsed: 80.5497789382935
+    gen: 164
+    last_fail_time: 1647525363.90603
+    last_result: 1
+    last_run_time: 1647525363.90603
+    last_todo: 0
+    mtime: 1648583207
+    seq: 806
+    total_failures: 4
+  t/rosie-ls/01-many.t:
+    elapsed: 999.681853055954
+    gen: 164
+    last_fail_time: 1647526283.031
+    last_result: 1
+    last_run_time: 1647526283.031
+    last_todo: 0
+    mtime: 1648583207
+    seq: 807
+    total_failures: 2
+version: 1
+...
