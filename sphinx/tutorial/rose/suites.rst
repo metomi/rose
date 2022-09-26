@@ -380,7 +380,7 @@ Rose Applications In Rose Suite Configurations
    You will find a copy of the ``forecast`` application located in
    ``app/forecast``.
 
-   #. **Create A Test Configuration For The** ``forecast`` **Application.**
+   #. **Create a test configuration for the** ``forecast`` **application.**
 
       The ``forecast`` application comes with test data
       (in ``file/test-date``), and is currently set up to work with
@@ -455,7 +455,7 @@ Rose Applications In Rose Suite Configurations
       You should see the stdout output of the Rose application. If there are
       any errors they will be marked with the ``[FAIL]`` prefix.
 
-   #. **Integrate The** ``forecast`` **Application Into The Suite.**
+   #. **Integrate the** ``forecast`` **application into the suite.**
 
       We can now configure the ``forecast`` application to work with real data.
 
@@ -500,7 +500,7 @@ Rose Applications In Rose Suite Configurations
          [[forecast]]
              script = rose task-run
 
-   #. **Make Changes To The Configuration.**
+   #. **Make changes to the configuration.**
 
       Open the :ref:`command-rose-config-edit` GUI and navigate to the
       :guilabel:`suite conf > template variables` panel.
@@ -521,7 +521,7 @@ Rose Applications In Rose Suite Configurations
 
       Finally, save these settings via :guilabel:`File > Save` in the menu.
 
-   #. **Run The Workflow.**
+   #. **Run the workflow.**
 
       Validate, install, run and examine the workflow
       (use :ref:`tutorial.gui` or :ref:`tutorial.tui`)::
@@ -531,7 +531,7 @@ Rose Applications In Rose Suite Configurations
          cylc play rose-suite-tutorial
 
 
-   #. **View Output In Cylc Review.**
+   #. **View output in Cylc Review.**
 
       .. note::
 

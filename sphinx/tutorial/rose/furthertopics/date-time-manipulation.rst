@@ -21,14 +21,6 @@ directory.
 The ``rose date`` Command
 -------------------------
 
-.. _isodatetime: https://github.com/metomi/isodatetime
-
-.. note::
-
-   ``rose date`` has been superseded by `isodatetime`_ which offers a
-   compatible CLI interface with more features (just swap out ``rose date``
-   for ``isodatetime``), as well as a Python API.
-
 The :ref:`command-rose-date` command provides functionality for:
 
 * Parsing and formatting datetimes e.g:

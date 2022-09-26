@@ -172,9 +172,9 @@ Metadata Items
          rose config-edit &
 
       If you get a message saying this feature has been removed, you should
-      switch to Rose 2019 by running::
+      use Rose 2019 by running::
 
-         export CYLC_VERSION=7
+         CYLC_VERSION=7 rose config-edit &
 
       .. tip::
 
