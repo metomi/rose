@@ -1,0 +1,44 @@
+name: test rsync check
+
+on:
+  pull_request:
+    paths:
+      - 'metomi/rose/loc_handlers/rsync.py'
+      - 'metomi/rose/loc_handlers/rsync_remote_check.py'
+      - '.github/workflows/test_rsync_test_script.yml'
+  workflow_dispatch:
+    inputs:
+      rose_ref:
+        description: The Rose branch to test against
+        required: true
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 2
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest']
+        python-version: [
+          '2.7',
+          '3.5', '3.6',
+          '3.7', '3.8', '3.9'
+        ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.rose_ref || github.sha }}
+          path: rose
+
+      - name: Configure Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Unit Tests
+        working-directory: rose
+        run: |
+          prove -vv t/rose-loc-handlers/test_rsync_loc_handlers.t
