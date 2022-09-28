@@ -478,7 +478,10 @@ mkdir -p "$HOME/cylc-run"
 
 ROSE_TEST_HOME=$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)
 export ROSE_TEST_HOME
-DIFFTOOL="$(rose config '--default=diff -u' t difftool)"
+
+# Set difftool to a sane-ish default to avoid need to have rose installed.
+rose &> /dev/null && DIFFTOOL="$(rose config '--default=diff -u' t difftool)" || DIFFTOOL='diff'
+
 TEST_KEY_BASE="$(basename "$0" .t)"
 # shellcheck disable=SC2034
 TEST_SOURCE_DIR="$(cd "$(dirname "$0")" && pwd)"
