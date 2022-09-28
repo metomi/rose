@@ -1,0 +1,63 @@
+name: update_tutorials
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: The branch to open the PR against
+        required: false
+        default: '2.0.x'
+  schedule:
+  - cron: '37 04 * * 6' # 03:37, Saturday
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  create-tutorials-pr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.rose_ref || github.sha }}
+          path: rose
+
+      - name: Update tutorials
+        run: |
+          git clone https://github.com/cylc/cylc-flow.git
+          git clone https://github.com/cylc/release-actions.git
+
+          # Two step process because rsync doesn't allow us
+          # to rename the folder.
+          cp -r cylc-flow/cylc/flow/etc/tutorial/cylc-forecasting-workflow \
+              cylc-forecasting-suite
+
+          rsync -va cylc-forecasting-suite \
+              rose/metomi/rose/etc/tutorial/
+      - name: Configure Git
+        uses: cylc/release-actions/configure-git@v1
+
+      - name: Create PR
+        working-directory: rose
+        run: |
+          if [[ -n $(git status --short) ]]; then
+            git checkout -b "automated-update-tutorial-workflow"
+            git add .
+            git commit -m "automated update of cylc tutoral suite"
+            git push origin "automated-update-tutorial-workflow"
+            gh pr create --title "Update Tutorial Workflow" \
+              --body "${PR_BODY}"\
+              --base 2.0.x
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_BODY: |
+            This PR Pulls in changes to the tutorial workflow from cylc flow.
+
+            - [ ] The PR target should be changed to the most appropriate branch.
+            - [ ] Ensure tests have passed.
+
+            **DELETE THE BRANCH ONCE IT IS MERGED**
