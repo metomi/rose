@@ -1,3 +1,0 @@
-rose tutorial "$(basename $TUT_DIR)" "${CYLC_RUN_DIR}/${REG}"
-sed -i '1s;^;[scheduler]\n    abort if any task fails = True\n;' "${CYLC_RUN_DIR}/${REG}/flow.cylc"
-cylc play --no-detach "${REG}" 2>&1

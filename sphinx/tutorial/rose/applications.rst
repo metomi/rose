@@ -136,7 +136,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
 .. ifslides::
 
    .. rubric:: In this practical we will convert the ``forecast`` task from the
-      :ref:`weather-forecasting suite <tutorial-datetime-cycling-practical>`
+      :ref:`weather-forecasting workflow <tutorial-datetime-cycling-practical>`
       into a Rose application.
 
    Next section: :ref:`tutorial-rose-metadata`
@@ -147,7 +147,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
 .. practical::
 
    .. rubric:: In this practical we will convert the ``forecast`` task from the
-      :ref:`weather-forecasting suite <tutorial-datetime-cycling-practical>`
+      :ref:`weather-forecasting workflow <tutorial-datetime-cycling-practical>`
       into a Rose application.
 
    Create a directory on your filesystem called ``rose-tutorial``::
@@ -214,7 +214,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
    #. **Copy the test data.**
 
       For now we will run the ``forecast`` application using some sample data
-      so that we can run it outside of the weather forecasting suite.
+      so that we can run it outside of the weather forecasting workflow.
 
       The test data was gathered in November 2017.
 
@@ -226,7 +226,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
 
       In the ``[runtime][forecast][environment]`` section of the ``flow.cylc``
       file in the
-      :ref:`weather-forecasting suite <tutorial-datetime-cycling-practical>`
+      :ref:`weather-forecasting workflow <tutorial-datetime-cycling-practical>`
       we set a few environment variables:
 
       * ``WIND_FILE_TEMPLATE``
@@ -260,7 +260,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
       Note that the ``WIND_FILE_TEMPLATE`` and ``RAINFALL_FILE`` environment
       variables are pointing at files in the ``test-data`` directory.
 
-      To make this application work outside of the weather forecasting suite
+      To make this application work outside of the weather forecasting workflow
       we will also need to
       provide the ``DOMAIN`` and ``RESOLUTION`` environment variables defined
       in the ``[runtime][root][environment]`` section of the ``flow.cylc``

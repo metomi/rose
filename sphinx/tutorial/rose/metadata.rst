@@ -35,7 +35,7 @@ The Metadata Format
 
 .. ifnotslides::
 
-   The :rose:file:`rose-meta.conf` file uses the standard 
+   The :rose:file:`rose-meta.conf` file uses the standard
    :ref:`Rose configuration format <tutorial-rose-configurations>`.
 
    The metadata for a setting is written in a section named
@@ -152,6 +152,11 @@ Metadata Items
       ``application-tutorial`` app we wrote in the
       :ref:`Rose application practical <rose-applications-practical>`.
 
+   .. note::
+
+      In order to use ``rose config-edit``, Rose 2019 must be installed.
+      Rose 2019 graphical utilities are compatible with Rose 2 configurations.
+
    #. **Create a Rose application called** ``metadata-tutorial``.
 
       Create a new copy of the ``application-tutorial`` application by running::
@@ -165,6 +170,11 @@ Metadata Items
       Rose configurations. Open the ``metadata-tutorial`` app::
 
          rose config-edit &
+
+      If you get a message saying this feature has been removed, you should
+      use Rose 2019 by running::
+
+         CYLC_VERSION=7 rose config-edit &
 
       .. tip::
 
@@ -220,7 +230,7 @@ Metadata Items
          rose metadata-check -C meta/
 
       There should not be any errors so this check will silently pass.
-      
+
       Next reload the metadata in the :ref:`command-rose-config-edit` window
       using the :menuselection:`Metadata --> Refresh Metadata` menu item.
       The descriptions should now display under each environment variable.
@@ -347,7 +357,7 @@ Metadata Items
 
       .. tip::
 
-         The :rose:conf:`rose-meta.conf[SETTING]value-hints` metadata option 
+         The :rose:conf:`rose-meta.conf[SETTING]value-hints` metadata option
          can be used to provide a longer description of each option.
 
    #. **Validate with** ``rose macro``.

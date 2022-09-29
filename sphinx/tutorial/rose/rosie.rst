@@ -46,7 +46,7 @@ system.
    the ``~/roses`` directory though Rosie working copies can be created
    elsewhere.
 
-.. ifnotslides::
+.. ifslides::
 
    Working copy installed in ``~/roses``.
 
@@ -141,18 +141,7 @@ Rosie provides commands for managing suites, including:
    Searches the suite database (using information from suite's
    :rose:file:`rose-suite.info` files).
 
-.. nextslide::
-
-.. figure:: img/rosie-go-annotated.png
-   :align: center
-   :width: 450px
-   :alt: rosie go GUI
-
-   Screenshot of the rosie go GUI.
-
 .. TODO - migrate the old "Rose User Guide: Rosie Go" page?
-
-.. nextslide::
 
 .. ifslides::
 
@@ -294,8 +283,8 @@ Rosie provides commands for managing suites, including:
 
          fcm sw configuration-change
 
-      Next, either using the :ref:`command-rose-config-edit` GUI or a text
-      editor, change the ``RESOLUTION`` setting in the
+      Next, either using the Rose 2019 :ref:`command-rose-config-edit` GUI or
+      a text editor, change the ``RESOLUTION`` setting in the
       :rose:file:`rose-suite.conf` file to ``0.1``.
 
       Check the status of the project::

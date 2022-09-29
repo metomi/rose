@@ -38,13 +38,35 @@ behaviours such as:
    * :term:`Rose suite configuration`
 
 
+Why Use Rose Configurations?
+----------------------------
+
+.. ifnotslides::
+
+   With Rose configurations the inputs and environment required for a
+   particular purpose can be encapsulated in a simple human-readable
+   configuration.
+
+   Configuration settings can have metadata associated with them which may be
+   used for multiple purposes including automatic checking and transforming.
+
+   Rose configurations can be edited either using a text editor or with
+   the :ref:`command-rose-config-edit` GUI which makes use of metadata for
+   display and on-the-fly validation purposes.
+
+.. ifslides::
+
+   * Encapsulation
+   * Validation
+   * Editing
+
+.. nextslide::
+
+
 Rose Configuration Format
 -------------------------
 
 .. ifnotslides::
-
-   Rose configurations are directories containing a Rose configuration file
-   along with other optional files and directories.
 
    All Rose configuration files use the same format which is based on the
    `INI`_ file format. *Like* the file format for :ref:`Cylc workflows
@@ -91,12 +113,6 @@ For example:
 
 .. nextslide::
 
-.. hint::
-
-   In Rose configuration files settings do not normally require quotation.
-
-.. nextslide::
-
 Throughout this tutorial we will refer to settings in the following format:
 
 * ``file`` - will refer to a Rose configuration *file*.
@@ -105,31 +121,8 @@ Throughout this tutorial we will refer to settings in the following format:
 * ``file[section]setting`` - will refer to a *setting in a section* in a Rose
   configuration file.
 
-
-Why Use Rose Configurations?
-----------------------------
-
-.. ifnotslides::
-
-   With Rose configurations the inputs and environment required for a
-   particular purpose can be encapsulated in a simple human-readable
-   configuration.
-
-   Configuration settings can have metadata associated with them which may be
-   used for multiple purposes including automatic checking and transforming.
-
-   Rose configurations can be edited either using a text editor or with
-   the :ref:`command-rose-config-edit` GUI which makes use of metadata for
-   display and on-the-fly validation purposes.
-
 .. ifslides::
-
-   * Encapsulation
-   * Validation
-   * Editing
 
    .. nextslide::
 
    Next section: :ref:`tutorial-rose-applications`
-
-.. TODO - add rose edit screenshot.

@@ -27,7 +27,7 @@ The :ref:`command-rose-date` command provides functionality for:
 
   .. code-block:: console
 
-     $ rose date '12-31-2000' --parse-format='%m-%d-%Y' 
+     $ rose date '12-31-2000' --parse-format='%m-%d-%Y'
      12-31-2000
      $ rose date '12-31-2000' --parse-format='%m-%d-%Y' --format='DD-MM-CCYY'
      31-12-2000
@@ -91,7 +91,7 @@ The work directory
 The share directory
    The :term:`share directory` serves the purpose of providing a storage place
    for any files which need to be shared between different tasks.
-   
+
    Within the share directory data is typically stored within cycle
    subdirectories i.e:
 
@@ -102,10 +102,10 @@ The share directory
    These are called the ``share/cycle`` directories.
 
    The path to the root of the share directory is provided by the
-   ``CYLC_SUITE_SHARE_DIR`` environment variable so the path to the cycle
+   ``CYLC_WORKFLOW_SHARE_DIR`` environment variable so the path to the cycle
    subdirectory would be::
 
-      "$CYLC_SUITE_SHARE_DIR/$CYLC_SUITE_CYCLE_POINT"
+      "$CYLC_WORKFLOW_SHARE_DIR/$CYLC_TASK_CYCLE_POINT"
 
 The :ref:`command-rose-task-env` command provides the environment variable
 :envvar:`ROSE_DATAC` which is a more convenient way to obtain the path of the

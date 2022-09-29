@@ -433,14 +433,14 @@ Open ``planet.py`` and paste in this text:
                return
            planet = world_node.value
            if planet.lower() == 'earth':
-               print 'Please choose a planet other than Earth.'
+               print('Please choose a planet other than Earth.')
                return
            constellation = self.get_planet_info(planet)
            if not constellation:
-               print 'Could not find horoscope entry for {0}'.format(planet)
+               print('Could not find horoscope entry for {0}'.format(planet))
                return
            else:
-               print (
+               print((
                    '{planet} is currently passing through {constellation}.\n'
                    'You should {generic_message} today.'
                ).format(
@@ -448,7 +448,7 @@ Open ``planet.py`` and paste in this text:
                    constellation = constellation,
                    generic_message = random.choice(
                      self.GENERIC_HOROSCOPE_STATEMENTS)
-               )
+               ))
 
        def get_planet_info(self, planet_name):
            cmd_strings = ["curl", "-s",
@@ -495,7 +495,7 @@ Open ``planet.py`` and alter the ``PlanetChanger`` class to look like this:
 
 .. code-block:: python
 
-   class PlanetChanger(rose.macro.MacroBase):
+   class PlanetChanger(MacroBase):
 
        """Switch between planets."""
 
