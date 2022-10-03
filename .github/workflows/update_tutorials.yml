@@ -48,6 +48,7 @@ jobs:
 
       - name: Check for changes
         id: check
+        working-directory: rose
         run: |
           if [[ -n $(git status --short) ]]; then
             echo "::set-output name=changed::true"
