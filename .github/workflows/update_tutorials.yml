@@ -1,0 +1,75 @@
+name: Update tutorial workflows
+
+on:
+  workflow_dispatch:
+    inputs:
+      rose_ref:
+        description: The rose branch to update the tutorials on
+        required: false
+      cylc_ref:
+        description: The cylc-flow branch to update the tutorials from
+        required: false
+  schedule:
+    - cron: '37 04 6,21 * *' # 04:37, on the 6th & 21st of each month
+
+jobs:
+  update_tutorials:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      ROSE_REF: ${{ inputs.rose_ref || 'master' }}
+      CYLC_REF: ${{ inputs.cylc_ref || 'master' }}
+    steps:
+      - name: Checkout rose
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ env.ROSE_REF }}
+          path: rose
+
+      - name: Checkout cylc-flow
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ env.CYLC_REF }}
+          path: cylc-flow
+
+      - name: Configure Git
+        uses: cylc/release-actions/configure-git@v1
+
+      - name: Update tutorials
+        run: |
+          rsync -va cylc-flow/cylc/flow/etc/tutorial rose/metomi/rose/etc/tutorial \
+            --exclude=consolidation-tutorial \
+            --exclude=inheritance-tutorial \
+            --exclude=message-trigger-tutorial \
+            --exclude=retries-tutorial \
+            --exclude=runtime-introduction \
+            --exclude=runtime-tutorial
+
+      - name: Check for changes
+        id: check
+        run: |
+          if [[ -n $(git status --short) ]]; then
+            echo "::set-output name=changed::true"
+          else
+            echo "::notice::No updates to the tutorials"
+          fi
+
+      - name: Create PR
+        if: steps.check.outputs.changed
+        working-directory: rose
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_BODY: |
+            This PR pulls in changes to the tutorial workflow from cylc flow.
+
+            - **Remember to open an equivalent PR on maintenance branches if needed**
+              - This can be done via [workflow dispatch](https://github.com/metomi/rose/actions/workflows/update_tutorials.yml)
+            - Remember to delete the branch once merged
+        run: |
+          git checkout -b "update-tutorials-${{ github.run_number }}"
+          git add -A
+          git commit -m "Update tutorials from cylc-flow"
+          git push
+          gh pr create --title "Update Tutorial Workflow" \
+            --body "$PR_BODY" \
+            --base "$ROSE_REF"
