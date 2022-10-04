@@ -38,7 +38,7 @@ jobs:
 
       - name: Update tutorials
         run: |
-          rsync -va cylc-flow/cylc/flow/etc/tutorial rose/metomi/rose/etc/tutorial \
+          rsync -va cylc-flow/cylc/flow/etc/tutorial/ rose/metomi/rose/etc/tutorial/ \
             --exclude=consolidation-tutorial \
             --exclude=inheritance-tutorial \
             --exclude=message-trigger-tutorial \
@@ -50,7 +50,9 @@ jobs:
         id: check
         working-directory: rose
         run: |
-          if [[ -n $(git status --short) ]]; then
+          STATUS="$(git status --short)"
+          if [[ -n "$STATUS" ]]; then
+            echo "$STATUS"
             echo "::set-output name=changed::true"
           else
             echo "::notice::No updates to the tutorials"
@@ -68,6 +70,7 @@ jobs:
               - This can be done via [workflow dispatch](https://github.com/metomi/rose/actions/workflows/update_tutorials.yml)
             - Remember to delete the branch once merged
         run: |
+          git config push.default current
           git checkout -b "update-tutorials-${{ github.run_number }}"
           git add -A
           git commit -m "Update tutorials from cylc-flow"
