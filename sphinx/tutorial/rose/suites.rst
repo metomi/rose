@@ -88,7 +88,7 @@ A Rose suite configuration is a Cylc :term:`source directory` containing a
    GREETING=Hello
 
    [template variables]
-   WORLD=Earth
+   WORLD="Earth"
 
 .. code-block:: cylc
    :caption: flow.cylc
@@ -253,7 +253,7 @@ Using a Rose workflow configuration with Cylc 8
 
       .. code-block:: diff
 
-         -[runtime]
+          [runtime]
          -    [[root]]
          -        # These environment variables will be available to all tasks.
          -        [[[environment]]]
