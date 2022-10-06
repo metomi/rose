@@ -1,5 +1,6 @@
 [scheduler]
     UTC mode = True
+    allow implicit tasks = True
 
 [scheduling]
     # Start the suite 7 hours before now ignoring minutes and seconds
