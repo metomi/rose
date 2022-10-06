@@ -52,6 +52,7 @@ below:
  - Mel Hall (Met Office, UK)
  - Ronnie Dutta (Met Office, UK)
  - Roddy Sharp (Met Office UK)
+ - Joe Wallwork (Met Office, UK)
 <!-- end-shortlog -->
 
 (All contributors are identifiable with email addresses in the version control
