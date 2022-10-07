@@ -1,10 +1,10 @@
 [scheduler]
     UTC mode = True
-    [[parameters]]
-        # A list of the weather stations we will be fetching observations from.
-        station = camborne, heathrow, shetland, belmullet
-        # A list of the sites we will be generating forecasts for.
-        site = exeter
+[[task parameters]]
+    # A list of the weather stations we will be fetching observations from.
+    station = camborne, heathrow, shetland, belmullet
+    # A list of the sites we will be generating forecasts for.
+    site = exeter
 
 [scheduling]
     # Start the suite 7 hours before now ignoring minutes and seconds
@@ -13,29 +13,26 @@
     initial cycle point = previous(T-00) - PT7H
     # Stop the suite 6 hours after the initial cycle point.
     final cycle point = +PT6H
-    [[dependencies]]
-        [[[PT3H]]]
-            # Repeat every three hours starting at the initial cycle point.
-            graph = """
-                get_observations<station> => consolidate_observations
-            """
+    [[graph]]
+        # Repeat every three hours starting at the initial cycle point.
+        PT3H = """
+            get_observations<station> => consolidate_observations
+        """
 
-        [[[+PT6H/PT6H]]]
-            # Repeat every six hours starting six hours after the initial
-            # cycle point.
-            graph = """
-                consolidate_observations => forecast
-                consolidate_observations[-PT3H] => forecast
-                consolidate_observations[-PT6H] => forecast
-                get_rainfall => forecast => post_process<site>
-            """
+        # Repeat every six hours starting six hours after the initial
+        # cycle point.
+        +PT6H/PT6H = """
+            consolidate_observations => forecast
+            consolidate_observations[-PT3H] => forecast
+            consolidate_observations[-PT6H] => forecast
+            get_rainfall => forecast => post_process<site>
+        """
 
-        [[[+PT12H/PT6H]]]
-            # Repeat every six hours starting twelve hours after the initial
-            # cycle point.
-            graph = """
-                forecast[-PT6H] => forecast
-            """
+        # Repeat every six hours starting twelve hours after the initial
+        # cycle point.
+        +PT12H/PT6H = """
+            forecast[-PT6H] => forecast
+        """
 
 [runtime]
     [[root]]
