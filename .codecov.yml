@@ -2,49 +2,51 @@
 # After modifying this file, it might be worth to validate it with:
 # `curl --data-binary @.codecov.yml https://codecov.io/validate`
 
-# which branch to monitor and whether wait for ci success
-codecov:
-  branch: master
-  notify:
-    require_ci_to_pass: yes
+# NOTE: Codecov has been disabled for rose - too much effort to extract coverage from functional tests
 
-# define the colour bar limits here
-coverage:
-  precision: 2
-  round: down
-  range: "75...100"
+# # which branch to monitor and whether wait for ci success
+# codecov:
+#   branch: master
+#   notify:
+#     require_ci_to_pass: yes
 
-  # diff type
-  status:
-    project:
-      default:
-        # commits below this threshold will be marked as failed
-        target: '84%'
-        # how much we allow the coverage to drop
-        threshold: '1%'
-    patch:
-      default:
-        # basic
-        target: '84%'
-        threshold: '1%'
-        base: auto
-        # advanced
-        branches: null
-        if_no_uploads: error
-        if_not_found: success
-        if_ci_failed: error
-        only_pulls: false
-        flags: null
-        paths: null
-    changes: no
+# # define the colour bar limits here
+# coverage:
+#   precision: 2
+#   round: down
+#   range: "75...100"
 
-# files to ignore
-ignore:
-  - "demo/**/*.py"
-  - "etc/**/*.py"
-  - "sphinx/**/*.py"
-  - "t/**/*.py"
-  - ".travis/**/*.py"
+#   # diff type
+#   status:
+#     project:
+#       default:
+#         # commits below this threshold will be marked as failed
+#         target: '84%'
+#         # how much we allow the coverage to drop
+#         threshold: '1%'
+#     patch:
+#       default:
+#         # basic
+#         target: '84%'
+#         threshold: '1%'
+#         base: auto
+#         # advanced
+#         branches: null
+#         if_no_uploads: error
+#         if_not_found: success
+#         if_ci_failed: error
+#         only_pulls: false
+#         flags: null
+#         paths: null
+#     changes: no
 
-# turn off comments to pull requests
-comment: off
+# # files to ignore
+# ignore:
+#   - "demo/**/*.py"
+#   - "etc/**/*.py"
+#   - "sphinx/**/*.py"
+#   - "t/**/*.py"
+#   - ".travis/**/*.py"
+
+# # turn off comments to pull requests
+# comment: off
