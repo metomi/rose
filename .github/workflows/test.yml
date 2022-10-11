@@ -1,6 +1,10 @@
 name: test
 
 on:
+  push:
+    branches:
+      - master
+      - '2.*.x'
   pull_request:
   workflow_dispatch:
     inputs:
@@ -140,6 +144,7 @@ jobs:
           echo "export PATH=\"$FCM_PATH:\$PATH\"" >> "$HOME/.bashrc"
 
       - name: Style
+        if: startsWith(matrix.os, 'ubuntu')
         working-directory: rose
         run: |
           flake8
@@ -147,6 +152,7 @@ jobs:
           yarn run lint
 
       - name: MyPy
+        if: startsWith(matrix.os, 'ubuntu')
         working-directory: rose
         run: |
           mypy
@@ -176,7 +182,7 @@ jobs:
           cylc scan --state=all --color=never
           etc/bin/rose-test-battery -j 1 -v --state=save,failed
 
-      - name: Upload
+      - name: Upload cylc-run artifact
         if: failure() && steps.functest.outcome == 'failure'
         uses: actions/upload-artifact@v3
         with:
