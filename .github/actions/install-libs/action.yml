@@ -1,0 +1,47 @@
+name: Install Cylc libs
+description: Install cylc-flow and cylc-rose at correct (or specified) versions.
+
+inputs:
+  cylc-flow-repo:
+    description: The cylc-flow GitHub repo/fork to install
+    required: false
+  cylc-flow-ref:
+    description: cylc-flow branch/tag/etc
+    required: false
+  cylc-rose-ref:
+    description: cylc-rose branch/tag etc
+    required: false
+
+# NOTE: hard-coded branches need to be manually updated as necessary.
+
+runs:
+  using: composite
+  steps:
+    - name: Install cylc-flow
+      shell: bash
+      env:
+        CYLC_FLOW_GITHUB: git+https://github.com/${{ inputs.cylc-flow-repo || 'cylc/cylc-flow' }}
+        CYLC_FLOW_REF: ${{ inputs.cylc-flow-ref }}
+      run: |
+        if [[ -n "$CYLC_FLOW_REF" ]]; then
+          pip install "${CYLC_FLOW_GITHUB}@${CYLC_FLOW_REF}"
+        elif [[ "$GITHUB_BASE_REF" == '2.0.x' ]]; then
+          pip install "${CYLC_FLOW_GITHUB}@8.0.x"
+        else
+          pip install "$CYLC_FLOW_GITHUB"
+        fi
+
+    - name: Install cylc-rose
+      shell: bash
+      env:
+        CYLC_ROSE_GITHUB: git+https://github.com/cylc/cylc-rose
+        CYLC_ROSE_REF: ${{ inputs.cylc-rose-ref }}
+      # NOTE: may pull in cylc-flow from PyPI despite previous step.
+      run: |
+        if [[ -n "$CYLC_ROSE_REF" ]]; then
+          pip install "${CYLC_ROSE_GITHUB}@${CYLC_ROSE_REF}"
+        elif [[ "$GITHUB_BASE_REF" == '2.0.x' ]]; then
+          pip install "${CYLC_ROSE_GITHUB}@1.1.x"
+        else
+          pip install "$CYLC_ROSE_GITHUB"
+        fi
