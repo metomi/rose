@@ -12,36 +12,28 @@ inputs:
     description: cylc-rose branch/tag etc
     required: false
 
-# NOTE: hard-coded branches need to be manually updated as necessary.
 
 runs:
   using: composite
   steps:
-    - name: Install cylc-flow
-      shell: bash
+    - shell: bash
       env:
         CYLC_FLOW_GITHUB: git+https://github.com/${{ inputs.cylc-flow-repo || 'cylc/cylc-flow' }}
         CYLC_FLOW_REF: ${{ inputs.cylc-flow-ref }}
-      run: |
-        if [[ -n "$CYLC_FLOW_REF" ]]; then
-          pip install "${CYLC_FLOW_GITHUB}@${CYLC_FLOW_REF}"
-        elif [[ "$GITHUB_BASE_REF" == '2.0.x' ]]; then
-          pip install "${CYLC_FLOW_GITHUB}@8.0.x"
-        else
-          pip install "$CYLC_FLOW_GITHUB"
-        fi
-
-    - name: Install cylc-rose
-      shell: bash
-      env:
         CYLC_ROSE_GITHUB: git+https://github.com/cylc/cylc-rose
         CYLC_ROSE_REF: ${{ inputs.cylc-rose-ref }}
-      # NOTE: may pull in cylc-flow from PyPI despite previous step.
       run: |
-        if [[ -n "$CYLC_ROSE_REF" ]]; then
-          pip install "${CYLC_ROSE_GITHUB}@${CYLC_ROSE_REF}"
-        elif [[ "$GITHUB_BASE_REF" == '2.0.x' ]]; then
-          pip install "${CYLC_ROSE_GITHUB}@1.1.x"
-        else
-          pip install "$CYLC_ROSE_GITHUB"
+        # NOTE: hard-coded branches need to be manually updated as necessary.
+        if [[ "$GITHUB_BASE_REF" == '2.0.x' ]]; then
+          : ${CYLC_FLOW_REF:='8.0.x'}
+          : ${CYLC_ROSE_REF:='1.1.x'}
         fi
+
+        if [[ -n "$CYLC_FLOW_REF" ]]; then
+          CYLC_FLOW_GITHUB="${CYLC_FLOW_GITHUB}@${CYLC_FLOW_REF}"
+        fi
+        if [[ -n "$CYLC_ROSE_REF" ]]; then
+          CYLC_ROSE_GITHUB="${CYLC_ROSE_GITHUB}@${CYLC_ROSE_REF}"
+        fi
+
+        pip install "$CYLC_FLOW_GITHUB" "$CYLC_ROSE_GITHUB"
