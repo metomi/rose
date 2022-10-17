@@ -1,6 +1,10 @@
 name: test
 
 on:
+  push:
+    branches:
+      - master
+      - '2.*.x'
   pull_request:
   workflow_dispatch:
     inputs:
@@ -13,10 +17,10 @@ on:
       fcm_repo:
         description: The FCM repo to test against
         required: false
-      cylc_ref:
+      cylc_flow_ref:
         description: The Cylc branch to test against
         required: false
-      cylc_repo:
+      cylc_flow_repo:
         description: The Cylc repo to test against
         required: false
   schedule:
@@ -41,22 +45,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.inputs.rose_ref || github.sha }}
+          ref: ${{ inputs.rose_ref || github.sha }}
           path: rose
 
       - name: Configure Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Install Cylc
-        env:
-          cylc_repo: ${{ github.event.inputs.cylc_repo || 'cylc/cylc-flow' }}
-          cylc_branch: ${{ github.event.inputs.cylc_ref || 'master' }}
-        run: |
-          pip install "git+https://github.com/${cylc_repo}@${cylc_branch}"
 
       - name: Brew Install
         if: startsWith(matrix.os, 'macos')
@@ -97,19 +94,25 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y shellcheck sqlite3 at graphviz graphviz-dev
 
+      - name: Install Cylc libs
+        uses: ./rose/.github/actions/install-libs
+        with:
+          cylc-flow-repo: ${{ inputs.cylc_flow_repo }}
+          cylc-flow-ref: ${{ inputs.cylc_flow_ref }}
+          cylc-rose-ref: ${{ inputs.cylc_rose_ref }}
+
       - name: Install Rose
         working-directory: rose
         run: |
           pip install ."[all]"
-          pip install git+https://github.com/cylc/cylc-rose.git
           yarn install
 
       - name: Checkout FCM
         if: startsWith(matrix.os, 'ubuntu')
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
-          repository: ${{ github.event.inputs.fcm_repo || 'metomi/fcm' }}
-          ref: ${{ github.event.inputs.fcm_ref || 'master' }}
+          repository: ${{ inputs.fcm_repo || 'metomi/fcm' }}
+          ref: ${{ inputs.fcm_ref || 'master' }}
           path: 'fcm'
 
       - name: Install FCM
@@ -140,6 +143,7 @@ jobs:
           echo "export PATH=\"$FCM_PATH:\$PATH\"" >> "$HOME/.bashrc"
 
       - name: Style
+        if: startsWith(matrix.os, 'ubuntu')
         working-directory: rose
         run: |
           flake8
@@ -147,6 +151,7 @@ jobs:
           yarn run lint
 
       - name: MyPy
+        if: startsWith(matrix.os, 'ubuntu')
         working-directory: rose
         run: |
           mypy
@@ -176,9 +181,9 @@ jobs:
           cylc scan --state=all --color=never
           etc/bin/rose-test-battery -j 1 -v --state=save,failed
 
-      - name: Upload
+      - name: Upload cylc-run artifact
         if: failure() && steps.functest.outcome == 'failure'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: cylc-run ${{ matrix.os }}
           path: ~/cylc-run/
@@ -188,12 +193,12 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.inputs.rose_ref || github.sha }}
+          ref: ${{ inputs.rose_ref || github.sha }}
 
       - name: Configure Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.7
 
@@ -202,11 +207,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y graphviz pkg-config libgraphviz-dev
 
-      - name: install
+      - name: Install Cylc libs
+        uses: ./.github/actions/install-libs
+        with:
+          cylc-flow-repo: ${{ inputs.cylc_flow_repo }}
+          cylc-flow-ref: ${{ inputs.cylc_flow_ref }}
+          cylc-rose-ref: ${{ inputs.cylc_rose_ref }}
+
+      - name: Install Rose
         run: |
           pip install -e .[docs,graph]
-          pip install git+https://github.com/cylc/cylc-flow.git
-          pip install git+https://github.com/cylc/cylc-rose.git
 
       - name: build (html)
         run: |
