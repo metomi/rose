@@ -94,18 +94,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y shellcheck sqlite3 at graphviz graphviz-dev
 
+      - name: Install Rose
+        working-directory: rose
+        run: |
+          pip install ."[all]"
+          yarn install
+
       - name: Install Cylc libs
         uses: ./rose/.github/actions/install-libs
         with:
           cylc-flow-repo: ${{ inputs.cylc_flow_repo }}
           cylc-flow-ref: ${{ inputs.cylc_flow_ref }}
           cylc-rose-ref: ${{ inputs.cylc_rose_ref }}
-
-      - name: Install Rose
-        working-directory: rose
-        run: |
-          pip install ."[all]"
-          yarn install
 
       - name: Checkout FCM
         if: startsWith(matrix.os, 'ubuntu')
@@ -207,16 +207,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y graphviz pkg-config libgraphviz-dev
 
+      - name: Install Rose
+        run: |
+          pip install -e .[docs,graph]
+
       - name: Install Cylc libs
         uses: ./.github/actions/install-libs
         with:
           cylc-flow-repo: ${{ inputs.cylc_flow_repo }}
           cylc-flow-ref: ${{ inputs.cylc_flow_ref }}
           cylc-rose-ref: ${{ inputs.cylc_rose_ref }}
-
-      - name: Install Rose
-        run: |
-          pip install -e .[docs,graph]
 
       - name: build (html)
         run: |
