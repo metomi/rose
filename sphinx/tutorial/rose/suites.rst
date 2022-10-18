@@ -48,7 +48,7 @@ A Rose suite configuration is a Cylc :term:`source directory` containing a
    :rose:file:`rose-app.conf` file. Its main configuration sections are:
 
    :rose:conf:`rose-suite.conf[env]`
-       Environment variables for use by the workflow :term:`scheduler`.
+      Environment variables for use by the workflow :term:`scheduler`.
    :rose:conf:`rose-suite.conf[template variables]`
       Generic variables for use in the ``flow.cylc`` file.
    :rose:conf:`rose-suite.conf[file:NAME]`
@@ -57,15 +57,16 @@ A Rose suite configuration is a Cylc :term:`source directory` containing a
 
    .. note::
 
-      At Rose 2/Cylc 8 setting a :rose:conf:`rose-suite.conf[template variables]`
+      At Rose 2/Cylc 8, using the :rose:conf:`rose-suite.conf[template variables]`
       section is the recommended way of working. Cylc will select a templating
       language based on the hashbang line at the start of the the ``flow.cylc``
-      file if you use :rose:conf:`rose-suite.conf[template variables]`.
+      file.
 
-      At Rose 2019/Cylc 7 these variables were instead set in sections called
+      At Rose 2019/Cylc 7, these variables were instead set in sections called
       :rose:conf:`rose-suite.conf[jinja2:suite.rc]` and
-      :rose:conf:`rose-suite.conf[empy:suite.rc]`. These are supported to
-      ease the transition to Rose 2, but should not be used for new suites.
+      :rose:conf:`rose-suite.conf[empy:suite.rc]`. These are still supported
+      to ease the transition to Rose 2, but should not be used for new
+      suite configurations.
 
 .. ifslides::
 
@@ -77,15 +78,12 @@ A Rose suite configuration is a Cylc :term:`source directory` containing a
 
 .. ifnotslides::
 
-   In the following example the environment variable ``GREETING`` and the
-   template variable ``WORLD`` are both set in the :rose:file:`rose-suite.conf`
-   file. These variables can then be used in the ``flow.cylc`` file:
+   In the following example the template variable ``WORLD`` is set in
+   the :rose:file:`rose-suite.conf` file.
+   This can then be used in the ``flow.cylc`` file:
 
 .. code-block:: rose
    :caption: rose-suite.conf
-
-   [env]
-   GREETING=Hello
 
    [template variables]
    WORLD=Earth
@@ -96,11 +94,11 @@ A Rose suite configuration is a Cylc :term:`source directory` containing a
    #!jinja2
    [scheduling]
        [[graph]]
-           R1 = hello_{{WORLD}}
+           R1 = hello_{{ WORLD }}
 
    [runtime]
-       [[hello_{{WORLD}}]]
-           script = echo "$GREETING {{WORLD}}"
+       [[hello_{{ WORLD }}]]
+           script = echo "hello {{ WORLD }}"
 
 .. nextslide::
 
@@ -137,7 +135,7 @@ Using a Rose workflow configuration with Cylc 8
 
    .. rubric:: In this tutorial we will create a Rose Suite Configuration for
       the
-      :ref:`weather-forecasting suite<tutorial-datetime-cycling-practical>`.
+      :ref:`weather-forecasting workflow<tutorial-datetime-cycling-practical>`.
 
 .. _suites-practical:
 
@@ -145,11 +143,11 @@ Using a Rose workflow configuration with Cylc 8
 
    .. rubric:: In this tutorial we will create a Rose Suite Configuration for
       the
-      :ref:`weather-forecasting suite<tutorial-datetime-cycling-practical>`.
+      :ref:`weather-forecasting workflow<tutorial-datetime-cycling-practical>`.
 
-   #. **Create A New Suite.**
+   #. **Create a new Cylc workflow**
 
-      Create a copy of the :ref:`weather-forecasting suite
+      Create a copy of the :ref:`weather-forecasting workflow
       <tutorial-cylc-runtime-forecasting-workflow>` by running::
 
          rose tutorial rose-suite-tutorial ~/cylc-src/rose-suite-tutorial
@@ -160,7 +158,7 @@ Using a Rose workflow configuration with Cylc 8
          If you haven't ever used Cylc 8 you may need to create the
          :term:`source directory`. (``mkdir ~/cylc-src``)
 
-   #. **Create A Rose Suite Configuration.**
+   #. **Create a Rose suite configuration**
 
       Create a blank :rose:file:`rose-suite.conf` file::
 
@@ -185,9 +183,7 @@ Using a Rose workflow configuration with Cylc 8
       .. code-block:: rose
 
          [template variables]
-         station="camborne", "heathrow", "shetland", "belmullet"
-
-         [env]
+         station="camborne", "heathrow", "shetland", "aldergrove"
          RESOLUTION=0.2
          DOMAIN=-12,48,5,61
 
@@ -204,7 +200,7 @@ Using a Rose workflow configuration with Cylc 8
          [scheduler]
              UTC mode = True
 
-   #. **Write Suite Metadata.**
+   #. **Write suite metadata**
 
       Create a ``meta/rose-meta.conf`` file and write some metadata for the
       settings defined in the :rose:file:`rose-suite.conf` file.
@@ -213,12 +209,6 @@ Using a Rose workflow configuration with Cylc 8
       * ``RESOLUTION`` is a "real" number.
       * ``DOMAIN`` is a list of four integers.
 
-      .. tip::
-
-         For the ``RESOLUTION`` and ``DOMAIN`` settings you can copy the
-         metadata you wrote in the :ref:`Metadata Tutorial
-         <tutorial-rose-metadata>`.
-
       .. spoiler:: Solution warning
 
          .. code-block:: rose
@@ -226,10 +216,10 @@ Using a Rose workflow configuration with Cylc 8
             [template variables=station]
             length=:
 
-            [env=RESOLUTION]
+            [template variables=RESOLUTION]
             type=real
 
-            [env=DOMAIN]
+            [template variables=DOMAIN]
             length=4
             type=integer
 
@@ -239,31 +229,33 @@ Using a Rose workflow configuration with Cylc 8
 
       Open the :ref:`command-rose-config-edit` GUI. You should see
       :guilabel:`suite conf` in the panel on the left-hand side of the window.
-      This will contain the environment and template variables we have just
-      defined.
+      This will contain the template variables we have just defined.
 
-   #. **Use Suite Variables In The** ``flow.cylc`` **File.**
+   #. **Use suite variables in the** ``flow.cylc`` **file**
 
       Next we need to make use of these settings in the ``flow.cylc`` file.
 
-      We can delete the ``RESOLUTION`` and ``DOMAIN`` settings in the
+      We need to change the ``RESOLUTION`` and ``DOMAIN`` settings in the
       ``[runtime][root][environment]`` section which would otherwise override
       the variables we have just defined in the :rose:file:`rose-suite.conf`
       file, like so:
 
       .. code-block:: diff
 
-         -[runtime]
-         -    [[root]]
-         -        # These environment variables will be available to all tasks.
-         -        [[[environment]]]
-         -            # The dimensions of each grid cell in degrees.
+          [runtime]
+              [[root]]
+                  # These environment variables will be available to all tasks.
+                  [[[environment]]]
+                      # The dimensions of each grid cell in degrees.
          -            RESOLUTION = 0.2
-         -            # The area to generate forecasts for (lng1, lat1, lng2, lat2).
+         +            RESOLUTION = {{ RESOLUTION }}
+                      # The area to generate forecasts for (lng1, lat1, lng2, lat2).
          -            DOMAIN = -12,48,5,61  # Do not change!
+         +            DOMAIN = {{ DOMAIN | join(", ") }}
 
-      We can write out the list of stations, using the `Jinja2`_ ``join``
-      filter to write the commas between the list items:
+      We have written out the ``DOMAIN`` list using the `Jinja2`_ ``join``
+      filter to write the commas between the list items. We can do the same
+      for ``station``:
 
       .. code-block:: diff
 
@@ -271,31 +263,29 @@ Using a Rose workflow configuration with Cylc 8
               UTC mode = True
           [task parameters]
              # A list of the weather stations we will be fetching observations from.
-         -   station = camborne, heathrow, shetland, belmullet
+         -   station = camborne, heathrow, shetland, aldergrove
          +   station = {{ station | join(", ") }}
              # A list of the sites we will be generating forecasts for.
              site = exeter
 
-   #. **Install The Suite.**
-
+   #. **Install the workflow**
 
       This workflow is not ready to play yet but you can check that it is
-      valid with :ref:`cylc validate <Validation>` -
+      valid with :ref:`cylc validate <Validation>`::
 
-         cylc validate rose-suite-tutorial
+         cylc validate .
 
-      You can then install the workflow with :ref:`cylc install <Install-Workflow>` -
+      You can then install the workflow with :ref:`cylc install <Install-Workflow>`::
 
          cylc install rose-suite-tutorial
 
-      Inspect the installed suite, which you will find in
+      Inspect the installed workflow, which you will find in
       the :term:`run directory`, i.e::
 
          ~/cylc-run/rose-suite-tutorial
 
-      You should find all the files contained in the :term:`run directory`
-      as well as the :term:`run directory` folders ``log``, ``work`` and
-      ``share``.
+      You should find all the files, plus the ``log`` directory,
+      contained in the run directory.
 
 
 Rose Applications In Rose Suite Configurations
@@ -380,17 +370,17 @@ Rose Applications In Rose Suite Configurations
 
    .. rubric:: In this practical we will take the ``forecast`` Rose application
       that we developed in the :ref:`Metadata Tutorial <tutorial-rose-metadata>`
-      and integrate it into the :ref:`weather-forecasting suite
+      and integrate it into the :ref:`weather-forecasting workflow
       <tutorial-datetime-cycling-practical>`.
 
-   Move into the suite directory from the previous practical::
+   Move into the workflow source directory from the previous practical::
 
       cd ~/cylc-src/rose-suite-tutorial
 
    You will find a copy of the ``forecast`` application located in
    ``app/forecast``.
 
-   #. **Create A Test Configuration For The** ``forecast`` **Application.**
+   #. **Create a test configuration for the** ``forecast`` **application.**
 
       The ``forecast`` application comes with test data
       (in ``file/test-date``), and is currently set up to work with
@@ -465,7 +455,7 @@ Rose Applications In Rose Suite Configurations
       You should see the stdout output of the Rose application. If there are
       any errors they will be marked with the ``[FAIL]`` prefix.
 
-   #. **Integrate The** ``forecast`` **Application Into The Suite.**
+   #. **Integrate the** ``forecast`` **application into the suite.**
 
       We can now configure the ``forecast`` application to work with real data.
 
@@ -496,9 +486,9 @@ Rose Applications In Rose Suite Configurations
          WEIGHTING=1
          MAP_TEMPLATE=map-template.html
          SPLINE_LEVEL=0
-         WIND_FILE_TEMPLATE=$CYLC_SUITE_WORK_DIR/{cycle}/consolidate_observations/wind_{xy}.csv
+         WIND_FILE_TEMPLATE=$CYLC_WORKFLOW_WORK_DIR/{cycle}/consolidate_observations/wind_{xy}.csv
          WIND_CYCLES=0, -3, -6
-         RAINFALL_FILE=$CYLC_SUITE_WORK_DIR/$CYLC_TASK_CYCLE_POINT/get_rainfall/rainfall.csv
+         RAINFALL_FILE=$CYLC_WORKFLOW_WORK_DIR/$CYLC_TASK_CYCLE_POINT/get_rainfall/rainfall.csv
          MAP_FILE=${CYLC_TASK_LOG_ROOT}-map.html
 
       Finally we need to change the ``forecast`` task to run
@@ -510,10 +500,10 @@ Rose Applications In Rose Suite Configurations
          [[forecast]]
              script = rose task-run
 
-   #. **Make Changes To The Configuration.**
+   #. **Make changes to the configuration.**
 
       Open the :ref:`command-rose-config-edit` GUI and navigate to the
-      :guilabel:`suite conf > env` panel.
+      :guilabel:`suite conf > template variables` panel.
 
       Change the ``RESOLUTION`` variable to ``0.1``
 
@@ -531,29 +521,31 @@ Rose Applications In Rose Suite Configurations
 
       Finally, save these settings via :guilabel:`File > Save` in the menu.
 
-   #. **Run The Suite.**
+   #. **Run the workflow.**
 
-      Install, validate, run and examine the suite.
+      Validate, install, run and examine the workflow
       (use :ref:`tutorial.gui` or :ref:`tutorial.tui`)::
 
+         cylc validate ~/cylc-src/rose-suite-tutorial
          cylc install rose-suite-tutorial
-         cylc validate rose-suite-tutorial
          cylc play rose-suite-tutorial
 
 
-   #. **View Output In Cylc Review.**
+   #. **View output in Cylc Review.**
 
       .. note::
 
-         Cylc review replaces the Rose Bush utility. It can view Cylc 7 and
-         Cylc 8 suites.
+         ``cylc review`` replaces the Rose Bush utility. It is a Cylc 7
+         command that can view Cylc 7 and Cylc 8 workflows.
 
+      Either navigate to your site's Cylc Review page if one has been set up, or
+      start a Cylc Review server by running the following command and open
+      the printed URL::
 
-      Open the Cylc Review page in a browser by running the following command
-      from within the suite directory::
+         cylc review start
 
-         cylc review
-
+      Navigate to your latest rose-suite-tutorial run and click
+      the "task jobs list".
       On this page you will see the tasks run by the suite, ordered from most
       to least recent. Near the top you should see an entry for the
       ``forecast`` task. On the right-hand side of the screen click

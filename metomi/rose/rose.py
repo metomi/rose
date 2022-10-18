@@ -47,40 +47,44 @@ DEAD_ENDS = {
     # (ns, sub_cmd): message
     ('rosa', 'rpmbuild'):
         'Rosa RPM Builder has been removed.',
-    ('rose', 'config-edit'):
-        'The Rose configuration editor has been removed, use the Cylc GUI.',
-    ('rose', 'edit'):
-        'The Rose configuration editor has been removed, use the Cylc GUI.',
+    ('rose', 'config-edit'): (
+        'The Rose configuration editor has been removed. The old '
+        'Rose 2019 GUI remains compatible with Rose 2 configurations.'
+    ),
+    ('rose', 'edit'): (
+        'The Rose configuration editor has been removed. The old '
+        'Rose 2019 GUI remains compatible with Rose 2 configurations.'
+    ),
     ('rose', 'metadata-graph'):
         'This command has been removed pending re-implementation',
     ('rose', 'suite-clean'):
-        'This command has been replaced by): "cylc clean".',
+        'This command has been replaced by: "cylc clean".',
     ('rose', 'suite-cmp-vc'):
-        'This command is awaiting re-implementation in Cylc8',
+        'This command is awaiting re-implementation in Cylc 8',
     ('rose', 'suite-gcontrol'):
-        'This command has been removed): use the Cylc GUI.',
+        'This command has been removed: use the Cylc GUI.',
     ('rose', 'sgc'):
-        'This command has been removed): use the Cylc GUI.',
+        'This command has been removed: use the Cylc GUI.',
     ('rose', 'suite-hook'):
         'Command obsolete, use Cylc event handlers',
     ('rose', 'task-hook'):
         'Command obsolete, use Cylc event handlers',
     ('rose', 'suite-log-view'):
-        'This command has been removed): use the Cylc GUI.',
+        'This command has been removed: use cylc review at Cylc 7 instead.',
     ('rose', 'suite-log'):
-        'This command has been removed): use the Cylc GUI',
+        'This command has been removed: use cylc review at Cylc 7 instead.',
     ('rose', 'slv'):
-        'This command has been removed): use the Cylc GUI',
+        'This command has been removed: use cylc review at Cylc 7 instead.',
     ('rose', 'suite-restart'):
-        'This command has been replaced by): "cylc restart".',
+        'This command has been replaced by: "cylc restart".',
     ('rose', 'suite-run'):
-        'This command has been replaced by): "cylc install".',
+        'This command has been replaced by: "cylc install".',
     ('rose', 'suite-init'):
-        'This command has been replaced by): "cylc install".',
+        'This command has been replaced by: "cylc install".',
     ('rose', 'suite-scan'):
-        'This command has been replaced by): "cylc scan".',
+        'This command has been replaced by: "cylc scan".',
     ('rose', 'suite-shutdown'):
-        'This command has been replaced by): "cylc stop".',
+        'This command has been replaced by: "cylc stop".',
     ('rose', 'suite-stop'):
         'This command has been replaced by: "cylc stop".',
     ('rosie', 'disco'):

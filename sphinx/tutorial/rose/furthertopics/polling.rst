@@ -27,10 +27,12 @@ file that looks like this:
        UTC mode = True # Ignore DST
    [scheduling]
        [[graph]]
-           R1 = """compose_letter => send_letter
-                      bob => read_letter"""
+           R1 = """
+               compose_letter => send_letter
+               bob => read_letter
+           """
 
-This is a simple suite which consists of the following:
+This is a simple workflow which consists of the following:
 
 * A ``compose_letter`` task.
 * A ``send_letter`` task which is run once the letter is composed.
@@ -49,10 +51,10 @@ It will need some runtime. Add the following to your ``flow.cylc`` file:
        [[send_letter]]
            env-script = eval `rose task-env`
            script = """
-                    sleep 5
-                    echo 'Hello Bob' > $ROSE_DATA/letter.txt
-                    sleep 10
-                    """
+               sleep 5
+               echo 'Hello Bob' > $ROSE_DATA/letter.txt
+               sleep 10
+           """
 
        [[bob]]
            script = rose task-run
@@ -65,7 +67,7 @@ It will need some runtime. Add the following to your ``flow.cylc`` file:
 Adding Polling
 --------------
 
-In the suite directory create an ``app`` directory.
+In the source directory create an ``app`` directory.
 
 In the ``app`` directory create a directory called ``bob``.
 
@@ -95,14 +97,12 @@ We now have an app that does the following:
    In practice, it may be preferable to have the ``[command]`` section at
    the top as that should contain the main command(s) being run by the app.
 
-Save your changes and install and run the suite using
+Save your changes and install and run the workflow using
 :ref:`cylc install <Install-Workflow>` and :ref:`cylc play <WorkflowStartUp>`::
 
    cylc validate .
    cylc install
    cylc play polling
-
-The suite should now run.
 
 Notice that ``bob`` finishes and triggers ``read_letter`` before
 ``send_letter`` has completed. This is because the polling condition has
@@ -129,8 +129,8 @@ following:
    default=echo 'Ooh, a letter!'
 
 Polling is now making use of the ``all-files`` option, which allows you to
-specify a list of files to check the existence of. Save your changes and
-run the suite to confirm it still works.
+specify a list of files to check the existence of. Save your changes, install
+and run the workflow to confirm it still works.
 
 
 Available Polling Types

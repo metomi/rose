@@ -1,10 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# Copyright (C) British Crown (Met Office) & Contributors - GNU V3+.
+# THIS FILE IS PART OF THE CYLC WORKFLOW ENGINE.
+# Copyright (C) NIWA & British Crown (Met Office) & Contributors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# -----------------------------------------------------------------------------
 # This is illustrative code developed for tutorial purposes, it is not
 # intended for scientific use and is not guarantied to be accurate or correct.
-# -----------------------------------------------------------------------------
 """
 Usage:
     forecast INTERVAL ITERATIONS
@@ -47,7 +61,7 @@ def get_wind_data(wind_file_path, wind_cycles):
             as strings.
 
     Return:
-            list - A list 2-tuples containing wind field matricies i.e.
+            list - A list 2-tuples containing wind field matrices i.e.
             [(wind_x, wind_y), ...]
 
     """
@@ -180,8 +194,8 @@ def get_cyclepoint(offset_hours):
     ).communicate()[0].strip().decode()
 
 
-def main(forecast_interval, forecast_itterations):
-    # Get suite settings.
+def main(forecast_interval, forecast_iterations):
+    # Get workflow settings.
     domain = util.parse_domain(os.environ['DOMAIN'])
     resolution = float(os.environ['RESOLUTION'])
 
@@ -212,7 +226,7 @@ def main(forecast_interval, forecast_itterations):
 
     # Generate forecasts.
     forecasts = {}
-    for lead_minutes in range(0, forecast_interval * (forecast_itterations + 1),
+    for lead_minutes in range(0, forecast_interval * (forecast_iterations + 1),
                               forecast_interval):
         forecast_name = '+PT%02dH%02dM' % (lead_minutes // 60,
                                            lead_minutes % 60)

@@ -1,1 +1,0 @@
-cylc validate "$TUT_DIR" --icp=2000

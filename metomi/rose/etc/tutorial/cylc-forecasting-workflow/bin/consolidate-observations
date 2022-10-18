@@ -1,16 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# Copyright (C) British Crown (Met Office) & Contributors - GNU V3+.
+# THIS FILE IS PART OF THE CYLC WORKFLOW ENGINE.
+# Copyright (C) NIWA & British Crown (Met Office) & Contributors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# -----------------------------------------------------------------------------
 # This is illustrative code developed for tutorial purposes, it is not
 # intended for scientific use and is not guarantied to be accurate or correct.
-# -----------------------------------------------------------------------------
 """
 Usage:
     consolidate-observations
 
 Environment Variables:
-    DOMIAN: The area in which to generate forecasts for in the format
+    DOMAIN: The area in which to generate forecasts for in the format
         (lng1, lat1, lng2, lat2).
     RESOLUTION: The length/width of each grid cell in degrees.
 
@@ -26,7 +40,7 @@ import util
 
 def plot_wind_data(wind_x, wind_y, x_range, y_range, x_coords, y_coords,
                    z_coords):
-    """Generate a 2D vector plot of the wind data if matplotlib is installed."""
+    """Generate a 2D vector plot of the wind data if matplotlib is installed"""
     try:
         import matplotlib
         matplotlib.use('Agg')
@@ -54,7 +68,7 @@ def get_wind_fields():
     """Read in wind.csv files, interpolate and return the wind fields."""
     # Filename glob for observation files.
     files = glob(os.path.join(
-        os.environ['CYLC_SUITE_WORK_DIR'],
+        os.environ['CYLC_WORKFLOW_WORK_DIR'],
         os.environ['CYLC_TASK_CYCLE_POINT'],
         'get_observations*',
         'wind.csv'))
@@ -67,10 +81,11 @@ def get_wind_fields():
     data.sort(key=lambda x: x[1])
 
     # Convert data into (lat, lng, (wind_x, wind_y)) components.
-    x_coords = [datum[0] for datum in data]
-    y_coords = [datum[1] for datum in data]
+    x_coords = [datum[1] for datum in data]
+    y_coords = [datum[0] for datum in data]
     z_coords = [(datum[3] * math.sin(math.radians(datum[2])),
-                 datum[3] * math.cos(math.radians(datum[2]))) for datum in data]
+                 datum[3] * math.cos(math.radians(datum[2])))
+                for datum in data]
 
     # Interpolate this data to generate wind "fields".
     wind_x = util.SurfaceFitter(x_coords, y_coords, [x[0] for x in z_coords])

@@ -1,41 +1,39 @@
+#!jinja2
 [scheduler]
     UTC mode = True
-    [[parameters]]
-        # A list of the weather stations we will be fetching observations from.
-        station = camborne, heathrow, shetland, belmullet
-        # A list of the sites we will be generating forecasts for.
-        site = exeter
+[task parameters]
+    # A list of the weather stations we will be fetching observations from.
+    station = camborne, heathrow, shetland, aldergrove
+    # A list of the sites we will be generating forecasts for.
+    site = exeter
 
 [scheduling]
-    # Start the suite 7 hours before now ignoring minutes and seconds
+    # Start the workflow 7 hours before now ignoring minutes and seconds
     # * previous(T-00) takes the current time ignoring minutes and seconds.
     # * - PT7H subtracts 7 hours from the time.
     initial cycle point = previous(T-00) - PT7H
-    # Stop the suite 6 hours after the initial cycle point.
+    # Stop the workflow 6 hours after the initial cycle point.
     final cycle point = +PT6H
-    [[dependencies]]
-        [[[PT3H]]]
-            # Repeat every three hours starting at the initial cycle point.
-            graph = """
-                get_observations<station> => consolidate_observations
-            """
+    [[graph]]
+        # Repeat every three hours starting at the initial cycle point.
+        PT3H = """
+            get_observations<station> => consolidate_observations
+        """
 
-        [[[+PT6H/PT6H]]]
-            # Repeat every six hours starting six hours after the initial
-            # cycle point.
-            graph = """
-                consolidate_observations => forecast
-                consolidate_observations[-PT3H] => forecast
-                consolidate_observations[-PT6H] => forecast
-                get_rainfall => forecast => post_process<site>
-            """
+        # Repeat every six hours starting six hours after the initial
+        # cycle point.
+        +PT6H/PT6H = """
+            consolidate_observations => forecast
+            consolidate_observations[-PT3H] => forecast
+            consolidate_observations[-PT6H] => forecast
+            get_rainfall => forecast => post_process<site>
+        """
 
-        [[[+PT12H/PT6H]]]
-            # Repeat every six hours starting twelve hours after the initial
-            # cycle point.
-            graph = """
-                forecast[-PT6H] => forecast
-            """
+        # Repeat every six hours starting twelve hours after the initial
+        # cycle point.
+        +PT12H/PT6H = """
+            forecast[-PT6H] => forecast
+        """
 
 [runtime]
     [[root]]
@@ -53,9 +51,9 @@
             # To use archived data comment this line out.
             API_KEY = DATAPOINT_API_KEY
 
-    [[get_observations<station=belmullet>]]
+    [[get_observations<station=aldergrove>]]
         [[[environment]]]
-            SITE_ID = 3976
+            SITE_ID = 3917
     [[get_observations<station=camborne>]]
         [[[environment]]]
             SITE_ID = 3808
@@ -81,16 +79,18 @@
         [[[environment]]]
             # The path to the files containing wind data (the {variables} will
             # get substituted in the forecast script).
-            WIND_FILE_TEMPLATE = $CYLC_SUITE_WORK_DIR/{cycle}/consolidate_observations/wind_{xy}.csv
+            WIND_FILE_TEMPLATE = $CYLC_WORKFLOW_WORK_DIR/{cycle}/consolidate_observations/wind_{xy}.csv
             # Offset in hours to cycles to process wind data from.
             WIND_CYCLES = 0, -3, -6
             # The path to the rainfall file.
-            RAINFALL_FILE = $CYLC_SUITE_WORK_DIR/$CYLC_TASK_CYCLE_POINT/get_rainfall/rainfall.csv
+            RAINFALL_FILE = $CYLC_WORKFLOW_WORK_DIR/$CYLC_TASK_CYCLE_POINT/get_rainfall/rainfall.csv
             # Create the html map file in the task's log directory.
             MAP_FILE = "${CYLC_TASK_LOG_ROOT}-map.html"
             # The path to the template file used to generate the html map.
-            MAP_TEMPLATE = "$CYLC_SUITE_RUN_DIR/lib/template/map.html"
+            MAP_TEMPLATE = "$CYLC_WORKFLOW_RUN_DIR/lib/template/map.html"
 
     [[post_process<site>]]
         # Generate a forecast for the location <site> 60 minutes in the future.
         script = post-process $CYLC_TASK_PARAM_site 60
+
+{% include 'etc/python-job.settings' %}

@@ -1,14 +1,31 @@
-# Copyright (C) British Crown (Met Office) & Contributors - GNU V3+.
+# -*- coding: utf-8 -*-
+# -----------------------------------------------------------------------------
+# THIS FILE IS PART OF THE CYLC WORKFLOW ENGINE.
+# Copyright (C) NIWA & British Crown (Met Office) & Contributors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# -----------------------------------------------------------------------------
 # This is illustrative code developed for tutorial purposes, it is not
 # intended for scientific use and is not guarantied to be accurate or correct.
-# -----------------------------------------------------------------------------
 from copy import copy
+from contextlib import suppress
 import math
+import jinja2
 import sys
 
-import jinja2
 
-R_0 = 6371.0  # Radius of the Earth (km).
+R_0 = 6371.  # Radius of the Earth (km).
 
 
 def frange(start, stop, step):
@@ -52,19 +69,18 @@ def field_to_csv(field, x_range, y_range, filename):
         x_range (list): List of the x coordinates of the extrapolated grid.
             These are the extrapolation coordinates, the length of this list
             defines the size of the grid.
-        x_range (list): List of the y coordinates of the extrapolated grid.
+        y_range (list): List of the y coordinates of the extrapolated grid.
             These are the extrapolation coordinates, the length of this list
             defines the size of the grid.
 
     """
     with open(filename, 'w+') as csv_file:
         for itt_y in y_range:
-            csv_file.write(
-                ', '.join('%.2f' % field(x, itt_y) for x in x_range) + '\n'
-            )
+            csv_file.write(', '.join('%.2f' % field(x, itt_y) for
+                                     x in x_range) + '\n')
 
 
-def generate_matrix(dim_x, dim_y, value=0.0):
+def generate_matrix(dim_x, dim_y, value=0.):
     """Generates a 2D list with the desired dimensions.
 
     Args:
@@ -103,15 +119,12 @@ def great_arc_distance(coordinate_1, coordinate_2):
     lng_2 = math.radians(lng_2)
     lat_2 = math.radians(lat_2)
     return (
-        2
-        * R_0
-        * math.asin(
+        2 * R_0 * math.asin(
             math.sqrt(
-                (math.sin((lat_2 - lat_1) / 2.0) ** 2)
-                + (
-                    math.cos(lat_1)
-                    * math.cos(lat_2)
-                    * (math.sin((lng_2 - lng_1) / 2.0) ** 2)
+                (math.sin((lat_2 - lat_1) / 2.) ** 2) + (
+                    math.cos(lat_1) *
+                    math.cos(lat_2) *
+                    (math.sin((lng_2 - lng_1) / 2.) ** 2)
                 )
             )
         )
@@ -136,13 +149,13 @@ def interpolate_grid(points, dim_x, dim_y, d_x, d_y, spline_order=0):
         data.
 
     """
-
     def spline_0(pos_x, pos_y, z_val):
         """Zeroth order beta spline (i.e. nearest point)."""
         return [(int(round(pos_x)), int(round(pos_y)), z_val)]  # [(x, y, z)]
 
     def spline_1(pos_x, pos_y, z_val):
-        """First order beta spline (weight spread about four nearest ponts)."""
+        """First order beta spline (weight spread about four nearest
+        points)."""
         x_0 = int(math.floor(pos_x))
         y_0 = int(math.floor(pos_y))
         x_1 = x_0 + 1
@@ -152,29 +165,26 @@ def interpolate_grid(points, dim_x, dim_y, d_x, d_y, spline_order=0):
             (x_0, y_0, (x_0 + d_x - pos_x) * (y_0 + d_y - pos_y) * z_val),
             (x_1, y_0, (pos_x - x_0) * (y_0 + d_y - pos_y) * z_val),
             (x_0, y_1, (x_0 + d_x - pos_x) * (pos_y - y_0) * z_val),
-            (x_1, y_1, (pos_x - x_0) * (pos_y - y_0) * z_val),
+            (x_1, y_1, (pos_x - x_0) * (pos_y - y_0) * z_val)
         ]
 
     if spline_order == 0:
         spline = spline_0
-    elif spline_order == 1:
+    elif spline_order == 1:  # noqa: SIM106 (case type matching)
         spline = spline_1
     else:
-        raise ValueError(
-            'Invalid spline order "%d" must be in (0, 1).' % spline_order
-        )
+        raise ValueError('Invalid spline order "%d" must be in (0, 1).' %
+                         spline_order)
 
-    grid = generate_matrix(dim_x, dim_y, 0.0)
+    grid = generate_matrix(dim_x, dim_y, 0.)
 
     for x_val, y_val, z_val in points:
         x_coord = x_val / d_x
         y_coord = y_val / d_y
         for grid_x, grid_y, grid_z in spline(x_coord, y_coord, z_val):
-            try:
+            with suppress(IndexError):
                 grid[grid_y][grid_x] += grid_z
-            except IndexError:
-                # Grid point out of bounds => skip.
-                pass
+                # skip grid point out of bounds
 
     return grid
 
@@ -182,7 +192,6 @@ def interpolate_grid(points, dim_x, dim_y, d_x, d_y, spline_order=0):
 def plot_vector_grid(filename, x_grid, y_grid):
     try:
         import matplotlib
-
         matplotlib.use('Agg')
         import matplotlib.pyplot as plt
     except ImportError:
@@ -199,15 +208,13 @@ def plot_vector_grid(filename, x_grid, y_grid):
             y_coords.append(itt_y)
             z_coords.append((
                 x_grid[itt_y][itt_x],
-                y_grid[itt_y][itt_x],
+                y_grid[itt_y][itt_x]
             ))
 
-    plt.quiver(
-        x_coords,
-        y_coords,
-        [x[0] for x in z_coords],
-        [y[1] for y in z_coords],
-    )
+    plt.quiver(x_coords,
+               y_coords,
+               [x[0] for x in z_coords],
+               [y[1] for y in z_coords])
     fig.savefig(filename)
 
 
@@ -217,8 +224,7 @@ def get_grid_coordinates(lng, lat, domain, resolution):
     length_y = int(abs(domain['lat2'] - domain['lat1']) // resolution)
     return (
         int((abs(lng - domain['lng1'])) // resolution),
-        length_y - int((abs(lat - domain['lat1'])) // resolution),
-    )
+        length_y - int((abs(lat - domain['lat1'])) // resolution))
 
 
 class SurfaceFitter:
@@ -243,11 +249,11 @@ class SurfaceFitter:
         self.points = list(zip(x_points, y_points, z_points))
 
         if kind == 'linear':
-            self.power = 1.0
+            self.power = 1.
         elif kind == 'quadratic':
-            self.power = 2.0
-        elif kind == 'cubic':
-            self.power = 3.0
+            self.power = 2.
+        elif kind == 'cubic':  # noqa: SIM106 (case type matching)
+            self.power = 3.
         else:
             raise ValueError('"%s" is not a valid interpolation method' % kind)
 
@@ -264,7 +270,7 @@ class SurfaceFitter:
                 z_val = z_point
                 break
             else:
-                weight = 1.0 / ((math.sqrt(d_x ** 2 + d_y ** 2)) ** self.power)
+                weight = 1. / ((math.sqrt(d_x ** 2 + d_y ** 2)) ** self.power)
                 sum_weight += weight
                 sum_value += weight * z_point
 
@@ -280,20 +286,18 @@ def parse_domain(domain):
         'lng1': bbox[0],
         'lat1': bbox[1],
         'lng2': bbox[2],
-        'lat2': bbox[3],
+        'lat2': bbox[3]
     }
 
 
 def generate_html_map(filename, template_file, data, domain, resolution):
-    with open(template_file, 'r') as template:
+    with open(template_file, 'r') as template:  # noqa: SIM117
         with open(filename, 'w+') as html_file:
-            html_file.write(
-                jinja2.Template(template.read()).render(
-                    resolution=resolution,
-                    lng1=domain['lng1'],
-                    lng2=domain['lng2'],
-                    lat1=domain['lat1'],
-                    lat2=domain['lat2'],
-                    data=data,
-                )
-            )
+            html_file.write(jinja2.Template(template.read()).render(
+                resolution=resolution,
+                lng1=domain['lng1'],
+                lng2=domain['lng2'],
+                lat1=domain['lat1'],
+                lat2=domain['lat2'],
+                data=data
+            ))
