@@ -15,3 +15,4 @@ htmlcov/
 *.egg-info
 .vscode/
 .pytest_cache/
+node_modules/
