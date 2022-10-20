@@ -334,7 +334,7 @@ Start, Stop, Restart
 
       * Camborne - ``3808``
       * Shetland - ``3005``
-      * Belmullet - ``3976``
+      * aldergrove - ``3917``
 
       .. spoiler:: Solution warning
 
@@ -356,10 +356,10 @@ Start, Stop, Restart
                     [[[environment]]]
                         SITE_ID = 3005
                         API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-                [[get_observations_belmullet]]
+                [[get_observations_aldergrove]]
                     script = get-observations
                     [[[environment]]]
-                        SITE_ID = 3976
+                        SITE_ID = 3917
                         API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
       Check the ``suite.rc`` file is valid by running the command:
@@ -449,7 +449,7 @@ Start, Stop, Restart
             cylc gui runtime-tutorial &
 
          Run the suite either by:
-          
+
          * Pressing the play button in the Cylc GUI. Then, ensuring that
            "Cold Start" is selected within the dialogue window, pressing the
            "Start" button.
@@ -500,4 +500,3 @@ Start, Stop, Restart
            i.e. the final cycle point.
          * ``task-name`` - set this to "forecast".
          * ``submission-number`` - set this to "01".
-

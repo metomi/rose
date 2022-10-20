@@ -8,7 +8,7 @@
         [[[PT3H]]]
             # Repeat every three hours starting at the initial cycle point.
             graph = """
-                get_observations_belmullet => consolidate_observations
+                get_observations_aldergrove => consolidate_observations
                 get_observations_camborne => consolidate_observations
                 get_observations_heathrow => consolidate_observations
                 get_observations_shetland => consolidate_observations

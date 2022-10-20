@@ -9,7 +9,7 @@
                 get_observations_camborne => consolidate_observations
                 get_observations_heathrow => consolidate_observations
                 get_observations_shetland => consolidate_observations
-                get_observations_belmullet => consolidate_observations
+                get_observations_aldergrove => consolidate_observations
             """
         [[[T06/PT6H]]]
             graph = """
@@ -25,7 +25,7 @@
             """
 
 [runtime]
-    [[get_observations_belmullet]]
+    [[get_observations_aldergrove]]
         script = get-observations
 
     [[get_observations_camborne]]
