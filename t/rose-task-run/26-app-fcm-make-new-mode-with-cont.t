@@ -51,8 +51,8 @@ run_pass "${TEST_KEY_BASE}-install" \
     cylc install \
         --workflow-name="${FLOW}" \
         --no-run-name \
-        -C "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}" \
-        -S "HOST='${JOB_HOST}'"
+        -S "HOST='${JOB_HOST}'" \
+        "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}"
 
 # Add some garbage before running the suite
 ssh -n -oBatchMode=yes "${JOB_HOST}" \
