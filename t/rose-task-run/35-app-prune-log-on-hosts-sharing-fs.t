@@ -55,7 +55,7 @@ run_pass "${TEST_KEY}" \
 
 TEST_KEY="${TEST_KEY_BASE}-prune.log"
 grep \
-    "ssh .* \\(${JOB_HOST_1}\\|${JOB_HOST_2}\\).* ls. -d..* 19700101T0000Z" \
+    "ssh .* \\(${JOB_HOST_1}\\|${JOB_HOST_2}\\).* ls -d.* 19700101T0000Z" \
     "${FLOW_RUN_DIR}/prune.log" >'prune-ssh.log'
 run_pass "${TEST_KEY}-prune-ssh-wc-l" test "$(wc -l <'prune-ssh.log')" -eq 2
 
