@@ -23,8 +23,11 @@ runs:
         CYLC_ROSE_GITHUB: git+https://github.com/cylc/cylc-rose
         CYLC_ROSE_REF: ${{ inputs.cylc-rose-ref }}
       run: |
+        # $GITHUB_BASE_REF for pull_request event or $GITHUB_REF_NAME for push event
+        BASE_REF="${GITHUB_BASE_REF:-$GITHUB_REF_NAME}"
+
         # NOTE: hard-coded branches need to be manually updated as necessary.
-        if [[ "$GITHUB_BASE_REF" == '2.0.x' ]]; then
+        if [[ "$BASE_REF" == '2.0.x' ]]; then
           : ${CYLC_FLOW_REF:='8.0.x'}
           : ${CYLC_ROSE_REF:='1.1.x'}
         fi
