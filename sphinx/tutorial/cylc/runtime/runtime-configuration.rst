@@ -334,7 +334,7 @@ Start, Stop, Restart
 
       * Camborne - ``3808``
       * Shetland - ``3005``
-      * aldergrove - ``3917``
+      * Aldergrove - ``3917``
 
       .. spoiler:: Solution warning
 

@@ -248,7 +248,7 @@ Parameters can be either words or integers:
 
          The relevant IDs are:
 
-         * aldergrove - ``3917``
+         * Aldergrove - ``3917``
          * Camborne - ``3808``
          * Heathrow - ``3772``
          * Shetland - ``3005``
