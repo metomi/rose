@@ -3,7 +3,7 @@
     UTC mode = True
     [[parameters]]
         # A list of the weather stations we will be fetching observations from.
-        station = camborne, heathrow, shetland, belmullet
+        station = camborne, heathrow, shetland, aldergrove
         # A list of the sites we will be generating forecasts for.
         site = exeter
 
@@ -52,9 +52,9 @@
             # To use archived data comment this line out.
             API_KEY = DATAPOINT_API_KEY
 
-    [[get_observations<station=belmullet>]]
+    [[get_observations<station=aldergrove>]]
         [[[environment]]]
-            SITE_ID = 3976
+            SITE_ID = 3917
     [[get_observations<station=camborne>]]
         [[[environment]]]
             SITE_ID = 3808

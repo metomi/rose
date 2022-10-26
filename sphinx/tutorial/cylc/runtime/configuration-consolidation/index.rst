@@ -33,10 +33,10 @@ Consolidating Configuration
               [[[environment]]]
                   SITE_ID = 3005
                   API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-          [[get_observations_belmullet]]
+          [[get_observations_aldergrove]]
               script = get-observations
               [[[environment]]]
-                  SITE_ID = 3976
+                  SITE_ID = 3917
                   API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
 .. ifnotslides::
@@ -68,7 +68,7 @@ Consolidating Configuration
           [[dependencies]]
               [[[T00/PT3H]]]
                   graph = """
-                      get_observations_belmullet => consolidate_observations
+                      get_observations_aldergrove => consolidate_observations
                       get_observations_camborne => consolidate_observations
                       get_observations_heathrow => consolidate_observations
                       get_observations_shetland => consolidate_observations

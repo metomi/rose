@@ -78,7 +78,7 @@ define a dictionary of station and ID pairs:
 
 .. code-block:: css+jinja
 
-   {% set stations = {'belmullet': 3976,
+   {% set stations = {'aldergrove': 3917,
                       'camborne': 3808,
                       'heathrow': 3772,
                       'shetland': 3005} %}
@@ -97,7 +97,7 @@ After processing, this would result in:
 
 .. code-block:: none
 
-       belmullet
+       aldergrove
        camborne
        heathrow
        shetland
@@ -116,7 +116,7 @@ This would result in:
 
 .. code-block:: none
 
-       belmullet - 3976
+       aldergrove - 3917
        camborne - 3808
        heathrow - 3772
        shetland - 3005
@@ -132,7 +132,7 @@ This would result in:
 
    #!Jinja2
 
-   {% set stations = {'belmullet': 3976,
+   {% set stations = {'aldergrove': 3917,
                       'camborne': 3808,
                       'heathrow': 3772,
                       'shetland': 3005} %}
@@ -217,10 +217,10 @@ This would result in:
                      SITE_ID = 3005
          -            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
          +            API_KEY = {{ API_KEY }}
-              [[get_observations_belmullet]]
+              [[get_observations_aldergrove]]
                   script = get-observations
                   [[[environment]]]
-                      SITE_ID = 3976
+                      SITE_ID = 3917
          -            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
          +            API_KEY = {{ API_KEY }}
              [[get_rainfall]]
