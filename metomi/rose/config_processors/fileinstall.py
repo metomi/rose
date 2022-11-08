@@ -624,10 +624,15 @@ class LocSubPath:
             File type and mode bits (see os.stat_result:st_mode).
     """
 
-    def __init__(self, name, checksum=None, access_mode=None):
-        self.name: str = name
-        self.checksum: Any = checksum
-        self.access_mode: Optional[int] = access_mode
+    def __init__(
+        self,
+        name: str,
+        checksum: Any = None,
+        access_mode: Optional[int] = None
+    ):
+        self.name = name
+        self.checksum = checksum
+        self.access_mode = access_mode
 
     def __lt__(self, other):
         return (self.name, self.checksum, self.access_mode) < (
