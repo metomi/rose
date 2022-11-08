@@ -25,7 +25,7 @@ import socket
 import sqlite3
 import tarfile
 from time import sleep
-from typing import Any, List, Tuple, Union
+from typing import Any, List, Optional, Tuple
 from uuid import uuid4
 
 from metomi.rose.fs_util import FileSystemEvent
@@ -68,7 +68,7 @@ class CylcProcessor(SuiteEngineProcessor):
         return os.path.join(cls.SUITE_DIR_REL_ROOT, suite_name, *paths)
 
     def get_suite_jobs_auths(
-        self, suite_name: str, cycle_name_tuples: Tuple[Any] = None
+        self, suite_name: str, cycle_name_tuples: Optional[Tuple[Any]] = None
     ) -> List[str]:
         """Get hosts of jobs from a Cylc workflow database.
 
@@ -95,7 +95,7 @@ class CylcProcessor(SuiteEngineProcessor):
 
     def get_task_auth(
         self, suite_name: str, task_name: str
-    ) -> Union[str, None]:
+    ) -> Optional[str]:
         """Get host for a remote task from a Cylc workflow definition.
 
         Returns: Hostname, or None if:
