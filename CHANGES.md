@@ -3,6 +3,13 @@
 Go to https://github.com/metomi/rose/milestones?state=closed
 for a full listing of issues for each release.
 
+## 2019.01.8 (2022-12-20)
+
+### Fixes
+
+[#2633](https://github.com/metomi/rose/pull/2633) - Fix problems with the
+Cylc and Rose tutorials.
+
 ## 2019.01.7 (2022-04-13)
 
 ### Fixes
