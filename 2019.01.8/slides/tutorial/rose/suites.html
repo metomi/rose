@@ -346,7 +346,7 @@ useful to be able to configure:</p>
 <p>Define these settings in the <a class="reference internal" href="../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> file by adding
 the following lines:</p>
 <div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[jinja2:suite.rc]</span>
-<span class="nv">station</span><span class="o">=</span><span class="s">&quot;camborne&quot;, &quot;heathrow&quot;, &quot;shetland&quot;, &quot;belmullet&quot;</span>
+<span class="nv">station</span><span class="o">=</span><span class="s">&quot;camborne&quot;, &quot;heathrow&quot;, &quot;shetland&quot;, &quot;aldergrove&quot;</span>
 
 <span class="nt">[env]</span>
 <span class="nv">RESOLUTION</span><span class="o">=</span><span class="s">0.2</span>
@@ -415,7 +415,7 @@ filter to write the commas between the list items:</p>
      UTC mode = True
      [[parameters]]
          # A list of the weather stations we will be fetching observations from.
-<span class="gd">-        station = camborne, heathrow, shetland, belmullet</span>
+<span class="gd">-        station = camborne, heathrow, shetland, aldergrove</span>
 <span class="gi">+        station = {{ station | join(&quot;, &quot;) }}</span>
          # A list of the sites we will be generating forecasts for.
          site = exeter

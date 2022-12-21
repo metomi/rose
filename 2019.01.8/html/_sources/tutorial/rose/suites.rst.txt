@@ -334,7 +334,7 @@ See the :ref:`Cheat Sheet` for more information.
       .. code-block:: rose
 
          [jinja2:suite.rc]
-         station="camborne", "heathrow", "shetland", "belmullet"
+         station="camborne", "heathrow", "shetland", "aldergrove"
 
          [env]
          RESOLUTION=0.2
@@ -411,7 +411,7 @@ See the :ref:`Cheat Sheet` for more information.
               UTC mode = True
               [[parameters]]
                   # A list of the weather stations we will be fetching observations from.
-         -        station = camborne, heathrow, shetland, belmullet
+         -        station = camborne, heathrow, shetland, aldergrove
          +        station = {{ station | join(", ") }}
                   # A list of the sites we will be generating forecasts for.
                   site = exeter
@@ -719,6 +719,6 @@ Rose Bush
       to least recent. Near the top you should see an entry for the
       ``forecast`` task. On the right-hand side of the screen click
       :guilabel:`job-map.html`.
-      
+
       As this file has a ``.html`` extension Rose Bush will render it.
       The raw text would be displayed otherwise.

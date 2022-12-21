@@ -375,13 +375,13 @@ the <a class="reference external" href="https://cylc.github.io/documentation.htm
             <p class="warning">digraph example {
 size = &quot;7,4&quot;
 
-get_observations_belmullet -&gt; consolidate_observations
+get_observations_aldergrove -&gt; consolidate_observations
 get_observations_camborne -&gt; consolidate_observations
 get_observations_heathrow -&gt; consolidate_observations
 get_observations_shetland -&gt; consolidate_observations
 
 hidden [style=&quot;invis&quot;]
-get_observations_belmullet -&gt; hidden [style=&quot;invis&quot;]
+get_observations_aldergrove -&gt; hidden [style=&quot;invis&quot;]
 get_observations_camborne -&gt; hidden [style=&quot;invis&quot;]
 hidden -&gt; consolidate_observations [style=&quot;invis&quot;]
 }</p></object>
@@ -543,7 +543,7 @@ task.</li>
     <span class="nt">[[dependencies]]</span>
         <span class="nt">[[[PT3H]]]</span>
             <span class="nv">graph</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-                <span class="kd">get_observations_belmullet</span> <span class="o">=&gt;</span> <span class="kd">consolidate_observations</span>
+                <span class="kd">get_observations_aldergrove</span> <span class="o">=&gt;</span> <span class="kd">consolidate_observations</span>
                 <span class="kd">get_observations_camborne</span> <span class="o">=&gt;</span> <span class="kd">consolidate_observations</span>
                 <span class="kd">get_observations_heathrow</span> <span class="o">=&gt;</span> <span class="kd">consolidate_observations</span>
                 <span class="kd">get_observations_shetland</span> <span class="o">=&gt;</span> <span class="kd">consolidate_observations</span>

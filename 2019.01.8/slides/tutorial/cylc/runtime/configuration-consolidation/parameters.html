@@ -225,9 +225,9 @@ the parameter, e.g. the following lines are equivalent:</p>
         <span class="nt">[[[environment]]]</span>
             <span class="nv">API_KEY </span><span class="o">=</span><span class="s"> xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
 
-    <span class="nt">[[get_observations</span>&lt;<span class="nb">station=belmullet</span>&gt;<span class="nt">]]</span>
+    <span class="nt">[[get_observations</span>&lt;<span class="nb">station=aldergrove</span>&gt;<span class="nt">]]</span>
         <span class="nt">[[[environment]]]</span>
-            <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3976</span>
+            <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3917</span>
     <span class="nt">[[get_observations</span>&lt;<span class="nb">station=camborne</span>&gt;<span class="nt">]]</span>
         <span class="nt">[[[environment]]]</span>
             <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3808</span>
@@ -263,7 +263,7 @@ the parameter, e.g. the following lines are equivalent:</p>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span> [cylc]
      UTC mode = True
 <span class="gi">+    [[parameters]]</span>
-<span class="gi">+        station = belmullet, camborne, heathrow, shetland</span>
+<span class="gi">+        station = aldergrove, camborne, heathrow, shetland</span>
 </pre></div>
 </div>
 <p>Remove the four <code class="docutils literal notranslate"><span class="pre">get_observations</span></code> tasks and insert the following code
@@ -292,7 +292,7 @@ environment variable. Add a new section for each station with a
 <p class="first admonition-title">Hint</p>
 <p>The relevant IDs are:</p>
 <ul class="last simple">
-<li>Belmullet - <code class="docutils literal notranslate"><span class="pre">3976</span></code></li>
+<li>Aldergrove - <code class="docutils literal notranslate"><span class="pre">3917</span></code></li>
 <li>Camborne - <code class="docutils literal notranslate"><span class="pre">3808</span></code></li>
 <li>Heathrow - <code class="docutils literal notranslate"><span class="pre">3772</span></code></li>
 <li>Shetland - <code class="docutils literal notranslate"><span class="pre">3005</span></code></li>
@@ -300,9 +300,9 @@ environment variable. Add a new section for each station with a
 </div>
 <div class="spoiler warning admonition">
 <p class="first admonition-title">Solution</p>
-<div class="last highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[get_observations</span>&lt;<span class="nb">station=belmullet</span>&gt;<span class="nt">]]</span>
+<div class="last highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[get_observations</span>&lt;<span class="nb">station=aldergrove</span>&gt;<span class="nt">]]</span>
     <span class="nt">[[[environment]]]</span>
-        <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3976</span>
+        <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3917</span>
 <span class="nt">[[get_observations</span>&lt;<span class="nb">station=camborne</span>&gt;<span class="nt">]]</span>
     <span class="nt">[[[environment]]]</span>
         <span class="nv">SITE_ID </span><span class="o">=</span><span class="s"> 3808</span>
@@ -326,7 +326,7 @@ graphing. Replace the <code class="docutils literal notranslate"><span class="pr
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span> [[[PT3H]]]
      # Repeat every three hours starting at the initial cycle point.
      graph = &quot;&quot;&quot;
-<span class="gd">-        get_observations_belmullet =&gt; consolidate_observations</span>
+<span class="gd">-        get_observations_aldergrove =&gt; consolidate_observations</span>
 <span class="gd">-        get_observations_camborne =&gt; consolidate_observations</span>
 <span class="gd">-        get_observations_heathrow =&gt; consolidate_observations</span>
 <span class="gd">-        get_observations_shetland =&gt; consolidate_observations</span>
@@ -360,7 +360,7 @@ avoid having to write out this section twice.</p>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span> [cylc]
      UTC mode = True
      [[parameters]]
-         station = belmullet, camborne, heathrow, shetland
+         station = aldergrove, camborne, heathrow, shetland
 <span class="gi">+        site = exeter, edinburgh</span>
 </pre></div>
 </div>

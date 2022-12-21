@@ -9,23 +9,23 @@
 <g id="graph0" class="graph" transform="scale(0.501992 0.501992) rotate(0) translate(4 184)">
 <title>example</title>
 <polygon fill="none" stroke="none" points="-4,5 -4,-184 1001,-184 1001,5 -4,5"/>
-<!-- get_observations_belmullet -->
-<g id="node1" class="node"><title>get_observations_belmullet</title>
+<!-- get_observations_aldergrove -->
+<g id="node1" class="node"><title>get_observations_aldergrove</title>
 <ellipse fill="none" stroke="black" cx="139" cy="-162" rx="139.132" ry="18"/>
-<text text-anchor="middle" x="139" y="-158.3" font-family="sans" font-size="14.00">get_observations_belmullet</text>
+<text text-anchor="middle" x="139" y="-158.3" font-family="sans" font-size="14.00">get_observations_aldergrove</text>
 </g>
 <!-- consolidate_observations -->
 <g id="node2" class="node"><title>consolidate_observations</title>
 <ellipse fill="none" stroke="black" cx="399" cy="-18" rx="128.533" ry="18"/>
 <text text-anchor="middle" x="399" y="-14.3" font-family="sans" font-size="14.00">consolidate_observations</text>
 </g>
-<!-- get_observations_belmullet&#45;&gt;consolidate_observations -->
-<g id="edge1" class="edge"><title>get_observations_belmullet&#45;&gt;consolidate_observations</title>
+<!-- get_observations_aldergrove&#45;&gt;consolidate_observations -->
+<g id="edge1" class="edge"><title>get_observations_aldergrove&#45;&gt;consolidate_observations</title>
 <path fill="none" stroke="black" d="M162.908,-144.053C190.063,-125.197 236.057,-94.4358 278,-72 300.548,-59.9389 326.408,-48.33 348.418,-39.0674"/>
 <polygon fill="black" stroke="black" points="350.026,-42.1894 357.914,-35.1156 347.336,-35.7268 350.026,-42.1894"/>
 </g>
 <!-- hidden -->
-<!-- get_observations_belmullet&#45;&gt;hidden -->
+<!-- get_observations_aldergrove&#45;&gt;hidden -->
 <!-- get_observations_camborne -->
 <g id="node3" class="node"><title>get_observations_camborne</title>
 <ellipse fill="none" stroke="black" cx="439" cy="-162" rx="142.481" ry="18"/>

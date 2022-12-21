@@ -149,7 +149,7 @@ top of the file:</p>
 
 <p>To consolidate the configuration for the <code class="docutils literal notranslate"><span class="pre">get_observations</span></code> tasks we could
 define a dictionary of station and ID pairs:</p>
-<div class="highlight-css+jinja notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">set</span> <span class="nv">stations</span> <span class="o">=</span> <span class="o">{</span><span class="s1">&#39;belmullet&#39;</span><span class="o">:</span> <span class="m">3976</span><span class="o">,</span>
+<div class="highlight-css+jinja notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">set</span> <span class="nv">stations</span> <span class="o">=</span> <span class="o">{</span><span class="s1">&#39;aldergrove&#39;</span><span class="o">:</span> <span class="m">3917</span><span class="o">,</span>
                    <span class="s1">&#39;camborne&#39;</span><span class="o">:</span> <span class="m">3808</span><span class="o">,</span>
                    <span class="s1">&#39;heathrow&#39;</span><span class="o">:</span> <span class="m">3772</span><span class="o">,</span>
                    <span class="s1">&#39;shetland&#39;</span><span class="o">:</span> <span class="m">3005</span><span class="o">}</span> <span class="cp">%}</span>
@@ -171,7 +171,7 @@ define a dictionary of station and ID pairs:</p>
 </pre></div>
 </div>
 <p>After processing, this would result in:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>belmullet
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>aldergrove
 camborne
 heathrow
 shetland
@@ -193,7 +193,7 @@ shetland
 </pre></div>
 </div>
 <p>This would result in:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>belmullet - 3976
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>aldergrove - 3917
 camborne - 3808
 heathrow - 3772
 shetland - 3005
@@ -210,7 +210,7 @@ shetland - 3005
 
 <div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="ch">#!Jinja2</span>
 
-<span class="cp">{% set stations = {&#39;belmullet&#39;: 3976,</span>
+<span class="cp">{% set stations = {&#39;aldergrove&#39;: 3917,</span>
 <span class="cp">                   &#39;camborne&#39;: 3808,</span>
 <span class="cp">                   &#39;heathrow&#39;: 3772,</span>
 <span class="cp">                   &#39;shetland&#39;: 3005} %}</span>
@@ -295,10 +295,10 @@ define an <code class="docutils literal notranslate"><span class="pre">API_KEY</
             SITE_ID = 3005
 <span class="gd">-            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
 <span class="gi">+            API_KEY = {{ API_KEY }}</span>
-     [[get_observations_belmullet]]
+     [[get_observations_aldergrove]]
          script = get-observations
          [[[environment]]]
-             SITE_ID = 3976
+             SITE_ID = 3917
 <span class="gd">-            API_KEY = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>
 <span class="gi">+            API_KEY = {{ API_KEY }}</span>
     [[get_rainfall]]
