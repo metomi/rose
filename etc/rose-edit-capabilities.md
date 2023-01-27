@@ -353,9 +353,235 @@ Rose Edit provides widgets for:
 > * [valuewidget](https://github.com/metomi/rose/tree/2019.01.x/lib/python/rose/config_editor/valuewidget)
 > * [panelwidget](https://github.com/metomi/rose/tree/2019.01.x/lib/python/rose/config_editor/panelwidget)
 
-> **TODO:**
-> Explore the widgets and record the key capabilities.
 
+> Explore the widgets and record the key capabilities.
+ 
+
+In general, the use of these widgets for an app like this can be done in a more flexible and modern way using web based libraries and technologies for existing and new features. 
+
+There is little from here to be reproduced as modern javascript ui library capabilities covers most of the functionality seen here. 
+
+ 
+
+Rather than mapping out every piece of functionality available from existing widgets and working out how to map that into a replacement technology to replace functionality in Rose Edit II, it is more useful to consider the architecture change from a top down perspective. In this way, by mapping the different data types and formats from the metadata into translated json-schema and subsequent json-forms we can identify what types of required functionality are not provided by the off-the-shelf solution. These may need careful design and implementation of custom widgets to build functionality as required, for example, when dealing with UM stash, and displaying/editing data in grid formats. 
+
+ 
+
+ 
+
+### Pagewidget 
+
+ 
+
+#### Existing: 
+
+ 
+
+Table.py - Used for viewing/editing tabular data. 
+
+ 
+
+Different data formats are allowed and are handled by the following classes: 
+
+ 
+
+class PageTable(gtk.Table):,  
+
+ 
+
+"""Return a widget table generated from panel_data. 
+
+ 
+
+It uses the variable information to create instances of 
+
+VariableWidget, which are then asked to insert themselves into the 
+
+table. 
+
+ 
+
+""" 
+
+ 
+
+class PageArrayTable(PageTable):,  
+
+ 
+
+"""Return a widget table that treats array values as row elements.""" 
+
+ 
+
+class PageLatentTable(gtk.Table):,  
+
+ 
+
+"""Return a widget table generated from panel_data. 
+
+ 
+
+It uses the variable information to create instances of 
+
+VariableWidget, which are then asked to insert themselves into the 
+
+table. 
+
+ 
+
+This particular container always shows latent variables. 
+
+ 
+
+""" 
+
+ 
+
+ 
+
+#### Proposed: 
+
+ 
+
+Move functionality to Frontend JS to take advantage of modern web technologies. 
+
+In the past I have used jqGrid for viewing and editing table data. This is a frontend solution allowing for front and backend validation. 
+
+An investigation is required to find an appropriate frontend solution that is most suitable for the new Rose Edit architecture. 
+
+There are a number of JavaScript based grids available for viewing and editing data of different types. Some thought will need to be given to custom widget features such as those seen with the UM stash widget. 
+
+ 
+
+ 
+
+### Valuewidget 
+
+ 
+
+ 
+
+#### Existing: 
+
+The array features of the widget are used for displaying values according to the different formats required. The metadata can arrive in different formats and this widget handles the display of these different formats in the GUI. The different formats are handled in the following files: entry.py, logical.py, mixed.py, python_list.py, row.py and spaced_list.py.  
+
+ 
+
+Other (non-array) UI functionality is performed by the following files: boolradio.py, booltoggle.py, character.py, choice.py, combobox.py, files.py, format.py, intspin.py, meta.py, radiobuttons.py, source.py, text.py, valuehints.py. 
+
+A lot of the functionality here is standard UI functionality that can be provided by standard frontend UI frameworks. The use of json-schema plugged into a JavaScript driven form for the frontend can utilise a lot of standard UI features without customisation. Some investigation is needed for some requirements, such as supporting hierarchical rose configuration structure within forms. 
+
+ 
+
+ 
+
+#### Proposed: 
+
+The pygtk functionality applied to widgets makes this a complicated approach to modifying and interacting with the widget. This kind of user interface interaction is better handled by JS libraries, rather than from Python since it lacks a lot of UI functionality such as limited event handlers etc. 
+
+By translating the array formats into a standardised approach within a json-schema context will allow a separation of concerns approach to offer a simplified delivery of user interface interactions for the GUI. 
+
+ 
+
+ 
+
+### Panelwidget 
+
+ 
+
+#### Existing: 
+
+ 
+
+Filesystem.py used for file navigation 
+
+ 
+
+class FileSystemPanel(gtk.ScrolledWindow):,  
+
+ 
+
+"""A class to show underlying files and directories in a gtk.TreeView.""" 
+
+ 
+
+summary_data.py for displaying and interacting with summary data 
+
+ 
+
+class BaseSummaryDataPanel(gtk.VBox): 
+
+ 
+
+"""A base class for summarising data across many namespaces.,  
+
+ 
+
+Subclasses should provide the following methods: 
+
+- def add_cell_renderer_for_value(self, column, column_title): 
+
+- def get_model_data(self): 
+
+- def get_section_column_index(self): 
+
+- def set_tree_cell_status(self, column, cell, model, row_iter): 
+
+- def set_tree_tip(self, treeview, row_iter, col_index, tip): 
+
+ 
+
+Subclasses may provide the following methods: 
+
+- def _get_custom_menu_items(self, path, column, event): 
+
+ 
+
+These are described below in their placeholder methods. 
+
+ 
+
+""" 
+
+ 
+
+class StandardSummaryDataPanel(BaseSummaryDataPanel):,  
+
+ 
+
+"""Class that provides a standard interface to summary data.""" 
+
+ 
+
+ 
+
+ 
+
+ 
+
+#### Proposed: 
+
+ 
+
+A more customised approach to file and namelist navigation has been proposed, that offers a more personalised GUI for individual users. For example, with the use of favorites and bookmarks for displaying configurations etc. 
+
+Need to find an approach for tracking history or crumbtrail navigation 
+
+As discussed, interaction with data cells and widgets may be better handled by modern JavaScript framework solutions where a lot of functionality is provided out of the box. 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
 
 ## Misc
 
