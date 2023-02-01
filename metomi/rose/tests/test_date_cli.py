@@ -20,7 +20,10 @@ import pytest
 import sys
 
 from metomi.rose.date_cli import (
-    _handle_old_offsets, _handle_old_datetimes, main
+    _handle_old_offsets,
+    _handle_old_datetimes,
+    _main,
+    main,
 )
 
 
@@ -255,3 +258,26 @@ def test_main(monkeypatch, capsys, args, expect):
     monkeypatch.setattr(sys, 'exit', fake_exit)
     main()
     assert capsys.readouterr().out.split('\n')[-2] == expect
+
+
+def test_cycling_mode(monkeypatch, capsys):
+    # it should default to the gregorian calendar
+    monkeypatch.setenv('ROSE_CYCLING_MODE', '')
+    _main(['rose-date', '2000', '--offset=P360D'])
+    out, _ = capsys.readouterr()
+    # 2000 + P360D = 20001226
+    assert out.splitlines()[0] == '2000'
+
+    # it should ignore the integer cycling mode
+    monkeypatch.setenv('ROSE_CYCLING_MODE', 'integer')
+    _main(['rose-date', '2000', '--offset=P360D'])
+    out, _ = capsys.readouterr()
+    # 2000 + P360D = 20001226
+    assert out.splitlines()[0] == '2000'
+
+    # but it should switch to alternative calendars as appropriate
+    monkeypatch.setenv('ROSE_CYCLING_MODE', '360_day')
+    _main(['rose-date', '2000', '--offset=P360D'])
+    out, _ = capsys.readouterr()
+    # 2000 + P360D = 2001
+    assert out.splitlines()[0] == '2001'

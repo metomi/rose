@@ -238,7 +238,7 @@ def _handle_old_datetimes(args: list) -> list:
     return args
 
 
-def main():
+def _main(argv):
     """Implement rose date."""
     if sys.stdin.isatty():
         print(
@@ -247,29 +247,37 @@ def main():
             file=sys.stderr
         )
 
-    if '--help' in sys.argv:
+    if '--help' in argv:
         print('\n' + __doc__)
-        sys.exit()
+        return 0
 
-    sys.argv = _handle_old_datetimes(sys.argv)
-    sys.argv = _handle_old_offsets(sys.argv)
+    argv = _handle_old_datetimes(argv)
+    argv = _handle_old_offsets(argv)
 
     # Handle Legacy Rose-date -c functionality
-    if '-c' in sys.argv or '--use-task-cycle-time' in sys.argv:
+    if '-c' in argv or '--use-task-cycle-time' in argv:
         if os.getenv('ROSE_TASK_CYCLE_TIME'):
             os.environ['ISODATETIMEREF'] = os.getenv('ROSE_TASK_CYCLE_TIME')
         elif not os.getenv('ISODATETIMEREF'):
-            sys.exit(
-                "[FAIL] [UNDEFINED ENVIRONMENT VARIABLE] ROSE_TASK_CYCLE_TIME")
+            return (
+                "[FAIL] [UNDEFINED ENVIRONMENT VARIABLE] ROSE_TASK_CYCLE_TIME"
+            )
 
         for opt in ('-c', '--use-task-cycle-time'):
-            if opt in sys.argv:
+            if opt in argv:
                 sys.argv.remove(opt)
-        if 'ref' not in sys.argv:
-            sys.argv.append('ref')
+        if 'ref' not in argv:
+            argv.append('ref')
 
     # Convert ROSE_CYCLING_MODE to ISODATETIMECALENDAR
-    if os.getenv('ROSE_CYCLING_MODE'):
+    if os.getenv('ROSE_CYCLING_MODE') not in ['integer', None]:
         os.environ['ISODATETIMECALENDAR'] = os.getenv('ROSE_CYCLING_MODE')
 
-    sys.exit(iso_main())
+    sys.argv = argv
+    return iso_main()
+
+
+def main():
+    sys.exit(
+        _main(sys.argv)
+    )
