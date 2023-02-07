@@ -30,4 +30,4 @@
 #     determine the list of database files to create.
 #     Does not override existing database files.
 #-------------------------------------------------------------------------------
-exec SQLALCHEMY_WARN_20=false python3 -m metomi.rosie.db_create "$@"
+exec env SQLALCHEMY_WARN_20=false python3 -m metomi.rosie.db_create "$@"
