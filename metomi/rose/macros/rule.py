@@ -50,6 +50,204 @@ REC_EXPR_IS_THIS_RULE = re.compile(
 )
 
 
+class MyInt(int):
+    """Override integer to maintain Python2 style interface
+    """
+    def __lt__(self, other):
+        """
+        Examples:
+            >>> MyInt(4) < MyInt(6)
+            True
+            >>> MyInt(4) < MyFloat(6.1)
+            True
+            >>> MyInt(4) < MyStr('Zaphod Beeblebrox')
+            True
+            >>> MyInt(99999) < MyStr('Zaphod Beeblebrox')
+            True
+            >>> MyInt(4) < MyFloat(-5.5)
+            False
+            >>> MyInt(42) < 42
+            False
+        """
+        if isinstance(other, (int, float, MyFloat, MyInt)):
+            return float(self) < float(other)
+        elif isinstance(other, MyStr):
+            return True
+        else:
+            return int(self) == other
+
+    def __eq__(self, other):
+        """
+        Examples:
+            >>> MyInt(22) == MyInt(22)
+            True
+            >>> MyInt(22) == MyInt(44)
+            False
+            >>> MyInt(22) == MyFloat(4.75734)
+            False
+            >>> MyInt(22) == MyFloat(22.0)
+            True
+            >>> MyInt(123) == MyStr('Hello World')
+            False
+            >>> MyInt(-77) == 'Viltvodle VI'
+            False
+        """
+        if isinstance(other, (int, float, MyFloat, MyInt)):
+            return float(self) == float(other)
+        elif isinstance(other, MyStr):
+            return False
+        else:
+            return int(self) == other
+
+    def __gt__(self, other):
+        """
+        Examples:
+            >>> MyInt(2) > MyFloat(2.0)
+            False
+            >>> MyInt(3) > MyFloat(2.0)
+            True
+        """
+        return (
+            not self.__lt__(other)
+            and not self.__eq__(other)
+        )
+
+    def __le__(self, other):
+        return not self.__gt__(other)
+
+    def __ge__(self, other):
+        return not self.__lt__(other)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+
+class MyFloat(float):
+    def __lt__(self, other):
+        """
+        Examples:
+            >>> MyInt(4) < MyInt(6)
+            True
+            >>> MyInt(4) < MyFloat(6.1)
+            True
+            >>> MyInt(4) < MyStr('Zaphod Beeblebrox')
+            True
+            >>> MyInt(99999) < MyStr('Zaphod Beeblebrox')
+            True
+            >>> MyInt(4) < MyFloat(-5.5)
+            False
+            >>> MyInt(1199) < 1199
+            False
+        """
+        if isinstance(other, (int, float, MyFloat, MyInt)):
+            return float(self) < float(other)
+        elif isinstance(other, MyStr):
+            return True
+        else:
+            return float(self) < other
+
+    def __eq__(self, other):
+        """
+        Examples:
+            >>> MyInt(22) == MyInt(22)
+            True
+            >>> MyInt(22) == MyInt(44)
+            False
+            >>> MyInt(22) == MyFloat(4.75734)
+            False
+            >>> MyInt(22) == MyFloat(22.0)
+            True
+            >>> MyInt(123) == MyStr('Hello World')
+            False
+            >>> MyInt(8000) == 8000.0
+            True
+        """
+        if isinstance(other, (int, float, MyFloat, MyInt)):
+            return float(self) == float(other)
+        elif isinstance(other, MyStr):
+            return False
+        else:
+            return float(self) == other
+
+    def __gt__(self, other):
+        """
+        Examples:
+            >>> MyInt(2) > MyFloat(2.0)
+            False
+            >>> MyInt(3) > MyFloat(2.0)
+            True
+        """
+        return (
+            not self.__lt__(other)
+            and not self.__eq__(other)
+        )
+
+    def __le__(self, other):
+        return not self.__gt__(other)
+
+    def __ge__(self, other):
+        return not self.__lt__(other)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+
+class MyStr(str):
+    def __lt__(self, other):
+        """
+        Examples:
+            >>> MyStr('aardvaark') < MyStr('zebra')
+            True
+            >>> MyStr('alligator') < MyInt(400)
+            False
+            >>> MyStr('pink fairy armadillo') < 'syrian hamster'
+            True
+        """
+        if isinstance(other, (MyFloat, MyInt)):
+            return False
+        elif isinstance(other, MyStr):
+            return str(self) < str(other)
+        else:
+            return str(self) < other
+
+    def __eq__(self, other):
+        """
+        Examples:
+            >>> MyStr('foo') == MyFloat(444.2)
+            False
+            >>> MyStr('foo') == MyStr('foo')
+            True
+            >>> MyStr('bar') == MyStr('foo')
+            False
+            >>> MyStr('Bird of Paradise') == 'Seagull'
+            False
+        """
+        if isinstance(other, (MyFloat, MyInt)):
+            return False
+        elif isinstance(other, MyStr):
+            return str(self) == str(other)
+        else:
+            return str(self) == other
+
+    def __gt__(self, other):
+        return (
+            not self.__lt__(other)
+            and not self.__eq__(other)
+        )
+
+    def __le__(self, other):
+        return not self.__gt__(other)
+
+    def __ge__(self, other):
+        return not self.__lt__(other)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+
+MYTYPES = {str: MyStr, int: MyInt, bool: MyInt, float: MyFloat}
+
+
 class RuleValueError(Exception):
     def __init__(self, *args):
         self.args = args
@@ -211,12 +409,20 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
             rule, setting_id, config, meta_config
         )
         template = jinja2.Template(rule_template_str)
+
+        # Recast to our own implementations of base types to maintain
+        # Python 2 behaviour
+        for key, value in rule_id_values.items():
+            for basetype, mytype in MYTYPES.items():
+                if isinstance(value, basetype):
+                    rule_id_values[key] = mytype(rule_id_values[key])
+
         return_string = template.render(rule_id_values)
         return ast.literal_eval(return_string)
 
     def evaluate_rule_id_usage(self, rule, setting_id, meta_config):
         """Return a set of setting ids referenced in the provided rule."""
-        log_ids = set([])
+        log_ids = set()
         self._process_rule(
             rule, setting_id, None, meta_config, log_ids=log_ids
         )
