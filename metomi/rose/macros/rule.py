@@ -68,6 +68,8 @@ class MyInt(int):
             False
             >>> MyInt(42) < 42
             False
+            >>> MyInt(77) < ''
+            False
         """
         if isinstance(other, (int, float, MyFloat, MyInt)):
             return float(self) < float(other)
@@ -203,37 +205,29 @@ class MyStr(str):
             >>> MyStr('pink fairy armadillo') < 'syrian hamster'
             True
         """
-        if isinstance(other, (MyFloat, MyInt)):
+        if isinstance(other, (int, float, MyFloat, MyInt)):
             return False
         elif isinstance(other, MyStr):
             return str(self) < str(other)
         else:
             return str(self) < other
 
-    def __eq__(self, other):
+    def __gt__(self, other):
         """
         Examples:
-            >>> MyStr('foo') == MyFloat(444.2)
+            >>> MyStr('aardvaark') > MyStr('zebra')
             False
-            >>> MyStr('foo') == MyStr('foo')
+            >>> MyStr('alligator') > MyInt(400)
             True
-            >>> MyStr('bar') == MyStr('foo')
-            False
-            >>> MyStr('Bird of Paradise') == 'Seagull'
+            >>> MyStr('pink fairy armadillo') > 'syrian hamster'
             False
         """
-        if isinstance(other, (MyFloat, MyInt)):
-            return False
+        if isinstance(other, (int, float, MyFloat, MyInt)):
+            return True
         elif isinstance(other, MyStr):
-            return str(self) == str(other)
+            return str(self) > str(other)
         else:
-            return str(self) == other
-
-    def __gt__(self, other):
-        return (
-            not self.__lt__(other)
-            and not self.__eq__(other)
-        )
+            return str(self) > other
 
     def __le__(self, other):
         return not self.__gt__(other)
