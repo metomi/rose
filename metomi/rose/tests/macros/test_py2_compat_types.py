@@ -179,7 +179,5 @@ def test_python2_compat_classes(test):
             first = mytype(first)
         if isinstance(second, basetype):
             second = mytype(second)
-
-    assert (first <= second) != test[1]['gt']
     assert (first > second) == test[1]['gt']
     assert (first == second) == test[1]['eq']

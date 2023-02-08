@@ -71,35 +71,10 @@ class MyInt(int):
             >>> MyInt(77) < ''
             False
         """
-        if isinstance(other, (int, float, MyFloat, MyInt)):
-            return float(self) < float(other)
-        elif isinstance(other, MyStr):
-            return True
-        else:
-            return int(self) == other
-
-    def __eq__(self, other):
-        """
-        Examples:
-            >>> MyInt(22) == MyInt(22)
-            True
-            >>> MyInt(22) == MyInt(44)
-            False
-            >>> MyInt(22) == MyFloat(4.75734)
-            False
-            >>> MyInt(22) == MyFloat(22.0)
-            True
-            >>> MyInt(123) == MyStr('Hello World')
-            False
-            >>> MyInt(-77) == 'Viltvodle VI'
-            False
-        """
-        if isinstance(other, (int, float, MyFloat, MyInt)):
-            return float(self) == float(other)
-        elif isinstance(other, MyStr):
+        try:
+            return int(self) < other
+        except TypeError:
             return False
-        else:
-            return int(self) == other
 
     def __gt__(self, other):
         """
@@ -109,19 +84,16 @@ class MyInt(int):
             >>> MyInt(3) > MyFloat(2.0)
             True
         """
-        return (
-            not self.__lt__(other)
-            and not self.__eq__(other)
-        )
+        try:
+            return int(self) > other
+        except TypeError:
+            return True
 
     def __le__(self, other):
         return not self.__gt__(other)
 
     def __ge__(self, other):
         return not self.__lt__(other)
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
 
 
 class MyFloat(float):
@@ -141,35 +113,10 @@ class MyFloat(float):
             >>> MyInt(1199) < 1199
             False
         """
-        if isinstance(other, (int, float, MyFloat, MyInt)):
+        try:
             return float(self) < float(other)
-        elif isinstance(other, MyStr):
+        except (TypeError, ValueError):
             return True
-        else:
-            return float(self) < other
-
-    def __eq__(self, other):
-        """
-        Examples:
-            >>> MyInt(22) == MyInt(22)
-            True
-            >>> MyInt(22) == MyInt(44)
-            False
-            >>> MyInt(22) == MyFloat(4.75734)
-            False
-            >>> MyInt(22) == MyFloat(22.0)
-            True
-            >>> MyInt(123) == MyStr('Hello World')
-            False
-            >>> MyInt(8000) == 8000.0
-            True
-        """
-        if isinstance(other, (int, float, MyFloat, MyInt)):
-            return float(self) == float(other)
-        elif isinstance(other, MyStr):
-            return False
-        else:
-            return float(self) == other
 
     def __gt__(self, other):
         """
@@ -179,19 +126,16 @@ class MyFloat(float):
             >>> MyInt(3) > MyFloat(2.0)
             True
         """
-        return (
-            not self.__lt__(other)
-            and not self.__eq__(other)
-        )
+        try:
+            return float(self) > float(other)
+        except (TypeError, ValueError):
+            return False
 
     def __le__(self, other):
         return not self.__gt__(other)
 
     def __ge__(self, other):
         return not self.__lt__(other)
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
 
 
 class MyStr(str):
@@ -234,9 +178,6 @@ class MyStr(str):
 
     def __ge__(self, other):
         return not self.__lt__(other)
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
 
 
 MYTYPES = {str: MyStr, int: MyInt, bool: MyInt, float: MyFloat}
