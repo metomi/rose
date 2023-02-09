@@ -20,7 +20,7 @@
 """
 Tests for Python 2 compatibility types
 
-These types MyInt, MyFloat and MyStr over-ride Python3 types
+These types Int, Float and Str over-ride Python3 types
 to produce Python2 behaviour to provide back compatibility for Rose.
 
 The tests were generated as follows:
@@ -46,7 +46,7 @@ print(data)
 
 """
 import pytest
-from metomi.rose.macros.rule import MyFloat, MyInt, MyStr
+from metomi.rose.macros.rule import Float, Int, Str
 
 TESTS = {
     (1.0, "zebra"): {"gt": False, "eq": False},
@@ -165,7 +165,7 @@ TESTS = {
     (999.0, -999.0): {"gt": True, "eq": False},
     ("zebra", 1.0): {"gt": True, "eq": False},
 }
-MYTYPES = {int: MyInt, float: MyFloat, str: MyStr}
+MYTYPES = {int: Int, float: Float, str: Str}
 
 
 @pytest.mark.parametrize('test', TESTS.items())

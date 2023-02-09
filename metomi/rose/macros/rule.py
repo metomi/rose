@@ -50,25 +50,25 @@ REC_EXPR_IS_THIS_RULE = re.compile(
 )
 
 
-class MyInt(int):
+class Int(int):
     """Override integer to maintain Python2 style interface
     """
     def __lt__(self, other):
         """
         Examples:
-            >>> MyInt(4) < MyInt(6)
+            >>> Int(4) < Int(6)
             True
-            >>> MyInt(4) < MyFloat(6.1)
+            >>> Int(4) < Float(6.1)
             True
-            >>> MyInt(4) < MyStr('Zaphod Beeblebrox')
+            >>> Int(4) < Str('Zaphod Beeblebrox')
             True
-            >>> MyInt(99999) < MyStr('Zaphod Beeblebrox')
+            >>> Int(99999) < Str('Zaphod Beeblebrox')
             True
-            >>> MyInt(4) < MyFloat(-5.5)
+            >>> Int(4) < Float(-5.5)
             False
-            >>> MyInt(42) < 42
+            >>> Int(42) < 42
             False
-            >>> MyInt(77) < ''
+            >>> Int(77) < ''
             False
         """
         try:
@@ -79,9 +79,9 @@ class MyInt(int):
     def __gt__(self, other):
         """
         Examples:
-            >>> MyInt(2) > MyFloat(2.0)
+            >>> Int(2) > Float(2.0)
             False
-            >>> MyInt(3) > MyFloat(2.0)
+            >>> Int(3) > Float(2.0)
             True
         """
         try:
@@ -96,21 +96,21 @@ class MyInt(int):
         return not self.__lt__(other)
 
 
-class MyFloat(float):
+class Float(float):
     def __lt__(self, other):
         """
         Examples:
-            >>> MyInt(4) < MyInt(6)
+            >>> Int(4) < Int(6)
             True
-            >>> MyInt(4) < MyFloat(6.1)
+            >>> Int(4) < Float(6.1)
             True
-            >>> MyInt(4) < MyStr('Zaphod Beeblebrox')
+            >>> Int(4) < Str('Zaphod Beeblebrox')
             True
-            >>> MyInt(99999) < MyStr('Zaphod Beeblebrox')
+            >>> Int(99999) < Str('Zaphod Beeblebrox')
             True
-            >>> MyInt(4) < MyFloat(-5.5)
+            >>> Int(4) < Float(-5.5)
             False
-            >>> MyInt(1199) < 1199
+            >>> Int(1199) < 1199
             False
         """
         try:
@@ -121,9 +121,9 @@ class MyFloat(float):
     def __gt__(self, other):
         """
         Examples:
-            >>> MyInt(2) > MyFloat(2.0)
+            >>> Int(2) > Float(2.0)
             False
-            >>> MyInt(3) > MyFloat(2.0)
+            >>> Int(3) > Float(2.0)
             True
         """
         try:
@@ -138,20 +138,20 @@ class MyFloat(float):
         return not self.__lt__(other)
 
 
-class MyStr(str):
+class Str(str):
     def __lt__(self, other):
         """
         Examples:
-            >>> MyStr('aardvaark') < MyStr('zebra')
+            >>> Str('aardvaark') < Str('zebra')
             True
-            >>> MyStr('alligator') < MyInt(400)
+            >>> Str('alligator') < Int(400)
             False
-            >>> MyStr('pink fairy armadillo') < 'syrian hamster'
+            >>> Str('pink fairy armadillo') < 'syrian hamster'
             True
         """
-        if isinstance(other, (int, float, MyFloat, MyInt)):
+        if isinstance(other, (int, float, Float, Int)):
             return False
-        elif isinstance(other, MyStr):
+        elif isinstance(other, Str):
             return str(self) < str(other)
         else:
             return str(self) < other
@@ -159,16 +159,16 @@ class MyStr(str):
     def __gt__(self, other):
         """
         Examples:
-            >>> MyStr('aardvaark') > MyStr('zebra')
+            >>> Str('aardvaark') > Str('zebra')
             False
-            >>> MyStr('alligator') > MyInt(400)
+            >>> Str('alligator') > Int(400)
             True
-            >>> MyStr('pink fairy armadillo') > 'syrian hamster'
+            >>> Str('pink fairy armadillo') > 'syrian hamster'
             False
         """
-        if isinstance(other, (int, float, MyFloat, MyInt)):
+        if isinstance(other, (int, float, Float, Int)):
             return True
-        elif isinstance(other, MyStr):
+        elif isinstance(other, Str):
             return str(self) > str(other)
         else:
             return str(self) > other
@@ -180,7 +180,7 @@ class MyStr(str):
         return not self.__lt__(other)
 
 
-MYTYPES = {str: MyStr, int: MyInt, bool: MyInt, float: MyFloat}
+MYTYPES = {str: Str, int: Int, bool: Int, float: Float}
 
 
 class RuleValueError(Exception):
