@@ -58,9 +58,6 @@ cd "$TESTDIR/../../"
 mkdir -p ~/.metomi
 mkdir -p "${HOME}/cylc-run"
 
-# silence sqlalchemy warnings which cause stderr tests to fail
-export SQLALCHEMY_WARN_20=false
-
 ROSE_TEST_TIME_INIT="$(date -u +'%Y%m%dT%H%M%SZ')"
 export ROSE_TEST_TIME_INIT
 

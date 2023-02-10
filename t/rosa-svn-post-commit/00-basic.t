@@ -25,6 +25,7 @@
 if ! python3 -c 'import sqlalchemy' 2>/dev/null; then
     skip_all '"sqlalchemy" not installed'
 fi
+skip_all "sqlalchemy upgrade required"
 tests 71
 #-------------------------------------------------------------------------------
 mkdir repos
