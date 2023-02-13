@@ -144,4 +144,4 @@ FILE_VAR_SOURCE = "source"
 # Paths in the Rose distribution.
 FILEPATH_README = "README.md"
 
-__version__ = "2.0.3.dev"
+__version__ = "2.0.3"
