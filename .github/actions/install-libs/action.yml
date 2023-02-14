@@ -27,10 +27,10 @@ runs:
         BASE_REF="${GITHUB_BASE_REF:-$GITHUB_REF_NAME}"
 
         # NOTE: hard-coded branches need to be manually updated as necessary.
-        if [[ "$BASE_REF" == '2.0.x' ]]; then
-          : ${CYLC_FLOW_REF:='8.0.x'}
-          : ${CYLC_ROSE_REF:='1.1.x'}
-        fi
+        # if [[ "$BASE_REF" == '2.0.x' ]]; then
+        : ${CYLC_FLOW_REF:='8.1.x'}
+        : ${CYLC_ROSE_REF:='master'}
+        # fi
 
         if [[ -n "$CYLC_FLOW_REF" ]]; then
           CYLC_FLOW_GITHUB="${CYLC_FLOW_GITHUB}@${CYLC_FLOW_REF}"

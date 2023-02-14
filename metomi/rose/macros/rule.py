@@ -50,6 +50,139 @@ REC_EXPR_IS_THIS_RULE = re.compile(
 )
 
 
+class Int(int):
+    """Override integer to maintain Python2 style interface
+    """
+    def __lt__(self, other):
+        """
+        Examples:
+            >>> Int(4) < Int(6)
+            True
+            >>> Int(4) < Float(6.1)
+            True
+            >>> Int(4) < Str('Zaphod Beeblebrox')
+            True
+            >>> Int(99999) < Str('Zaphod Beeblebrox')
+            True
+            >>> Int(4) < Float(-5.5)
+            False
+            >>> Int(42) < 42
+            False
+            >>> Int(77) < ''
+            False
+        """
+        try:
+            return int(self) < other
+        except TypeError:
+            return False
+
+    def __gt__(self, other):
+        """
+        Examples:
+            >>> Int(2) > Float(2.0)
+            False
+            >>> Int(3) > Float(2.0)
+            True
+        """
+        try:
+            return int(self) > other
+        except TypeError:
+            return True
+
+    def __le__(self, other):
+        return not self.__gt__(other)
+
+    def __ge__(self, other):
+        return not self.__lt__(other)
+
+
+class Float(float):
+    def __lt__(self, other):
+        """
+        Examples:
+            >>> Int(4) < Int(6)
+            True
+            >>> Int(4) < Float(6.1)
+            True
+            >>> Int(4) < Str('Zaphod Beeblebrox')
+            True
+            >>> Int(99999) < Str('Zaphod Beeblebrox')
+            True
+            >>> Int(4) < Float(-5.5)
+            False
+            >>> Int(1199) < 1199
+            False
+        """
+        try:
+            return float(self) < float(other)
+        except (TypeError, ValueError):
+            return True
+
+    def __gt__(self, other):
+        """
+        Examples:
+            >>> Int(2) > Float(2.0)
+            False
+            >>> Int(3) > Float(2.0)
+            True
+        """
+        try:
+            return float(self) > float(other)
+        except (TypeError, ValueError):
+            return False
+
+    def __le__(self, other):
+        return not self.__gt__(other)
+
+    def __ge__(self, other):
+        return not self.__lt__(other)
+
+
+class Str(str):
+    def __lt__(self, other):
+        """
+        Examples:
+            >>> Str('aardvaark') < Str('zebra')
+            True
+            >>> Str('alligator') < Int(400)
+            False
+            >>> Str('pink fairy armadillo') < 'syrian hamster'
+            True
+        """
+        if isinstance(other, (int, float, Float, Int)):
+            return False
+        elif isinstance(other, Str):
+            return str(self) < str(other)
+        else:
+            return str(self) < other
+
+    def __gt__(self, other):
+        """
+        Examples:
+            >>> Str('aardvaark') > Str('zebra')
+            False
+            >>> Str('alligator') > Int(400)
+            True
+            >>> Str('pink fairy armadillo') > 'syrian hamster'
+            False
+        """
+        if isinstance(other, (int, float, Float, Int)):
+            return True
+        elif isinstance(other, Str):
+            return str(self) > str(other)
+        else:
+            return str(self) > other
+
+    def __le__(self, other):
+        return not self.__gt__(other)
+
+    def __ge__(self, other):
+        return not self.__lt__(other)
+
+
+MYTYPES = {str: Str, int: Int, bool: Int, float: Float}
+
+
 class RuleValueError(Exception):
     def __init__(self, *args):
         self.args = args
@@ -211,12 +344,20 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
             rule, setting_id, config, meta_config
         )
         template = jinja2.Template(rule_template_str)
+
+        # Recast to our own implementations of base types to maintain
+        # Python 2 behaviour
+        for key, value in rule_id_values.items():
+            for basetype, mytype in MYTYPES.items():
+                if isinstance(value, basetype):
+                    rule_id_values[key] = mytype(rule_id_values[key])
+
         return_string = template.render(rule_id_values)
         return ast.literal_eval(return_string)
 
     def evaluate_rule_id_usage(self, rule, setting_id, meta_config):
         """Return a set of setting ids referenced in the provided rule."""
-        log_ids = set([])
+        log_ids = set()
         self._process_rule(
             rule, setting_id, None, meta_config, log_ids=log_ids
         )
