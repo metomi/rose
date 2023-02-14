@@ -8,6 +8,20 @@ creating a new release entry be sure to copy & paste the span tag with the
 `actions:bind` attribute, which is used by a regex to find the text to be
 updated. Only the first match gets replaced, so it's fine to leave the old
 ones in. -->
+
+--------------------------------------------------------------------------------
+
+## 2.0.3 (<span actions:bind='release-date'>Released 2023-02-13</span>)
+
+### Fixes
+
+[#2666](https://github.com/metomi/rose/pull/2666) -
+Fix issues with `rose date` when run in integer cycling Cylc workflows.
+
+[#2670](https://github.com/metomi/rose/pull/2670) - Rose Macro made to
+follow Python 2 type comparison rules.
+
+
 --------------------------------------------------------------------------------
 
 ## 2.0.2 (<span actions:bind='release-date'>Released 2022-11-08</span>)
