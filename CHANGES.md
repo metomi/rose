@@ -15,6 +15,9 @@ ones in. -->
 
 ### Fixes
 
+[#2666](https://github.com/metomi/rose/pull/2666) -
+Fix issues with `rose date` when run in integer cycling Cylc workflows.
+
 [#2670](https://github.com/metomi/rose/pull/2670) - Rose Macro made to
 follow Python 2 type comparison rules.
 
