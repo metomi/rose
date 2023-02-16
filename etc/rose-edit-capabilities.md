@@ -228,9 +228,9 @@ be filtered via the view menu.
 ||||||
 | Menu options|||||
 | File >|||||
-| Open| Open configuration <br/> `@cylc_ls.feature(TEXT_DOCUMENT_DID_OPEN)` ||||
+| Open| Open configuration |Pygls can register a function to this Language Server Protocol (LSP) feature using a decorator and a type from @microsoft/lsprotocol `@my_ls.feature(lsprotocol.types.TEXT_DOCUMENT_DID_OPEN)`|||
 | Save| Save changes||||
-| Check And Save| Check and save changes| Check all metadata incl. fail-if/warn-if and validator macros, then save. |||
+| Check And Save| Check and save changes| Check all metadata incl. fail-if/warn-if and validator macros, then save.<br/> LSP: `TEXT_DOCUMENT_DID_SAVE` |||
 | Load All Apps| Load All Apps| Option is enabled for rose-suite.conf but errors when selecting this option. Option is disabled for rose-app.conf|||
 | Quit| Quits rose edit||||
 | Edit >|||||
