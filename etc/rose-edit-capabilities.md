@@ -228,7 +228,7 @@ be filtered via the view menu.
 ||||||
 | Menu options|||||
 | File >|||||
-| Open| Open configuration||||
+| Open| Open configuration <br/> `@cylc_ls.feature(TEXT_DOCUMENT_DID_OPEN)` ||||
 | Save| Save changes||||
 | Check And Save| Check and save changes| Check all metadata incl. fail-if/warn-if and validator macros, then save. |||
 | Load All Apps| Load All Apps| Option is enabled for rose-suite.conf but errors when selecting this option. Option is disabled for rose-app.conf|||
