@@ -17,11 +17,17 @@ on:
       fcm_repo:
         description: The FCM repo to test against
         required: false
-      cylc_flow_ref:
-        description: The Cylc branch to test against
+      cylc_flow_tag:
+        description: The cylc-flow branch to test against
         required: false
       cylc_flow_repo:
-        description: The Cylc repo to test against
+        description: The cylc-flow repo to test against
+        required: false
+      cylc_rose_tag:
+        description: The cylc-rose branch to test against
+        required: false
+      cylc_rose_repo:
+        description: The cylc-rose repo to test against
         required: false
   schedule:
   - cron: '37 04 * * 1-5' # 03:37, Monday-Friday
@@ -100,12 +106,17 @@ jobs:
           pip install ."[all]"
           yarn install
 
-      - name: Install Cylc libs
-        uses: ./rose/.github/actions/install-libs
+      - name: Install Cylc
+        uses: cylc/release-actions/install-cylc-components@v1
         with:
-          cylc-flow-repo: ${{ inputs.cylc_flow_repo }}
-          cylc-flow-ref: ${{ inputs.cylc_flow_ref }}
-          cylc-rose-ref: ${{ inputs.cylc_rose_ref }}
+          cylc_flow: true
+          cylc_flow_opts: ''
+          cylc_flow_repo: ${{ inputs.cylc_flow_repo || 'cylc/cylc-flow' }}
+          cylc_flow_tag: ${{ inputs.cylc_flow_tag }}
+          cylc_rose: true
+          cylc_rose_opts: ''
+          cylc_rose_repo: ${{ inputs.cylc_rose_repo || 'cylc/cylc-rose' }}
+          cylc_rose_tag: ${{ inputs.cylc_rose_tag }}
 
       - name: Checkout FCM
         if: startsWith(matrix.os, 'ubuntu')
@@ -211,12 +222,17 @@ jobs:
         run: |
           pip install -e .[docs,graph]
 
-      - name: Install Cylc libs
-        uses: ./.github/actions/install-libs
+      - name: Install Cylc
+        uses: cylc/release-actions/install-cylc-components@v1
         with:
-          cylc-flow-repo: ${{ inputs.cylc_flow_repo }}
-          cylc-flow-ref: ${{ inputs.cylc_flow_ref }}
-          cylc-rose-ref: ${{ inputs.cylc_rose_ref }}
+          cylc_flow: true
+          cylc_flow_opts: ''
+          cylc_flow_repo: ${{ inputs.cylc_flow_repo || 'cylc/cylc-flow' }}
+          cylc_flow_tag: ${{ inputs.cylc_flow_tag }}
+          cylc_rose: true
+          cylc_rose_opts: ''
+          cylc_rose_repo: ${{ inputs.cylc_rose_repo || 'cylc/cylc-rose' }}
+          cylc_rose_tag: ${{ inputs.cylc_rose_tag }}
 
       - name: build (html)
         run: |
