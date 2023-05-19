@@ -10,8 +10,11 @@
     final cycle point = 20100101
     [[dependencies]]
         [[[T00]]]
-            graph="""BUNCH_TASKS:finish-all => dummy
-                     dummy => !BUNCH_TASKS"""
+            graph = """
+                BUNCH_TASKS:finish-all => dummy
+                bunch_incremental => dummy
+                dummy => !BUNCH_TASKS
+            """
 
 [runtime]
     [[root]]
@@ -24,9 +27,6 @@
     [[bunch_fail]]
         inherit = BUNCH_TASKS
     [[bunch_incremental]]
-        inherit = BUNCH_TASKS
-        [[[job]]]
-            execution retry delays = PT1S
     [[bunch_bigpop]]
         inherit = BUNCH_TASKS
     [[bunch_names]]
