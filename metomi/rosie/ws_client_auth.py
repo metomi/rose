@@ -16,6 +16,7 @@
 # -----------------------------------------------------------------------------
 """The authentication manager for the Rosie web service client."""
 
+from abc import ABC, abstractmethod
 import ast
 from getpass import getpass
 import os
@@ -23,8 +24,8 @@ import re
 import shlex
 import socket
 import sys
+from typing import Optional
 from urllib.parse import urlparse
-import warnings
 
 import metomi.rose.config
 from metomi.rose.env import env_var_process
@@ -33,23 +34,12 @@ from metomi.rose.reporter import Reporter
 from metomi.rose.resource import ResourceLocator
 
 try:
-    from gi import require_version, pygtkcompat
-
-    require_version('Gtk', '3.0')  # For GTK+ >=v3 use PyGObject; v2 use PyGTK
-    require_version('Secret', '1')
-    from gi.repository import Secret
-
-    del pygtkcompat
-    GI_FLAG = True
-except (ImportError, ValueError):
-    GI_FLAG = False
-try:
-    with warnings.catch_warnings():
-        warnings.simplefilter('ignore')
-        import gtk
-    import gnomekeyring
+    import keyring
+    KEYRING_FLAG = True
 except ImportError:
-    pass
+    KEYRING_FLAG = False
+else:
+    import keyring.errors
 
 
 class UndefinedRosiePrefixWS(Exception):
@@ -78,69 +68,38 @@ class RosieStoreRetrievalError(Exception):
         return message
 
 
-class GnomekeyringStore:
-
-    """Password management with gnomekeyring."""
+class BaseStore(ABC):
+    """Abstract base class for password management."""
 
     @classmethod
-    def usable(cls):
+    @abstractmethod
+    def usable(cls) -> bool:
         """Can this store be used?"""
-        if "gnomekeyring" in globals() and gnomekeyring.is_available():
-            if "gtk" in globals() and not hasattr(gtk, "application_name"):
-                gtk.application_name = "rosie.ws_client"
-            return True
-        return False
+        ...
 
-    def __init__(self):
-        self.item_ids = {}
+    @abstractmethod
+    def store_password(
+        self, scheme: str, host: str, username: str, password: str
+    ) -> None:
+        """Store the password of username@root."""
+        ...
 
-    def clear_password(self, scheme, host, username):
+    @abstractmethod
+    def find_password(
+        self, scheme: str, host: str, username: str
+    ) -> Optional[str]:
+        """Return the password of username@root."""
+        ...
+
+    @abstractmethod
+    def clear_password(
+        self, scheme: str, host: str, username: str
+    ) -> None:
         """Remove the password from the cache."""
-        try:
-            if (scheme, host, username) in self.item_ids:
-                ring_id, item_id = self.item_ids[(scheme, host, username)]
-                gnomekeyring.item_delete_sync(ring_id, item_id)
-        except gnomekeyring.NoKeyringDaemonError:
-            pass
-
-    def find_password(self, scheme, host, username):
-        """Return the password of username@root."""
-        try:
-            res = gnomekeyring.find_network_password_sync(
-                username, None, host, None, scheme
-            )
-            ring_id = res[0]["keyring"]
-            item_id = res[0]["item_id"]
-            self.item_ids[(scheme, host, username)] = (ring_id, item_id)
-            return res[0]["password"]
-        except (gnomekeyring.NoMatchError, gnomekeyring.NoKeyringDaemonError):
-            return
-        except gnomekeyring.Error as exc:
-            exc_type = "gnomekeyring." + type(exc).__name__
-            exc_string = str(exc)
-            raise RosieStoreRetrievalError(exc_type, exc_string)
-
-    def store_password(self, scheme, host, username, password):
-        """Return the password of username@root."""
-        self.clear_password(scheme, host, username)
-        try:
-            item_id = gnomekeyring.item_create_sync(
-                None,
-                gnomekeyring.ITEM_NETWORK_PASSWORD,
-                host,
-                {"user": username, "protocol": scheme, "server": host},
-                password,
-                True,
-            )
-        except (
-            gnomekeyring.CancelledError,
-            gnomekeyring.NoKeyringDaemonError,
-        ):
-            pass
-        self.item_ids[(scheme, host, username)] = (None, item_id)
+        ...
 
 
-class GPGAgentStore:
+class GPGAgentStore(BaseStore):
 
     """Password management with gpg-agent."""
 
@@ -256,53 +215,32 @@ class GPGAgentStore:
         pass
 
 
-class LibsecretStore:
+class KeyringStore(BaseStore):
+    """Password management with keyring.
 
-    """Password management with libsecret."""
+    Supports GNOME keyring & MacOS keychain among others."""
 
     @classmethod
-    def usable(cls):
-        """Can this store be used?"""
-        return bool(GI_FLAG)
+    def usable(cls) -> bool:
+        return KEYRING_FLAG
 
-    def __init__(self):
-        # Attributes must be explicitly defined; not managed by the schema
-        self.category = ("protocol", "server", "user")
-        self.attributes = dict(
-            (key, Secret.SchemaAttributeType.STRING) for key in self.category
-        )
-        self.schema = Secret.Schema.new(
-            "org.rosie.disco.Store", Secret.SchemaFlags.NONE, self.attributes
-        )
+    def store_password(
+        self, scheme: str, host: str, username: str, password: str
+    ) -> None:
+        keyring.set_password(host, username, password)
 
-    def clear_password(self, scheme, host, username):
-        """Remove the password from the cache."""
-        template = dict(zip(self.category, (scheme, host, username)))
-        Secret.password_clear_sync(self.schema, template, None)
+    def find_password(
+        self, scheme: str, host: str, username: str
+    ) -> Optional[str]:
+        return keyring.get_password(host, username)
 
-    def find_password(self, scheme, host, username):
-        """Return the password of username@root."""
-        template = dict(zip(self.category, (scheme, host, username)))
+    def clear_password(
+        self, scheme: str, host: str, username: str
+    ) -> None:
         try:
-            password = Secret.password_lookup_sync(self.schema, template, None)
-        except Secret.SECRET_ERROR_PROTOCOL:
-            return
-        return password
-
-    def store_password(self, scheme, host, username, password):
-        """Return the password of username@root."""
-        template = dict(zip(self.category, (scheme, host, username)))
-        self.clear_password(scheme, host, username)
-        try:
-            Secret.password_store_sync(
-                self.schema,
-                template,
-                Secret.COLLECTION_DEFAULT,
-                host,
-                password,
-                None,
-            )
-        except Secret.SECRET_ERROR_PROTOCOL:
+            keyring.delete_password(host, username)
+        except keyring.errors.PasswordDeleteError:
+            # No such password
             pass
 
 
@@ -312,15 +250,16 @@ class RosieWSClientAuthManager:
 
     ST_UNC = "UNC"  # Item is unchanged
     ST_MOD = "MOD"  # Item is modified
-    PASSWORD_STORES_STR = "gpgagent gnomekeyring libsecret"
+    PASSWORD_STORES_STR = "gpgagent keyring"
     PASSWORD_STORE_CLASSES = {
         "gpgagent": GPGAgentStore,
-        "gnomekeyring": GnomekeyringStore,
-        "libsecret": LibsecretStore,
+        "keyring": KeyringStore,
     }
     PROMPT_USERNAME = "Username for %(prefix)r - %(root)r: "
     PROMPT_PASSWORD = "Password for %(username)s at %(prefix)r - %(root)r: "
     STR_CANCELLED = "cancelled by user"
+
+    password_store: Optional[BaseStore]
 
     def __init__(
         self, prefix, popen=None, prompt_func=None, event_handler=None
@@ -466,7 +405,7 @@ class RosieWSClientAuthManager:
     def _prompt(self, is_retry=False):
         """Prompt for the username and password, where necessary.
 
-        Prompt with zenity or raw_input/getpass.
+        Prompt with raw_input/getpass.
 
         """
         if callable(self.prompt_func) and not hasattr(
@@ -477,7 +416,6 @@ class RosieWSClientAuthManager:
             )
             return
 
-        icon_path = ResourceLocator.default().locate("images/rosie-icon.png")
         if is_retry:
             username = ""
 
@@ -485,16 +423,7 @@ class RosieWSClientAuthManager:
                 "prefix": self.prefix,
                 "root": self.root,
             }
-            if self.popen.which("zenity") and os.getenv("DISPLAY"):
-                username = self.popen.run(
-                    "zenity",
-                    "--entry",
-                    "--title=Rosie",
-                    "--window-icon=" + icon_path,
-                    "--text=" + prompt,
-                )[1].strip()
-            else:
-                username = input(prompt)
+            username = input(prompt)
             if not username:
                 raise KeyboardInterrupt(self.STR_CANCELLED)
             if username and username != self.username:
@@ -522,17 +451,7 @@ class RosieWSClientAuthManager:
                     need_prompting = False
 
             if not password and need_prompting:
-                if self.popen.which("zenity") and os.getenv("DISPLAY"):
-                    password = self.popen.run(
-                        "zenity",
-                        "--entry",
-                        "--hide-text",
-                        "--title=Rosie",
-                        "--window-icon=" + icon_path,
-                        "--text=" + prompt,
-                    )[1].strip()
-                else:
-                    password = getpass(prompt)
+                password = getpass(prompt)
             if not password:
                 raise KeyboardInterrupt(self.STR_CANCELLED)
             if password and password != self.password:
