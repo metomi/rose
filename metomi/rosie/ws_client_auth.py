@@ -40,6 +40,7 @@ except ImportError:
     KEYRING_FLAG = False
 else:
     import keyring.errors
+    from keyring.backends.fail import Keyring as NoAvailableKeyring
 
 
 class UndefinedRosiePrefixWS(Exception):
@@ -222,7 +223,9 @@ class KeyringStore(BaseStore):
 
     @classmethod
     def usable(cls) -> bool:
-        return KEYRING_FLAG
+        return KEYRING_FLAG and not isinstance(
+            keyring.get_keyring(), NoAvailableKeyring
+        )
 
     def store_password(
         self, scheme: str, host: str, username: str, password: str
