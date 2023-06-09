@@ -107,7 +107,7 @@ class GPGAgentStore(BaseStore):
     RECV_BUFSIZE = 4096
 
     @classmethod
-    def usable(cls):
+    def usable(cls) -> bool:
         """Can this store be used?"""
         try:
             cls.get_socket()
@@ -116,7 +116,7 @@ class GPGAgentStore(BaseStore):
         return True
 
     @classmethod
-    def get_socket(cls):
+    def get_socket(cls) -> socket.socket:
         """Get a connected, ready-to-use socket for gpg-agent."""
         agent_info = os.environ.get("GPG_AGENT_INFO")
         if agent_info is None:
@@ -126,14 +126,14 @@ class GPGAgentStore(BaseStore):
         try:
             gpg_socket.connect(socket_address)
         except socket.error as exc:
-            raise GPGAgentStoreConnectionError("socket error: %s" % exc)
+            raise GPGAgentStoreConnectionError(f"socket error: {exc}")
         cls._socket_receive(gpg_socket, b"^OK .*\n")
         gpg_socket.send(b"GETINFO socket_name\n")
         reply = cls._socket_receive(gpg_socket, b"^(?!OK)[^ ]+ .*\n")
         if not reply.startswith(b"D"):
-            raise GPGAgentStoreConnectionError("socket: bad reply: %r" % reply)
+            raise GPGAgentStoreConnectionError(f"socket: bad reply: {reply}")
         reply_socket_address = reply.split()[1]
-        if reply_socket_address != socket_address:
+        if reply_socket_address.decode() != socket_address:
             # The gpg-agent documentation advises making this check.
             raise GPGAgentStoreConnectionError("daemon socket mismatch")
         tty = os.environ.get("GPG_TTY")
@@ -143,12 +143,12 @@ class GPGAgentStore(BaseStore):
                     "no $GPG_TTY env var and failed to extrapolate it"
                 )
             tty = os.ttyname(sys.stdin.fileno())
-        gpg_socket.send(b"OPTION putenv=GPG_TTY=%s\n" % tty)
+        gpg_socket.send(f"OPTION putenv=GPG_TTY={tty}\n".encode())
         cls._socket_receive(gpg_socket, b"^OK\n")
         for name in ("TERM", "LANG", "LC_ALL", "DISPLAY"):
             val = os.environ.get(name)
             if val is not None:
-                gpg_socket.send(b"OPTION putenv=%s=%s\n" % (name, val))
+                gpg_socket.send(f"OPTION putenv={name}={val}\n".encode())
                 cls._socket_receive(gpg_socket, b"^OK\n")
         return gpg_socket
 
@@ -159,13 +159,10 @@ class GPGAgentStore(BaseStore):
             reply += gpg_socket.recv(cls.RECV_BUFSIZE)
         return reply
 
-    def __init__(self):
-        pass
-
-    def clear_password(self, scheme, host, username):
+    def clear_password(self, scheme: str, host: str, username: str) -> None:
         """Remove the password from the cache."""
         gpg_socket = self.get_socket()
-        gpg_socket.send("CLEAR_PASSPHRASE rosie:%s:%s\n" % (scheme, host))
+        gpg_socket.send(f"CLEAR_PASSPHRASE rosie:{scheme}:{host}\n".encode())
         # This command always returns 'OK', even when the cache id is invalid.
         self._socket_receive(gpg_socket, b"^OK")
 
@@ -173,37 +170,40 @@ class GPGAgentStore(BaseStore):
         """Return the password of username@root."""
         return self.get_password(scheme, host, username, no_ask=True)
 
-    def get_password(self, scheme, host, username, no_ask=False, prompt=None):
+    def get_password(
+        self,
+        scheme: str,
+        host: str,
+        username: str,
+        no_ask: bool = False,
+        prompt: Optional[str] = None
+    ) -> Optional[str]:
         """Store and retrieve the password."""
         gpg_socket = self.get_socket()
-        no_ask_option = ""
-        if no_ask:
-            no_ask_option = "--no-ask"
-        if prompt is None:
-            prompt = "X"
-        else:
-            prompt = prompt.replace(" ", "+")
+        no_ask_option = "--no-ask" if no_ask else ""
+        prompt = "X" if prompt is None else prompt.replace(" ", "+")
         gpg_socket.send(
-            "GET_PASSPHRASE --data %s rosie:%s:%s X X %s\n"
-            % (no_ask_option, scheme, host, prompt)
+            f"GET_PASSPHRASE --data {no_ask_option} "
+            f"rosie:{scheme}:{host} X X {prompt}\n"
+            .encode()
         )
         reply = self._socket_receive(gpg_socket, b"^(?!OK)[^ ]+ .*\n")
         replylines = reply.splitlines()
         for line in replylines:
-            if line.startswith("D"):
-                return line.split(None, 1)[1]
+            if line.startswith(b"D"):
+                return line.split(None, 1)[1].decode()
         if not no_ask:
             # We want gpg-agent to prompt for a password.
             for line in replylines:
                 if (
-                    line.startswith("INQUIRE ")
-                    or "Operation cancelled" in line
+                    line.startswith(b"INQUIRE ")
+                    or b"Operation cancelled" in line
                 ):
                     # Prompt was launched, or a launched prompt was cancelled.
                     return None
             # Prompt couldn't be launched.
             raise RosieStoreRetrievalError(
-                "gpg-agent", reply.replace("OK\n", "").replace("\n", " ")
+                "gpg-agent", reply.replace(b"OK\n", b"").replace(b"\n", b" ")
             )
         return None
 
