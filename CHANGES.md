@@ -11,6 +11,18 @@ ones in. -->
 
 --------------------------------------------------------------------------------
 
+## 2.0.5 (<span actions:bind='release-date'>Awaiting Release</span>)
+
+### Fixes
+
+[#2699](https://github.com/metomi/rose/pull/2699) -
+Fix an issue where the incremental mode in Rose Bunch was ignored when rerun
+as a task in a Cylc workflow. This change also ensure that incremental mode
+ignores the previous output in the event that the task is re-run as part of a
+later flow
+
+--------------------------------------------------------------------------------
+
 ## 2.0.4 (<span actions:bind='release-date'>Released 2023-04-27</span>)
 
 ### Fixes
