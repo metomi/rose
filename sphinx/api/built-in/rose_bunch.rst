@@ -12,12 +12,12 @@ its output directed to separate ``.out`` and ``.err`` files of the form:
 .. code-block:: sub
 
    bunch.<name>.out
-   
+
 Should you need separate working directories you should configure your
 command to create the appropriate subdirectory for working in.
 
 .. note::
-   
+
    Under load balancing systems such as PBS or Slurm, you will need to
    set resource requests to reflect the resources required by running
    multiple commands at once e.g. if one command would require 1GB
@@ -91,7 +91,7 @@ sections of the :rose:file:`rose-app.conf` file, but
       .. rose:conf:: fail-mode=continue|abort
 
          :default: continue
-         
+
          Specify what action you want the job to take on the failure of a
          command that it is trying to run. If set to continue all command
          variants will be run by the job and the job will return a non-zero
@@ -111,7 +111,7 @@ sections of the :rose:file:`rose-app.conf` file, but
       .. rose:conf:: incremental=true|false
 
          :default: true
-         
+
          If set to ``true`` then only failed commands will be re-run on
          retrying running of the job. If any changes are made to the
          configuration being run then all variants will be re-run. Similarly,
@@ -120,6 +120,10 @@ sections of the :rose:file:`rose-app.conf` file, but
          will result in all commands being run. In verbose mode the app
          will report commands that won't be run due to previous successes
          in the job output with a ``[PASS]`` prefix.
+
+         .. seealso::
+
+            :ref:`rosebunch.CylcTasks`
 
       .. rose:conf:: names=name1 name2 ...
 
@@ -167,3 +171,14 @@ sections of the :rose:file:`rose-app.conf` file, but
          ``command-instances`` and ``COMMAND_INSTANCES``, which are reserved
          for the auto-generated list of instances when the
          :rose:conf:`[bunch]command-instances=N` option is used.
+
+.. _roseBunch.CylcTasks:
+
+Incremental Mode In Cylc Tasks
+------------------------------
+
+When incremental mode is turned on, only failed commands will be re-run
+if the task is run again (e.g. by manual triggering, or automatic retries).
+
+If the task is run again as part of a new flow (e.g. ``--flow=new``),
+then all commands will be re-run.

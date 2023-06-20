@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 75
+tests 78
 #-------------------------------------------------------------------------------
 # Define some constant patterns
 FAIL_PATTERN="\[FAIL\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*"
@@ -48,6 +48,11 @@ run_pass "$TEST_KEY" \
         --host=localhost \
         --no-detach \
         --debug
+
+run_pass "${TEST_KEY_BASE}-restart-paused" cylc play "${FLOW}" --pause --host=localhost
+run_pass "${TEST_KEY_BASE}-trigger" cylc trigger "${FLOW}//*/bunch_incremental"
+run_pass "${TEST_KEY_BASE}-play" cylc play "${FLOW}" --no-detach
+
 #-------------------------------------------------------------------------------
 CYCLE=20100101T0000Z
 LOG_DIR="$FLOW_RUN_DIR/log/job/$CYCLE"
@@ -111,6 +116,12 @@ file_grep $TEST_KEY_PREFIX-ran-2 \
 # Second run files
 #-------------------------------------------------------------------------------
 FILE=$LOG_DIR/$APP/02/job.out
+
+# Ensure that the re-triggered task is done:
+while ! grep "TOTAL" "$FILE" 2>&1 /dev/null; do
+    sleep 1
+done
+
 file_grep_fail $TEST_KEY_PREFIX-not-ran-0 \
     "$INFO_PATTERN 0: added to pool" $FILE
 file_grep $TEST_KEY_PREFIX-skip-0 \
