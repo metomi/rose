@@ -11,7 +11,7 @@ ones in. -->
 
 --------------------------------------------------------------------------------
 
-## 2.0.4 (<span actions:bind='release-date'>Released 2023-04-27</span>)
+## 2.0.4 (<span actions:bind='release-date'>Released 2023-06-20</span>)
 
 ### Fixes
 
