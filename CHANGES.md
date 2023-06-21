@@ -11,6 +11,15 @@ ones in. -->
 
 --------------------------------------------------------------------------------
 
+## 2.0.5 (<span actions:bind='release-date'>Upcoming</span>)
+
+### Fixes
+
+[#2700](https://github.com/metomi/rose/pull/2700) -
+Fix rosie password caching.
+
+--------------------------------------------------------------------------------
+
 ## 2.0.4 (<span actions:bind='release-date'>Released 2023-04-27</span>)
 
 ### Fixes
