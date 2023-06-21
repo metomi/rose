@@ -40,6 +40,8 @@ except ImportError:
     KEYRING_FLAG = False
 else:
     import keyring.errors
+    # Fallback non-functional keyring - used to check if keyring.get_keyring()
+    # gives us a usable keyring:
     from keyring.backends.fail import Keyring as NoAvailableKeyring
 
 
