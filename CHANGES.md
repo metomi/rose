@@ -11,7 +11,7 @@ ones in. -->
 
 --------------------------------------------------------------------------------
 
-## 2.1.0 (<span actions:bind='release-date'>Awaiting Release</span>)
+## 2.1.0 (<span actions:bind='release-date'>Released 2023-07-21</span>)
 
 ### Fixes
 
