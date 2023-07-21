@@ -291,6 +291,10 @@ class RoseBunchApp(BuiltinApp):
         # Set max number of processes to run at once
         max_procs = conf_tree.node.get_value([self.BUNCH_SECTION, "pool-size"])
 
+        # Add CYLC_TASK_FLOW_NUMBERS to configuration:
+        cylc_task_flow_numbers = os.environ.get('CYLC_TASK_FLOW_NUMBERS', "0")
+        conf_tree.node.set(['CYLC_TASK_FLOW_NUMBERS'], cylc_task_flow_numbers)
+
         if max_procs:
             max_procs = int(metomi.rose.env.env_var_process(max_procs))
         else:
@@ -475,7 +479,7 @@ class RoseBunchDAO:
     def create_tables(self):
         """Create tables as appropriate"""
         existing = []
-        first_run = os.environ.get("CYLC_TASK_TRY_NUMBER") == "1"
+        first_run = os.environ.get("CYLC_TASK_SUBMIT_NUMBER") == "1"
 
         for row in self.conn.execute(
             "SELECT name FROM sqlite_master " + "WHERE type=='table'"
@@ -566,7 +570,6 @@ class RoseBunchDAO:
 
     def record_config(self, config, clear_db=False):
         """Take in a conf_tree object and record the entries"""
-
         if clear_db:
             d_stmt = "DELETE FROM " + self.TABLE_CONFIG
             self.conn.execute(d_stmt)
