@@ -1,0 +1,256 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting Started &mdash; Rose Documentation 2.1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/diff_selector.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/grid_table.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/hieroglyph_theme_addons.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/tutorial.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/addons.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/rose-favicon.png"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/js/diff_selector.js"></script>
+        <script src="_static/js/minicylc.js"></script>
+        <script src="_static/js/spoiler.js"></script>
+        <script src="_static/js/addons.js"></script>
+        <script src="_static/js/versioning.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Rose Tutorial" href="tutorial/rose/index.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/rose-logo-crop.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                2.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#text-editor">Text Editor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#editor-syntax-highlighting">Editor Syntax Highlighting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuring-cylc">Configuring Cylc</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/rose/index.html">Rose Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rose API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/configuration/index.html">Rose Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/other.html">Other Python API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/rose-built-in-applications.html">Rose Built-In Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="terms.html">Rose Terms Of Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="course/um-ut.html">UM User Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Rose Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Getting Started</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading"></a></h1>
+<p>If you are working with a new installation of Rose you should look at the
+<a class="reference internal" href="api/configuration/site-and-user.html#site-and-user-configuration"><span class="std std-ref">Site And User Configuration</span></a>.</p>
+<p>Rose combines the settings in the site configuration and the user configuration
+at run time. You can view the resultant configuration by issuing the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">config</span>
+</pre></div>
+</div>
+<p>Rose should work out of the box if it is configured correctly at your site.</p>
+<section id="text-editor">
+<h2>Text Editor<a class="headerlink" href="#text-editor" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>The default external text editor used by <em>GUIs</em> is <code class="docutils literal notranslate"><span class="pre">gedit</span></code>.</p></li>
+<li><p>The default external text editor used by <em>CLI</em> commands is the value of
+the <code class="docutils literal notranslate"><span class="pre">VISUAL</span></code> or <code class="docutils literal notranslate"><span class="pre">EDITOR</span></code> environment variable, or <code class="docutils literal notranslate"><span class="pre">vi</span></code> if neither
+environment variable is set.</p></li>
+</ul>
+<p>To change the default editor change the following settings in the user
+configuration file <code class="docutils literal notranslate"><span class="pre">~/.metomi/rose.conf</span></code>:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">[external]geditor</span></code></dt><dd><p>The external text editor used by GUIs</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">[external]editor</span></code></dt><dd><p>The external text editor used by CLI commands</p>
+</dd>
+</dl>
+<p>For emacs and most text editors, you can do something like:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[external]</span>
+<span class="nv">editor</span><span class="o">=</span><span class="s">emacs</span>
+<span class="nv">geditor</span><span class="o">=</span><span class="s">emacs</span>
+</pre></div>
+</div>
+<p>For any text editor command that normally forks and detaches from the shell
+it is started in, you should use an option to ensure that the text editor
+runs in the foreground to allow Rose to wait for the edit session to
+finish. E.g. for <code class="docutils literal notranslate"><span class="pre">gvim</span></code>, you will do:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[external]</span>
+<span class="nv">editor</span><span class="o">=</span><span class="s">gvim -f</span>
+<span class="nv">geditor</span><span class="o">=</span><span class="s">gvim -f</span>
+</pre></div>
+</div>
+</section>
+<section id="editor-syntax-highlighting">
+<h2>Editor Syntax Highlighting<a class="headerlink" href="#editor-syntax-highlighting" title="Permalink to this heading"></a></h2>
+<p>There are <code class="docutils literal notranslate"><span class="pre">gedit</span></code>, <code class="docutils literal notranslate"><span class="pre">kate</span></code>, <code class="docutils literal notranslate"><span class="pre">vim</span></code>, and <code class="docutils literal notranslate"><span class="pre">emacs</span></code> plugins for syntax
+highlighting of Rose configuration files, located within the Rose installation.</p>
+<p>Run the following command to see the available syntax files and their
+locations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ rose resource syntax
+</pre></div>
+</div>
+<p>Each file contains setup instructions within.</p>
+<p>Additionally there is a <a class="reference external" href="https://pygments.org">Pygments</a> lexer located
+<a class="reference external" href="https://github.com/metomi/rose/blob/master/sphinx/ext/rose_lang.py">in the source code</a></p>
+</section>
+<section id="configuring-cylc">
+<h2>Configuring Cylc<a class="headerlink" href="#configuring-cylc" title="Permalink to this heading"></a></h2>
+<p>See the “Installation” and “User Config File” sections of the
+<a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/user-guide/index.html">Cylc User Guide</a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tutorial/rose/index.html" class="btn btn-neutral float-right" title="Rose Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright : Copyright (C) British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2.1.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = ".html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2.1.0";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "getting-started";
+    </script>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+
+
+</body>
+</html>
