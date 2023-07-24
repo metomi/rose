@@ -11,11 +11,6 @@
 Rose Documentation
 ==================
 
-.. warning::
-
-   This is a release candidate, for production work select a Rose 2019
-   version.
-
 Rose is a toolkit for writing, editing and running application configurations.
 :ref:`What Is Rose <Rose Tutorial>`?
 
