@@ -1,0 +1,320 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Date and Time Manipulation &mdash; Rose Documentation 2.1.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/diff_selector.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/grid_table.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/hieroglyph_theme_addons.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/tutorial.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/addons.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+    <link rel="shortcut icon" href="../../../_static/rose-favicon.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/js/diff_selector.js"></script>
+        <script src="../../../_static/js/minicylc.js"></script>
+        <script src="../../../_static/js/spoiler.js"></script>
+        <script src="../../../_static/js/addons.js"></script>
+        <script src="../../../_static/js/versioning.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Fail-If, Warn-If" href="failif-warnif.html" />
+    <link rel="prev" title="Command Keys" href="command-keys.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/rose-logo-crop.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                2.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Rose Tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../configurations.html">Rose Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../applications.html">Rose Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../metadata.html">Rose Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../suites.html">Rose Suite Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rosie.html">Rosie</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../summary.html">Summary</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Further Topics</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="command-keys.html">Command Keys</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Date and Time Manipulation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#the-rose-date-command">The <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">date</span></code> Command</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#using-rose-date-in-a-suite">Using <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">date</span></code> In A Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-rose-datac-environment-variable">The <code class="docutils literal notranslate"><span class="pre">ROSE_DATAC</span></code> Environment Variable</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="failif-warnif.html">Fail-If, Warn-If</a></li>
+<li class="toctree-l3"><a class="reference internal" href="macro-development.html">Custom Macros</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optional-configurations.html">Optional Configurations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="polling.html">Polling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rose-arch.html">Rose Arch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rose-bunch.html">Rose Bunch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rose-stem.html">Rose Stem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rose-stem-tutorial.html">Rose Stem Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="trigger.html">Trigger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upgrading.html">Upgrading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upgrading-macro-development.html">Upgrading Macro Development</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rose API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/configuration/index.html">Rose Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/other.html">Other Python API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-built-in-applications.html">Rose Built-In Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../terms.html">Rose Terms Of Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../course/um-ut.html">UM User Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Rose Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Rose Tutorial</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Further Topics</a></li>
+      <li class="breadcrumb-item active">Date and Time Manipulation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="date-and-time-manipulation">
+<span id="rose-tutorial-datetime-manipulation"></span><h1>Date and Time Manipulation<a class="headerlink" href="#date-and-time-manipulation" title="Permalink to this heading"></a></h1>
+<p><a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-datetime-cycling" title="(in Cylc v8.1)"><span class="xref std std-term">Datetime cycling</span></a> suites inevitably involve
+performing some form of datetime arithmetic. In the
+<a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/tutorial/scheduling/datetime-cycling.html#tutorial-datetime-cycling-practical" title="(in Cylc v8.1)"><span class="xref std std-ref">weather forecasting suite</span></a> we wrote
+in the Cylc tutorial this arithmetic was done using the <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">cyclepoint</span></code>
+command. For example we calculated the cycle point three hours before the
+present cycle using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">cyclepoint</span> <span class="o">--</span><span class="n">offset</span><span class="o">-</span><span class="n">hours</span><span class="o">=-</span><span class="mi">3</span>
+</pre></div>
+</div>
+<p>Rose provides the <a class="reference internal" href="../../../api/command-reference.html#command-rose-date"><span class="std std-ref">rose date</span></a> command which provides functionality
+beyond <code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">cyclepoint</span></code> as well as the <span class="target" id="index-0"></span><a class="reference internal" href="../../../api/environment-variables.html#envvar-ROSE_DATAC"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_DATAC</span></code></a> environment
+variable which provides an easy way to get the path of the <code class="docutils literal notranslate"><span class="pre">share/cycle</span></code>
+directory.</p>
+<section id="the-rose-date-command">
+<h2>The <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">date</span></code> Command<a class="headerlink" href="#the-rose-date-command" title="Permalink to this heading"></a></h2>
+<p>The <a class="reference internal" href="../../../api/command-reference.html#command-rose-date"><span class="std std-ref">rose date</span></a> command provides functionality for:</p>
+<ul>
+<li><p>Parsing and formatting datetimes e.g:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rose<span class="w"> </span>date<span class="w"> </span><span class="s1">&#39;12-31-2000&#39;</span><span class="w"> </span>--parse-format<span class="o">=</span><span class="s1">&#39;%m-%d-%Y&#39;</span>
+<span class="go">12-31-2000</span>
+<span class="gp">$ </span>rose<span class="w"> </span>date<span class="w"> </span><span class="s1">&#39;12-31-2000&#39;</span><span class="w"> </span>--parse-format<span class="o">=</span><span class="s1">&#39;%m-%d-%Y&#39;</span><span class="w"> </span>--format<span class="o">=</span><span class="s1">&#39;DD-MM-CCYY&#39;</span>
+<span class="go">31-12-2000</span>
+</pre></div>
+</div>
+</li>
+<li><p>Adding offsets to datetimes e.g:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rose<span class="w"> </span>date<span class="w"> </span><span class="s1">&#39;2000-01-01T0000Z&#39;</span><span class="w"> </span>--offset<span class="w"> </span><span class="s1">&#39;+P1M&#39;</span>
+<span class="go">2000-02-01T0000Z</span>
+</pre></div>
+</div>
+</li>
+<li><p>Calculating the duration between two datetimes e.g:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rose<span class="w"> </span>date<span class="w"> </span><span class="s1">&#39;2000&#39;</span><span class="w"> </span><span class="s1">&#39;2001&#39;</span><span class="w">  </span><span class="c1"># Note - 2000 was a leap year!</span>
+<span class="go">P366D</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>See the <a class="reference internal" href="../../../api/command-reference.html#command-rose-date"><span class="std std-ref">rose date</span></a> command reference for more information.</p>
+</section>
+<section id="using-rose-date-in-a-suite">
+<h2>Using <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">date</span></code> In A Suite<a class="headerlink" href="#using-rose-date-in-a-suite" title="Permalink to this heading"></a></h2>
+<p>In datetime cycling suites <a class="reference internal" href="../../../api/command-reference.html#command-rose-date"><span class="std std-ref">rose date</span></a> can work with the
+cyclepoint using the <code class="docutils literal notranslate"><span class="pre">CYLC_TASK_CYCLE_POINT</span></code> environment variable:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[hello_america]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> rose date $CYLC_TASK_CYCLE_POINT --format=&#39;MM-DD-CCYY&#39;</span>
+</pre></div>
+</div>
+<p>Alternatively, if you are providing the standard Rose task environment using
+<a class="reference internal" href="../../../api/command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a> then <a class="reference internal" href="../../../api/command-reference.html#command-rose-date"><span class="std std-ref">rose date</span></a> can use the <code class="docutils literal notranslate"><span class="pre">-c</span></code>
+option to pick up the cycle point:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[hello_america]]</span>
+        <span class="nv">env-script </span><span class="o">=</span><span class="s"> eval $(rose task-env)</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> rose date -c --format=&#39;MM-DD-CCYY&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="the-rose-datac-environment-variable">
+<h2>The <code class="docutils literal notranslate"><span class="pre">ROSE_DATAC</span></code> Environment Variable<a class="headerlink" href="#the-rose-datac-environment-variable" title="Permalink to this heading"></a></h2>
+<p>There are two locations where task output is likely to be located:</p>
+<dl>
+<dt>The work directory</dt><dd><p>Each task is executed within its <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-work-directory" title="(in Cylc v8.1)"><span class="xref std std-term">work directory</span></a> which is located in:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span><span class="s">&lt;run directory&gt;</span>/work/<span class="s">&lt;cycle&gt;</span>/<span class="s">&lt;task-name&gt;</span>
+</pre></div>
+</div>
+<p>The path to a task’s work directory can be obtained from the
+<code class="docutils literal notranslate"><span class="pre">CYLC_TASK_WORK_DIR</span></code> environment variable.</p>
+</dd>
+<dt>The share directory</dt><dd><p>The <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-share-directory" title="(in Cylc v8.1)"><span class="xref std std-term">share directory</span></a> serves the purpose of providing a storage place
+for any files which need to be shared between different tasks.</p>
+<p>Within the share directory data is typically stored within cycle
+subdirectories i.e:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span><span class="s">&lt;run directory&gt;</span>/share/<span class="s">&lt;cycle&gt;</span>
+</pre></div>
+</div>
+<p>These are called the <code class="docutils literal notranslate"><span class="pre">share/cycle</span></code> directories.</p>
+<p>The path to the root of the share directory is provided by the
+<code class="docutils literal notranslate"><span class="pre">CYLC_WORKFLOW_SHARE_DIR</span></code> environment variable so the path to the cycle
+subdirectory would be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;$CYLC_WORKFLOW_SHARE_DIR/$CYLC_TASK_CYCLE_POINT&quot;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>The <a class="reference internal" href="../../../api/command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a> command provides the environment variable
+<span class="target" id="index-1"></span><a class="reference internal" href="../../../api/environment-variables.html#envvar-ROSE_DATAC"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_DATAC</span></code></a> which is a more convenient way to obtain the path of the
+<code class="docutils literal notranslate"><span class="pre">share/cycle</span></code> directory.</p>
+<p>To get the path to a previous (or a future) <code class="docutils literal notranslate"><span class="pre">share/cycle</span></code> directory we can
+provide an offset to <a class="reference internal" href="../../../api/command-reference.html#command-rose-task-env"><span class="std std-ref">rose task-env</span></a> e.g:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">task</span><span class="o">-</span><span class="n">env</span> <span class="o">--</span><span class="n">cycle</span><span class="o">-</span><span class="n">offset</span><span class="o">=</span><span class="n">PT1H</span>
+</pre></div>
+</div>
+<p>The path is then made available as the <code class="docutils literal notranslate"><span class="pre">ROSE_DATACPT1H</span></code> environment variable.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="command-keys.html" class="btn btn-neutral float-left" title="Command Keys" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="failif-warnif.html" class="btn btn-neutral float-right" title="Fail-If, Warn-If" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright : Copyright (C) British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2.1.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../../../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2.1.0";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "tutorial/rose/furthertopics/date-time-manipulation";
+    </script>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+
+
+</body>
+</html>
