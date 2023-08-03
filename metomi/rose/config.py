@@ -217,8 +217,8 @@ class ConfigNode:
         try:
             for keys_1, node_1 in self.walk(no_ignore=True):
                 node_2 = other.get(keys_1, no_ignore=True)
-                if (
-                    type(node_1) != type(node_2)
+                if (  # noqa: E721
+                    type(node_1) != type(node_2)  # noqa: E721
                     or (
                         not isinstance(node_1.value, dict)
                         and node_1.value != node_2.value
