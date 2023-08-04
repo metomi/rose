@@ -33,6 +33,13 @@ get_reg
 APP_LOG_PATH="${HOME}/cylc-run/${FLOW}/log/job/2000/bunchapp"
 SCHD_LOG_PATH="${HOME}/cylc-run/${FLOW}/log/scheduler/log"
 
+poll() {
+    local TIMEOUT=$(($(date +%s) + 120)) # wait 2 minutes
+    while (($(date +%s) < TIMEOUT)) && eval "$@"; do
+        sleep 1
+    done
+}
+
 grep_incrementals() {
     # Check that a rose app-run runs, skips, and fails the desired number of
     # Tasks;
@@ -86,19 +93,16 @@ run_pass "${TEST_SET}" \
 
 # Wait for first run of the task to finish - bunch should have one
 # success and one failure:
-poll ! grep CYLC_JOB_INIT_TIME "${APP_LOG_PATH}/01/job.status" 2>&1 /dev/null
 poll ! grep CYLC_JOB_EXIT "${APP_LOG_PATH}/01/job.status" 2>&1 /dev/null
 grep_incrementals "${APP_LOG_PATH}/01" 1 0
 
 # Re trigger task in same flow - bunch should skip previously succeeded tasks:
 cylc trigger "${FLOW}//2000/bunchapp/"
-poll ! grep CYLC_JOB_INIT_TIME "${APP_LOG_PATH}/02/job.status" 2>&1 /dev/null
 poll ! grep CYLC_JOB_EXIT "${APP_LOG_PATH}/02/job.status" 2>&1 /dev/null
 grep_incrementals "${APP_LOG_PATH}/02" 0 1
 
 # Re trigger task in new flow - bunch should treat as a new task:
 cylc trigger "${FLOW}//2000/bunchapp/" --flow=new
-poll ! grep CYLC_JOB_INIT_TIME "${APP_LOG_PATH}/03/job.status" 2>&1 /dev/null
 poll ! grep CYLC_JOB_EXIT "${APP_LOG_PATH}/03/job.status" 2>&1 /dev/null
 grep_incrementals "${APP_LOG_PATH}/03" 1 0
 
