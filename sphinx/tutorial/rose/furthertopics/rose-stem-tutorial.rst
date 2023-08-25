@@ -20,9 +20,28 @@ This tutorial will walk you through creating a simple example of the
 Rose Stem testing system which will involve piloting a spaceship
 through space.
 
+.. admonition:: Without Version Control
+   :class: hint
+
+   You can run this tutorial without reference to version control using FCM.
+   Look for boxes like this one.
+   You will still need FCM installed to build the Fortran app.
 
 Getting Started
 ---------------
+
+.. admonition:: Without Version Control
+   :class: hint
+
+   This section can be replaced with
+
+   .. code-block:: console
+
+      mkdir -p ~/rose-tutorial/spaceship_working_copy
+      rose tutorial rose-stem .
+
+   Then skip to :ref:`spaceship_command`
+
 
 We will start the Rose Stem tutorial by setting up an `FCM`_ repository
 called ``SPACESHIP`` to store the code and test suite in.
@@ -61,6 +80,7 @@ Finally populate your working copy by running (answering ``y`` to the prompt)::
 
    rose tutorial rose-stem .
 
+.. _spaceship_command:
 
 ``spaceship_command.f90``
 -------------------------
@@ -231,6 +251,11 @@ app with the path to this file.
 Adding the suite to version control
 -----------------------------------
 
+.. admonition:: Without Version Control
+   :class: hint
+
+   Skip to :ref:`without_vc`
+
 Before running the suite we need to make sure that all the files and
 directories we have created are known to the version control system.
 
@@ -240,6 +265,9 @@ to the prompts)*.
 
 Running the test suite
 ----------------------
+
+Installing the workflow
+^^^^^^^^^^^^^^^^^^^^^^^
 
 We should now be able to install the test suite. Simply type::
 
@@ -252,6 +280,22 @@ We use ``--group`` in preference to ``--task`` in this suite (both are
 synonymous) as we specify a group of tasks set up in the Jinja2 variable
 ``name_graphs``.
 
+.. _without_vc:
+
+Without FCM version control
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Without the FCM source control you need to explictly state the workflow
+source and project name:
+
+.. code-block:: console
+
+   rose stem --group=command_spaceship --source=spaceship=$PWD
+
+
+Playing the Workflow
+^^^^^^^^^^^^^^^^^^^^
+
 .. admonition:: Change from Rose 2019
 
    Previously, the ``rose stem`` command ran the suite. At Cylc 8, it simply
@@ -260,8 +304,6 @@ synonymous) as we specify a group of tasks set up in the Jinja2 variable
 We must now use ``cylc play`` to start the workflow::
 
    cylc play spaceship_working_copy
-
-
 
 This can be inspected as running successfully by opening Cylc Review in a
 browser and checking the jobs. Alternatively, use the Cylc GUI or Cylc TUI to

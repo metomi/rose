@@ -12,7 +12,7 @@ Rose Stem
 
 .. seealso::
 
-   :ref:`rose-stem` documentation.
+   :ref:`rose-stem` overview.
 
 Rose Stem is a testing system for use with Rose. It provides a user-friendly
 way of defining source trees and tasks on the command line which are then
@@ -20,8 +20,8 @@ passed by Rose Stem to the suite as Jinja2 variables.
 
 .. warning::
 
-   Rose Stem requires the use of `FCM`_ as it requires some of the version
-   control information.
+   Rose Stem was designed to get version control information from `FCM`_.
+   Some features will not work if ``--sources`` are not FCM projects.
 
 
 Motivation
@@ -95,36 +95,40 @@ of a program.
 The ``--source`` Argument
 -------------------------
 
-The source argument provides a set of Jinja2 variables which can then be
-included in any compilation tasks in a suite. You can specify multiple
-``--source`` arguments on the command line. For example::
+Source arguments provide a set of Jinja2 variables to Cylc.
+These arguments convey information about a directory or URL.
+
+You can specify more than one ``--source`` argument on the command line.
+For example::
 
    rose stem --source=/path/to/workingcopy --source=fcm:other_project_tr@head
 
-Each source tree is associated with a project (via an ``fcm`` command) when
-:ref:`command-rose-stem` is run on the command line. This project name
-is then used in the construction of the Jinja2 variable names.
+* If the source points to an FCM repository rose stem uses
+  FCM to get project information.
+* If the source is not an FCM repository you will need to
+  add a project name: ``--source=<name>=<path/URL>``. Some Jinja2
+  variables provided by rose-stem will be empty.
 
-Each project has a Jinja2 variable ``SOURCE_FOO`` where ``FOO`` is the
+Each project has a Jinja2 variable ``SOURCE_<project>``
 project name. This contains a space-separated list of all sourcetrees
 belonging to that project, which can then be given to an appropriate
 build task in the suite so it builds those source trees.
 
-Similarly, a ``HOST_SOURCE_FOO`` variable is also provided. This is
-identical to ``SOURCE_FOO`` except any working copies have the local
+Similarly, a ``HOST_SOURCE_<project>`` variable is also provided. This is
+identical to ``SOURCE_<project>`` except any working copies have the local
 hostname prepended. This is to assist building on remote machines.
 
 The first source specified must be a working copy which contains the
-Rose Stem suite. The suite is expected to be in a
+Rose Stem suite's Cylc workflow definitions. The suite is expected to be in a
 subdirectory named ``rose-stem`` off the top of the working copy. This
 source is used to generate three additional variables:
 
-``SOURCE_FOO_BASE``
+``SOURCE_<project>_BASE``
    The base directory of the project
-``HOST_SOURCE_FOO_BASE``
+``HOST_SOURCE_<project>_BASE``
    The base directory of the project with the hostname prepended if it is a
    working copy
-``SOURCE_FOO_REV``
+``SOURCE_<project>_REV``
    The revision of the project (if any)
 
 These settings override the variables in the :rose:file:`rose-suite.conf` file.
@@ -148,11 +152,15 @@ you can specify this using the ``--source`` argument::
    rose stem --source=foo=/path/to/source
 
 assigns the URL ``/path/to/source`` to the foo project, so the variables
-``SOURCE_FOO`` and ``SOURCE_FOO_BASE`` will be set to ``/path/to/source``.
+``SOURCE_FOO`` and ``SOURCE_<project>_BASE`` will be set to ``/path/to/source``.
 
 
-The ``--group`` Argument
-------------------------
+The ``--group`` and ``--task`` Arguments
+----------------------------------------
+
+.. note::
+
+   ``--group`` and ``--task`` are the same argument.
 
 The group argument is used to provide a Pythonic list of groups in the
 variable ``RUN_NAMES`` which can then be looped over in a suite to switch
@@ -160,19 +168,11 @@ sets of tasks on and off.
 
 Each ``--group`` argument adds another group to the list. For example::
 
-   rose stem --group=mygroup --group=myothergroup
+   rose stem --group=mygroup --task=myothergroup
 
 runs two groups named ``mygroup`` and ``myothergroup`` with the current
 working copy. The suite will then interpret these into a set of tasks which
 build with the given source tree(s), run the program, and compare the output.
-
-
-The ``--task`` Argument
------------------------
-
-The task argument is provided as a synonym for ``--group``. Depending on how
-exactly the Rose Stem suite works users may find one of these arguments more
-intuitive to use than the other.
 
 
 Comparing Output With :rose:app:`rose_ana`
