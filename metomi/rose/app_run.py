@@ -429,6 +429,7 @@ class AppRunner(Runner):
 
         # Environment variables: PATH
         self._prep_path(conf_tree)
+        self._prep_shadow_pythonpath(conf_tree)
 
         # Free format files not defined in the configuration file
         file_section_prefix = self.config_pm.get_handler("file").PREFIX
@@ -483,6 +484,13 @@ class AppRunner(Runner):
             conf_tree.node.set(["env", "PATH"], value)
         else:
             conf_tree.node.set(["env", "PATH"], os.getenv("PATH"))
+
+    @staticmethod
+    def _prep_shadow_pythonpath(conf_tree):
+        """Restore users PYTHONPATH from _PYTHONPATH"""
+        shadow_pythonpath = os.environ.get('_PYTHONPATH', None)
+        if shadow_pythonpath:
+            conf_tree.node.set(["env", "PYTHONPATH"], shadow_pythonpath)
 
     def _poll(self, conf_tree):
         """Run any configured file polling."""
