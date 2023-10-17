@@ -15,12 +15,13 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 
 import json
-from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 import pytest
 
 from metomi.rosie.suite_id import SuiteId
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
 @pytest.mark.parametrize(
     'vcs_info, expected',
