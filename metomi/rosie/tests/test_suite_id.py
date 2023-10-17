@@ -23,6 +23,7 @@ from metomi.rosie.suite_id import SuiteId
 if TYPE_CHECKING:
     from pathlib import Path
 
+
 @pytest.mark.parametrize(
     'vcs_info, expected',
     [
