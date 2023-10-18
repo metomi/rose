@@ -209,7 +209,7 @@ run_fail "$TEST_KEY" rose app-run --config=../config -q \
     '--define=[file:shopping-list-3.nl]source=namelist:shopping_list'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] file:shopping-list-3.nl=source=namelist:shopping_list: bad or missing value
+[FAIL] file:shopping-list-3.nl=source=namelist:shopping_list: could not locate namelist:shopping_list
 __CONTENT__
 test_teardown
 #-------------------------------------------------------------------------------
@@ -221,7 +221,7 @@ run_fail "$TEST_KEY" rose app-run --config=../config -q \
     '--define=[!namelist:shopping_list]'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] file:shopping-list-3.nl=source=namelist:shopping_list: bad or missing value
+[FAIL] file:shopping-list-3.nl=source=namelist:shopping_list: could not locate namelist:shopping_list
 __CONTENT__
 test_teardown
 #-------------------------------------------------------------------------------
