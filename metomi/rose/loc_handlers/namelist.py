@@ -61,7 +61,7 @@ class NamelistLocHandler:
             if section_value is None:
                 sections.remove(section)
         if not sections:
-            raise ValueError(loc.name)
+            raise ValueError(f"could not locate {loc.name}")
         return sections
 
     async def pull(self, loc, conf_tree):

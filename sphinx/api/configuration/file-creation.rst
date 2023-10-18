@@ -25,6 +25,17 @@ root directory to install file targets with a relative path:
       :opt svn: The Subversion scheme. The location is a Subversion URL or
          an FCM location keyword. A URI with these schemes ``svn``,
          ``svn+ssh`` and ``fcm`` are automatically recognised.
+      :opt git: The Git scheme. The location is complex due to Git semantics.
+         It must have the scheme ``git`` and be of the form
+         ``git:REPOSITORY_URL::PATHSPEC::TREEISH``. ``REPOSITORY_URL`` should
+         be a Git repository URI which may itself have a scheme ``ssh``,
+         ``git``, ``https``, or be of the form ``HOST:PATH``, or ``PATH`` for
+         local repositories. ``PATHSPEC`` should be a path to a file or
+         directory that you want to extract. ``TREEISH`` should be a tag,
+         branch, or long commit hash to specify the commit at which you want
+         to extract. These should follow the same semantics as if you git
+         cloned ``REPOSITORY_URL``, git checkout'ed ``TREEISH``, and extracted
+         the path ``PATHSPEC`` within the clone.
       :opt rsync: This scheme is useful for pulling a file or directory from
          a remote host using ``rsync`` via ``ssh``. A URI should have the
          form ``HOST:PATH``.
