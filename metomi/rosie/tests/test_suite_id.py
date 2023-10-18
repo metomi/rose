@@ -44,7 +44,7 @@ if TYPE_CHECKING:
     ]
 )
 def test_parse_cylc_vc_file(
-    vcs_info: dict, expected: Optional[str], tmp_path: Path
+    vcs_info: dict, expected: Optional[str], tmp_path: 'Path'
 ):
     vcs_file = tmp_path / 'gimli.json'
     vcs_file.write_text(json.dumps(vcs_info))
