@@ -65,6 +65,17 @@ class RosieSvnPreCommitHook(RosieSvnHook):
         access_list.sort()
         return owner, access_list
 
+    def _get_authors(self, txn, repos):
+        """Retrieve the author of the transaction and any alias."""
+        txn_author = self._svnlook("author", "-t", txn, repos).strip()
+        try:
+            text = self._svnlook(
+                "propget", repos, "fcm:authoraliases", ".")
+        except Exception:
+            return txn_author, None
+        author_dict = dict([element.split(":") for element in text.split()])
+        return txn_author, author_dict.get(txn_author)
+
     def _verify_users(self, status, path, txn_owner, txn_access_list,
                       bad_changes):
         """Check txn_owner and txn_access_list.
@@ -106,14 +117,20 @@ class RosieSvnPreCommitHook(RosieSvnHook):
             status, path = line.split(None, 1)
             changes.add((status, path))
         bad_changes = []
-        author = None
-        super_users = None
         rev_info_map = {}
         txn_info_map = {}
 
         conf = ResourceLocator.default().get_conf()
         ignores_str = conf.get_value(["rosa-svn", "ignores"], self.IGNORES)
         ignores = shlex.split(ignores_str)
+
+        author, author_alias = self._get_authors(txn, repos)
+        super_users = []
+        for s_key in ["rosa-svn", "rosa-svn-pre-commit"]:
+            value = conf.get_value([s_key, "super-users"])
+            if value is not None:
+                super_users = shlex.split(value)
+                break
 
         for status, path in sorted(changes):
             if any(fnmatch(path, ignore) for ignore in ignores):
@@ -123,6 +140,11 @@ class RosieSvnPreCommitHook(RosieSvnHook):
             tail = None
             if not names[-1]:
                 tail = names.pop()
+
+            # Allow root property modification by super users.
+            if (len(names) == 1 and not names[0]
+                    and status == "_U" and author in super_users):
+                continue
 
             # Directories above the suites must match the ID patterns
             is_bad = False
@@ -247,20 +269,16 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                 continue
 
             # See whether author has permission to make changes
-            if author is None:
-                author = self._svnlook("author", "-t", txn, repos).strip()
-            if super_users is None:
-                super_users = []
-                for s_key in ["rosa-svn", "rosa-svn-pre-commit"]:
-                    value = conf.get_value([s_key, "super-users"])
-                    if value is not None:
-                        super_users = shlex.split(value)
-                        break
             if sid not in rev_info_map:
                 rev_info_map[sid] = self._load_info(
                     repos, sid, branch=branch)
             owner, access_list = self._get_access_info(rev_info_map[sid])
             admin_users = super_users + [owner]
+
+            # If an author alias username is the owner, allow the new username
+            # owner privileges.
+            if author_alias == owner:
+                admin_users += [author]
 
             # Only admin users can remove the suite
             if author not in admin_users and not path_tail:
