@@ -411,6 +411,18 @@ ID will end with ``ROSIE`` - e.g. ``foo-ROSIE``.
 
 This can be created by running ``rosie create --meta-suite``.
 
+User aliases
+^^^^^^^^^^^^
+
+If you need to map usernames from old to new, for example after
+migrating a Rosie repository from one platform to another with
+different authentication, you can set a ``rosie:authoraliases``
+property on the root of the repository with whitespace separated
+key:value pairs e.g. ``newalice:oldalice newbob:oldbob``. This
+will allow users to authenticate as owners of the suites and
+transition their owner and access-list entries over to the new
+usernames.
+
 Creating a Known Keys File
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 

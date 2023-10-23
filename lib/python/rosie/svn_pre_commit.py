@@ -65,15 +65,22 @@ class RosieSvnPreCommitHook(RosieSvnHook):
         access_list.sort()
         return owner, access_list
 
+    def _get_author_aliases(self, repos, txn=None):
+        """Return the current author alternative name map."""
+        txn_args = ()
+        if txn is not None:
+            txn_args = ("-t", txn)
+        try:
+            text = self._svnlook(
+                "propget", repos, "rosie:authoraliases", ".", *txn_args)
+        except Exception:
+            return {}
+        return dict([element.split(":") for element in text.split()])
+
     def _get_authors(self, txn, repos):
         """Retrieve the author of the transaction and any alias."""
         txn_author = self._svnlook("author", "-t", txn, repos).strip()
-        try:
-            text = self._svnlook(
-                "propget", repos, "fcm:authoraliases", ".")
-        except Exception:
-            return txn_author, None
-        author_dict = dict([element.split(":") for element in text.split()])
+        author_dict = self._get_author_aliases(repos)
         return txn_author, author_dict.get(txn_author)
 
     def _verify_users(self, status, path, txn_owner, txn_access_list,
@@ -143,7 +150,18 @@ class RosieSvnPreCommitHook(RosieSvnHook):
 
             # Allow root property modification by super users.
             if (len(names) == 1 and not names[0]
-                    and status == "_U" and author in super_users):
+                    and status == "_U"):
+                if author not in super_users:
+                    msg = "Must be a super user to change root properties"
+                    bad_changes.append(BadChange(status, path, content=msg))
+                    continue
+                try:
+                    self._get_author_aliases(repos, txn=txn)
+                except ValueError:
+                    msg = "Malformed rosie:authoraliases property"
+                    bad_changes.append(BadChange(status, path, content=msg))
+                    continue
+                # OK if author is in super users and property OK.
                 continue
 
             # Directories above the suites must match the ID patterns
