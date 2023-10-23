@@ -130,6 +130,7 @@ __CHANGED__
 rm -rf foo_wc
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-modify-with-alias-good-1
+svn update -q aa000
 echo "vehicle=carriage" >>aa000/rose-suite.info
 REV1=$(svn info --show-item revision aa000/)
 run_pass "$TEST_KEY" svn commit -q -m 't' --username=daisynew aa000
