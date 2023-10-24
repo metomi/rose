@@ -148,7 +148,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
 
    .. rubric:: In this practical we will convert the ``forecast`` task from the
       :ref:`weather-forecasting workflow <tutorial-datetime-cycling-practical>`
-      into a Rose application.
+      into a standalone Rose application.
 
    Create a directory on your filesystem called ``rose-tutorial``::
 
@@ -166,15 +166,17 @@ An application can be run using the :ref:`command-rose-app-run` command:
    #. **Provide the required resources in the** ``application-tutorial``
       **application.**
 
-      The application requires three resources:
+      The application gets three resources from different places in the
+      :ref:`weather-forecasting workflow <tutorial-datetime-cycling-practical>`:
 
       * The ``bin/forecast`` script.
       * The ``lib/python/util.py`` Python library.
       * The ``lib/template/map.html`` HTML template.
 
-      Rather than leaving these resources scattered throughout the
-      :term:`run directory` we can encapsulate them into the
-      application directory.
+      We will move all these resources into a single application directory.
+
+      This makes a rose application easier to maintain by keeping all the
+      files required in the same place.
 
       Install the ``forecast`` script and ``util.py`` library into the ``bin/``
       directory by running this command::

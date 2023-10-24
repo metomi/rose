@@ -213,6 +213,11 @@ texinfo_documents = [
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 # texinfo_show_urls = 'footnote'
 
+linkcheck_ignore = [
+    # linux.die.net doesn't like our request headers
+    'https?://linux.die.net/man/1/rsync',
+]
+
 
 def setup(app):
     # set the html_static_path in an extension so as not to conflict with
