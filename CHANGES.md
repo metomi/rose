@@ -13,6 +13,13 @@ ones in. -->
 
 ## 2.1.0 (<span actions:bind='release-date'>Released 2023-07-21</span>)
 
+### Breaking Changes
+
+[2736](https://github.com/metomi/rose/pull/2736)
+Rose now ignores `PYTHONPATH` to make it more robust to task environments
+which set this value. If you want to add to the Rose environment itself,
+e.g. to write a rose-ana test, use `ROSE_PYTHONPATH`.
+
 ### Fixes
 
 [#2699](https://github.com/metomi/rose/pull/2699) -
