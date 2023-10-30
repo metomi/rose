@@ -72,7 +72,7 @@ class RosieSvnPreCommitHook(RosieSvnHook):
             txn_args = ("-t", txn)
         try:
             text = self._svnlook(
-                "propget", repos, "rosie:authoraliases", ".", *txn_args)
+                "cat", repos, "/R/O/S/I/E/trunk/author_aliases", *txn_args)
         except Exception:
             return {}
         return dict([element.split(":") for element in text.split()])
@@ -147,22 +147,6 @@ class RosieSvnPreCommitHook(RosieSvnHook):
             tail = None
             if not names[-1]:
                 tail = names.pop()
-
-            # Allow root property modification by super users.
-            if (len(names) == 1 and not names[0]
-                    and status == "_U"):
-                if author not in super_users:
-                    msg = "Must be a super user to change root properties"
-                    bad_changes.append(BadChange(status, path, content=msg))
-                    continue
-                try:
-                    self._get_author_aliases(repos, txn=txn)
-                except ValueError:
-                    msg = "Malformed rosie:authoraliases property"
-                    bad_changes.append(BadChange(status, path, content=msg))
-                    continue
-                # OK if author is in super users and property OK.
-                continue
 
             # Directories above the suites must match the ID patterns
             is_bad = False

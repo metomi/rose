@@ -416,10 +416,14 @@ User aliases
 
 If you need to map usernames from old to new, for example after
 migrating a Rosie repository from one platform to another with
-different authentication, you can set a ``rosie:authoraliases``
-property on the root of the repository with whitespace separated
-key:value pairs e.g. ``newalice:oldalice newbob:oldbob``. This
-will allow users to authenticate as owners of the suites and
+different authentication, you can create an ``author_aliases``
+file within the ``ROSIE`` special suite's trunk with whitespace
+separated key-value pairs e.g.::
+
+   newalice:oldalice
+   newbob:oldbob
+
+This will allow users to authenticate as owners of the suites and
 transition their owner and access-list entries over to the new
 usernames.
 

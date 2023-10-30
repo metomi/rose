@@ -27,7 +27,7 @@ cat >conf/rose.conf <<'__ROSE_CONF__'
 super-users=rosie
 __ROSE_CONF__
 #-------------------------------------------------------------------------------
-tests 53
+tests 51
 #-------------------------------------------------------------------------------
 mkdir repos
 svnadmin create repos/foo
@@ -89,48 +89,44 @@ svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
 
 __ERR__
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-create-alias-bad-1
-svn checkout -q $SVN_URL/ foo_wc/
-svn propset rosie:authoraliases "daisynew:daisy
-bar:baz" foo_wc/
-run_fail "$TEST_KEY" svn commit -q -m 't' foo_wc
+TEST_KEY=$TEST_KEY_BASE-modify-bad-2
+svn update -q aa000
+run_fail "$TEST_KEY" svn commit -q -m 't' --username=daisynew aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 svn: E165001: Commit failed (details follow):
 svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
-[FAIL] PERMISSION DENIED: _U  /: Must be a super user to change root properties
+[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.info: User not in access list
 
 __ERR__
-rm -rf foo_wc
-#-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-create-alias-bad-2
-svn checkout -q $SVN_URL/ foo_wc/
-svn propset rosie:authoraliases "daisynew:daisy bar" foo_wc/
-run_fail "$TEST_KEY" svn commit -q -m 't' --username=rosie foo_wc
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-svn: E165001: Commit failed (details follow):
-svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
-[FAIL] PERMISSION DENIED: _U  /: Malformed rosie:authoraliases property
-
-__ERR__
-rm -rf foo_wc
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-create-alias-ok-1
-svn checkout -q $SVN_URL/ foo_wc/
-svn propset rosie:authoraliases "daisynew:daisy
-bar:baz" foo_wc/
-run_pass "$TEST_KEY" svn commit -q -m 't' --username=rosie foo_wc
+cat >rose-suite.info <<__ROSE_SUITE_INFO__
+owner=rosie_member0
+project=Rosie admin
+title=${TEST_KEY}
+__ROSE_SUITE_INFO__
+run_pass "$TEST_KEY" \
+    svn import rose-suite.info -q -m 't' --non-interactive \
+    $SVN_URL/R/O/S/I/E/trunk/rose-suite.info
+svn checkout -q $SVN_URL/R/O/S/I/E/trunk/ ROSIE/
+cat >ROSIE/author_aliases <<'__TEXT__'
+daisynew:daisy
+bar:baz
+__TEXT__
+svn add -q ROSIE/author_aliases
+run_pass "$TEST_KEY" svn commit -q -m 't' --username=rosie_member0 ROSIE/
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 svnlook changed repos/foo >"$TEST_KEY.changed"
 file_cmp "$TEST_KEY.changed" "$TEST_KEY.changed" <<'__CHANGED__'
-_U  /
+A   R/O/S/I/E/trunk/author_aliases
 __CHANGED__
-rm -rf foo_wc
+rm -rf ROSIE
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-modify-with-alias-good-1
 svn update -q aa000
+svn revert -R aa000
 echo "vehicle=carriage" >>aa000/rose-suite.info
 REV1=$(svn info --show-item revision aa000/)
 run_pass "$TEST_KEY" svn commit -q -m 't' --username=daisynew aa000
@@ -174,16 +170,16 @@ svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-delete-alias-ok
-svn checkout -q $SVN_URL/ foo_wc/
-svn propdel rosie:authoraliases foo_wc/
-run_pass "$TEST_KEY" svn commit -q -m 't' --username=rosie foo_wc
+svn checkout -q $SVN_URL/R/O/S/I/E/trunk/ ROSIE/
+svn delete ROSIE/author_aliases
+run_pass "$TEST_KEY" svn commit -q -m 't' --username=rosie ROSIE
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 svnlook changed repos/foo >"$TEST_KEY.changed"
 file_cmp "$TEST_KEY.changed" "$TEST_KEY.changed" <<'__CHANGED__'
-_U  /
+D   R/O/S/I/E/trunk/author_aliases
 __CHANGED__
-rm -rf foo_wc
+rm -rf ROSIE
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-modify-no-alias-ok
 svn update -q aa000
@@ -201,16 +197,19 @@ U   a/a/0/0/0/trunk/rose-suite.info
 __CHANGED__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-create-single-alias-ok-1
-svn checkout -q $SVN_URL/ foo_wc/
-svn propset rosie:authoraliases "daisynew2:daisynew" foo_wc/
-run_pass "$TEST_KEY" svn commit -q -m 't' --username=rosie foo_wc
+svn checkout -q $SVN_URL/R/O/S/I/E/trunk ROSIE/
+cat >ROSIE/author_aliases <<'__TEXT__'
+daisynew2:daisynew
+__TEXT__
+svn add ROSIE/author_aliases
+run_pass "$TEST_KEY" svn commit -q -m 't' --username=rosie_member0 ROSIE
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 svnlook changed repos/foo >"$TEST_KEY.changed"
 file_cmp "$TEST_KEY.changed" "$TEST_KEY.changed" <<'__CHANGED__'
-_U  /
+A   R/O/S/I/E/trunk/author_aliases
 __CHANGED__
-rm -rf foo_wc
+rm -rf ROSIE
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-modify-with-single-alias-good-1
 svn update -q aa000
