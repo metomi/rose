@@ -15,7 +15,7 @@ on:
 jobs:
   test:
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 2
+    timeout-minutes: 5
     strategy:
       fail-fast: false
       matrix:
@@ -23,7 +23,7 @@ jobs:
         python-version: [
           '2.7',
           '3.5', '3.6',
-          '3.7', '3.8', '3.9'
+          '3.7', '3.8', '3.9', '3.12'
         ]
 
     steps:
@@ -34,11 +34,23 @@ jobs:
           path: rose
 
       - name: Configure Python
+        id: configure-py
         uses: actions/setup-python@v4
+        continue-on-error: true
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Setup Mamba
+        if: steps.configure-py.outcome == 'failure'
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          mamba-version: '*'
+          channels: conda-forge
+
       - name: Unit Tests
         working-directory: rose
+        # use login shell for conda activation
+        shell: bash -leo pipefail {0}
         run: |
           prove -vv t/rose-loc-handlers/test_rsync_loc_handlers.t
