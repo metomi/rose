@@ -234,7 +234,6 @@ RECIPS=$(get_recips 'del')
 file_grep "$TEST_KEY-smtpd.log.recips" "To: $RECIPS" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.subject" \
     "Subject: foo-aa001/trunk@7" "$TEST_SMTPD_LOG"
-cat $TEST_SMTPD_LOG > /home/h02/tpilling/foo
 file_grep "$TEST_KEY-smtpd.log.text" \
     "D   a/a/0/0/1//trunk/" "$TEST_SMTPD_LOG"
 file_cmp "$TEST_KEY-rc" "$PWD/rosa-svn-post-commit.rc" <<<'0'
