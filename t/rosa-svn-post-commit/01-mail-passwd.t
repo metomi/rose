@@ -170,7 +170,6 @@ RECIPS=$(get_recips 'mod-owner')
 file_grep "$TEST_KEY-smtpd.log.recips" "To: $RECIPS" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.subject" \
     "Subject: foo-aa000/trunk@4" "$TEST_SMTPD_LOG"
-cat "$TEST_SMTPD_LOG" > /home/h02/tpilling/foo
 file_grep "$TEST_KEY-smtpd.log.text" \
     "-owner=$USER" "$TEST_SMTPD_LOG"
 file_grep "$TEST_KEY-smtpd.log.text" \
