@@ -109,7 +109,6 @@ __ROSE_SUITE_INFO
 cat /dev/null >"$TEST_SMTPD_LOG"
 rosie create -q -y --info-file=rose-suite.info --no-checkout
 RECIPS=$(get_recips 'new')
-cat ${TEST_SMTPD_LOG} > "/home/h02/tpilling/foo"
 echo $RECIPS >&2
 if [[ -z $RECIPS ]]; then
     skip 4 'no recipient'
