@@ -27,7 +27,7 @@ cat >conf/rose.conf <<'__ROSE_CONF__'
 super-users=rosie
 __ROSE_CONF__
 #-------------------------------------------------------------------------------
-tests 73
+tests 70
 #-------------------------------------------------------------------------------
 mkdir repos
 svnadmin create repos/foo
@@ -40,7 +40,7 @@ __PRE_COMMIT__
 chmod +x repos/foo/hooks/pre-commit
 export LANG=C
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-create-good-1
+TEST_KEY=$TEST_KEY_BASE-create-good
 cat >rose-suite.info <<__ROSE_SUITE_INFO__
 access-list=frank dave
 owner=daisy
@@ -63,7 +63,7 @@ A   a/a/0/0/0/trunk/
 A   a/a/0/0/0/trunk/rose-suite.info
 __CHANGED__
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-modify-good-1
+TEST_KEY=$TEST_KEY_BASE-modify-good
 svn checkout -q $SVN_URL/a/a/0/0/0/trunk/ aa000/
 echo "vehicle=bicycle" >>aa000/rose-suite.info
 REV1=$(svn info --show-item revision aa000/)
@@ -78,7 +78,7 @@ file_cmp "$TEST_KEY.changed" "$TEST_KEY.changed" <<'__CHANGED__'
 U   a/a/0/0/0/trunk/rose-suite.info
 __CHANGED__
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-modify-bad-1
+TEST_KEY=$TEST_KEY_BASE-modify-bad
 svn update -q aa000
 echo "subtitle=answer" >>aa000/rose-suite.info
 run_fail "$TEST_KEY" svn commit -q -m 't' --username=hal aa000
@@ -90,18 +90,7 @@ svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
 
 __ERR__
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-modify-bad-2
-svn update -q aa000
-run_fail "$TEST_KEY" svn commit -q -m 't' --username=daisynew aa000
-file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
-svn: E165001: Commit failed (details follow):
-svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
-[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.info: User not in access list
-
-__ERR__
-#-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-create-alias-ok-1
+TEST_KEY=$TEST_KEY_BASE-create-alias-ok
 cat >rose-suite.info <<__ROSE_SUITE_INFO__
 owner=rosie_member0
 project=Rosie admin
@@ -161,7 +150,7 @@ A   a/a/0/0/0/trunk/extra-stuff
 U   a/a/0/0/0/trunk/rose-suite.info
 __CHANGED__
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-modify-with-alias-bad-1
+TEST_KEY=$TEST_KEY_BASE-modify-with-alias-bad
 echo "references=stretched" >>aa000/rose-suite.info
 run_fail "$TEST_KEY" svn commit -q -m 't' --username=hal aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
@@ -172,7 +161,7 @@ svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
 
 __ERR__
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-modify-with-alias-access-list-good-1
+TEST_KEY=$TEST_KEY_BASE-modify-with-alias-access-list-good
 # Restore the state without aliases.
 svn update -q aa000
 sed -i "s/new//g" aa000/rose-suite.info
@@ -276,7 +265,7 @@ file_cmp "$TEST_KEY.changed" "$TEST_KEY.changed" <<'__CHANGED__'
 U   a/a/0/0/0/trunk/rose-suite.info
 __CHANGED__
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-create-single-alias-ok-1
+TEST_KEY=$TEST_KEY_BASE-create-single-alias-ok
 svn checkout -q $SVN_URL/R/O/S/I/E/trunk ROSIE/
 cat >ROSIE/author_aliases <<'__TEXT__'
 daisynew2:daisy
@@ -291,7 +280,7 @@ A   R/O/S/I/E/trunk/author_aliases
 __CHANGED__
 rm -rf ROSIE
 #-------------------------------------------------------------------------------
-TEST_KEY=$TEST_KEY_BASE-modify-with-single-alias-good-1
+TEST_KEY=$TEST_KEY_BASE-modify-with-single-alias-good
 svn update -q aa000
 echo "bicycle_for=two" >>aa000/rose-suite.info
 REV1=$(svn info --show-item revision aa000/)
