@@ -77,11 +77,9 @@ class RosieSvnPreCommitHook(RosieSvnHook):
             return {}
         return dict([element.split(":") for element in text.split()])
 
-    def _get_authors(self, txn, repos):
-        """Retrieve the author of the transaction and any alias."""
-        txn_author = self._svnlook("author", "-t", txn, repos).strip()
-        author_dict = self._get_author_aliases(repos)
-        return txn_author, author_dict.get(txn_author)
+    def _get_author(self, txn, repos):
+        """Retrieve the author of the transaction."""
+        return self._svnlook("author", "-t", txn, repos).strip()
 
     def _verify_users(self, status, path, txn_owner, txn_access_list,
                       bad_changes):
@@ -126,18 +124,11 @@ class RosieSvnPreCommitHook(RosieSvnHook):
         bad_changes = []
         rev_info_map = {}
         txn_info_map = {}
+        found_author_info = False
 
         conf = ResourceLocator.default().get_conf()
         ignores_str = conf.get_value(["rosa-svn", "ignores"], self.IGNORES)
         ignores = shlex.split(ignores_str)
-
-        author, author_alias = self._get_authors(txn, repos)
-        super_users = []
-        for s_key in ["rosa-svn", "rosa-svn-pre-commit"]:
-            value = conf.get_value([s_key, "super-users"])
-            if value is not None:
-                super_users = shlex.split(value)
-                break
 
         for status, path in sorted(changes):
             if any(fnmatch(path, ignore) for ignore in ignores):
@@ -270,6 +261,17 @@ class RosieSvnPreCommitHook(RosieSvnHook):
             if (self.ST_ADDED, path_head + "trunk/") in changes:
                 continue
 
+            if not found_author_info:
+                author = self._get_author(txn, repos)
+                author_aliases = self._get_author_aliases(repos)
+                super_users = []
+                for s_key in ["rosa-svn", "rosa-svn-pre-commit"]:
+                    value = conf.get_value([s_key, "super-users"])
+                    if value is not None:
+                        super_users = shlex.split(value)
+                        break
+                found_author_info = True
+
             # See whether author has permission to make changes
             if sid not in rev_info_map:
                 rev_info_map[sid] = self._load_info(
@@ -277,9 +279,9 @@ class RosieSvnPreCommitHook(RosieSvnHook):
             owner, access_list = self._get_access_info(rev_info_map[sid])
             admin_users = super_users + [owner]
 
-            # If an author alias username is the owner, allow the new username
-            # owner privileges.
-            if author_alias == owner:
+            if author in author_aliases and author_aliases[author] == owner:
+                # If an author alias username is the owner, allow the new username
+                # owner privileges.
                 admin_users += [author]
 
             # Only admin users can remove the suite
@@ -290,7 +292,8 @@ class RosieSvnPreCommitHook(RosieSvnHook):
 
             # Admin users and those in access list can modify everything in
             # trunk apart from specific entries in the trunk info file
-            if "*" in access_list or author in admin_users + access_list:
+            if ("*" in access_list or author in admin_users + access_list
+                    or author_aliases.get(author) in access_list):
                 if path_tail != self.TRUNK_INFO_FILE:
                     continue
             else:
@@ -298,9 +301,19 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                 bad_changes.append(BadChange(status, path, content=msg))
                 continue
 
-            # Only the admin users can change owner and access list
+            # Only the admin users can change owner and access list except
+            # that access list users can change them to aliases.
+
             if owner == txn_owner and access_list == txn_access_list:
+                # No substantive change made, fine.
                 continue
+
+            if (owner == author_aliases.get(txn_owner)
+                    and set(access_list)
+                        == set([author_aliases.get(_) for _ in txn_access_list])):
+                # The change has purely been an aliased one, fine.
+                continue
+
             if author not in admin_users:
                 if owner != txn_owner:
                     bad_changes.append(BadChange(status, path, BadChange.PERM,

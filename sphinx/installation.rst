@@ -425,7 +425,9 @@ separated key-value pairs e.g.::
 
 This will allow users to authenticate as owners of the suites and
 transition their owner and access-list entries over to the new
-usernames.
+usernames. Users on the access-list may also map old owner and
+access-list usernames over to the new ones using these aliases,
+but any incomplete or imprecise mapping will be disallowed.
 
 Creating a Known Keys File
 ^^^^^^^^^^^^^^^^^^^^^^^^^^

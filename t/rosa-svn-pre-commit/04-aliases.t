@@ -27,7 +27,7 @@ cat >conf/rose.conf <<'__ROSE_CONF__'
 super-users=rosie
 __ROSE_CONF__
 #-------------------------------------------------------------------------------
-tests 51
+tests 73
 #-------------------------------------------------------------------------------
 mkdir repos
 svnadmin create repos/foo
@@ -42,6 +42,7 @@ export LANG=C
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-create-good-1
 cat >rose-suite.info <<__ROSE_SUITE_INFO__
+access-list=frank dave
 owner=daisy
 project=rose
 title=${TEST_KEY}
@@ -112,7 +113,8 @@ run_pass "$TEST_KEY" \
 svn checkout -q $SVN_URL/R/O/S/I/E/trunk/ ROSIE/
 cat >ROSIE/author_aliases <<'__TEXT__'
 daisynew:daisy
-bar:baz
+franknew:frank
+davenew:dave
 __TEXT__
 svn add -q ROSIE/author_aliases
 run_pass "$TEST_KEY" svn commit -q -m 't' --username=rosie_member0 ROSIE/
@@ -143,6 +145,7 @@ __CHANGED__
 TEST_KEY=$TEST_KEY_BASE-modify-with-alias-good-2
 svn update -q aa000
 sed -i "s/owner=daisy/owner=daisynew/" aa000/rose-suite.info
+sed -i "s/access-list=frank dave/access-list=franknew davenew/" aa000/rose-suite.info
 touch aa000/extra-stuff
 svn add aa000/extra-stuff
 REV1=$(svn info --show-item revision aa000/)
@@ -169,6 +172,83 @@ svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
 
 __ERR__
 #-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-modify-with-alias-access-list-good-1
+# Restore the state without aliases.
+svn update -q aa000
+sed -i "s/new//g" aa000/rose-suite.info
+REV1=$(svn info --show-item revision aa000/)
+run_pass "$TEST_KEY-setup" svn commit -q -m 't' --username=daisynew aa000
+file_cmp "$TEST_KEY-setup.out" "$TEST_KEY-setup.out" </dev/null
+file_cmp "$TEST_KEY-setup.err" "$TEST_KEY-setup.err" </dev/null
+svn update -q aa000
+REV2=$(svn info --show-item revision aa000/)
+run_pass "$TEST_KEY-setup.rev" bash -c "(( $REV2 > $REV1 ))"
+svnlook changed repos/foo >"$TEST_KEY-setup.changed"
+file_cmp "$TEST_KEY-setup.changed" "$TEST_KEY-setup.changed" <<'__CHANGED__'
+U   a/a/0/0/0/trunk/rose-suite.info
+__CHANGED__
+# Now change the owner and access-list but only to aliases.
+sed -i "s/owner=daisy/owner=daisynew/" aa000/rose-suite.info
+sed -i "s/access-list=frank dave/access-list=franknew davenew/" aa000/rose-suite.info
+REV1=$(svn info --show-item revision aa000/)
+run_pass "$TEST_KEY" svn commit -q -m 't' --username=franknew aa000
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+svn update -q aa000
+REV2=$(svn info --show-item revision aa000/)
+run_pass "$TEST_KEY.rev" bash -c "(( $REV2 > $REV1 ))"
+svnlook changed repos/foo >"$TEST_KEY.changed"
+file_cmp "$TEST_KEY.changed" "$TEST_KEY.changed" <<'__CHANGED__'
+U   a/a/0/0/0/trunk/rose-suite.info
+__CHANGED__
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-modify-with-alias-access-list-bad-1
+# Restore the state without aliases.
+svn update -q aa000
+sed -i "s/new//g" aa000/rose-suite.info
+REV1=$(svn info --show-item revision aa000/)
+run_pass "$TEST_KEY-setup" svn commit -q -m 't' --username=daisynew aa000
+file_cmp "$TEST_KEY-setup.out" "$TEST_KEY-setup.out" </dev/null
+file_cmp "$TEST_KEY-setup.err" "$TEST_KEY-setup.err" </dev/null
+svn update -q aa000
+REV2=$(svn info --show-item revision aa000/)
+run_pass "$TEST_KEY-setup.rev" bash -c "(( $REV2 > $REV1 ))"
+svnlook changed repos/foo >"$TEST_KEY-setup.changed"
+file_cmp "$TEST_KEY-setup.changed" "$TEST_KEY-setup.changed" <<'__CHANGED__'
+U   a/a/0/0/0/trunk/rose-suite.info
+__CHANGED__
+# Access-list user trying to change the owner, should be blocked.
+sed -i "s/owner=daisy/owner=franknew/" aa000/rose-suite.info
+sed -i "s/access-list=frank dave/access-list=franknew davenew/" aa000/rose-suite.info
+REV1=$(svn info --show-item revision aa000/)
+run_fail "$TEST_KEY" svn commit -q -m 't' --username=franknew aa000
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+svn: E165001: Commit failed (details follow):
+svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
+[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.info: owner=franknew
+
+__ERR__
+#-------------------------------------------------------------------------------
+TEST_KEY=$TEST_KEY_BASE-modify-with-alias-access-list-bad-2
+svn revert -q -R aa000
+# Access-list user trying to change the access-list, should be blocked.
+sed -i "s/owner=daisy/owner=daisynew/" aa000/rose-suite.info
+sed -i "s/access-list=frank dave/access-list=franknew davenew heywood/" aa000/rose-suite.info
+REV1=$(svn info --show-item revision aa000/)
+run_fail "$TEST_KEY" svn commit -q -m 't' --username=franknew aa000
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
+svn: E165001: Commit failed (details follow):
+svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
+[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.info: owner=daisynew
+
+__ERR__
+svn revert -q -R aa000
+svn update -q aa000
+REV2=$(svn info --show-item revision aa000/)
+run_pass "$TEST_KEY.rev" bash -c "(( $REV2 == $REV1 ))"
+#-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-delete-alias-ok
 svn checkout -q $SVN_URL/R/O/S/I/E/trunk/ ROSIE/
 svn delete ROSIE/author_aliases
@@ -185,7 +265,7 @@ TEST_KEY=$TEST_KEY_BASE-modify-no-alias-ok
 svn update -q aa000
 echo "plant=flower" >>aa000/rose-suite.info
 REV1=$(svn info --show-item revision aa000/)
-run_pass "$TEST_KEY" svn commit -q -m 't' --username=daisynew aa000
+run_pass "$TEST_KEY" svn commit -q -m 't' --username=daisy aa000
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 svn update -q aa000
@@ -199,9 +279,9 @@ __CHANGED__
 TEST_KEY=$TEST_KEY_BASE-create-single-alias-ok-1
 svn checkout -q $SVN_URL/R/O/S/I/E/trunk ROSIE/
 cat >ROSIE/author_aliases <<'__TEXT__'
-daisynew2:daisynew
+daisynew2:daisy
 __TEXT__
-svn add ROSIE/author_aliases
+svn add -q ROSIE/author_aliases
 run_pass "$TEST_KEY" svn commit -q -m 't' --username=rosie_member0 ROSIE
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
