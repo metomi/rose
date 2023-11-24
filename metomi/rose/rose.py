@@ -20,7 +20,7 @@ import sys
 
 
 def pythonpath_manip():
-    """Stop PYTHONPATH contaminating the Cylc Environment
+    """Stop PYTHONPATH contaminating the Rose Environment
 
     * Remove PYTHONPATH items from sys.path to prevent PYTHONPATH
       contaminating the Rose Environment.
