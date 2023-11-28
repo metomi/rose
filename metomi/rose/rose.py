@@ -30,10 +30,14 @@ def pythonpath_manip():
         https://github.com/cylc/cylc-flow/issues/5124
     """
     if 'ROSE_PYTHONPATH' in os.environ:
-        for item in os.environ['ROSE_PYTHONPATH'].split(os.pathsep):
-            print(f'extracted {item} from ROSE_PYTHONPATH')
-            abspath = os.path.abspath(item)
-            sys.path.insert(0, abspath)
+        paths = [
+            os.path.abspath(item)
+            for item in os.environ['ROSE_PYTHONPATH'].split(os.pathsep)
+        ]
+        print(f"Extracted {paths} from ROSE_PYTHONPATH")
+        paths.extend(sys.path)
+        sys.path = paths
+
     if 'PYTHONPATH' in os.environ:
         for item in os.environ['PYTHONPATH'].split(os.pathsep):
             abspath = os.path.abspath(item)
