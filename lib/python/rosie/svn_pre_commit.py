@@ -312,7 +312,7 @@ class RosieSvnPreCommitHook(RosieSvnHook):
                 continue
 
             if author not in admin_users:
-                if owner != txn_owner:
+                if owner != txn_owner and owner != author_aliases.get(txn_owner):
                     bad_changes.append(BadChange(status, path, BadChange.PERM,
                                                  "owner=" + txn_owner))
                 else:  # access list
