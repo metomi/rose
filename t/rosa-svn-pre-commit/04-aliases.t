@@ -230,7 +230,7 @@ file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 svn: E165001: Commit failed (details follow):
 svn: E165001: Commit blocked by pre-commit hook (exit code 1) with output:
-[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.info: owner=daisynew
+[FAIL] PERMISSION DENIED: U   a/a/0/0/0/trunk/rose-suite.info: access-list=davenew franknew heywood
 
 __ERR__
 svn revert -q -R aa000
