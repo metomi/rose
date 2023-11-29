@@ -65,14 +65,11 @@ class RosieSvnPreCommitHook(RosieSvnHook):
         access_list.sort()
         return owner, access_list
 
-    def _get_author_aliases(self, repos, txn=None):
+    def _get_author_aliases(self, repos):
         """Return the current author alternative name map."""
-        txn_args = ()
-        if txn is not None:
-            txn_args = ("-t", txn)
         try:
             text = self._svnlook(
-                "cat", repos, "/R/O/S/I/E/trunk/author_aliases", *txn_args)
+                "cat", repos, "/R/O/S/I/E/trunk/author_aliases")
         except Exception:
             return {}
         return dict([element.split(":") for element in text.split()])
