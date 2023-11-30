@@ -307,7 +307,7 @@ class RosieSvnPreCommitHook(RosieSvnHook):
 
             if (owner == author_aliases.get(txn_owner)
                     and set(access_list)
-                        == set([author_aliases.get(_) for _ in txn_access_list])):
+                        == set(author_aliases.get(_) for _ in txn_access_list)):
                 # The change has purely been an aliased one, fine.
                 continue
 
