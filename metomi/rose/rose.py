@@ -34,7 +34,6 @@ def pythonpath_manip():
             os.path.abspath(item)
             for item in os.environ['ROSE_PYTHONPATH'].split(os.pathsep)
         ]
-        print(f"Extracted {paths} from ROSE_PYTHONPATH")
         paths.extend(sys.path)
         sys.path = paths
 
