@@ -42,7 +42,7 @@ jobs:
 
       - name: Setup Mamba
         if: steps.configure-py.outcome == 'failure'
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: ${{ matrix.python-version }}
           mamba-version: '*'
