@@ -194,7 +194,7 @@ jobs:
 
       - name: Upload cylc-run artifact
         if: failure() && steps.functest.outcome == 'failure'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cylc-run ${{ matrix.os }}
           path: ~/cylc-run/
