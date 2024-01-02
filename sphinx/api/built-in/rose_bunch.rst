@@ -37,7 +37,7 @@ Example
    command-format=echo arg1: %(arg1)s, arg2: %(arg2)s, command-instance: %(command-instances)s
    command-instances = 4
    fail-handle = abort
-   incremental = True
+   incremental = true
    names = foo1 bar2 baz3 qux4
    pool-size=2
 
