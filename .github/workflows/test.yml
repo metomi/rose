@@ -179,6 +179,9 @@ jobs:
         env:
           OBJC_DISABLE_INITIALIZE_FORK_SAFETY: YES
         run: |
+          # Configure Git for the Git dependent tests to function.
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com" 
           # rose tests should pass first time around
           etc/bin/rose-test-battery -j 4 --state=save
 
