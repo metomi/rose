@@ -11,7 +11,7 @@ ones in. -->
 
 --------------------------------------------------------------------------------
 
-## 2.2.0 (<span actions:bind='release-date'>Upcoming</span>)
+## 2.2.0 (<span actions:bind='release-date'>Released 2024-01-18</span>)
 
 ### Breaking Changes
 
