@@ -26,7 +26,7 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
-tests 9
+tests 8
 
 get_reg
 
@@ -108,4 +108,5 @@ grep_incrementals "${APP_LOG_PATH}/03" 1 0
 run_pass "stop workflow" cylc stop "${FLOW}" --kill
 poll ! grep DONE "${SCHD_LOG_PATH}"
 
-run_pass "cleanup" cylc clean -y "${FLOW}"
+purge
+exit 0
