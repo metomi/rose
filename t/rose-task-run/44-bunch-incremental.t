@@ -26,12 +26,13 @@
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 
-tests 9
+tests 8
 
 get_reg
 
 APP_LOG_PATH="${HOME}/cylc-run/${FLOW}/log/job/2000/bunchapp"
 SCHD_LOG_PATH="${HOME}/cylc-run/${FLOW}/log/scheduler/log"
+SPACER_STATUS="${HOME}/cylc-run/${FLOW}/log/job/2000/spacer/job.status"
 
 grep_incrementals() {
     # Check that a rose app-run runs, skips, and fails the desired number of
@@ -50,18 +51,21 @@ touch "rose-suite.conf"
 cat > "flow.cylc" <<__HERE__
 [scheduler]
     cycle point format = %Y
+    allow implicit tasks = true
 
 [scheduling]
     initial cycle point = 2000
 
     [[graph]]
-        R1 = bunchapp & long
+        R1 = """
+            bunchapp => spacer => long
+        """
 
 [runtime]
     [[bunchapp]]
         script = rose task-run
     [[long]]
-        script = sleep 300
+        script = sleep 500
 
 __HERE__
 
@@ -90,15 +94,19 @@ poll ! grep CYLC_JOB_EXIT "${APP_LOG_PATH}/01/job.status" 2>&1 /dev/null
 grep_incrementals "${APP_LOG_PATH}/01" 1 0
 
 # Re trigger task in same flow - bunch should skip previously succeeded tasks:
+poll ! grep CYLC_JOB_EXIT "${SPACER_STATUS}" 2>&1 /dev/null
 cylc trigger "${FLOW}//2000/bunchapp/"
 poll ! grep CYLC_JOB_EXIT "${APP_LOG_PATH}/02/job.status" 2>&1 /dev/null
 grep_incrementals "${APP_LOG_PATH}/02" 0 1
 
 # Re trigger task in new flow - bunch should treat as a new task:
+poll ! grep CYLC_JOB_EXIT "${SPACER_STATUS}" 2>&1 /dev/null
 cylc trigger "${FLOW}//2000/bunchapp/" --flow=new
 poll ! grep CYLC_JOB_EXIT "${APP_LOG_PATH}/03/job.status" 2>&1 /dev/null
 grep_incrementals "${APP_LOG_PATH}/03" 1 0
 
 run_pass "stop workflow" cylc stop "${FLOW}" --kill
 poll ! grep DONE "${SCHD_LOG_PATH}"
-run_pass "cleanup" cylc clean -y "${FLOW}"
+
+purge
+exit 0
