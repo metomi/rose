@@ -97,7 +97,7 @@ The share directory
 
    .. code-block:: sub
 
-      <run directory>/share/<cycle>
+      <run directory>/share/cycle/<cycle>
 
    These are called the ``share/cycle`` directories.
 
@@ -105,7 +105,7 @@ The share directory
    ``CYLC_WORKFLOW_SHARE_DIR`` environment variable so the path to the cycle
    subdirectory would be::
 
-      "$CYLC_WORKFLOW_SHARE_DIR/$CYLC_TASK_CYCLE_POINT"
+      "$CYLC_WORKFLOW_SHARE_DIR/cycle/$CYLC_TASK_CYCLE_POINT"
 
 The :ref:`command-rose-task-env` command provides the environment variable
 :envvar:`ROSE_DATAC` which is a more convenient way to obtain the path of the
