@@ -94,6 +94,9 @@ jobs:
           __HERE__
           cat "$HOME/.bashrc"
 
+      - name: Configure git  # Configure Git for Git dependent tests.
+        uses: cylc/release-actions/configure-git@v1
+
       - name: Apt-Get Install
         if: startsWith(matrix.os, 'ubuntu')
         run: |
@@ -179,9 +182,6 @@ jobs:
         env:
           OBJC_DISABLE_INITIALIZE_FORK_SAFETY: YES
         run: |
-          # Configure Git for the Git dependent tests to function.
-          git config --global user.name "${GITHUB_ACTOR}"
-          git config --global user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com" 
           # rose tests should pass first time around
           etc/bin/rose-test-battery -j 4 --state=save
 
