@@ -45,7 +45,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.rose_ref || github.sha }}
-          path: rose
 
       - name: Configure Python
         uses: actions/setup-python@v5
@@ -58,20 +57,20 @@ jobs:
           sudo apt-get install -y shellcheck
 
       - name: Install Rose
-        working-directory: rose
         run: |
-          pip install ."[lints]"
+          pip install ."[lint]"
           yarn install
 
-      - name: Style
-        working-directory: rose
-        run: |
-          flake8
-          etc/bin/shellchecker
-          yarn run lint
+      - name: Flake8
+        run: flake8
+        
+      - name: Shellchecker
+        run: etc/bin/shellchecker
+
+      - name: ESLint
+        run: yarn run lint
 
       - name: MyPy
-        working-directory: rose
         run: |
           mypy
 
