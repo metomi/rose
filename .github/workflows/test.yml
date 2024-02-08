@@ -37,7 +37,46 @@ defaults:
     shell: bash  # macos default shell is zsh
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.rose_ref || github.sha }}
+
+      - name: Configure Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
+
+      - name: Apt-Get Install
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: Install Rose
+        run: |
+          pip install ."[lint]"
+          yarn install
+
+      - name: Flake8
+        run: flake8
+        
+      - name: Shellchecker
+        run: etc/bin/shellchecker
+
+      - name: ESLint
+        run: yarn run lint
+
+      - name: MyPy
+        run: |
+          mypy
+
+
   test:
+    needs: lint
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     strategy:
@@ -69,7 +108,6 @@ jobs:
             bash \
             coreutils \
             gnu-sed \
-            shellcheck \
             sqlite3 \
             subversion \
             graphviz
@@ -153,20 +191,6 @@ jobs:
           # the bashrc wat (needed for subsequent gh action steps)
           echo "export PATH=\"$FCM_PATH:\$PATH\"" >> "$HOME/.bashrc"
 
-      - name: Style
-        if: startsWith(matrix.os, 'ubuntu')
-        working-directory: rose
-        run: |
-          flake8
-          etc/bin/shellchecker
-          yarn run lint
-
-      - name: MyPy
-        if: startsWith(matrix.os, 'ubuntu')
-        working-directory: rose
-        run: |
-          mypy
-
       - name: Unit Tests
         working-directory: rose
         run: |
@@ -200,6 +224,7 @@ jobs:
           path: ~/cylc-run/
 
   docs:
+    needs: lint
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -211,7 +236,7 @@ jobs:
       - name: Configure Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.7
+          python-version: 3.9
 
       - name: install graphviz
         run: |
