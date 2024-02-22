@@ -17,6 +17,7 @@
 """Process "file:*" sections in node of a metomi.rose.config_tree.ConfigTree.
 """
 
+from contextlib import suppress
 from fnmatch import fnmatch
 from glob import glob
 from io import BytesIO
@@ -106,6 +107,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         finally:
             if cwd != os.getcwd():
                 self.manager.fs_util.chdir(cwd)
+            if loc_dao.conn:
+                with suppress(Exception):
+                    loc_dao.conn.close()
 
     def _process(self, conf_tree, nodes, loc_dao, **kwargs):
         """Helper for self.process."""
