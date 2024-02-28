@@ -227,7 +227,7 @@
 {%- if "-list" in key %}
 {%- set value = value|join(" ") %}
 {%- endif %}
-{%- set info = info ~ "<strong>" ~ key ~ "</strong>" ~ ": " ~ value ~ "<br/>"  %}
+{%- set info = info ~ "<strong>" ~ key ~ "</strong>" ~ ": " ~ value|escape ~ "<br/>"  %}
 {%- endif %}
 {%- if loop.last %}
           <tr>
