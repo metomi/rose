@@ -3,12 +3,22 @@
 Go to https://github.com/metomi/rose/milestones?state=closed
 for a full listing of issues for each release.
 
+## 2019.01.9 (Upcoming)
+
+### Fixes
+
+[#2765](https://github.com/metomi/rose/pull/2765) - Fix bug in Rosie
+Suite Discovery where certain content in `rose-suite.info` could cause
+display issues.
+
+
 ## 2019.01.8 (2022-12-20)
 
 ### Fixes
 
 [#2633](https://github.com/metomi/rose/pull/2633) - Fix problems with the
 Cylc and Rose tutorials.
+
 
 ## 2019.01.7 (2022-04-13)
 
@@ -17,12 +27,14 @@ Cylc and Rose tutorials.
 [#2488](https://github.com/metomi/rose/pull/2582) - Fix Python 2.6 bug
 in [#2486](https://github.com/metomi/rose/pull/2486)
 
+
 ## 2019.01.6 (2022-03-29)
 
 ### Fixes
 
 [#2485](https://github.com/metomi/rose/pull/2486) - Prevent Rose 2019
 modifying Cylc 8 workflows.
+
 
 ## 2019.01.5 (2021-03-19)
 
@@ -38,7 +50,6 @@ fileinstall did not work if a file was installed previously, overwritten, then
 returned to to the orginal source.
 
 
---------------------------------------------------------------------------------
 
 ## 2019.01.4 (2020-12-11)
 
@@ -57,7 +68,6 @@ template variable incompatibility with Cylc8.
 (see the
 [discourse post](https://cylc.discourse.group/t/cylc8-rose-template-variables-jinja2-suite-rc/295)).
 
---------------------------------------------------------------------------------
 
 ## 2019.01.3 (2020-04-22)
 
@@ -78,7 +88,6 @@ Remove forecast suite tutorial's absolute dependency on external data.
 [#2392](https://github.com/metomi/rose/pull/2392)
 A tutorial on how to use Message Triggers.
 
---------------------------------------------------------------------------------
 
 ## 2019.01.2 (2019-06-12)
 
@@ -99,7 +108,6 @@ templating insertion.
 rose app-run, rose task-run, rose suite-run: allow use of `--define=` on top
 level special settings such as `opts` and `import` in configuration.
 
---------------------------------------------------------------------------------
 
 ## 2019.01.1 (2019-05-03)
 
@@ -121,7 +129,6 @@ rose suite-run: fix connection to suite that has just been started.
 [#2289](https://github.com/metomi/rose/pull/2289):
 rose config-edit: fix int spin box manual edit.
 
---------------------------------------------------------------------------------
 
 ## 2019.01.0 (2019-01-25)
 
@@ -161,7 +168,6 @@ Misc doc fixes.
 [#2230](https://github.com/metomi/rose/pull/2230):
 Report test coverage.
 
---------------------------------------------------------------------------------
 
 ## 2018.11.0 (2018-11-28)
 
@@ -220,7 +226,6 @@ Lots of improvements and fixes to documentation.
 
 Launch programs with `python2` instead of `python`.
 
---------------------------------------------------------------------------------
 
 ## 2018.06.0 (2018-06-27)
 
@@ -243,7 +248,6 @@ Rose User Guide: misc fixes and improvements.
 [#2194](https://github.com/metomi/rose/pull/2194):
 rose suite-run: improve handling of `root-dir` settings on remote machine.
 
---------------------------------------------------------------------------------
 
 ## 2018.05.0 (2018-05-22)
 
@@ -274,7 +278,6 @@ without installing the suite.
 Rose Bush: suites list, cycles list, task jobs list, and broadcast lists pages
 now refresh automatically every 2 minutes.
 
---------------------------------------------------------------------------------
 
 ## 2018.02.0 (2018-02-07)
 
@@ -334,7 +337,6 @@ Rose Bush:
 rose suite-cmp-vc: new command to compare version control system information of
 suite source between latest install and now.
 
---------------------------------------------------------------------------------
 
 ## Older Releases
 
