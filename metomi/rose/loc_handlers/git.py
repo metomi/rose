@@ -154,8 +154,8 @@ class GitLocHandler:
                     "--no-cone"
                 )
                 await self.manager.popen.run_ok_async(
-                    "git", git_dir_opt, "fetch", "--depth=1", "--filter=blob:none",
-                    "origin", loc.key
+                    "git", git_dir_opt, "fetch", "--depth=1",
+                    "--filter=blob:none", "origin", loc.key
                 )
             else:
                 await self.manager.popen.run_ok_async(
