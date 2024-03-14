@@ -133,9 +133,8 @@ class GitLocHandler:
     async def pull(self, loc, conf_tree):
         """Get loc to its cache.
 
-        We would strongly prefer to use git sparse-checkout (with
-        filtered clones) but it is not available on many systems (Git
-        >= 2.25) and it is still marked as experimental.
+        git sparse-checkout is not available below Git 2.25, and seems to omit
+        contents altogether if set to the root of the repo (as of 2.40.1).
 
         """
         if not loc.real_name:
@@ -149,20 +148,20 @@ class GitLocHandler:
             await self.manager.popen.run_ok_async(
                 "git", git_dir_opt, "remote", "add", "origin", remote
             )
-            if self.git_version >= (2, 25, 0):
+            if self.git_version >= (2, 25, 0) and path != "./":
                 await self.manager.popen.run_ok_async(
                     "git", git_dir_opt, "sparse-checkout", "set", path,
                     "--no-cone"
                 )
+                await self.manager.popen.run_ok_async(
+                    "git", git_dir_opt, "fetch", "--depth=1", "--filter=blob:none",
+                    "origin", loc.key
+                )
             else:
                 await self.manager.popen.run_ok_async(
-                    "git", git_dir_opt, "config", "extensions.partialClone",
-                    "true"
+                    "git", git_dir_opt, "fetch", "--depth=1", "origin", loc.key
                 )
-            await self.manager.popen.run_ok_async(
-                "git", git_dir_opt, "fetch", "--depth=1", "--filter=blob:none",
-                "origin", loc.key
-            )
+
             await self.manager.popen.run_ok_async(
                 "git", git_dir_opt, f"--work-tree={tmpdirname}", "checkout",
                 loc.key

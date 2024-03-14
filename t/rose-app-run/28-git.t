@@ -65,7 +65,7 @@ GIT_WS_PID=${!}
 sleep 10
 cd $START_PWD
 #-------------------------------------------------------------------------------
-tests 49
+tests 51
 #-------------------------------------------------------------------------------
 remote_test_modes=("ssh" "http" "local")
 remote_locations=("$HOSTNAME:$TEST_DIR/hellorepo/" "http://localhost:$GIT_WS_PORT/cgi-bin/git" "$TEST_DIR/hellorepo/")
@@ -175,6 +175,25 @@ find hello -type f | LANG=C sort >'find-hello-after.out'
 file_cmp "$TEST_KEY.find-hello" 'find-hello-before.out' 'find-hello-after.out'
 find hello -type f -newer timeline | LANG=C sort >'find-hello-after-newer.out'
 file_cmp "$TEST_KEY.find-hello-newer" 'find-hello-after-newer.out' </dev/null
+test_teardown
+#-------------------------------------------------------------------------------
+TEST_KEY="$TEST_KEY_BASE-entire-contents"
+test_setup
+test_init <<__CONFIG__
+[command]
+default=true
+
+[file:hello]
+source=git:$TEST_DIR/hellorepo::./::$MAIN_BRANCH
+__CONFIG__
+run_pass "$TEST_KEY" rose app-run --config=../config -q
+find hello -type f | LANG=C sort >'find-hello.out'
+file_cmp "$TEST_KEY.find" 'find-hello.out' <<__FILE__
+hello/fruit/orange.txt
+hello/fruit/raspberry.txt
+hello/grass.txt
+hello/tree.txt
+__FILE__
 test_teardown
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-bad-ref"
