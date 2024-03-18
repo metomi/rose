@@ -42,7 +42,7 @@ class FileSystemLocHandler:
         loc.scheme = "fs"
         name = os.path.expanduser(loc.name)
         if not os.path.exists(name):
-            raise ValueError(loc.name)
+            raise ValueError(f"path does not exist or not accessible: {name}")
         paths_and_checksums = get_checksum(name)
         for path, checksum, access_mode in paths_and_checksums:
             loc.add_path(path, checksum, access_mode)

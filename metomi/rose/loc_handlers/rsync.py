@@ -67,7 +67,7 @@ class RsyncLocHandler:
             out = self.manager.popen(*cmd, stdin=stdin)[0]
         lines = out.splitlines()
         if not lines or lines[0] not in [loc.TYPE_BLOB, loc.TYPE_TREE]:
-            raise ValueError(loc.name)
+            raise ValueError(f"could not locate {path} on host {host}")
         loc.loc_type = lines.pop(0)
         if loc.loc_type == loc.TYPE_BLOB:
             line = lines.pop(0)
