@@ -357,8 +357,11 @@ Metadata Items
 
       .. tip::
 
-         The :rose:conf:`rose-meta.conf[SETTING]value-hints` metadata option
-         can be used to provide a longer description of each option.
+         Longer descriptions can be included:
+
+         * :rose:conf:`rose-meta.conf[SETTING]description` provides a tooltip.
+         * :rose:conf:`rose-meta.conf[SETTING]help` will appear in a separate
+           window accessible in the GUI.
 
    #. **Validate with** ``rose macro``.
 
