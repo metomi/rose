@@ -15,11 +15,13 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 
 import json
-from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 import pytest
 
 from metomi.rosie.suite_id import SuiteId
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 @pytest.mark.parametrize(
@@ -42,7 +44,7 @@ from metomi.rosie.suite_id import SuiteId
     ]
 )
 def test_parse_cylc_vc_file(
-    vcs_info: dict, expected: Optional[str], tmp_path: Path
+    vcs_info: dict, expected: Optional[str], tmp_path: 'Path'
 ):
     vcs_file = tmp_path / 'gimli.json'
     vcs_file.write_text(json.dumps(vcs_info))

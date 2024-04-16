@@ -14,11 +14,42 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
+
+import os
+import sys
+
+
+def pythonpath_manip():
+    """Stop PYTHONPATH contaminating the Rose Environment
+
+    * Remove PYTHONPATH items from sys.path to prevent PYTHONPATH
+      contaminating the Rose Environment.
+    * Add items from ROSE_PYTHONPATH to sys.path.
+
+    See Also:
+        https://github.com/cylc/cylc-flow/issues/5124
+    """
+    if 'ROSE_PYTHONPATH' in os.environ:
+        paths = [
+            os.path.abspath(item)
+            for item in os.environ['ROSE_PYTHONPATH'].split(os.pathsep)
+        ]
+        paths.extend(sys.path)
+        sys.path = paths
+
+    if 'PYTHONPATH' in os.environ:
+        for item in os.environ['PYTHONPATH'].split(os.pathsep):
+            abspath = os.path.abspath(item)
+            if abspath in sys.path:
+                sys.path.remove(abspath)
+
+
+pythonpath_manip()
+
+
 import argparse
 from inspect import signature
-import os
 from pathlib import Path
-import sys
 
 from pkg_resources import (
     DistributionNotFound,

@@ -17,7 +17,15 @@
 """A multiprocessing runner of jobs with dependencies."""
 
 import asyncio
+
 from metomi.rose.reporter import Event
+
+
+# set containing references to "background" coroutines that are not referenced
+# from any code (i.e. are not directly awaited), adding them to this list
+# avoids the potential for garbage collection to delete them whilst they are
+# running
+_BACKGROUND_TASKS = set()
 
 
 class JobEvent(Event):
@@ -175,18 +183,32 @@ class JobRunner:
                 The maximum number of jobs to run concurrently.
 
         """
-        running = []
         loop = asyncio.get_event_loop()
         loop.set_exception_handler(self.job_processor.handle_event)
-        loop.run_until_complete(
-            asyncio.gather(
-                self._run_jobs(running, job_manager, args, concurrency),
-                self._post_process_jobs(running, job_manager, args),
-            )
-        )
+        coro = self._run(job_manager, *args, concurrency=concurrency)
+        try:
+            # event loop is not running (e.g. rose CLI use)
+            loop.run_until_complete(coro)
+        except RuntimeError:
+            # event loop is already running (e.g. cylc CLI use)
+            # WARNING: this starts the file installation running, but it
+            # doesn't wait for it to finish, that's your problem :(
+            task = loop.create_task(coro)
+            # reference this task from a global variable to prevent it from
+            # being garbage collected
+            _BACKGROUND_TASKS.add(task)
+            # tidy up afterwards
+            task.add_done_callback(_BACKGROUND_TASKS.discard)
         dead_jobs = job_manager.get_dead_jobs()
         if dead_jobs:
             raise JobRunnerNotCompletedError(dead_jobs)
+
+    async def _run(self, job_manager, *args, concurrency=6):
+        running = []
+        await asyncio.gather(
+            self._run_jobs(running, job_manager, args, concurrency),
+            self._post_process_jobs(running, job_manager, args),
+        )
 
     async def _run_jobs(self, running, job_manager, args, concurrency):
         """Run pending jobs subject to the concurrency limit.

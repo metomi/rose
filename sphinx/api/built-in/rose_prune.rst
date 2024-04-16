@@ -123,12 +123,10 @@ Configuration
 
       .. rose:conf:: prune-work-at=cycle[:globs] ...
 
-         .. deprecated:: foo
+         .. deprecated:: 2015.04.0
             Equivalent to ``prune{work}=cycle[:globs] ...``\ .
 
       .. rose:conf:: prune-datac-at=cycle[:globs] ...
 
-         .. deprecated:: foo
+         .. deprecated:: 2015.04.0
             Equivalent to ``prune{share/cycle}=cycle[:globs] ...``\ .
-
-         foo
