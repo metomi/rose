@@ -63,7 +63,7 @@ jobs:
 
       - name: Flake8
         run: flake8
-        
+
       - name: Shellchecker
         run: etc/bin/shellchecker
 
