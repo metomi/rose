@@ -135,7 +135,7 @@ Using a Rose workflow configuration with Cylc 8
 
    .. rubric:: In this tutorial we will create a Rose Suite Configuration for
       the
-      :ref:`weather-forecasting workflow<tutorial-datetime-cycling-practical>`.
+      :ref:`weather-forecasting workflow<tutorial-cylc-runtime-forecasting-workflow>`.
 
 .. _suites-practical:
 
@@ -143,12 +143,11 @@ Using a Rose workflow configuration with Cylc 8
 
    .. rubric:: In this tutorial we will create a Rose Suite Configuration for
       the
-      :ref:`weather-forecasting workflow<tutorial-datetime-cycling-practical>`.
+      :ref:`weather-forecasting workflow<tutorial-cylc-runtime-forecasting-workflow>`.
 
    #. **Create a new Cylc workflow**
 
-      Create a copy of the :ref:`weather-forecasting workflow
-      <tutorial-cylc-runtime-forecasting-workflow>` by running::
+      Create a copy of the weather-forecasting workflow by running::
 
          rose tutorial rose-suite-tutorial ~/cylc-src/rose-suite-tutorial
          cd ~/cylc-src/rose-suite-tutorial
@@ -370,8 +369,7 @@ Rose Applications In Rose Suite Configurations
 
    .. rubric:: In this practical we will take the ``forecast`` Rose application
       that we developed in the :ref:`Metadata Tutorial <tutorial-rose-metadata>`
-      and integrate it into the :ref:`weather-forecasting workflow
-      <tutorial-datetime-cycling-practical>`.
+      and integrate it into the weather-forecasting workflow.
 
    Move into the workflow source directory from the previous practical::
 

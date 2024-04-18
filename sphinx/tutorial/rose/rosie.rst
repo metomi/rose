@@ -146,7 +146,7 @@ Rosie provides commands for managing suites, including:
 .. ifslides::
 
    .. rubric:: In this practical we will add the
-      :ref:`weather-forecasting suite <tutorial-datetime-cycling-practical>`
+      weather-forecasting suite
       from the :ref:`previous practical <suites-practical>` to a rosie
       repository, make some changes, and commit them to the repository.
 
@@ -156,7 +156,7 @@ Rosie provides commands for managing suites, including:
 .. practical::
 
    .. rubric:: In this practical we will add the
-      :ref:`weather-forecasting suite <tutorial-datetime-cycling-practical>`
+      weather-forecasting suite
       from the :ref:`previous practical <suites-practical>` to a rosie
       repository, make some changes, and commit them to the repository.
 

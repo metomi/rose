@@ -136,7 +136,8 @@ An application can be run using the :ref:`command-rose-app-run` command:
 .. ifslides::
 
    .. rubric:: In this practical we will convert the ``forecast`` task from the
-      :ref:`weather-forecasting workflow <tutorial-datetime-cycling-practical>`
+      weather-forecasting workflow in the
+      :ref:`Cylc tutorials <tutorial-cylc-runtime-forecasting-workflow>`
       into a Rose application.
 
    Next section: :ref:`tutorial-rose-metadata`
@@ -147,8 +148,11 @@ An application can be run using the :ref:`command-rose-app-run` command:
 .. practical::
 
    .. rubric:: In this practical we will convert the ``forecast`` task from the
-      :ref:`weather-forecasting workflow <tutorial-datetime-cycling-practical>`
-      into a standalone Rose application.
+      weather-forecasting workflow in the
+      :ref:`Cylc tutorials <tutorial-cylc-runtime-forecasting-workflow>`
+      into a standalone Rose application. By the end you will be able to run
+      the application standalone (running it as a task in the workflow will
+      come later).
 
    Create a directory on your filesystem called ``rose-tutorial``::
 
@@ -166,8 +170,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
    #. **Provide the required resources in the** ``application-tutorial``
       **application.**
 
-      The application gets three resources from different places in the
-      :ref:`weather-forecasting workflow <tutorial-datetime-cycling-practical>`:
+      The application gets three resources from different places:
 
       * The ``bin/forecast`` script.
       * The ``lib/python/util.py`` Python library.
@@ -227,9 +230,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
    #. **Move environment variables defined in the** ``flow.cylc`` **file.**
 
       In the ``[runtime][forecast][environment]`` section of the ``flow.cylc``
-      file in the
-      :ref:`weather-forecasting workflow <tutorial-datetime-cycling-practical>`
-      we set a few environment variables:
+      file in the weather-forecasting workflow we set a few environment variables:
 
       * ``WIND_FILE_TEMPLATE``
       * ``WIND_CYCLES``
@@ -237,7 +238,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
       * ``MAP_FILE``
       * ``MAP_TEMPLATE``
 
-      We will now move these into the application. This way, all of the
+      We will now add these into the application. This way, all of the
       configuration specific to the application live within it.
 
       Add the following lines to the :rose:conf:`rose-app.conf[env]` section:
@@ -263,8 +264,8 @@ An application can be run using the :ref:`command-rose-app-run` command:
       variables are pointing at files in the ``test-data`` directory.
 
       To make this application work outside of the weather forecasting workflow
-      we will also need to
-      provide the ``DOMAIN`` and ``RESOLUTION`` environment variables defined
+      we will also need to provide the ``DOMAIN`` and ``RESOLUTION``
+      environment variables that were defined
       in the ``[runtime][root][environment]`` section of the ``flow.cylc``
       file as well as the ``CYLC_TASK_CYCLE_POINT`` environment variable
       provided by Cylc when it runs a task.
