@@ -1,7 +1,3 @@
-.. include:: ../../hyperlinks.rst
-   :start-line: 1
-
-
 .. _tutorial-rose-summary:
 
 Summary

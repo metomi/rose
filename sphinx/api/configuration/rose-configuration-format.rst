@@ -1,6 +1,3 @@
-.. include:: ../../hyperlinks.rst
-   :start-line: 1
-
 .. _Rose Configuration Format:
 
 Rose Configuration Format

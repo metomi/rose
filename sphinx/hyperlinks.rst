@@ -3,11 +3,7 @@
 .. This document contains hyperlink references to be used throughout the
    documentation.
 
-   To use hyperlinks defined in this file add the following code at the top of
-   the file::
-
-       .. include:: path/to/thisfile.rst
-          :start-line: 1
+   They are automatically included for use in every page (via conf.py)
 
 .. _Cylc: https://cylc.github.io/
 .. _Cylc Flow: https://github.com/cylc/cylc-flow

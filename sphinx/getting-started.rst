@@ -1,7 +1,3 @@
-.. include:: hyperlinks.rst
-   :start-line: 1
-
-
 Getting Started
 ===============
 
@@ -29,7 +25,7 @@ configuration file ``~/.metomi/rose.conf``:
 
 ``[external]geditor``
    The external text editor used by GUIs
-``[external]editor`` 
+``[external]editor``
    The external text editor used by CLI commands
 
 For emacs and most text editors, you can do something like:
