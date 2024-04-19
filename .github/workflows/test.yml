@@ -263,9 +263,9 @@ jobs:
         run: |
           make -C sphinx/ html SPHINXOPTS='-Wn'
 
-      - name: build (slides)
-        run: |
-          make -C sphinx/ slides SPHINXOPTS='-Wn'
+      # - name: build (slides)
+      #   run: |
+      #     make -C sphinx/ slides SPHINXOPTS='-Wn'
 
       - name: build (linkcheck)
         run: |

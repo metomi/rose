@@ -4,73 +4,69 @@ Date and Time Manipulation
 ==========================
 
 :term:`Datetime cycling <datetime cycling>` suites inevitably involve
-performing some form of datetime arithmetic. In the
-:ref:`weather forecasting suite <tutorial-datetime-cycling-practical>` we wrote
-in the Cylc tutorial this arithmetic was done using the ``cylc cyclepoint``
-command. For example we calculated the cycle point three hours before the
+performing some form of datetime arithmetic. For example, in a Cylc task we
+can calculate the cycle point three hours before the
 present cycle using::
 
    cylc cyclepoint --offset-hours=-3
 
-Rose provides the :ref:`command-rose-date` command which provides functionality
-beyond ``cylc cyclepoint`` as well as the :envvar:`ROSE_DATAC` environment
+The `isodatetime`_ command provides functionality
+beyond ``cylc cyclepoint``. Rose also provides the :envvar:`ROSE_DATAC` environment
 variable which provides an easy way to get the path of the ``share/cycle``
 directory.
 
 
-The ``rose date`` Command
--------------------------
+The ``isodatetime`` Command
+---------------------------
 
-The :ref:`command-rose-date` command provides functionality for:
+The ``isodatetime`` command provides functionality for:
 
 * Parsing and formatting datetimes e.g:
 
   .. code-block:: console
 
-     $ rose date '12-31-2000' --parse-format='%m-%d-%Y'
+     $ isodatetime 12-31-2000 --parse-format='%m-%d-%Y'
      12-31-2000
-     $ rose date '12-31-2000' --parse-format='%m-%d-%Y' --format='DD-MM-CCYY'
+     $ isodatetime 12-31-2000 --parse-format='%m-%d-%Y' --format='DD-MM-CCYY'
      31-12-2000
 
 * Adding offsets to datetimes e.g:
 
   .. code-block:: console
 
-     $ rose date '2000-01-01T0000Z' --offset '+P1M'
-     2000-02-01T0000Z
+     $ isodatetime 2000-01-01T00:00Z --offset '+P1M'
+     2000-02-01T00:00Z
 
 * Calculating the duration between two datetimes e.g:
 
   .. code-block:: console
 
-     $ rose date '2000' '2001'  # Note - 2000 was a leap year!
+     $ isodatetime 2000 2001  # Note - 2000 was a leap year!
      P366D
 
-See the :ref:`command-rose-date` command reference for more information.
+See the ``isodatetime --help`` command reference for more information.
 
 
-Using ``rose date`` In A Suite
-------------------------------
+Using ``isodatetime`` In A Suite
+--------------------------------
 
-In datetime cycling suites :ref:`command-rose-date` can work with the
+In datetime cycling suites, ``isodatetime`` can work with the
 cyclepoint using the ``CYLC_TASK_CYCLE_POINT`` environment variable:
 
 .. code-block:: cylc
 
    [runtime]
        [[hello_america]]
-           script = rose date $CYLC_TASK_CYCLE_POINT --format='MM-DD-CCYY'
+           script = isodatetime $CYLC_TASK_CYCLE_POINT --format='MM-DD-CCYY'
 
-Alternatively, if you are providing the standard Rose task environment using
-:ref:`command-rose-task-env` then :ref:`command-rose-date` can use the ``-c``
-option to pick up the cycle point:
+Alternatively, Cylc automatically sets the ``ISODATETIMEREF`` environment variable
+which allows you to use the special ``ref`` argument:
 
 .. code-block:: cylc
 
    [runtime]
        [[hello_america]]
-           env-script = eval $(rose task-env)
-           script = rose date -c --format='MM-DD-CCYY'
+           script = isodatetime ref --format='MM-DD-CCYY'
 
 
 The ``ROSE_DATAC`` Environment Variable
@@ -118,4 +114,4 @@ provide an offset to :ref:`command-rose-task-env` e.g::
 
 The path is then made available as the ``ROSE_DATACPT1H`` environment variable.
 
-.. TODO - Write a short practical using ROSE_DATAC and rose-date.
+.. TODO - Write a short practical using ROSE_DATAC and isodatetime.

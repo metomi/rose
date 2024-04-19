@@ -1,6 +1,3 @@
-.. include:: ../../hyperlinks.rst
-   :start-line: 1
-
 .. _floating point: https://docs.python.org/3/library/stdtypes.html#typesnumeric
 .. _cast: https://docs.python.org/3/library/ast.html#ast.literal_eval
 .. _Python in operator: https://docs.python.org/3/reference/expressions.html#membership-test-operations
@@ -687,15 +684,15 @@ The metadata options for a configuration fall into four categories:
 
          .. _trigger-file-creation:
 
-         It is possible to use metadata triggers to trigger file creation, 
+         It is possible to use metadata triggers to trigger file creation,
          switching on/off as required.
 
-         For example, with the following :rose:file:`rose-app.conf` and 
+         For example, with the following :rose:file:`rose-app.conf` and
          :rose:file:`rose-meta.conf` files, file creation is triggered when
-         setting ``trigger=file:foo`` to ``.true.``. 
+         setting ``trigger=file:foo`` to ``.true.``.
 
 
-         :rose:file:`rose-app.conf` file: 
+         :rose:file:`rose-app.conf` file:
 
          .. code-block:: rose
 
@@ -708,7 +705,7 @@ The metadata options for a configuration fall into four categories:
             [namelist:foo]
             switch=.false.
 
-         :rose:file:`rose-meta.conf` file:  
+         :rose:file:`rose-meta.conf` file:
 
          .. code-block:: rose
 

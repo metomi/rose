@@ -3,17 +3,14 @@
 .. This document contains hyperlink references to be used throughout the
    documentation.
 
-   To use hyperlinks defined in this file add the following code at the top of
-   the file::
-
-       .. include:: path/to/thisfile.rst
-          :start-line: 1
+   They are automatically included for use in every page (via conf.py)
 
 .. _Cylc: https://cylc.github.io/
 .. _Cylc Flow: https://github.com/cylc/cylc-flow
 .. _Cylc Rose: https://github.com/cylc/cylc-rose
 .. _Cylc User Guide: https://cylc.github.io/cylc-doc/stable/html/user-guide/index.html
 .. _Cylc Workflow Design Guide: https://cylc.github.io/cylc-doc/stable/html/workflow-design-guide/index.html
+.. _isodatetime: https://github.com/metomi/isodatetime
 
 .. _EmPy: https://pypi.org/project/empy/
 .. _extglob pattern matching: https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html#Pattern-Matching

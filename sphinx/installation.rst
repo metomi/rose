@@ -1,7 +1,3 @@
-.. include:: hyperlinks.rst
-   :start-line: 1
-
-
 Installation
 ============
 
@@ -121,7 +117,7 @@ Check the following:
 1. You can access the Rosie Subversion repository without being prompted
    for a username and a password. This may require configuring Subversion
    to cache your authentication information with a keyring.
-   
+
    *(See Subversion Book > Advanced Topics > Network Model > Client
    Credentials for a discussion on how to do this.)*
 
@@ -129,9 +125,9 @@ Check the following:
    web service from your computer. E.g. if the Rosie web service is
    hosted at ``https://somehost.on.the.internet/rosie/x``, you can check
    that you have access by typing the following on the command line::
-   
+
       curl -I https://somehost.on.the.internet/rosie/x
-      
+
    It should return a HTTP code 200. If you are prompted for a username
    and a password, you may need to have access to a keyring to cache
    the authentication information.
@@ -139,9 +135,9 @@ Check the following:
 3. You can access the Rosie web service using the Rosie client. E.g.
    using the above configuration for the prefix ``x``, type the
    following on the command line::
-   
+
       rosie hello --prefix=x
-      
+
    It should return a greeting, e.g. ``Hello user``.
 
 

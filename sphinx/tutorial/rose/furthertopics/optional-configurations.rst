@@ -131,7 +131,7 @@ You should see the following:
 
 .. code-block:: none
 
-   I'd like to order a chocolate icecream in a tub with nuts.
+   I'd like to order a chocolate ice cream in a tub with nuts.
 
 The ``chocolate`` configuration has overwritten the ``FLAVOUR`` environment
 variable from the ``fudge sundae`` configuration. This is because optional
@@ -142,7 +142,7 @@ To see how the optional configurations would be applied use the
 :ref:`command-rose-config` command providing the configuration files in the
 order they would be loaded::
 
-   rose config --file rose-app.conf --file opt/rose-app-fudge-sundae --file chocolate
+   rose config --file rose-app.conf --file opt/rose-app-fudge-sundae.conf --file opt/rose-app-chocolate.conf
 
 You should see:
 

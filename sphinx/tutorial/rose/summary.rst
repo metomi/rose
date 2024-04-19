@@ -1,7 +1,3 @@
-.. include:: ../../hyperlinks.rst
-   :start-line: 1
-
-
 .. _tutorial-rose-summary:
 
 Summary
@@ -131,23 +127,23 @@ Suite Commands
    * :ref:`command-rose-app-run`
    * :ref:`command-rose-task-run`
 
-Rose Utilities
---------------
+Utilities
+---------
 
-Rose contains some utilities to make life easier:
+There are some utilities to make life easier:
 
 .. ifnotslides::
 
-   :ref:`command-rose-date`
+   `isodatetime`_
       A utility for parsing, manipulating and formatting date-times which is
       useful for working with the Cylc :term:`cycle point`:
 
       .. code-block:: console
 
-         $ rose date 2000 --offset '+P1Y1M1D'
+         $ isodatetime 2000 --offset '+P1Y1M1D'
          2001-02-02T0000Z
 
-         $ rose date $CYLC_TASK_CYCLE_POINT --format 'The month is %B.'
+         $ isodatetime $CYLC_TASK_CYCLE_POINT --format 'The month is %B.'
          The month is April.
 
       See the :ref:`date-time tutorial <rose-tutorial-datetime-manipulation>`
@@ -155,14 +151,14 @@ Rose contains some utilities to make life easier:
 
 .. ifslides::
 
-   ``rose date``
+   ``isodatetime``
 
    .. code-block:: console
 
-      $ rose date 2000 --offset '+P1Y1M1D'
+      $ isodatetime 2000 --offset '+P1Y1M1D'
       2001-02-02T0000Z
 
-      $ rose date $CYLC_TASK_CYCLE_POINT --format 'The month is %B.'
+      $ isodatetime $CYLC_TASK_CYCLE_POINT --format 'The month is %B.'
       The month is April.
 
 Rose Built-In Applications
