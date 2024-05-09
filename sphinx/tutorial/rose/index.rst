@@ -25,6 +25,5 @@ Rose also contains other optional tools for:
    applications
    metadata
    suites
-   rosie
    summary
    furthertopics/index
