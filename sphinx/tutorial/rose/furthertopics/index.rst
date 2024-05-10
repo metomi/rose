@@ -19,6 +19,7 @@ This section goes into detail in additional Rose topics.
    rose-bunch
    rose-stem
    rose-stem-tutorial
+   rosie
    trigger
    upgrading
    upgrading-macro-development
