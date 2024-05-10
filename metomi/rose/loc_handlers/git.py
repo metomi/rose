@@ -87,17 +87,9 @@ class GitLocHandler:
             self.manager.popen.run_ok(
                 "git", git_dir_opt, "init"
             )
-            self.manager.popen.run_ok(
-                "git", git_dir_opt, "remote", "add", "origin", remote
-            )
 
             # Make sure we configure for minimum fetching.
-            if self.git_version >= (2, 25, 0):
-                self.manager.popen.run_ok(
-                    "git", git_dir_opt, "sparse-checkout", "set", path,
-                    "--no-cone"
-                )
-            else:
+            if self.git_version < (2, 25, 0):
                 self.manager.popen.run_ok(
                     "git", git_dir_opt, "config", "extensions.partialClone",
                     "true"
@@ -109,7 +101,7 @@ class GitLocHandler:
             # Fetch the ref/commit as efficiently as we can.
             ret_code, _, stderr = self.manager.popen.run(
                 "git", git_dir_opt, "fetch", "--depth=1",
-                "--filter=blob:none", "origin", commithash
+                "--filter=blob:none", remote, commithash
             )
             if ret_code:
                 raise ValueError(f"source={loc.name}: {stderr}")
@@ -145,9 +137,6 @@ class GitLocHandler:
             await self.manager.popen.run_ok_async(
                 "git", git_dir_opt, "init"
             )
-            await self.manager.popen.run_ok_async(
-                "git", git_dir_opt, "remote", "add", "origin", remote
-            )
             if self.git_version >= (2, 25, 0) and path != "./":
                 await self.manager.popen.run_ok_async(
                     "git", git_dir_opt, "sparse-checkout", "set", path,
@@ -155,11 +144,11 @@ class GitLocHandler:
                 )
                 await self.manager.popen.run_ok_async(
                     "git", git_dir_opt, "fetch", "--depth=1",
-                    "--filter=blob:none", "origin", loc.key
+                    "--filter=blob:none", remote, loc.key
                 )
             else:
                 await self.manager.popen.run_ok_async(
-                    "git", git_dir_opt, "fetch", "--depth=1", "origin", loc.key
+                    "git", git_dir_opt, "fetch", "--depth=1", remote, loc.key
                 )
 
             await self.manager.popen.run_ok_async(

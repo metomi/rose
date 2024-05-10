@@ -37,7 +37,29 @@ root directory to install file targets with a relative path:
          cloned ``REPOSITORY_URL``, git checkout'ed ``TREEISH``, and extracted
          the path ``PATHSPEC`` within the clone. To extract from the root of
          the repository use a ``PATHSPEC`` of ``./`` e.g.
-         ``git:git@github.com:metomi/rose::./::2.2.0``.
+         ``git:git@github.com:metomi/rose::./::2.2.0``. It may help to think
+         of the parts of the location as git:Where::What::When. Examples:
+
+         .. code-block:: rose
+
+           # Download the sphinx directory from the master branch of
+           # the github.com/metomi/rose repo.
+           [file:rose-docs]
+           source=git:git@github.com:metomi/rose::sphinx::master
+
+           # Extract the whole contents of version 2.0.1 of the local
+           # repository at /home/user/some/path/to/my/git/repo.
+           [file:all_of_my_repo]
+           source=git:/home/user/some/path/to/my/git/repo::./::2.0.1
+
+           # Extract a single file from a particular commit of a repo
+           # on a machine that we have ssh access to.
+           [file:my_file]
+           source=git:machine01:/data/user/my_repo_name::etc/my_file::7261bff4d9a6c582ec759ef52c46dd794fe8794e
+
+         You should set ``git config uploadpack.allowFilter true`` and
+         ``git config uploadpack.allowAnySHA1InWant true`` on repositories
+         if you are setting them up to pull from.
       :opt rsync: This scheme is useful for pulling a file or directory from
          a remote host using ``rsync`` via ``ssh``. A URI should have the
          form ``HOST:PATH``.
