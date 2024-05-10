@@ -1,0 +1,17 @@
+#!jinja2
+[cylc]
+    UTC mode = True
+[scheduling]
+    [[dependencies]]
+        graph = """
+            hello-make:finish & hello-make => fin
+        """
+
+[runtime]
+    [[hello-make]]
+        script = rose task-run --app-key=make --new
+    [[hello-make-bin]]
+        script = rose task-run --app-key=make
+        [[[remote]]]
+            host = {{HOST}}
+    [[fin]]
