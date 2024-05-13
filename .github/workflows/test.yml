@@ -109,8 +109,7 @@ jobs:
             coreutils \
             gnu-sed \
             sqlite3 \
-            subversion \
-            graphviz
+            subversion
 
           # add GNU coreutils and sed to the user PATH (for actions steps)
           # (see instructions in brew install output)
@@ -141,7 +140,7 @@ jobs:
       - name: Install Rose
         working-directory: rose
         run: |
-          pip install ."[all]"
+          pip install ."[${{ (startsWith(matrix.os, 'ubuntu') && 'all') || 'tests,docs' }}]"
           yarn install
 
       - name: Install Cylc
