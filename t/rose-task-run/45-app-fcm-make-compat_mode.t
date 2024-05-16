@@ -47,7 +47,7 @@ run_fail "${TEST_KEY_BASE}-play" \
             --no-detach \
             --debug
 
-# It is a compat mode error.
+# It is an error you would expect in compat mode.
 # If we had turned compat mode off this would be a graphing error:
 #   "Output fcm_make:failed can't be both required and optional"
 file_grep "${TEST_KEY_BASE}-grep-failure" \
