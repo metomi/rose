@@ -4,14 +4,13 @@
 [scheduling]
     [[dependencies]]
         graph = """
-            hello-make:finish & hello-make => fin
+            fcm_make:finish => fin
+            fcm_make:fail => fin
         """
 
 [runtime]
-    [[hello-make]]
-        script = rose task-run --app-key=make --new
-    [[hello-make-bin]]
-        script = rose task-run --app-key=make
-        [[[remote]]]
-            host = {{HOST}}
+    [[fcm_make]]
+        script = rose task-run --app-key=fcm_make --new
+    [[fcm_make2]]
+        platform = any_old_thing
     [[fin]]

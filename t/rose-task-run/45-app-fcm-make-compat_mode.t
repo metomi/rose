@@ -21,24 +21,14 @@
 # Ensure that when Cylc Rose gets workflow config that
 # compatibility run mode isn't changed.
 # https://github.com/cylc/cylc-rose/issues/319
+# To do this we check that the error for the fcm_make task derives
+# from the platform for the fcm_make2 task is garbage,
+# not from the config becoming illegal because compat mode has
+# been switched off.
 #-------------------------------------------------------------------------------
 . "$(dirname "$0")/test_header"
 
-if ! fcm help make 1>/dev/null 2>&1; then
-    skip_all '"fcm make" unavailable'
-fi
-if ! gfortran --version 1>/dev/null 2>&1; then
-    skip_all '"gfortran" unavailable'
-fi
-JOB_HOST="$(rose config --default= 't' 'job-host')"
-if [[ -n "${JOB_HOST}" ]]; then
-    JOB_HOST="$(rose host-select -q "${JOB_HOST}")"
-fi
-if [[ -z "${JOB_HOST}" ]]; then
-    skip_all '"[t]job-host" not defined or not available'
-fi
-
-tests 2
+tests 3
 export ROSE_CONF_PATH=
 get_reg
 
@@ -46,10 +36,9 @@ run_pass "${TEST_KEY_BASE}-install" \
     cylc install \
         --workflow-name="${FLOW}" \
         --no-run-name \
-        -S "HOST='${JOB_HOST}'" \
         "${TEST_SOURCE_DIR}/${TEST_KEY_BASE}"
 
-run_pass "${TEST_KEY_BASE}-play" \
+run_fail "${TEST_KEY_BASE}-play" \
     timeout 120 \
         cylc play \
             "${FLOW}" \
@@ -57,6 +46,13 @@ run_pass "${TEST_KEY_BASE}-play" \
             --host='localhost' \
             --no-detach \
             --debug
+
+# It is a compat mode error.
+# If we had turned compat mode off this would be a graphing error:
+#   "Output fcm_make:failed can't be both required and optional"
+file_grep "${TEST_KEY_BASE}-grep-failure" \
+    'No matching platform "any_old_thing" found' \
+    "${HOME}/cylc-run/${FLOW}/log/job/1/fcm_make/NN/job.err"
 
 purge
 exit 0
