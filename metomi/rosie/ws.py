@@ -38,9 +38,17 @@ from pathlib import Path
 import pwd
 import signal
 from time import sleep
+import sys
+
+if sys.version_info[:2] >= (3, 9):
+    from importlib.resources import files
+else:
+    # BACK_COMPAT: importlib_resources
+    # FROM: Python 3.7
+    # TO: Python: 3.9
+    from importlib_resources import files
 
 import jinja2
-import pkg_resources
 from tornado.ioloop import IOLoop, PeriodicCallback
 import tornado.log
 import tornado.web
@@ -88,12 +96,12 @@ class RosieDiscoServiceApplication(tornado.web.Application):
         self.props["rose_version"] = ROSE_VERSION
 
         # Get location of HTML files from package
-        rosie_lib = os.path.join(
-            pkg_resources.resource_filename('metomi.rosie', 'lib'),
+        rosie_lib = str(files('metomi.rosie').joinpath(
+            "lib",
             "html",
             "template",
             "rosie-disco",
-        )
+        ))
 
         # Autoescape markup to prevent code injection from user inputs.
         self.props["template_env"] = jinja2.Environment(
