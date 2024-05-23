@@ -140,7 +140,7 @@ jobs:
       - name: Install Rose
         working-directory: rose
         run: |
-          pip install ."[${{ (startsWith(matrix.os, 'ubuntu') && 'all') || 'tests,docs' }}]"
+          pip install ."[tests,docs${{ (startsWith(matrix.os, 'ubuntu') && ',graph,rosa') || '' }}]"
           yarn install
 
       - name: Install Cylc
