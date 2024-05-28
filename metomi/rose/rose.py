@@ -17,6 +17,7 @@
 
 import os
 import sys
+from typing import TYPE_CHECKING
 
 
 def pythonpath_manip():
@@ -51,11 +52,6 @@ import argparse
 from inspect import signature
 from pathlib import Path
 
-from pkg_resources import (
-    DistributionNotFound,
-    iter_entry_points,
-)
-
 from metomi.rose import (
     __file__ as rose_init_file,
     __version__,
@@ -63,6 +59,27 @@ from metomi.rose import (
 from metomi.rose.scripts import (
     __file__ as script_init_file,
 )
+
+if TYPE_CHECKING:
+    try:
+        from importlib_metadata import EntryPoint
+    except ImportError:
+        from importlib.metadata import EntryPoint  # type: ignore
+
+
+def iter_entry_points(name: str):
+    """Iterate over all entry points for a given group name"""
+    if sys.version_info[:2] >= (3, 12):
+        from importlib.metadata import entry_points
+    else:
+        # BACK_COMPAT: importlib_metadata
+        #   importlib.metadata was added in Python 3.8. The required interfaces
+        #   were completed by 3.12. For lower versions we must use the
+        #   importlib_metadata backport.
+        # FROM: Python 3.7
+        # TO: Python: 3.12
+        from importlib_metadata import entry_points
+    yield from entry_points().select(group=name)
 
 
 USAGE = f'''
@@ -214,12 +231,13 @@ def _exec_python(ns, sub_cmd, entry_point, args):
     sys.exit(0)
 
 
-def load_entry_point(entry_point):
+def load_entry_point(entry_point: 'EntryPoint'):
     try:
         return entry_point.load()
-    except DistributionNotFound:
+    except ModuleNotFoundError as exc:
         print(
             (
+                f'{type(exc).__name__}: {exc}\n'
                 'This functionality requires optional dependencies:'
                 f' {", ".join(entry_point.extras)}'
                 '\n(e.g. pip install metomi-rose'
