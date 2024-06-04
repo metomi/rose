@@ -65,7 +65,7 @@ GIT_WS_PID=${!}
 sleep 10
 cd $START_PWD
 #-------------------------------------------------------------------------------
-tests 51
+tests 55
 #-------------------------------------------------------------------------------
 remote_test_modes=("ssh" "http" "local")
 remote_locations=("$HOSTNAME:$TEST_DIR/hellorepo/" "http://localhost:$GIT_WS_PORT/cgi-bin/git" "$TEST_DIR/hellorepo/")
@@ -87,19 +87,19 @@ for i in 0 1 2; do
 default=true
 
 [file:hello/fruit_main]
-source=git:$remote::fruit::$MAIN_BRANCH
+source=git:$remote::fruit/::$MAIN_BRANCH
 
 [file:hello/fruit_tag1]
-source=git:$remote::fruit::v1.0
+source=git:$remote::fruit/::v1.0
 
 [file:hello/fruit_tag2]
-source=git:$remote::fruit::v2.0
+source=git:$remote::fruit/::v2.0
 
 [file:hello/fruit_commit1]
-source=git:$remote::fruit::$COMMITHASH1
+source=git:$remote::fruit/::$COMMITHASH1
 
 [file:hello/fruit_commit2]
-source=git:$remote::fruit::$COMMITHASH2
+source=git:$remote::fruit/::$COMMITHASH2
 
 [file:hello/tree_main.txt]
 source=git:$remote::tree.txt::$MAIN_BRANCH
@@ -121,31 +121,31 @@ __CONFIG__
     run_pass "$TEST_KEY" rose app-run --config=../config -q
     find hello -type f | LANG=C sort >'find-hello.out'
     file_cmp "$TEST_KEY.found" "find-hello.out" <<__CONTENT__
-hello/fruit_commit1/fruit/raspberry.txt
-hello/fruit_commit2/fruit/orange.txt
-hello/fruit_commit2/fruit/raspberry.txt
-hello/fruit_main/fruit/orange.txt
-hello/fruit_main/fruit/raspberry.txt
-hello/fruit_tag1/fruit/raspberry.txt
-hello/fruit_tag2/fruit/orange.txt
-hello/fruit_tag2/fruit/raspberry.txt
+hello/fruit_commit1/raspberry.txt
+hello/fruit_commit2/orange.txt
+hello/fruit_commit2/raspberry.txt
+hello/fruit_main/orange.txt
+hello/fruit_main/raspberry.txt
+hello/fruit_tag1/raspberry.txt
+hello/fruit_tag2/orange.txt
+hello/fruit_tag2/raspberry.txt
 hello/tree_branch1.txt
 hello/tree_commit1.txt
 hello/tree_main.txt
 hello/tree_tag1.txt
 hello/tree_tag2.txt
 __CONTENT__
-    file_cmp "$TEST_KEY.found_file0" "hello/fruit_commit1/fruit/raspberry.txt" <<__CONTENT__
+    file_cmp "$TEST_KEY.found_file0" "hello/fruit_commit1/raspberry.txt" <<__CONTENT__
 Octavia
 __CONTENT__
-    file_cmp "$TEST_KEY.found_file1" "hello/fruit_commit1/fruit/raspberry.txt" "hello/fruit_commit2/fruit/raspberry.txt"
-    file_cmp "$TEST_KEY.found_file2" "hello/fruit_commit1/fruit/raspberry.txt" "hello/fruit_main/fruit/raspberry.txt"
-    file_cmp "$TEST_KEY.found_file3" "hello/fruit_commit1/fruit/raspberry.txt" "hello/fruit_tag1/fruit/raspberry.txt"
-    file_cmp "$TEST_KEY.found_file4" "hello/fruit_commit2/fruit/orange.txt" <<__CONTENT__
+    file_cmp "$TEST_KEY.found_file1" "hello/fruit_commit1/raspberry.txt" "hello/fruit_commit2/raspberry.txt"
+    file_cmp "$TEST_KEY.found_file2" "hello/fruit_commit1/raspberry.txt" "hello/fruit_main/raspberry.txt"
+    file_cmp "$TEST_KEY.found_file3" "hello/fruit_commit1/raspberry.txt" "hello/fruit_tag1/raspberry.txt"
+    file_cmp "$TEST_KEY.found_file4" "hello/fruit_commit2/orange.txt" <<__CONTENT__
 Clementine
 __CONTENT__
-    file_cmp "$TEST_KEY.found_file5" "hello/fruit_commit2/fruit/orange.txt" "hello/fruit_main/fruit/orange.txt"
-    file_cmp "$TEST_KEY.found_file6" "hello/fruit_commit2/fruit/orange.txt" "hello/fruit_tag2/fruit/orange.txt"
+    file_cmp "$TEST_KEY.found_file5" "hello/fruit_commit2/orange.txt" "hello/fruit_main/orange.txt"
+    file_cmp "$TEST_KEY.found_file6" "hello/fruit_commit2/orange.txt" "hello/fruit_tag2/orange.txt"
     file_cmp "$TEST_KEY.found_file7" "hello/tree_commit1.txt" <<__CONTENT__
 Holly
 __CONTENT__
@@ -203,11 +203,11 @@ test_init <<__CONFIG__
 default=true
 
 [file:hello/fruit_main]
-source=git:$TEST_DIR/hellorepo/::fruit::bad_ref
+source=git:$TEST_DIR/hellorepo/::fruit/::bad_ref
 __CONFIG__
 run_fail "$TEST_KEY" rose app-run --config=../config
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
-[FAIL] file:hello/fruit_main=source=git:$TEST_DIR/hellorepo/::fruit::bad_ref: ls-remote: could not find ref 'bad_ref' in '$TEST_DIR/hellorepo/'
+[FAIL] file:hello/fruit_main=source=git:$TEST_DIR/hellorepo/::fruit/::bad_ref: ls-remote: could not find ref 'bad_ref' in '$TEST_DIR/hellorepo/'
 __ERROR__
 test_teardown
 #-------------------------------------------------------------------------------
@@ -218,10 +218,42 @@ test_init <<__CONFIG__
 default=true
 
 [file:hello/fruit_main]
-source=git:$TEST_DIR/hellorepo/::fruit::${COMMITHASH1::7}
+source=git:$TEST_DIR/hellorepo/::fruit/::${COMMITHASH1::7}
 __CONFIG__
 run_fail "$TEST_KEY" rose app-run --config=../config
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
-[FAIL] file:hello/fruit_main=source=git:$TEST_DIR/hellorepo/::fruit::${COMMITHASH1::7}: ls-remote: could not find ref '${COMMITHASH1::7}' in '$TEST_DIR/hellorepo/': you may be using an unsupported short commit hash
+[FAIL] file:hello/fruit_main=source=git:$TEST_DIR/hellorepo/::fruit/::${COMMITHASH1::7}: ls-remote: could not find ref '${COMMITHASH1::7}' in '$TEST_DIR/hellorepo/': you may be using an unsupported short commit hash
+__ERROR__
+test_teardown
+#-------------------------------------------------------------------------------
+TEST_KEY="$TEST_KEY_BASE-bad-path-blob-should-be-tree"
+test_setup
+test_init <<__CONFIG__
+[command]
+default=true
+
+[file:hello/fruit_main]
+source=git:$TEST_DIR/hellorepo::fruit::$MAIN_BRANCH
+__CONFIG__
+run_fail "$TEST_KEY" rose app-run --config=../config
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
+[FAIL] Expected path 'fruit' to be type 'blob', but it was 'tree'. Check trailing slash.
+[FAIL] source: remote:$TEST_DIR/hellorepo ref:$MAIN_BRANCH commit:$COMMITHASH2 path:fruit (git:$TEST_DIR/hellorepo::fruit::$MAIN_BRANCH)
+__ERROR__
+test_teardown
+#-------------------------------------------------------------------------------
+TEST_KEY="$TEST_KEY_BASE-bad-path-tree-should-be-blob"
+test_setup
+test_init <<__CONFIG__
+[command]
+default=true
+
+[file:hello/fruit_main/txt]
+source=git:$TEST_DIR/hellorepo::fruit/orange.txt/::$MAIN_BRANCH
+__CONFIG__
+run_fail "$TEST_KEY" rose app-run --config=../config
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
+[FAIL] Expected path 'fruit/orange.txt/' to be type 'tree', but it was 'blob'. Check trailing slash.
+[FAIL] source: remote:$TEST_DIR/hellorepo ref:$MAIN_BRANCH commit:$COMMITHASH2 path:fruit/orange.txt/ (git:$TEST_DIR/hellorepo::fruit/orange.txt/::$MAIN_BRANCH)
 __ERROR__
 test_teardown

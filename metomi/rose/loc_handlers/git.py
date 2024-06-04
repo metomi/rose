@@ -69,51 +69,20 @@ class GitLocHandler:
         """Set loc.real_name, loc.scheme, loc.loc_type.
 
         Within Git we have a lot of trouble figuring out remote
-        loc_type - a clone is required, unfortunately.
-
-        Short commit hashes will not work since there is no remote
-        rev-parse functionality. Long commit hashes will work if the
-        uploadpack.allowAnySHA1InWant configuration is set on the
-        remote repo or server.
-
-        Filtering requires uploadpack.allowFilter to be set true on
-        the remote repo or server.
+        loc_type - a clone is required, unfortunately. There is a
+        tradeoff between extra Git commands and bandwidth vs
+        parse failure behaviour. We have decided to short cut the
+        loc_type calculation to save commands and bandwidth,
+        catching failures later.
 
         """
         loc.scheme = self.SCHEMES[0]
         remote, path, ref = self._parse_name(loc)
-        with tempfile.TemporaryDirectory() as tmpdirname:
-            git_dir_opt = f"--git-dir={tmpdirname}/.git"
-            self.manager.popen.run_ok(
-                "git", git_dir_opt, "init"
-            )
 
-            # Make sure we configure for minimum fetching.
-            if self.git_version < (2, 25, 0):
-                self.manager.popen.run_ok(
-                    "git", git_dir_opt, "config", "extensions.partialClone",
-                    "true"
-                )
+        # Extract the commit hash if we don't already have it.
+        commithash = self._get_commithash(remote, ref)
 
-            # Extract the commit hash if we don't already have it.
-            commithash = self._get_commithash(remote, ref)
-
-            # Fetch the ref/commit as efficiently as we can.
-            ret_code, _, stderr = self.manager.popen.run(
-                "git", git_dir_opt, "fetch", "--depth=1",
-                "--filter=blob:none", remote, commithash
-            )
-            if ret_code:
-                raise ValueError(f"source={loc.name}: {stderr}")
-
-            # Determine the type of the path object.
-            ret_code, typetext, stderr = self.manager.popen.run(
-                "git", git_dir_opt, "cat-file", "-t", f"{commithash}:{path}"
-            )  # N.B. git versions >1.8 can use '-C' to set git dir.
-            if ret_code:
-                raise ValueError(f"source={loc.name}: {stderr}")
-
-        if typetext.strip() == "tree":
+        if path.endswith("/"):  # This is a short cut, checked later.
             loc.loc_type = loc.TYPE_TREE
         else:
             loc.loc_type = loc.TYPE_BLOB
@@ -127,6 +96,9 @@ class GitLocHandler:
 
         git sparse-checkout is not available below Git 2.25, and seems to omit
         contents altogether if set to the root of the repo (as of 2.40.1).
+
+        Filtering requires uploadpack.allowFilter to be set true on
+        the remote repo or server.
 
         """
         if not loc.real_name:
@@ -156,6 +128,14 @@ class GitLocHandler:
                 loc.key
             )
             name = tmpdirname + "/" + path
+
+            # Check that we have inferred the right type from the path name.
+            real_loc_type = loc.TYPE_TREE if os.path.isdir(name) else loc.TYPE_BLOB
+            if real_loc_type != loc.loc_type:
+                raise ValueError(
+                    f"Expected path '{path}' to be type '{loc.loc_type}', "
+                    + f"but it was '{real_loc_type}'. Check trailing slash."
+                )
             dest = loc.cache
             if loc.loc_type == "tree":
                 dest += "/"
@@ -167,6 +147,14 @@ class GitLocHandler:
         return re.split(self.URI_SEPARATOR, nonscheme, maxsplit=3)
 
     def _get_commithash(self, remote, ref):
+        """Get the commit hash given a branch, tag, or commit hash.
+
+        Short commit hashes will not resolve since there is no remote
+        rev-parse functionality. Long commit hashes will work if the
+        uploadpack.allowAnySHA1InWant configuration is set on the
+        remote repo or server.
+
+        """
         ret_code, info, _ = self.manager.popen.run(
             "git", "ls-remote", "--exit-code", remote, ref)
         if ret_code:

@@ -35,17 +35,18 @@ root directory to install file targets with a relative path:
          branch, or long commit hash to specify the commit at which you want
          to extract. These should follow the same semantics as if you git
          cloned ``REPOSITORY_URL``, git checkout'ed ``TREEISH``, and extracted
-         the path ``PATHSPEC`` within the clone. To extract from the root of
-         the repository use a ``PATHSPEC`` of ``./`` e.g.
+         the path ``PATHSPEC`` within the clone. ``PATHSPEC`` must end with a
+         trailing slash (``/``) if it is a directory. To extract from the root
+         of the repository use a ``PATHSPEC`` of ``./`` e.g.
          ``git:git@github.com:metomi/rose::./::2.2.0``. It may help to think
          of the parts of the location as git:Where::What::When. Examples:
 
          .. code-block:: rose
 
            # Download the sphinx directory from the master branch of
-           # the github.com/metomi/rose repo.
+           # the github.com/metomi/rose repo. Note trailing slash.
            [file:rose-docs]
-           source=git:git@github.com:metomi/rose::sphinx::master
+           source=git:git@github.com:metomi/rose::sphinx/::master
 
            # Extract the whole contents of version 2.0.1 of the local
            # repository at /home/user/some/path/to/my/git/repo.
