@@ -130,7 +130,9 @@ class GitLocHandler:
             name = tmpdirname + "/" + path
 
             # Check that we have inferred the right type from the path name.
-            real_loc_type = loc.TYPE_TREE if os.path.isdir(name) else loc.TYPE_BLOB
+            real_loc_type = (
+                loc.TYPE_TREE if os.path.isdir(name) else loc.TYPE_BLOB
+            )
             if real_loc_type != loc.loc_type:
                 raise ValueError(
                     f"Expected path '{path}' to be type '{loc.loc_type}', "
