@@ -35,11 +35,14 @@ class GitLocHandler:
 
     def __init__(self, manager):
         self.manager = manager
+        # Determine (just once) what git version we have, if any.
         ret_code, versiontext, stderr = self.manager.popen.run(
             "git", "version")
         if ret_code:
+            # Git not installed.
             self.git_version = None
         else:
+            # Git is installed, get the version.
             version_nums = []
             for num_string in versiontext.split()[-1].split("."):
                 try:
@@ -49,6 +52,7 @@ class GitLocHandler:
             self.git_version = tuple(version_nums)
 
     def can_pull(self, loc):
+        """Determine if this is a suitable handler for loc."""
         if self.git_version is None:
             return False
         scheme = urlparse(loc.name).scheme
@@ -89,7 +93,7 @@ class GitLocHandler:
         loc.real_name = (
             f"remote:{remote} ref:{ref} commit:{commithash} path:{path}"
         )
-        loc.key = commithash
+        loc.key = commithash  # We'll notice branch/tag updates.
 
     async def pull(self, loc, conf_tree):
         """Get loc to its cache.
@@ -110,6 +114,7 @@ class GitLocHandler:
                 "git", git_dir_opt, "init"
             )
             if self.git_version >= (2, 25, 0) and path != "./":
+                # sparse-checkout available and suitable for this case.
                 await self.manager.popen.run_ok_async(
                     "git", git_dir_opt, "sparse-checkout", "set", path,
                     "--no-cone"
@@ -119,10 +124,12 @@ class GitLocHandler:
                     "--filter=blob:none", remote, loc.key
                 )
             else:
+                # Fallback.
                 await self.manager.popen.run_ok_async(
                     "git", git_dir_opt, "fetch", "--depth=1", remote, loc.key
                 )
 
+            # Checkout to temporary location, then extract only 'path' later.
             await self.manager.popen.run_ok_async(
                 "git", git_dir_opt, f"--work-tree={tmpdirname}", "checkout",
                 loc.key
@@ -138,6 +145,8 @@ class GitLocHandler:
                     f"Expected path '{path}' to be type '{loc.loc_type}', "
                     + f"but it was '{real_loc_type}'. Check trailing slash."
                 )
+
+            # Extract only 'path' to cache.
             dest = loc.cache
             if loc.loc_type == "tree":
                 dest += "/"
