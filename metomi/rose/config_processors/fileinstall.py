@@ -17,6 +17,7 @@
 """Process "file:*" sections in node of a metomi.rose.config_tree.ConfigTree.
 """
 
+import asyncio
 from contextlib import suppress
 from fnmatch import fnmatch
 from glob import glob
@@ -45,6 +46,13 @@ from metomi.rose.job_runner import JobManager, JobProxy, JobRunner
 from metomi.rose.popen import RosePopener
 from metomi.rose.reporter import Event
 from metomi.rose.scheme_handler import SchemeHandlersManager
+
+
+# set containing references to "background" coroutines that are not referenced
+# from any code (i.e. are not directly awaited), adding them to this list
+# avoids the potential for garbage collection to delete them whilst they are
+# running
+_BACKGROUND_TASKS = set()
 
 
 class ConfigProcessorForFile(ConfigProcessorBase):
@@ -89,12 +97,33 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         if not nodes:
             return
 
+        loop = asyncio.get_event_loop()
+        loop.set_exception_handler(self.handle_event)
+        coro = self.__process(conf_tree, nodes, **kwargs)
+
+        try:
+            # event loop is not running (e.g. rose CLI use)
+            loop.run_until_complete(coro)
+        except RuntimeError:
+            # event loop is already running (e.g. cylc CLI use)
+            # WARNING: this starts the file installation running, but it
+            # doesn't wait for it to finish, that's your problem :(
+            task = loop.create_task(coro)
+            # reference this task from a global variable to prevent it from
+            # being garbage collected
+            _BACKGROUND_TASKS.add(task)
+            # tidy up afterwards
+            task.add_done_callback(_BACKGROUND_TASKS.discard)
+
+    async def __process(self, conf_tree, nodes, **kwargs):
+        """Helper for self._process."""
         # Create database to store information for incremental updates,
         # if it does not already exist.
         loc_dao = LocDAO()
         loc_dao.create()
 
         cwd = os.getcwd()
+
         file_install_root = conf_tree.node.get_value(
             ["file-install-root"], os.getenv("ROSE_FILE_INSTALL_ROOT", None)
         )
@@ -102,8 +131,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
             file_install_root = env_var_process(file_install_root)
             self.manager.fs_util.makedirs(file_install_root)
             self.manager.fs_util.chdir(file_install_root)
+
         try:
-            self._process(conf_tree, nodes, loc_dao, **kwargs)
+            await self._process(conf_tree, nodes, loc_dao, **kwargs)
         finally:
             if cwd != os.getcwd():
                 self.manager.fs_util.chdir(cwd)
@@ -111,7 +141,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 with suppress(Exception):
                     loc_dao.conn.close()
 
-    def _process(self, conf_tree, nodes, loc_dao, **kwargs):
+    async def _process(self, conf_tree, nodes, loc_dao, **kwargs):
         """Helper for self.process."""
         # Ensure that everything is overwritable
         # Ensure that container directories exist
@@ -360,7 +390,9 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 if nproc_str is not None:
                     nproc = int(nproc_str)
                 job_runner = JobRunner(self, nproc)
-                job_runner(JobManager(jobs), conf_tree, loc_dao, work_dir)
+                await job_runner(
+                    JobManager(jobs), conf_tree, loc_dao, work_dir
+                )
             except ValueError as exc:
                 if exc.args and exc.args[0] in jobs:
                     job = jobs[exc.args[0]]
