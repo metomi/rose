@@ -161,9 +161,7 @@ class GitLocHandler:
         """Get the commit hash given a branch, tag, or commit hash.
 
         Short commit hashes will not resolve since there is no remote
-        rev-parse functionality. Long commit hashes will work if the
-        uploadpack.allowAnySHA1InWant configuration is set on the
-        remote repo or server.
+        rev-parse functionality.
 
         """
         ret_code, info, _ = self.manager.popen.run(
@@ -171,8 +169,9 @@ class GitLocHandler:
         if ret_code:
             err = f"ls-remote: could not find ref '{ref}' in '{remote}'"
             if REC_COMMIT_HASH.match(ref):
-                if len(ref) == 40:
-                    # Likely a full commit hash.
+                if len(ref) in [40, 64]:  # SHA1, SHA256 hashes.
+                    # Likely a full commit hash, but the server
+                    # uploadpack.allowAnySHA1InWant configuration is not set.
                     return ref
                 err += ": you may be using an unsupported short commit hash"
             raise ValueError(err)

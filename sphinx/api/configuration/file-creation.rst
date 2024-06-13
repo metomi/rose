@@ -68,8 +68,8 @@ root directory to install file targets with a relative path:
            source=git:machine01:/data/user/my_repo_name::etc/my_file::7261bff4d9a6c582ec759ef52c46dd794fe8794e
 
          You should set ``git config uploadpack.allowFilter true`` and
-         ``git config uploadpack.allowAnySHA1InWant true`` on repositories
-         if you are setting them up to pull from.
+         optionally ``git config uploadpack.allowAnySHA1InWant true`` on
+         repositories if you are setting them up to pull from.
       :opt rsync: This scheme is useful for pulling a file or directory from
          a remote host using ``rsync`` via ``ssh``. A URI should have the
          form ``HOST:PATH``.
