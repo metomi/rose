@@ -155,7 +155,7 @@ class GitLocHandler:
 
     def _parse_name(self, loc):
         scheme, nonscheme = loc.name.split(":", 1)
-        return re.split(self.URI_SEPARATOR, nonscheme, maxsplit=3)
+        return nonscheme.split(self.URI_SEPARATOR, maxsplit=3)
 
     def _get_commithash(self, remote, ref):
         """Get the commit hash given a branch, tag, or commit hash.
