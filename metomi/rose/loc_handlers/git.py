@@ -166,7 +166,7 @@ class GitLocHandler:
         """
         ret_code, info, _ = self.manager.popen.run(
             "git", "ls-remote", "--exit-code", remote, ref)
-        if ret_code == 128:
+        if ret_code != 2:
             # repo not found
             raise ValueError(f"ls-remote: could not locate '{remote}'")
         if ret_code:
