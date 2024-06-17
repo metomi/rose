@@ -65,7 +65,7 @@ GIT_WS_PID=${!}
 sleep 10
 cd $START_PWD
 #-------------------------------------------------------------------------------
-tests 55
+tests 57
 #-------------------------------------------------------------------------------
 remote_test_modes=("ssh" "http" "local")
 remote_locations=("$HOSTNAME:$TEST_DIR/hellorepo/" "http://localhost:$GIT_WS_PORT/cgi-bin/git" "$TEST_DIR/hellorepo/")
@@ -194,6 +194,21 @@ hello/fruit/raspberry.txt
 hello/grass.txt
 hello/tree.txt
 __FILE__
+test_teardown
+#-------------------------------------------------------------------------------
+TEST_KEY="$TEST_KEY_BASE-bad-repo"
+test_setup
+test_init <<__CONFIG__
+[command]
+default=true
+
+[file:hello/fruit_main]
+source=git:$TEST_DIR/zz9+zα/::earth/::v1
+__CONFIG__
+run_fail "$TEST_KEY" rose app-run --config=../config
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
+[FAIL] file:hello/fruit_main=source=git:$TEST_DIR/zz9+zα/::earth/::v1: ls-remote: could not locate '$TEST_DIR/zz9+zα/'
+__ERROR__
 test_teardown
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-bad-ref"
