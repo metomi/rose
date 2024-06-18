@@ -166,6 +166,40 @@ wait "$GIT_WS_PID" 2>/dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY="$TEST_KEY_BASE-null-change"
 test_setup
+test_init <<__CONFIG__
+[command]
+default=true
+
+[file:hello/fruit_main]
+source=git:$remote::fruit/::$MAIN_BRANCH
+
+[file:hello/fruit_tag1]
+source=git:$remote::fruit/::v1.0
+
+[file:hello/fruit_tag2]
+source=git:$remote::fruit/::v2.0
+
+[file:hello/fruit_commit1]
+source=git:$remote::fruit/::$COMMITHASH1
+
+[file:hello/fruit_commit2]
+source=git:$remote::fruit/::$COMMITHASH2
+
+[file:hello/tree_main.txt]
+source=git:$remote::tree.txt::$MAIN_BRANCH
+
+[file:hello/tree_branch1.txt]
+source=git:$remote::tree.txt::branch1
+
+[file:hello/tree_tag1.txt]
+source=git:$remote::tree.txt::v1.0
+
+[file:hello/tree_tag2.txt]
+source=git:$remote::tree.txt::v2.0
+
+[file:hello/tree_commit1.txt]
+source=git:$remote::tree.txt::$COMMITHASH1
+__CONFIG__
 rose app-run --config=../config -q || exit 1
 find hello -type f | LANG=C sort >'find-hello-before.out'
 touch timeline # Nothing should be created after "timeline"
