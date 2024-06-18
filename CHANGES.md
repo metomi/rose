@@ -18,6 +18,7 @@ Minor changes required for compatibility with cylc-flow 8.3.0 (via cylc-rose).
 ### Enhancements
 
 [#2754](https://github.com/metomi/rose/pull/2754) - support for file creation from Git repositories
+
 --------------------------------------------------------------------------------
 
 ## 2.2.0 (<span actions:bind='release-date'>Released 2024-01-18</span>)
