@@ -67,6 +67,9 @@ non-Python dependencies are satisfied.
    + ``rose task-run``
    + ``cylc install``
 
+   Git is likewise required for installing files from Git repositories or
+   hosting services such as GitHub. Note Git is not automatically installed
+   by the metomi-rose conda.
 
 Configuring Rose
 ----------------

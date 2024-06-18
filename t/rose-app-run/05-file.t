@@ -44,7 +44,7 @@ Hello and good bye.
 __CONTENT__
 OUT=$(cd config/file && cat hello1 hello2 hello3/text)
 #-------------------------------------------------------------------------------
-tests 62
+tests 65
 #-------------------------------------------------------------------------------
 # Normal mode with free format files.
 TEST_KEY=$TEST_KEY_BASE
@@ -70,7 +70,18 @@ run_fail "$TEST_KEY" rose app-run --config=../config -q \
     --define='[file:hello4]source=stuff:ing'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] file:hello4=source=stuff:ing: bad or missing value
+[FAIL] file:hello4=source=stuff:ing: don't know how to process stuff:ing
+__CONTENT__
+test_teardown
+#-------------------------------------------------------------------------------
+# Normal mode with free format files and a file with an invalid scheme.
+TEST_KEY=$TEST_KEY_BASE-invalid-content
+test_setup
+run_fail "$TEST_KEY" rose app-run --config=../config -q \
+    --define='schemes=stuff*=where_is_the_stuff' --define='[file:hello4]source=stuff:ing'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
+[FAIL] file:hello4=source=stuff:ing: don't support scheme where_is_the_stuff
 __CONTENT__
 test_teardown
 #-------------------------------------------------------------------------------

@@ -131,6 +131,9 @@ jobs:
           __HERE__
           cat "$HOME/.bashrc"
 
+      - name: Configure git  # Configure Git for Git dependent tests.
+        uses: cylc/release-actions/configure-git@v1
+
       - name: Apt-Get Install
         if: startsWith(matrix.os, 'ubuntu')
         run: |

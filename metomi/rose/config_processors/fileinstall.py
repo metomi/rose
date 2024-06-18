@@ -208,7 +208,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         source.scheme = scheme
                         break
                 self.loc_handlers_manager.parse(source, conf_tree)
-            except ValueError:
+            except ValueError as exc:
                 if source.is_optional:
                     sources.pop(source.name)
                     for name in source.used_by_names:
@@ -220,6 +220,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                     raise ConfigProcessError(
                         ["file:" + source.used_by_names[0], "source"],
                         source.name,
+                        exc
                     )
             prev_source = loc_dao.select(source.name)
             source.is_out_of_date = (
@@ -856,7 +857,7 @@ class PullableLocHandlersManager(SchemeHandlersManager):
             # Scheme specified in the configuration.
             handler = self.get_handler(loc.scheme)
             if handler is None:
-                raise ValueError(loc.name)
+                raise ValueError(f"don't support scheme {loc.scheme}")
         else:
             # Scheme not specified in the configuration.
             scheme = urlparse(loc.name).scheme
@@ -865,7 +866,7 @@ class PullableLocHandlersManager(SchemeHandlersManager):
                 if handler is None:
                     handler = self.guess_handler(loc)
                 if handler is None:
-                    raise ValueError(loc.name)
+                    raise ValueError(f"don't know how to process {loc.name}")
             else:
                 handler = self.get_handler(self.DEFAULT_SCHEME)
         return handler.parse(loc, conf_tree)

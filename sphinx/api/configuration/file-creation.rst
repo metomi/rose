@@ -25,6 +25,51 @@ root directory to install file targets with a relative path:
       :opt svn: The Subversion scheme. The location is a Subversion URL or
          an FCM location keyword. A URI with these schemes ``svn``,
          ``svn+ssh`` and ``fcm`` are automatically recognised.
+      :opt git: The Git scheme. The location is complex due to Git semantics.
+         It must have the scheme ``git`` and be of the form
+         ``git:REPOSITORY_URL::PATHSPEC::TREEISH``:
+         
+         * ``REPOSITORY_URL`` should
+           be a Git repository URI which may itself have a scheme ``ssh``,
+           ``git``, ``https``, or be of the form ``HOST:PATH``, or ``PATH`` for
+           local repositories.
+         * ``PATHSPEC`` should be a path to a file or
+           directory that you want to extract.
+           The ``PATHSPEC`` must end with a
+           trailing slash (``/``) if it is a directory. To extract from the root
+           of the repository use a ``PATHSPEC`` of ``./`` e.g.
+           ``git:git@github.com:metomi/rose::./::2.2.0``.
+         * ``TREEISH`` should be a tag,
+           branch, or long commit hash to specify the commit at which you want
+           to extract.
+
+         These should follow the same semantics as if you git
+         cloned ``REPOSITORY_URL``, git checkout'ed ``TREEISH``, and extracted
+         the path ``PATHSPEC`` within the clone. It may help to think
+         of the parts of the location as ``git:Where::What::When``.
+         
+         ..rubric:: Examples:
+
+         .. code-block:: rose
+
+           # Download the sphinx directory from the master branch of
+           # the github.com/metomi/rose repo. Note trailing slash.
+           [file:rose-docs]
+           source=git:git@github.com:metomi/rose::sphinx/::master
+
+           # Extract the whole contents of version 2.0.1 of the local
+           # repository at /home/user/some/path/to/my/git/repo.
+           [file:all_of_my_repo]
+           source=git:/home/user/some/path/to/my/git/repo::./::2.0.1
+
+           # Extract a single file from a particular commit of a repo
+           # on a machine that we have ssh access to.
+           [file:my_file]
+           source=git:machine01:/data/user/my_repo_name::etc/my_file::7261bff4d9a6c582ec759ef52c46dd794fe8794e
+
+         You should set ``git config uploadpack.allowFilter true`` and
+         optionally ``git config uploadpack.allowAnySHA1InWant true`` on
+         repositories if you are setting them up to pull from.
       :opt rsync: This scheme is useful for pulling a file or directory from
          a remote host using ``rsync`` via ``ssh``. A URI should have the
          form ``HOST:PATH``.
