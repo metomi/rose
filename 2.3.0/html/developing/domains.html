@@ -1,0 +1,453 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sphinx Domains &mdash; Rose Documentation 2.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=f63d8bfa" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/diff_selector.css?v=9704a72b" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/grid_table.css?v=0285b42e" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/hieroglyph_theme_addons.css?v=814c2015" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tutorial.css?v=b869d33c" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/addons.css?v=d1f804c3" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=466af0f7" />
+
+  
+    <link rel="shortcut icon" href="../_static/rose-favicon.png"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=c3c8ae58"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/js/diff_selector.js?v=3109bfa4"></script>
+        <script src="../_static/js/minicylc.js?v=ddc882fd"></script>
+        <script src="../_static/js/spoiler.js?v=12631137"></script>
+        <script src="../_static/js/addons.js?v=39bd7dee"></script>
+        <script src="../_static/js/versioning.js?v=df0214e8"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/rose-logo-crop.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                2.3.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/rose/index.html">Rose Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rose API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/configuration/index.html">Rose Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/other.html">Other Python API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/rose-built-in-applications.html">Rose Built-In Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../terms.html">Rose Terms Of Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../course/um-ut.html">UM User Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Rose Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Sphinx Domains</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="sphinx-domains">
+<h1>Sphinx Domains<a class="headerlink" href="#sphinx-domains" title="Link to this heading"></a></h1>
+<p>Sphinx includes a system for documenting objects in a structured way via
+<a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html">domains</a>. For example to document a Python function one might do:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">py:function</span><span class="p">::</span> answer()
+
+   <span class="nc">:return:</span> int The ultimate answer to life, the universe and everything.
+
+   Return 42.
+</pre></div>
+</div>
+<p>This is what the <code class="docutils literal notranslate"><span class="pre">sphinx.ext.autodoc</span></code> system does (e.g. <code class="docutils literal notranslate"><span class="pre">autofunction</span></code>)
+for you automatically.</p>
+<p>For documenting Rose components an extension adding a Rose domain has been
+added.</p>
+<section id="rose-domain">
+<h2>Rose Domain<a class="headerlink" href="#rose-domain" title="Link to this heading"></a></h2>
+<p id="module-rose_domain">The Rose domain is for documenting Rose configurations and built-in
+applications.</p>
+<dl>
+<dt>Rose Objects:</dt><dd><p>The Rose domain supports the following object types:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rose:app</span></code> - Rose Applications.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rose:file</span></code> - Root Rose configurations.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rose:conf</span></code> - Rose configurations. Nest them to create configuration
+sections.</p></li>
+</ul>
+<p>See the corresponding directives for more information on each object type.</p>
+</dd>
+<dt>Reference Syntax:</dt><dd><p>Once documented, objects can be referenced using the following syntax:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>:rose:CONFIG-FILE[parent-section]child-config
+:rose:CONFIG-FILE|top-level-config
+</pre></div>
+</div>
+<p>Where <code class="docutils literal notranslate"><span class="pre">CONFIG-FILE</span></code> is:</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">APP-NAME</span></code> for applications (e.g. <code class="docutils literal notranslate"><span class="pre">fcm_make</span></code>).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">FILE-NAME</span></code> for configuration files (e.g. <code class="docutils literal notranslate"><span class="pre">rose.conf</span></code>).</p></li>
+</ul>
+</dd>
+<dt>Referencing From RST Files:</dt><dd><p>To reference a Rose object add the object <code class="docutils literal notranslate"><span class="pre">TYPE</span></code> into the domain
+(e.g. <code class="docutils literal notranslate"><span class="pre">conf</span></code> or <code class="docutils literal notranslate"><span class="pre">app</span></code>).</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="na">:rose:TYPE:</span><span class="nv">`CONFIG-FILE[parent-section]child-config`</span>
+</pre></div>
+</div>
+<p>e.g:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="m">*</span> <span class="na">:rose:app:</span><span class="nv">`fcm_make`</span>
+<span class="m">*</span> <span class="na">:rose:conf:</span><span class="nv">`fcm_make.args`</span>
+</pre></div>
+</div>
+</dd>
+<dt>Autodocumentation:</dt><dd><p>Documentation can be auto-built from RST formatted comments in Rose
+configuration files using the <code class="docutils literal notranslate"><span class="pre">autoconfig</span></code> directive.</p>
+<p>Note that due to the implementation of <a class="reference internal" href="../api/configuration/api.html#module-metomi.rose.config" title="metomi.rose.config"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metomi.rose.config</span></code></a> the
+autodocumenter will represent empty sections as top level configuration
+nodes.</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">rose:file</span><span class="p">::</span> rose-suite.conf
+
+   The config file used for configuring suite level settings.
+
+<span class="p">   ..</span> <span class="ow">rose:conf</span><span class="p">::</span> jinja2:suite.rc
+
+      A section for specifying Jinja2 settings for use in the
+      <span class="s">``flow.cylc``</span> file.
+
+      Note that one ommits the square brackets for config sections. If
+      :rose:conf: contains other :rose:conf:&#39;s then it is implicitly a
+      section and the brackets are added automatically. If you wish to
+      document a section which contains no settings write it using
+      square brackets.
+
+<span class="p">      ..</span> <span class="ow">rose:conf</span><span class="p">::</span> ROSE_VERSION
+
+         provide the intended Rose version to the suite.
+
+<span class="p">         ..</span> <span class="ow">deprecated</span><span class="p">::</span> 6.1.0
+
+            No longer required, this context is now provided internally.
+
+<span class="p">      ..</span> <span class="ow">rose:conf</span><span class="p">::</span> CYLC_VERSION
+
+         provide the intended Rose version to the suite.
+
+<span class="p">         ..</span> <span class="ow">deprecated</span><span class="p">::</span> 6.1.0
+
+            See <span class="na">:rose:conf:</span><span class="nv">`ROSE_VERSION`</span>.
+
+<span class="c">            ..            ^ relative reference</span>
+</pre></div>
+</div>
+<dl>
+<dt>Referencing Objects Via Intersphinx:</dt><dd><p>Reference Rose objects as you would any other e.g:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="na">:rose:file:</span><span class="nv">`intersphinx-mapping:rose-app.conf`</span>
+</pre></div>
+</div>
+<p>A quick way to get the object reference is to extract if from the URL.
+For example in the following URL:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>doc-root/api/configuration/application.html#rose:file:rose-app.conf
+</pre></div>
+</div>
+<p>The reference is <code class="docutils literal notranslate"><span class="pre">rose:file:rose-app.conf</span></code>.</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="rose_domain.RoseDirective">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rose_domain.</span></span><span class="sig-name descname"><span class="pre">RoseDirective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rose_domain.html#RoseDirective"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rose_domain.RoseDirective" title="Link to this definition"></a></dt>
+<dd><p>Base class for implementing Rose objects.</p>
+<dl class="simple">
+<dt>Subclasses must provide:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">NAME</span></code></p></li>
+</ul>
+</dd>
+<dt>Subclasses can provide:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">LABEL</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ARGUMENT_SEPARATOR</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">ARGUMENT_REGEX</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ALT_FORM_SEPARATOR</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ALT_FORM_TEMPLATE</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">doc_field_types</span></code> - List of <code class="docutils literal notranslate"><span class="pre">Field</span></code> objects for object
+parameters.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run()</span></code> - For adding special rev_context variables via
+<code class="docutils literal notranslate"><span class="pre">add_rev_context</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">handle_signature()</span></code> - For changing the display of objects.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">custom_name_template</span></code> - String template accepting one string
+format argument for custom formatting the node name (e.g. <code class="docutils literal notranslate"><span class="pre">'[%s]'</span></code>
+for conf sections).</p></li>
+</ul>
+</dd>
+<dt>ref_context Variables:</dt><dd><p>Sphinx domains use <code class="docutils literal notranslate"><span class="pre">ref_context</span></code> variables to determine the
+relationship between objects. E.g. for a Rose app the <code class="docutils literal notranslate"><span class="pre">rose:app</span></code>
+variable is set to the name of the app. This variable will be made
+available to all children which is how they determine that they belong
+to the app.</p>
+<ul class="simple">
+<li><p>Variables set in <code class="docutils literal notranslate"><span class="pre">run()</span></code> are available to this object along with
+all of its children.</p></li>
+<li><p>Variables set in <code class="docutils literal notranslate"><span class="pre">before_content()</span></code> are only available to children.</p></li>
+<li><p>All variables set via <code class="docutils literal notranslate"><span class="pre">add_ref_context()</span></code> will be automatically
+removed in <code class="docutils literal notranslate"><span class="pre">after_content()</span></code> to prevent leaking scope.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rose_domain.RoseDirective.ALT_FORM_SEPARATOR">
+<span class="sig-name descname"><span class="pre">ALT_FORM_SEPARATOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'&amp;'</span></em><a class="headerlink" href="#rose_domain.RoseDirective.ALT_FORM_SEPARATOR" title="Link to this definition"></a></dt>
+<dd><p>String for splitting alternate names.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rose_domain.RoseDirective.ALT_FORM_TEMPLATE">
+<span class="sig-name descname"><span class="pre">ALT_FORM_TEMPLATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'(alternate:</span> <span class="pre">%s)'</span></em><a class="headerlink" href="#rose_domain.RoseDirective.ALT_FORM_TEMPLATE" title="Link to this definition"></a></dt>
+<dd><p>String template for writing out alternate names. Takes one string format
+argument.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rose_domain.RoseDirective.ARGUMENT_SEPARATOR">
+<span class="sig-name descname"><span class="pre">ARGUMENT_SEPARATOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rose_domain.RoseDirective.ARGUMENT_SEPARATOR" title="Link to this definition"></a></dt>
+<dd><p>String for separating the configuration name and argument.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rose_domain.RoseDirective.LABEL">
+<span class="sig-name descname"><span class="pre">LABEL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#rose_domain.RoseDirective.LABEL" title="Link to this definition"></a></dt>
+<dd><p>Label to prepend to objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rose_domain.RoseDirective.NAME">
+<span class="sig-name descname"><span class="pre">NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rose_domain.RoseDirective.NAME" title="Link to this definition"></a></dt>
+<dd><p>The Rose domain this directive implements, see RoseDomain.directives</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rose_domain.RoseAppDirective">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rose_domain.</span></span><span class="sig-name descname"><span class="pre">RoseAppDirective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rose_domain.html#RoseAppDirective"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rose_domain.RoseAppDirective" title="Link to this definition"></a></dt>
+<dd><p>Directive for documenting Rose apps.</p>
+<p class="rubric">Example</p>
+<p>Click <span class="guilabel">source</span> to view source code.</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">rose:app</span><span class="p">::</span> foo
+
+   An app called <span class="s">``foo``</span>.
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rose_domain.RoseFileDirective">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rose_domain.</span></span><span class="sig-name descname"><span class="pre">RoseFileDirective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rose_domain.html#RoseFileDirective"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rose_domain.RoseFileDirective" title="Link to this definition"></a></dt>
+<dd><p>Directive for documenting Rose files.</p>
+<p class="rubric">Example</p>
+<p>Click <span class="guilabel">source</span> to view source code.</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">rose:file</span><span class="p">::</span> foo
+
+   An configuration file called <span class="s">``foo``</span>.
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rose_domain.RoseConfigDirective">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rose_domain.</span></span><span class="sig-name descname"><span class="pre">RoseConfigDirective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rose_domain.html#RoseConfigDirective"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rose_domain.RoseConfigDirective" title="Link to this definition"></a></dt>
+<dd><p>Directive for documenting config sections.</p>
+<dl class="simple">
+<dt>Optional Attributes:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">envvar</span></code> - Associate an environment variable with this
+configuration option.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">compulsory</span></code> - Set to <code class="docutils literal notranslate"><span class="pre">True</span></code> for compulsory settings, omit this
+field for optional settings.</p></li>
+</ul>
+</dd>
+<dt>Additional ref_context:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rose:conf-section</span></code> - Set for parent configurations, is available
+to any child nodes.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>Click <span class="guilabel">source</span> to view source code.</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">rose:conf</span><span class="p">::</span> foo
+
+   <span class="nc">:default:</span> foo
+   <span class="nc">:opt argtype foo:</span> Description of option <span class="s">``foo``</span>.
+   <span class="nc">:opt bar:</span> Description of bar
+
+   A setting called <span class="s">``foo``</span>.
+
+<span class="p">..</span> <span class="ow">rose:conf</span><span class="p">::</span> bar
+
+   A section called <span class="s">``bar``</span>.
+
+<span class="p">   ..</span> <span class="ow">rose:conf</span><span class="p">::</span> baz
+
+      <span class="nc">:compulsory:</span> True
+      <span class="nc">:env:</span> AN_ASSOCIATED_ENVIRONMENT_VARIABLE
+
+      A config called <span class="s">``[bar]baz``</span>.
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rose_domain.RoseAutoDirective">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rose_domain.</span></span><span class="sig-name descname"><span class="pre">RoseAutoDirective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lineno</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_machine</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rose_domain.html#RoseAutoDirective"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rose_domain.RoseAutoDirective" title="Link to this definition"></a></dt>
+<dd><p>Directive for autodocumenting Rose configuration files.</p>
+<p>Uses RST formatted comments in Rose configuration files using
+<a class="reference internal" href="../api/configuration/api.html#module-metomi.rose.config" title="metomi.rose.config"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metomi.rose.config</span></code></a>.</p>
+<p>Note the directive only documents config objects not the file itself.</p>
+<p class="rubric">Example</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="c">.. rose:file: foo.conf</span>
+
+<span class="c">   .. autoconfig:: path/to/foo.conf</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">orphan<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright : Copyright (C) British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2.3.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2.3.0";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "developing/domains";
+    </script>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+
+
+</body>
+</html>

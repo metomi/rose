@@ -1,0 +1,476 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rosie &mdash; Rose Documentation 2.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=f63d8bfa" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/diff_selector.css?v=9704a72b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/grid_table.css?v=0285b42e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/hieroglyph_theme_addons.css?v=814c2015" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/tutorial.css?v=b869d33c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/addons.css?v=d1f804c3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=466af0f7" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/rose-favicon.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=c3c8ae58"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/js/diff_selector.js?v=3109bfa4"></script>
+        <script src="../../../_static/js/minicylc.js?v=ddc882fd"></script>
+        <script src="../../../_static/js/spoiler.js?v=12631137"></script>
+        <script src="../../../_static/js/addons.js?v=39bd7dee"></script>
+        <script src="../../../_static/js/versioning.js?v=df0214e8"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Trigger" href="trigger.html" />
+    <link rel="prev" title="Rose Stem Tutorial" href="rose-stem-tutorial.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/rose-logo-crop.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                2.3.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Rose Tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../configurations.html">Rose Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../applications.html">Rose Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../metadata.html">Rose Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../suites.html">Rose Suite Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../summary.html">Summary</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Further Topics</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="command-keys.html">Command Keys</a></li>
+<li class="toctree-l3"><a class="reference internal" href="date-time-manipulation.html">Date and Time Manipulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="failif-warnif.html">Fail-If, Warn-If</a></li>
+<li class="toctree-l3"><a class="reference internal" href="macro-development.html">Custom Macros</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optional-configurations.html">Optional Configurations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="polling.html">Polling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rose-arch.html">Rose Arch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rose-bunch.html">Rose Bunch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rose-stem.html">Rose Stem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rose-stem-tutorial.html">Rose Stem Tutorial</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Rosie</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rosie-suites">Rosie Suites</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#version-control">Version Control</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#suite-naming">Suite Naming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-rose-suite-info-file">The <code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.info</span></code> File</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#managing-suites">Managing Suites</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="trigger.html">Trigger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upgrading.html">Upgrading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upgrading-macro-development.html">Upgrading Macro Development</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rose API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/configuration/index.html">Rose Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/other.html">Other Python API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-built-in-applications.html">Rose Built-In Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../terms.html">Rose Terms Of Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../course/um-ut.html">UM User Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Rose Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Rose Tutorial</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Further Topics</a></li>
+      <li class="breadcrumb-item active">Rosie</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rosie">
+<span id="tutorial-rosie"></span><h1>Rosie<a class="headerlink" href="#rosie" title="Link to this heading"></a></h1>
+<p>Rosie is a tool for managing Rose suite configurations which is included in
+Rose. The purpose of Rosie is to facilitate suite development, management and
+collaboration.
+Rosie:</p>
+<ul class="simple">
+<li><p>Adds version control to Rose suite configurations.</p></li>
+<li><p>Updates a database to keep track of Rose suite configurations.</p></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This tutorial does not require specific FCM knowledge but basic version
+control awareness is important. For more information on FCM version
+control see the <a class="reference external" href="http://metomi.github.io/fcm/doc/user_guide/">FCM User Guide</a>.</p>
+</div>
+<section id="rosie-suites">
+<h2>Rosie Suites<a class="headerlink" href="#rosie-suites" title="Link to this heading"></a></h2>
+<p>A Rosie suite is a Rose suite configuration which is managed by the Rosie
+system.</p>
+<p>Rosie suites can be created by the command:</p>
+<dl class="simple">
+<dt><a class="reference internal" href="../../../api/command-reference.html#command-rosie-create"><span class="std std-ref">rosie create</span></a></dt><dd><ul class="simple">
+<li><p>Create a new suite.</p></li>
+<li><p>Create a new suite, starting with the content of another suite.
+(<cite>rosie copy</cite> is an alias that extends <cite>rosie create</cite>)</p></li>
+</ul>
+</dd>
+</dl>
+<p>By default Rosie creates the <a class="reference external" href="http://svnbook.red-bean.com/en/1.7/svn.basic.in-action.html#svn.basic.in-action.wc">working copy</a> (local copy) of new suites in
+the <code class="docutils literal notranslate"><span class="pre">~/roses</span></code> directory though Rosie working copies can be created
+elsewhere.</p>
+</section>
+<section id="version-control">
+<h2>Version Control<a class="headerlink" href="#version-control" title="Link to this heading"></a></h2>
+<p>In Rosie suites the <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-run-directory" title="(in Cylc v8.2)"><span class="xref std std-term">run directory</span></a> is added to <a class="reference internal" href="#version-control">version control</a>
+using <a class="reference external" href="https://metomi.github.io/fcm/doc/">FCM</a>.</p>
+<p>FCM is a <a class="reference external" href="http://subversion.apache.org/">SVN</a> (Subversion) wrapper which provides a standard working
+practice for SVN projects. FCM implements all of the SVN commands as well as
+additional functionality. See the <a class="reference external" href="http://metomi.github.io/fcm/doc/user_guide/">FCM User Guide</a> for more information.</p>
+</section>
+<section id="suite-naming">
+<h2>Suite Naming<a class="headerlink" href="#suite-naming" title="Link to this heading"></a></h2>
+<p>Each Rosie suite is assigned a unique name made up of a <em>prefix</em> followed by
+a hyphen and then an <em>identifier</em> made up of two characters and three
+numbers, e.g:</p>
+<div align="center" class="align-center"><div class="graphviz"><object data="../../../_images/graphviz-4efecf27503e12c383bf64a0071acc70d7417daf.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">graph Example {
+ranksep=0
+
+node [shape=&quot;plaintext&quot;, fontsize=&quot;11&quot;]
+edge [style=&quot;invis&quot;]
+
+a1 [label=&quot;u&quot;, fontsize=20]
+a2 [label=&quot;Prefix&quot;, fontcolor=&quot;#707070&quot;]
+b1 [label=&quot;-&quot;, fontsize=20]
+b2 [label=&quot;&quot;, fontcolor=&quot;#707070&quot;]
+c1 [label=&quot;aa001&quot;, fontsize=20]
+c2 [label=&quot;Unique Identifier&quot;, fontcolor=&quot;#707070&quot;]
+
+a1 -- a2
+b1 -- b2
+c1 -- c2
+}</p></object></div>
+</div>
+<p>The prefix denotes the repository in which the suite is located. Prefixes are
+site specific and are configured by the
+<a class="reference internal" href="../../../api/configuration/site-and-user.html#rose:conf:rose.conf[rosie-id]prefix-location.PREFIX" title="rose:conf:rose.conf[rosie-id]prefix-location.PREFIX"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose.conf[rosie-id]prefix-location.PREFIX</span></code></a> setting.</p>
+<p>Within the Rose user community the <code class="docutils literal notranslate"><span class="pre">u</span></code> prefix is typically configured to
+point at the <code class="docutils literal notranslate"><span class="pre">https://code.metoffice.gov.uk</span></code> repository.</p>
+</section>
+<section id="the-rose-suite-info-file">
+<h2>The <a class="reference internal" href="../../../api/configuration/suite.html#rose:file:rose-suite.info" title="rose:file:rose-suite.info"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.info</span></code></a> File<a class="headerlink" href="#the-rose-suite-info-file" title="Link to this heading"></a></h2>
+<p>All Rosie suites require a <a class="reference internal" href="../../../api/configuration/suite.html#rose:file:rose-suite.info" title="rose:file:rose-suite.info"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.info</span></code></a> file. This file
+provides information about the suite for use in the suite management and
+version control systems. The <a class="reference internal" href="../../../api/configuration/suite.html#rose:file:rose-suite.info" title="rose:file:rose-suite.info"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.info</span></code></a> file uses the
+<a class="reference internal" href="../configurations.html#tutorial-rose-configurations"><span class="std std-ref">Rose Configuration Format</span></a>.
+The main settings are:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">title</span></code></dt><dd><p>A short title for the suite.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">owner</span></code></dt><dd><p>The user who has control over the suite (i.e. their username).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">project</span></code></dt><dd><p>The project to which this suite belongs (can be an arbitrary name).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">access-list</span></code></dt><dd><p>An optional list of users who have permission to commit to the trunk of the
+suite.</p>
+</dd>
+</dl>
+</section>
+<section id="managing-suites">
+<h2>Managing Suites<a class="headerlink" href="#managing-suites" title="Link to this heading"></a></h2>
+<p>Rosie provides commands for managing suites, including:</p>
+<dl class="simple">
+<dt><a class="reference internal" href="../../../api/command-reference.html#command-rosie-checkout"><span class="std std-ref">rosie checkout</span></a></dt><dd><p>Creates a local copy of a suite.</p>
+</dd>
+<dt><a class="reference internal" href="../../../api/command-reference.html#command-rosie-ls"><span class="std std-ref">rosie ls</span></a></dt><dd><p>Lists all locally checked-out suites.</p>
+</dd>
+<dt><a class="reference internal" href="../../../api/command-reference.html#command-rosie-lookup"><span class="std std-ref">rosie lookup</span></a></dt><dd><p>Searches the suite database (using information from suite’s
+<a class="reference internal" href="../../../api/configuration/suite.html#rose:file:rose-suite.info" title="rose:file:rose-suite.info"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.info</span></code></a> files).</p>
+</dd>
+</dl>
+<div class="note admonition">
+<p class="admonition-title">Practical</p>
+<p class="rubric">In this practical we will add the
+weather-forecasting suite
+from the <a class="reference internal" href="../suites.html#suites-practical"><span class="std std-ref">previous practical</span></a> to a rosie
+repository, make some changes, and commit them to the repository.</p>
+<div class="tip admonition note">
+<p class="admonition-title">Note</p>
+<p>For brevity this practical uses the abbreviated version of SVN commands,
+e.g. <code class="docutils literal notranslate"><span class="pre">svn</span> <span class="pre">st</span></code> is the abbreviated form of <code class="docutils literal notranslate"><span class="pre">svn</span> <span class="pre">status</span></code>.
+FCM supports both the full and abbreviated names.</p>
+</div>
+<ol class="arabic">
+<li><p><strong>Create A New Rosie Suite.</strong></p>
+<p>First, create a blank Rosie suite in an appropriate repository.
+You will probably want to use a “testing” repository if one is available
+to you.</p>
+<p>You can specify the repository to use with the <code class="docutils literal notranslate"><span class="pre">--prefix</span></code> command-line
+option. For instance to use the (internal) Met Office Testing Repository
+supply the command line argument <code class="docutils literal notranslate"><span class="pre">--prefix=mot</span></code>.</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>rosie create --prefix=<span class="s">&lt;prefix&gt;</span>
+</pre></div>
+</div>
+<p>You will then be presented with a <a class="reference internal" href="../../../api/configuration/suite.html#rose:file:rose-suite.info" title="rose:file:rose-suite.info"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.info</span></code></a> file open
+in a text editor. For the <code class="docutils literal notranslate"><span class="pre">title</span></code> field type “Dummy Weather Forecasting
+Suite” and for the <code class="docutils literal notranslate"><span class="pre">project</span></code> enter “tutorial”. Save the file and close
+the editor.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If the text editor does not appear you may have to press enter on the
+keyboard.</p>
+</div>
+<p>Rosie will create the new suite in the <code class="docutils literal notranslate"><span class="pre">~/roses</span></code> directory and the
+exact location will appear in the command output. Move into the suite
+directory:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>cd ~/roses/<span class="s">&lt;name&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Add Files To The Suite.</strong></p>
+<p>Add the files from the Weather Forecasting Suite by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">tutorial</span> <span class="n">rose</span><span class="o">-</span><span class="n">weather</span><span class="o">-</span><span class="n">forecasting</span><span class="o">-</span><span class="n">suite</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>We now need to add these files to version control. First check the SVN
+status by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">st</span>
+</pre></div>
+</div>
+<p>You should see a list of files with the <code class="docutils literal notranslate"><span class="pre">?</span></code> symbol next to them,
+as well as <code class="file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code> with an <code class="docutils literal notranslate"><span class="pre">M</span></code> symbol beside it. <code class="docutils literal notranslate"><span class="pre">?</span></code>
+means the files marked are untracked (not version controlled), whereas
+<code class="docutils literal notranslate"><span class="pre">M</span></code> indicates files which have been modified. Add all untracked files
+to version control by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">add</span> <span class="o">--</span><span class="n">check</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>Answer yes (“y”) where prompted. Now check the status again:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">st</span>
+</pre></div>
+</div>
+<p>You should see a list of files with the <code class="docutils literal notranslate"><span class="pre">A</span></code> character, meaning “added”,
+next to them. Finally commit the changes by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">ci</span>
+</pre></div>
+</div>
+<p>A text editor will open. Add a message for your commit, save the file and
+close the editor. You will then be prompted as to whether you want to
+make the commit. Answer yes.</p>
+<p>You have now added the Weather Forecasting Suite to version control. Open
+the Trac browser to see your suite:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">browse</span>
+</pre></div>
+</div>
+<p>A web browser window will open, showing the Trac page for your Rosie
+suite.</p>
+</li>
+<li><p><strong>Checkout The Suite.</strong></p>
+<p>Now that the suite is in the Rosie repository a working copy can be
+checked out on any machine with access to the repository by executing:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>rosie checkout <span class="s">&lt;name&gt;</span>
+</pre></div>
+</div>
+<p>Test this by deleting the working copy then checking out a new one:</p>
+<div class="highlight-sub notranslate"><div class="highlight"><pre><span></span>cd ~/roses
+rm -rf <span class="s">&lt;name&gt;</span>
+rosie checkout <span class="s">&lt;name&gt;</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="note spoiler admonition">
+<p class="admonition-title">Practical Extension</p>
+<ol class="arabic">
+<li><p><strong>Make Changes In A Branch.</strong></p>
+<p>Next we will make a change to the suite. Rather than making this change
+in the “trunk” (referred to as “master” in git terminology) we will
+work in a new “branch”.</p>
+<p>Create a new branch called “configuration-change” by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">bc</span> <span class="n">configuration</span><span class="o">-</span><span class="n">change</span>
+</pre></div>
+</div>
+<p>Provide a brief commit message of your choosing when prompted and enter
+yes (“y”).</p>
+<p>You can list all branches by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">bls</span>
+</pre></div>
+</div>
+<p>Switch to your new branch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">sw</span> <span class="n">configuration</span><span class="o">-</span><span class="n">change</span>
+</pre></div>
+</div>
+<p>Next, either using the Rose 2019 <a class="reference internal" href="../../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> GUI or
+a text editor, change the <code class="docutils literal notranslate"><span class="pre">RESOLUTION</span></code> setting in the
+<a class="reference internal" href="../../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> file to <code class="docutils literal notranslate"><span class="pre">0.1</span></code>.</p>
+<p>Check the status of the project:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">st</span>
+</pre></div>
+</div>
+<p>You should see the <a class="reference internal" href="../../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> file with a <code class="docutils literal notranslate"><span class="pre">M</span></code>,
+meaning modified, next to it. Commit the change by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">ci</span>
+</pre></div>
+</div>
+<p>Again you will need to provide a commit message and answer yes to the
+prompt.</p>
+</li>
+<li><p><strong>Merge The Branch.</strong></p>
+<p>Switch back to the trunk then merge your change branch into the trunk:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">sw</span> <span class="n">trunk</span>
+<span class="n">fcm</span> <span class="n">merge</span> <span class="n">configuration</span><span class="o">-</span><span class="n">change</span>
+</pre></div>
+</div>
+<p>Check the status (you should see the <code class="docutils literal notranslate"><span class="pre">M</span></code> symbol next to the
+<a class="reference internal" href="../../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> file) then commit the merge:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fcm</span> <span class="n">st</span>
+<span class="n">fcm</span> <span class="n">ci</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">orphan<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rose-stem-tutorial.html" class="btn btn-neutral float-left" title="Rose Stem Tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="trigger.html" class="btn btn-neutral float-right" title="Trigger" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright : Copyright (C) British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2.3.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../../../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2.3.0";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "tutorial/rose/furthertopics/rosie";
+    </script>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+
+
+</body>
+</html>

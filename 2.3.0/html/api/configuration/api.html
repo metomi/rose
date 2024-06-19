@@ -1,0 +1,1414 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rose Configuration API &mdash; Rose Documentation 2.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=f63d8bfa" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/diff_selector.css?v=9704a72b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/grid_table.css?v=0285b42e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/hieroglyph_theme_addons.css?v=814c2015" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/tutorial.css?v=b869d33c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/addons.css?v=d1f804c3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=466af0f7" />
+
+  
+    <link rel="shortcut icon" href="../../_static/rose-favicon.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=c3c8ae58"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/js/diff_selector.js?v=3109bfa4"></script>
+        <script src="../../_static/js/minicylc.js?v=ddc882fd"></script>
+        <script src="../../_static/js/spoiler.js?v=12631137"></script>
+        <script src="../../_static/js/addons.js?v=39bd7dee"></script>
+        <script src="../../_static/js/versioning.js?v=df0214e8"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Command Reference" href="../command-reference.html" />
+    <link rel="prev" title="File Creation Mode" href="file-creation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/rose-logo-crop.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                2.3.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/rose/index.html">Rose Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rose API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Rose Configuration</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="application.html">Application Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="suite.html">Suite Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="site-and-user.html">Site And User Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metadata.html">Configuration Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rose-configuration-format.html">Rose Configuration Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file-creation.html">File Creation Mode</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Rose Configuration API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cli">CLI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#python">Python</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.config.ConfigDecodeError"><code class="docutils literal notranslate"><span class="pre">ConfigDecodeError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.config.ConfigDumper"><code class="docutils literal notranslate"><span class="pre">ConfigDumper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.config.ConfigError"><code class="docutils literal notranslate"><span class="pre">ConfigError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.config.ConfigLoader"><code class="docutils literal notranslate"><span class="pre">ConfigLoader</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.config.ConfigNode"><code class="docutils literal notranslate"><span class="pre">ConfigNode</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.config.ConfigNodeDiff"><code class="docutils literal notranslate"><span class="pre">ConfigNodeDiff</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.config.ConfigSyntaxError"><code class="docutils literal notranslate"><span class="pre">ConfigSyntaxError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.config.ConfigSyntaxError.exc.code"><code class="docutils literal notranslate"><span class="pre">ConfigSyntaxError.exc.code</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.config.ConfigSyntaxError.exc.file_name"><code class="docutils literal notranslate"><span class="pre">ConfigSyntaxError.exc.file_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.config.ConfigSyntaxError.exc.line_num"><code class="docutils literal notranslate"><span class="pre">ConfigSyntaxError.exc.line_num</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.config.ConfigSyntaxError.exc.col_num"><code class="docutils literal notranslate"><span class="pre">ConfigSyntaxError.exc.col_num</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.config.ConfigSyntaxError.exc.line"><code class="docutils literal notranslate"><span class="pre">ConfigSyntaxError.exc.line</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.config.dump"><code class="docutils literal notranslate"><span class="pre">dump()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.config.load"><code class="docutils literal notranslate"><span class="pre">load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.config.sort_element"><code class="docutils literal notranslate"><span class="pre">sort_element()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.config.sort_settings"><code class="docutils literal notranslate"><span class="pre">sort_settings()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../other.html">Other Python API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-built-in-applications.html">Rose Built-In Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../terms.html">Rose Terms Of Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../course/um-ut.html">UM User Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Rose Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Rose Configuration</a></li>
+      <li class="breadcrumb-item active">Rose Configuration API</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rose-configuration-api">
+<h1>Rose Configuration API<a class="headerlink" href="#rose-configuration-api" title="Link to this heading"></a></h1>
+<section id="cli">
+<h2>CLI<a class="headerlink" href="#cli" title="Link to this heading"></a></h2>
+<p>The <a class="reference internal" href="../command-reference.html#command-rose-config"><span class="std std-ref">rose config</span></a> command provides a command line tool for
+reading, processing and dumping files written in the <a class="reference internal" href="rose-configuration-format.html#rose-configuration-format"><span class="std std-ref">Rose Configuration Format</span></a>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span>
+<span class="go">&gt; [foo]</span>
+<span class="go">&gt; bar=baz</span>
+<span class="go">&gt; &quot; &gt; rose.conf</span>
+
+<span class="gp">$ </span>rose<span class="w"> </span>config<span class="w"> </span>foo<span class="w"> </span>--file<span class="w"> </span>rose.conf
+<span class="go">bar=baz</span>
+</pre></div>
+</div>
+<p>For more information see the <a class="reference internal" href="../command-reference.html#command-rose-config"><span class="std std-ref">rose config</span></a> command line reference.</p>
+</section>
+<section id="python">
+<span id="config-api"></span><h2>Python<a class="headerlink" href="#python" title="Link to this heading"></a></h2>
+<p>Rose provides a Python API for loading, processing, editing and dumping Rose
+configurations via the <a class="reference internal" href="#module-metomi.rose.config" title="metomi.rose.config"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metomi.rose.config</span></code></a> module located within the
+Rose Python library.</p>
+<p id="module-metomi.rose.config">Simple INI-style configuration data model, loader and dumper.</p>
+<dl>
+<dt>Synopsis:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a config file.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;config.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">_</span> <span class="o">=</span> <span class="n">config_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">[foo]</span>
+<span class="gp">... </span><span class="s1">bar=Bar</span>
+<span class="gp">... </span><span class="s1">!baz=Baz</span>
+<span class="gp">... </span><span class="s1">     &#39;&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Load in a config file.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">config_node</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;config.conf&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">ConfigSyntaxError</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="c1"># Handle exception.</span>
+<span class="gp">... </span>    <span class="k">pass</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Retrieve config settings.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+<span class="go">{&#39;value&#39;: &#39;Bar&#39;, &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Set new config settings.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;new&#39;</span><span class="p">],</span> <span class="s1">&#39;New&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Overwrite existing config settings.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">],</span> <span class="n">state</span><span class="o">=</span><span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_NORMAL</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">value</span><span class="o">=</span><span class="s1">&#39;NewBaz&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Write out config to a file.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dump</span><span class="p">(</span><span class="n">config_node</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+<span class="go">[foo]</span>
+<span class="go">bar=Bar</span>
+<span class="go">baz=NewBaz</span>
+<span class="go">new=New</span>
+</pre></div>
+</div>
+</dd>
+<dt>Classes:</dt><dd><table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metomi.rose.config.ConfigNode</span></code></a>([value, ...])</p></td>
+<td><p>Represent a node in a configuration file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#metomi.rose.config.ConfigNodeDiff" title="metomi.rose.config.ConfigNodeDiff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metomi.rose.config.ConfigNodeDiff</span></code></a>()</p></td>
+<td><p>Represent differences between two ConfigNode instances.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metomi.rose.config.ConfigDumper" title="metomi.rose.config.ConfigDumper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metomi.rose.config.ConfigDumper</span></code></a>([char_assign])</p></td>
+<td><p>Dumper of a ConfigNode object in Rose INI format.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#metomi.rose.config.ConfigLoader" title="metomi.rose.config.ConfigLoader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metomi.rose.config.ConfigLoader</span></code></a>([...])</p></td>
+<td><p>Loader of an INI format configuration into a ConfigNode object.</p></td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Functions:</dt><dd><table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metomi.rose.config.load" title="metomi.rose.config.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metomi.rose.config.load</span></code></a>(source[, root])</p></td>
+<td><p>Shorthand for <a class="reference internal" href="#metomi.rose.config.ConfigLoader.load" title="metomi.rose.config.ConfigLoader.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">ConfigLoader.load()</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#metomi.rose.config.dump" title="metomi.rose.config.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metomi.rose.config.dump</span></code></a>(root[, target, ...])</p></td>
+<td><p>Shorthand for <a class="reference internal" href="#metomi.rose.config.ConfigDumper.dump" title="metomi.rose.config.ConfigDumper.dump"><code class="xref py py-func docutils literal notranslate"><span class="pre">ConfigDumper.dump()</span></code></a>.</p></td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Limitations:</dt><dd><ul class="simple">
+<li><p>The loader does not handle trailing comments.</p></li>
+</ul>
+</dd>
+<dt>What about the standard library ConfigParser? Well, it is problematic:</dt><dd><ul class="simple">
+<li><p>The comment character and style is hard-coded.</p></li>
+<li><p>The assignment character is hard-coded.</p></li>
+<li><p>A duplicated section header causes an exception to be raised.</p></li>
+<li><p>Option keys are transformed to lower case by default.</p></li>
+<li><p>It is far too complicated and confusing.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigDecodeError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metomi.rose.config.</span></span><span class="sig-name descname"><span class="pre">ConfigDecodeError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unicode_decode_err</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigDecodeError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigDecodeError" title="Link to this definition"></a></dt>
+<dd><p>Exception that should be raised when loading a configuration file that
+is not encoded in a UTF-8 compatible charset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Path to the config file</p></li>
+<li><p><strong>unicode_decode_err</strong> (<a class="reference external" href="https://docs.python.org/3/library/exceptions.html#UnicodeDecodeError" title="(in Python v3.12)"><em>UnicodeDecodeError</em></a>) – The original exception raised
+when doing bytes.decode()</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigDumper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metomi.rose.config.</span></span><span class="sig-name descname"><span class="pre">ConfigDumper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char_assign</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'='</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigDumper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigDumper" title="Link to this definition"></a></dt>
+<dd><p>Dumper of a ConfigNode object in Rose INI format.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Bar&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Baz&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">comments</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Currently ignored!&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="n">state</span><span class="o">=</span><span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_USER_IGNORED</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dumper</span> <span class="o">=</span> <span class="n">ConfigDumper</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dumper</span><span class="p">(</span><span class="n">config_node</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+<span class="go">[foo]</span>
+<span class="go">bar=Bar</span>
+<span class="go">#Currently ignored!</span>
+<span class="go">!baz=Baz</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigDumper.dump">
+<span class="sig-name descname"><span class="pre">dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target=&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_sections=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_option_items=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_escape_ok=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concat_mode=False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigDumper.dump"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigDumper.dump" title="Link to this definition"></a></dt>
+<dd><p>Format a ConfigNode object and write result to target.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<a class="reference internal" href="#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><em>ConfigNode</em></a>) – The root config node.</p></li>
+<li><p><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><em>object</em></a>) – An open file handle or a string containing a
+file path. If not specified, the result is written to
+sys.stdout.</p></li>
+<li><p><strong>sort_sections</strong> (<em>Callable</em>) – An optional argument that should be
+a function for sorting a list of section keys.</p></li>
+<li><p><strong>sort_option_items</strong> (<em>Callable</em>) – An optional argument that
+should be a function for sorting a list of option (key, value)
+tuples in string values.</p></li>
+<li><p><strong>env_escape_ok</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – An optional argument to indicate
+that $NAME and ${NAME} syntax in values should be escaped.</p></li>
+<li><p><strong>concat_mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – Switch on concatenation mode. If
+True, add [] before root level options.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metomi.rose.config.</span></span><span class="sig-name descname"><span class="pre">ConfigError</span></span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigError" title="Link to this definition"></a></dt>
+<dd><p>Base class for config errors.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigLoader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metomi.rose.config.</span></span><span class="sig-name descname"><span class="pre">ConfigLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char_assign</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'='</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">char_comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_sections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigLoader" title="Link to this definition"></a></dt>
+<dd><p>Loader of an INI format configuration into a ConfigNode object.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;config.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">_</span> <span class="o">=</span> <span class="n">config_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">[foo]</span>
+<span class="gp">... </span><span class="s1">!bar=Bar</span>
+<span class="gp">... </span><span class="s1">baz=Baz</span>
+<span class="gp">... </span><span class="s1">    &#39;&#39;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loader</span> <span class="o">=</span> <span class="n">ConfigLoader</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">config_node</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;config.conf&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">ConfigSyntaxError</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">raise</span>  <span class="c1"># Handle exception.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+<span class="go">{&#39;value&#39;: &#39;Bar&#39;, &#39;state&#39;: &#39;!&#39;, &#39;comments&#39;: []}</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigLoader.can_miss_opt_conf_key">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">can_miss_opt_conf_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigLoader.can_miss_opt_conf_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigLoader.can_miss_opt_conf_key" title="Link to this definition"></a></dt>
+<dd><p>Return KEY if key is a string like “(KEY)”, None otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigLoader.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_comments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigLoader.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigLoader.load" title="Link to this definition"></a></dt>
+<dd><p>Read a source configuration file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – An open file handle, a string for a file path or
+a list of [SECTION]KEY=VALUE items.</p></li>
+<li><p><strong>node</strong> (<a class="reference internal" href="#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><em>ConfigNode</em></a>) – A ConfigNode object if specified, otherwise
+created.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new ConfigNode object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode">ConfigNode</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create example config file.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;config.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">_</span> <span class="o">=</span> <span class="n">config_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">[foo]</span>
+<span class="gp">... </span><span class="s1"># Some comment</span>
+<span class="gp">... </span><span class="s1">!bar=Bar</span>
+<span class="gp">... </span><span class="s1">    &#39;&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Load config file.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loader</span> <span class="o">=</span> <span class="n">ConfigLoader</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">config_node</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;config.conf&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">ConfigSyntaxError</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">raise</span>  <span class="c1"># Handle exception.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+<span class="go">{&#39;value&#39;: &#39;Bar&#39;, &#39;state&#39;: &#39;!&#39;, &#39;comments&#39;: [&#39; Some comment&#39;]}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigLoader.load_with_opts">
+<span class="sig-name descname"><span class="pre">load_with_opts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">more_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">used_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_config_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mark_opt_confs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigLoader.load_with_opts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigLoader.load_with_opts" title="Link to this definition"></a></dt>
+<dd><p>Read a source configuration file with optional configurations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – A file path.</p></li>
+<li><p><strong>node</strong> (<a class="reference internal" href="#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><em>ConfigNode</em></a>) – A ConfigNode object if specified,
+otherwise one is created.</p></li>
+<li><p><strong>more_keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a>) – A list of additional optional
+configuration names. If source is “rose-${TYPE}.conf”, the
+file of each name should be “opt/rose-${TYPE}-${NAME}.conf”.</p></li>
+<li><p><strong>used_keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a>) – If defined, it should be a list for
+this method to  append to. The key of each successfully loaded
+optional configuration will be appended to the list (unless the
+key is already in the list). Missing optional configurations
+that are specified in more_keys will not raise an error.
+If not defined, any missing optional configuration will
+trigger an OSError.</p></li>
+<li><p><strong>mark_opt_configs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – if True, add comments above any
+settings which have been loaded from an optional config.</p></li>
+<li><p><strong>return_config_map</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – If True, construct and return
+a dict (config_map) containing config names vs their uncombined
+nodes. Optional configurations use their opt keys as keys, and
+the main configuration uses ‘None’.</p></li>
+<li><p><strong>defines</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a>) – A list of [SECTION]KEY=VALUE overrides.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>node or (node, config_map):</dt><dd><ul class="simple">
+<li><p>node - The loaded configuration as a ConfigNode.</p></li>
+<li><p>config_map - A dictionary containing opt_conf_key: ConfigNode
+pairs. Only returned if return_config_map is True.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)">tuple</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Write config file.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;config.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">_</span> <span class="o">=</span> <span class="n">config_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">[foo]</span>
+<span class="gp">... </span><span class="s1">bar=Bar</span>
+<span class="gp">... </span><span class="s1">    &#39;&#39;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Write optional config file (foo).</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="s1">&#39;opt&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;opt/config-foo.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">opt_config_file</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">_</span> <span class="o">=</span> <span class="n">opt_config_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">[foo]</span>
+<span class="gp">... </span><span class="s1">bar=Baz</span>
+<span class="gp">... </span><span class="s1">    &#39;&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">loader</span> <span class="o">=</span> <span class="n">ConfigLoader</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="p">,</span> <span class="n">config_map</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load_with_opts</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s1">&#39;config.conf&#39;</span><span class="p">,</span> <span class="n">more_keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="n">return_config_map</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+<span class="go">&#39;Baz&#39;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">original_config_node</span> <span class="o">=</span> <span class="n">config_map</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original_config_node</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+<span class="go">&#39;Bar&#39;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">optional_config_node</span> <span class="o">=</span> <span class="n">config_map</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">optional_config_node</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+<span class="go">&#39;Baz&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metomi.rose.config.</span></span><span class="sig-name descname"><span class="pre">ConfigNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNode" title="Link to this definition"></a></dt>
+<dd><p>Represent a node in a configuration file.</p>
+<dl class="simple">
+<dt>Nodes are stored hierarchically, for instance the following config</dt><dd><p>[foo]
+bar = Bar</p>
+</dd>
+</dl>
+<p>When loaded by ConfigNode.load(file) would result in three levels of
+ConfigNodes, the first representing “root” (i.e. the top level of the
+config), one representing the config section “foo” and one representing the
+setting “bar”.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a new ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Add sub-nodes.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Bar&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Baz&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> 
+<span class="go">{&#39;value&#39;: {&#39;foo&#39;: {&#39;value&#39;: {&#39;bar&#39;: {&#39;value&#39;: &#39;Bar&#39;,</span>
+<span class="go">                                     &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []},</span>
+<span class="go">                             &#39;baz&#39;: {&#39;value&#39;: &#39;Baz&#39;,</span>
+<span class="go">                                     &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []}},</span>
+<span class="go">                   &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []}},</span>
+<span class="go"> &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Set the state of a node.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="n">state</span><span class="o">=</span><span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_USER_IGNORED</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the value of the node at a position.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">])</span>
+<span class="go">&#39;Baz&#39;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Walk over the hierarchical structure of a node.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">keys</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">()]</span>
+<span class="go">[[&#39;foo&#39;], [&#39;foo&#39;, &#39;baz&#39;], [&#39;foo&#39;, &#39;bar&#39;]]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Walk over the config skipping ignored sections.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">keys</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">no_ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+<span class="go">[[&#39;foo&#39;], [&#39;foo&#39;, &#39;baz&#39;]]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Add two ConfigNode instances to create a new &quot;merged&quot; node.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">another_config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">another_config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;New&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_config_node</span> <span class="o">=</span> <span class="n">config_node</span> <span class="o">+</span> <span class="n">another_config_node</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">keys</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">new_config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">()]</span>
+<span class="go">[[&#39;&#39;, &#39;new&#39;], [&#39;foo&#39;], [&#39;foo&#39;, &#39;baz&#39;], [&#39;foo&#39;, &#39;bar&#39;]]</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNode.STATE_NORMAL">
+<span class="sig-name descname"><span class="pre">STATE_NORMAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#metomi.rose.config.ConfigNode.STATE_NORMAL" title="Link to this definition"></a></dt>
+<dd><p>The default state of a ConfigNode.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNode.STATE_SYST_IGNORED">
+<span class="sig-name descname"><span class="pre">STATE_SYST_IGNORED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'!!'</span></em><a class="headerlink" href="#metomi.rose.config.ConfigNode.STATE_SYST_IGNORED" title="Link to this definition"></a></dt>
+<dd><p>ConfigNode state if a metadata opperation has logically ignored the
+config.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNode.STATE_USER_IGNORED">
+<span class="sig-name descname"><span class="pre">STATE_USER_IGNORED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'!'</span></em><a class="headerlink" href="#metomi.rose.config.ConfigNode.STATE_USER_IGNORED" title="Link to this definition"></a></dt>
+<dd><p>ConfigNode state if it has been specifically ignored in the config.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNode.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_diff</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNode.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNode.add" title="Link to this definition"></a></dt>
+<dd><p>Apply a ConfigNodeDiff object to self.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_diff</strong> (<a class="reference internal" href="#metomi.rose.config.ConfigNodeDiff" title="metomi.rose.config.ConfigNodeDiff"><em>ConfigNodeDiff</em></a>) – A diff to apply to this ConfigNode.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create ConfigNode</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Bar&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">keys</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">()]</span>
+<span class="go">[[&#39;foo&#39;], [&#39;foo&#39;, &#39;bar&#39;]]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create ConfigNodeDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_added_setting</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                   <span class="n">data</span><span class="o">=</span><span class="s1">&#39;Baz&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Apply ConfigNodeDiff to ConfigNode</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_node_diff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">keys</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">()]</span>
+<span class="go">[[&#39;foo&#39;], [&#39;foo&#39;, &#39;baz&#39;], [&#39;foo&#39;, &#39;bar&#39;]]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNode.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNode.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNode.get" title="Link to this definition"></a></dt>
+<dd><p>Return a node at the position of keys, if any.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a>) – A list defining a hierarchy of
+node.value ‘keys’. If an entry in keys is the null
+string, it is skipped.</p></li>
+<li><p><strong>no_ignore</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – If True any ignored nodes will
+not be returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The config node located at the position of keys or
+None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode">ConfigNode</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">],</span> <span class="s1">&#39;Bar&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">],</span> <span class="s1">&#39;Baz&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">state</span><span class="o">=</span><span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_USER_IGNORED</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># A ConfigNode containing sub-nodes.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">])</span> 
+<span class="go">{&#39;value&#39;: {&#39;bar&#39;: {&#39;value&#39;: &#39;Bar&#39;, &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []},</span>
+<span class="go">           &#39;baz&#39;: {&#39;value&#39;: &#39;Baz&#39;, &#39;state&#39;: &#39;!&#39;, &#39;comments&#39;: []}},</span>
+<span class="go"> &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># A bottom level sub-node.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+<span class="go">{&#39;value&#39;: &#39;Bar&#39;, &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Skip ignored nodes.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">config_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">],</span> <span class="n">no_ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNode.get_filter">
+<span class="sig-name descname"><span class="pre">get_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">no_ignore</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNode.get_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNode.get_filter" title="Link to this definition"></a></dt>
+<dd><p>Return this ConfigNode unless no_ignore and node is ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>no_ignore</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – If True only return this node if it is not
+ignored.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>This ConfigNode unless no_ignore and node is ignored.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode">ConfigNode</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">{&#39;value&#39;: 42, &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">{&#39;value&#39;: 42, &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+<span class="gp">... </span>                     <span class="n">state</span><span class="o">=</span><span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_USER_IGNORED</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">{&#39;value&#39;: 42, &#39;state&#39;: &#39;!&#39;, &#39;comments&#39;: []}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">config_node</span><span class="o">.</span><span class="n">get_filter</span><span class="p">(</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNode.get_value">
+<span class="sig-name descname"><span class="pre">get_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNode.get_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNode.get_value" title="Link to this definition"></a></dt>
+<dd><p>Return the value of a normal node at the position of keys, if any.</p>
+<p>If the node does not exist or is ignored, return None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a>) – A list defining a hierarchy of node.value
+‘keys’. If an entry in keys is the null string, it is skipped.</p></li>
+<li><p><strong>default</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><em>object</em></a>) – Return default if the value is not set.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of this ConfigNode at the position of keys or
+default if not set.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)">object</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="s1">&#39;foo&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">],</span> <span class="s1">&#39;Bar&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get value without specifying keys returns the value of the</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># root ConfigNode (which in this case is a dict of its</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># sub-nodes).</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> 
+<span class="go">{&#39;foo&#39;: {&#39;value&#39;: {&#39;bar&#39;: {&#39;value&#39;: &#39;Bar&#39;, &#39;state&#39;: &#39;&#39;,</span>
+<span class="go">                           &#39;comments&#39;: []}},</span>
+<span class="go">         &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []}}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Intermediate level ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">])</span>
+<span class="go">{&#39;bar&#39;: {&#39;value&#39;: &#39;Bar&#39;, &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []}}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Bottom level ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+<span class="go">&#39;Bar&#39;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># If there is no node located at the position of keys or if</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># that node is unset then the default value is returned.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                      <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNode.is_ignored">
+<span class="sig-name descname"><span class="pre">is_ignored</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNode.is_ignored"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNode.is_ignored" title="Link to this definition"></a></dt>
+<dd><p>Return True if current node is in the “ignored” state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNode.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNode.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNode.set" title="Link to this definition"></a></dt>
+<dd><p>Set node properties at the position of keys, if any.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a>) – A list defining a hierarchy of node.value ‘keys’.
+If an entry in keys is the null string, it is skipped.</p></li>
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><em>object</em></a>) – The node.value property to set at this position.</p></li>
+<li><p><strong>state</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The node.state property to set at this position.
+If None, the node.state property is unchanged.</p></li>
+<li><p><strong>comments</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The node.comments property to set at this position.
+If None, the node.comments property is unchanged.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>This config node.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode">ConfigNode</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span>
+<span class="go">{&#39;value&#39;: {}, &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Add a sub-node at the position &#39;foo&#39; with the comment &#39;Info&#39;.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="n">comments</span><span class="o">=</span><span class="s1">&#39;Info&#39;</span><span class="p">)</span>
+<span class="gp">... </span>
+<span class="go">{&#39;value&#39;: {&#39;foo&#39;: {&#39;value&#39;: {}, &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: &#39;Info&#39;}},</span>
+<span class="go"> &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Set the value for the sub-node at the position</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># &#39;foo&#39; to &#39;Foo&#39;.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Foo&#39;</span><span class="p">)</span>
+<span class="gp">... </span>
+<span class="go">{&#39;value&#39;: {&#39;foo&#39;: {&#39;value&#39;: &#39;Foo&#39;, &#39;state&#39;: &#39;&#39;,</span>
+<span class="go">                   &#39;comments&#39;: &#39;Info&#39;}},</span>
+<span class="go"> &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Set the value of the ConfigNode to True, this overwrites all</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># sub-nodes!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">{&#39;value&#39;: True, &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNode.unset">
+<span class="sig-name descname"><span class="pre">unset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNode.unset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNode.unset" title="Link to this definition"></a></dt>
+<dd><p>Remove a node at the position of keys, if any.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a>) – A list defining a hierarchy of node.value ‘keys’.
+If an entry in keys is the null string, it is skipped.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The ConfigNode instance that was removed, else None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode">ConfigNode</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Foo&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Unset without providing any keys does nothing.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">config_node</span><span class="o">.</span><span class="n">unset</span><span class="p">())</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Unset with invalid keys does nothing.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">config_node</span><span class="o">.</span><span class="n">unset</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">]))</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Unset with valid keys removes the node from the node.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">unset</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">])</span>
+<span class="go">{&#39;value&#39;: &#39;Foo&#39;, &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span>
+<span class="go">{&#39;value&#39;: {}, &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNode.walk">
+<span class="sig-name descname"><span class="pre">walk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNode.walk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNode.walk" title="Link to this definition"></a></dt>
+<dd><p>Return all keylist - sub-node pairs below keys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a>) – A list defining a hierarchy of node.value ‘keys’.
+If an entry in keys is the null string, it is skipped.</p></li>
+<li><p><strong>no_ignore</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – If True any ignored nodes will be skipped.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>tuple - (keys, sub_node)</dt><dd><ul class="simple">
+<li><p>keys (list) - A list defining a hierarchy of node.value
+‘keys’. If a sub-node is at the top level, and does not
+contain any node children, a null string will be
+prepended to the returned keylist.</p></li>
+<li><p>sub_node (ConfigNode) - The config node at the position of
+keys.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">],</span> <span class="s1">&#39;Bar&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">],</span> <span class="s1">&#39;Baz&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">state</span><span class="o">=</span><span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_USER_IGNORED</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Walk over the full hierarchy.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">keys</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">()]</span>
+<span class="go">[[&#39;foo&#39;], [&#39;foo&#39;, &#39;baz&#39;], [&#39;foo&#39;, &#39;bar&#39;]]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Walk over one branch of the hierarchy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">keys</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">])]</span>
+<span class="go">[[&#39;foo&#39;, &#39;baz&#39;], [&#39;foo&#39;, &#39;bar&#39;]]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Skip over ignored nodes.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">keys</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">no_ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+<span class="go">[[&#39;foo&#39;], [&#39;foo&#39;, &#39;bar&#39;]]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Invalid/non-existent keys.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">keys</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;elephant&#39;</span><span class="p">])]</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNodeDiff">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metomi.rose.config.</span></span><span class="sig-name descname"><span class="pre">ConfigNodeDiff</span></span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNodeDiff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNodeDiff" title="Link to this definition"></a></dt>
+<dd><p>Represent differences between two ConfigNode instances.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a new ConfigNodeDiff.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_added_setting</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                   <span class="n">data</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Bar&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,))</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a new ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;baz&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Baz&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Apply the diff to the node.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_node_diff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[(</span><span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span><span class="o">.</span><span class="n">get_value</span><span class="p">())</span> <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">sub_node</span> <span class="ow">in</span>
+<span class="gp">... </span> <span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">()]</span>
+<span class="go">[([&#39;&#39;, &#39;bar&#39;], &#39;Bar&#39;), ([&#39;&#39;, &#39;baz&#39;], &#39;Baz&#39;)]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a ConfigNodeDiff by comparing two ConfigNodes.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">another_config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">another_config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;NewBar&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">another_config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;New&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_from_configs</span><span class="p">(</span><span class="n">config_node</span><span class="p">,</span>
+<span class="gp">... </span>                                  <span class="n">another_config_node</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_added</span><span class="p">()</span>
+<span class="go">[((&#39;&#39;, &#39;new&#39;), (&#39;New&#39;, &#39;&#39;, []))]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_removed</span><span class="p">()</span>
+<span class="go">[((&#39;&#39;, &#39;baz&#39;), (&#39;Baz&#39;, &#39;&#39;, []))]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_modified</span><span class="p">()</span>
+<span class="go">[((&#39;&#39;, &#39;bar&#39;), ((&#39;Bar&#39;, &#39;&#39;, []), (&#39;NewBar&#39;, &#39;&#39;, [])))]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Inverse a ConfigNodeDiff.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reversed_diff</span> <span class="o">=</span> <span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_reversed</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reversed_diff</span><span class="o">.</span><span class="n">get_added</span><span class="p">()</span>
+<span class="go">[((&#39;&#39;, &#39;baz&#39;), (&#39;Baz&#39;, &#39;&#39;, []))]</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNodeDiff.delete_removed">
+<span class="sig-name descname"><span class="pre">delete_removed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNodeDiff.delete_removed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNodeDiff.delete_removed" title="Link to this definition"></a></dt>
+<dd><p>Deletes all ‘removed’ keys from this ConfigNodeDiff.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_removed_setting</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                     <span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">delete_removed</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_removed</span><span class="p">()</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNodeDiff.get_added">
+<span class="sig-name descname"><span class="pre">get_added</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNodeDiff.get_added"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNodeDiff.get_added" title="Link to this definition"></a></dt>
+<dd><p>Return a list of tuples of added keys with their data.</p>
+<p>The data is a tuple of value, state, comments, where value is
+set to None for sections.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>A list of the form [(keys, data), …]</dt><dd><ul class="simple">
+<li><p>keys - The position of an added setting.</p></li>
+<li><p>data - Tuple of the form (value, state, comments) of the
+properties of the added setting.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)">list</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_added_setting</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                   <span class="p">(</span><span class="s1">&#39;Foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_added</span><span class="p">()</span>
+<span class="go">[((&#39;foo&#39;,), (&#39;Foo&#39;, None, None))]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNodeDiff.get_all_keys">
+<span class="sig-name descname"><span class="pre">get_all_keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNodeDiff.get_all_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNodeDiff.get_all_keys" title="Link to this definition"></a></dt>
+<dd><p>Return all keys affected by this ConfigNodeDiff.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list containing any keys affected by this diff as tuples,
+e.g. (‘foo’, ‘bar’).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)">list</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_added_setting</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">],(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_removed_setting</span><span class="p">([</span><span class="s1">&#39;bar&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                     <span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_all_keys</span><span class="p">()</span>
+<span class="go">[(&#39;bar&#39;,), (&#39;foo&#39;,)]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNodeDiff.get_as_opt_config">
+<span class="sig-name descname"><span class="pre">get_as_opt_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNodeDiff.get_as_opt_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNodeDiff.get_as_opt_config" title="Link to this definition"></a></dt>
+<dd><p>Return a ConfigNode such that main + new_node = main + diff.</p>
+<p>Add all the added settings, add all the modified settings,
+add all the removed settings as user-ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new ConfigNode instance.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode">ConfigNode</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_added_setting</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                   <span class="p">(</span><span class="s1">&#39;Foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_removed_setting</span><span class="p">([</span><span class="s1">&#39;bar&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                     <span class="p">(</span><span class="s1">&#39;Bar&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_as_opt_config</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">())</span> 
+<span class="go">[([&#39;&#39;, &#39;bar&#39;], {&#39;value&#39;: &#39;Bar&#39;, &#39;state&#39;: &#39;!&#39;, &#39;comments&#39;: []}),</span>
+<span class="go"> ([&#39;&#39;, &#39;foo&#39;], {&#39;value&#39;: &#39;Foo&#39;, &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []})]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNodeDiff.get_modified">
+<span class="sig-name descname"><span class="pre">get_modified</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNodeDiff.get_modified"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNodeDiff.get_modified" title="Link to this definition"></a></dt>
+<dd><p>Return a dict of altered keys with before and after data.</p>
+<p>The data is a list of two tuples (before and after) of value,
+state, comments, where value is set to None for sections.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>A list of the form [(keys, data), …]:</dt><dd><ul class="simple">
+<li><p>keys - The position of an added setting.</p></li>
+<li><p>data - Tuple of the form (value, state, comments) for the
+properties of the setting before the modification.</p></li>
+<li><p>old_data - The same tuple as data but representing the
+properties of the setting after the modification.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)">list</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_modified_setting</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="p">(</span><span class="s1">&#39;Foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;New Foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_modified</span><span class="p">()</span>
+<span class="go">[((&#39;foo&#39;,), ((&#39;Foo&#39;, None, None), (&#39;New Foo&#39;, None, None)))]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNodeDiff.get_removed">
+<span class="sig-name descname"><span class="pre">get_removed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNodeDiff.get_removed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNodeDiff.get_removed" title="Link to this definition"></a></dt>
+<dd><p>Return a dict of removed keys with their data.</p>
+<p>The data is a tuple of value, state, comments, where value is
+set to None for sections.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>A list of the form <code class="docutils literal notranslate"><span class="pre">[(keys,</span> <span class="pre">data),</span> <span class="pre">...]</span></code>:</dt><dd><ul class="simple">
+<li><p>keys - The position of an added setting.</p></li>
+<li><p>data - Tuple of the form (value, state, comments) of the
+properties of the removed setting.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)">list</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_removed_setting</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                     <span class="n">data</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_removed</span><span class="p">()</span>
+<span class="go">[((&#39;foo&#39;,), (&#39;foo&#39;, None, None))]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNodeDiff.get_reversed">
+<span class="sig-name descname"><span class="pre">get_reversed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNodeDiff.get_reversed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNodeDiff.get_reversed" title="Link to this definition"></a></dt>
+<dd><p>Return an inverse (add-&gt;remove, etc) copy of this ConfigNodeDiff.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new ConfigNodeDiff instance.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#metomi.rose.config.ConfigNodeDiff" title="metomi.rose.config.ConfigNodeDiff">ConfigNodeDiff</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create ConfigNodeDiff instance.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_added_setting</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">],(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_removed_setting</span><span class="p">([</span><span class="s1">&#39;bar&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                     <span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate reversed diff.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reversed_diff</span> <span class="o">=</span> <span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_reversed</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reversed_diff</span><span class="o">.</span><span class="n">get_added</span><span class="p">()</span>
+<span class="go">[((&#39;bar&#39;,), (&#39;bar&#39;, None, None))]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reversed_diff</span><span class="o">.</span><span class="n">get_removed</span><span class="p">()</span>
+<span class="go">[((&#39;foo&#39;,), (&#39;foo&#39;, None, None))]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNodeDiff.set_added_setting">
+<span class="sig-name descname"><span class="pre">set_added_setting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNodeDiff.set_added_setting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNodeDiff.set_added_setting" title="Link to this definition"></a></dt>
+<dd><p>Set a config setting to be “added” in this ConfigNodeDiff.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><em>tuple</em></a>) – The position of the setting to add.</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><em>tuple</em></a>) – A tuple of the form
+<code class="docutils literal notranslate"><span class="pre">(value:</span> <span class="pre">object,</span> <span class="pre">state:</span> <span class="pre">string,</span> <span class="pre">comments:</span> <span class="pre">string)</span></code>
+for the setting to add.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_added_setting</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                                   <span class="p">(</span><span class="s1">&#39;Foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_added_setting</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">(</span><span class="s1">&#39;Bar&#39;</span><span class="p">,</span> <span class="n">ConfigNode</span><span class="o">.</span><span class="n">STATE_USER_IGNORED</span><span class="p">,</span> <span class="s1">&#39;Some Info&#39;</span><span class="p">,))</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_node_diff</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">config_node</span><span class="o">.</span><span class="n">walk</span><span class="p">())</span> 
+<span class="go">[([&#39;&#39;, &#39;foo&#39;], {&#39;value&#39;: &#39;Foo&#39;, &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: []}),</span>
+<span class="go"> ([&#39;&#39;, &#39;bar&#39;],</span>
+<span class="go">  {&#39;value&#39;: &#39;Bar&#39;, &#39;state&#39;: &#39;!&#39;, &#39;comments&#39;: &#39;Some Info&#39;})]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNodeDiff.set_from_configs">
+<span class="sig-name descname"><span class="pre">set_from_configs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_node_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_node_2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNodeDiff.set_from_configs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNodeDiff.set_from_configs" title="Link to this definition"></a></dt>
+<dd><p>Create diff data from two ConfigNode instances.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_node_1</strong> (<a class="reference internal" href="#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><em>ConfigNode</em></a>) – The node for which to base the diff
+off of.</p></li>
+<li><p><strong>config_node_2</strong> (<a class="reference internal" href="#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><em>ConfigNode</em></a>) – The “new” node the changes of which
+this diff will “apply”.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create two ConfigNode instances to compare.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_1</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node_1</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_2</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node_2</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a ConfigNodeDiff instance.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_from_configs</span><span class="p">(</span><span class="n">config_node_1</span><span class="p">,</span> <span class="n">config_node_2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_added</span><span class="p">()</span>
+<span class="go">[((&#39;bar&#39;,), (None, &#39;&#39;, []))]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">get_removed</span><span class="p">()</span>
+<span class="go">[((&#39;foo&#39;,), (None, &#39;&#39;, []))]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNodeDiff.set_modified_setting">
+<span class="sig-name descname"><span class="pre">set_modified_setting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNodeDiff.set_modified_setting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNodeDiff.set_modified_setting" title="Link to this definition"></a></dt>
+<dd><p>Set a config setting to be “modified” in this ConfigNodeDiff.</p>
+<p>If a property in both the old_data and data (new data) are both set to
+None then no change will be made to any pre-existing value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><em>tuple</em></a>) – The position of the setting to add.</p></li>
+<li><p><strong>old_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><em>tuple</em></a>) – A tuple <code class="docutils literal notranslate"><span class="pre">(value:</span> <span class="pre">object,</span> <span class="pre">state:</span> <span class="pre">str,</span> <span class="pre">comments:</span> <span class="pre">str)</span></code>
+for the “current” properties of the setting to modify.</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><em>object</em></a>) – A tuple <code class="docutils literal notranslate"><span class="pre">(value:</span> <span class="pre">object,</span> <span class="pre">state:</span> <span class="pre">str,</span> <span class="pre">comments:</span> <span class="pre">str)</span></code>
+for “new” properties to change this setting to.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a ConfigNodeDiff.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_modified_setting</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="p">(</span><span class="s1">&#39;Foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;New Foo&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Foo&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">comments</span><span class="o">=</span><span class="s1">&#39;Some Info&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Apply the ConfigNodeDiff to the ConfigNode</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_node_diff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">])</span>
+<span class="go">{&#39;value&#39;: &#39;New Foo&#39;, &#39;state&#39;: &#39;&#39;, &#39;comments&#39;: &#39;Some Info&#39;}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigNodeDiff.set_removed_setting">
+<span class="sig-name descname"><span class="pre">set_removed_setting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigNodeDiff.set_removed_setting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigNodeDiff.set_removed_setting" title="Link to this definition"></a></dt>
+<dd><p>Set a config setting to be “removed” in this ConfigNodeDiff.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a>) – The position of the setting to add.</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><em>tuple</em></a>) – A tuple <code class="docutils literal notranslate"><span class="pre">(value:</span> <span class="pre">object,</span> <span class="pre">state:</span> <span class="pre">str,</span> <span class="pre">comments:</span> <span class="pre">str)</span></code> of the
+properties for the setting to remove.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a ConfigNodeDiff.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span> <span class="o">=</span> <span class="n">ConfigNodeDiff</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node_diff</span><span class="o">.</span><span class="n">set_removed_setting</span><span class="p">([</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="s1">&#39;Z&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a ConfigNode.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span> <span class="o">=</span> <span class="n">ConfigNode</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">config_node</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Foo&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">comments</span><span class="o">=</span><span class="s1">&#39;Some Info&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Apply the ConfigNodeDiff to the ConfigNode</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config_node</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_node_diff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">config_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">]))</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigSyntaxError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metomi.rose.config.</span></span><span class="sig-name descname"><span class="pre">ConfigSyntaxError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#ConfigSyntaxError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.ConfigSyntaxError" title="Link to this definition"></a></dt>
+<dd><p>Exception raised for syntax error loading a configuration file.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigSyntaxError.exc.code">
+<span class="sig-prename descclassname"><span class="pre">exc.</span></span><span class="sig-name descname"><span class="pre">code</span></span><a class="headerlink" href="#metomi.rose.config.ConfigSyntaxError.exc.code" title="Link to this definition"></a></dt>
+<dd><p>Error code. Can be one of:
+ConfigSyntaxError.BAD_CHAR (bad characters in a name)
+ConfigSyntaxError.BAD_SYNTAX (general syntax error)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigSyntaxError.exc.file_name">
+<span class="sig-prename descclassname"><span class="pre">exc.</span></span><span class="sig-name descname"><span class="pre">file_name</span></span><a class="headerlink" href="#metomi.rose.config.ConfigSyntaxError.exc.file_name" title="Link to this definition"></a></dt>
+<dd><p>The name of the file that triggers the error.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigSyntaxError.exc.line_num">
+<span class="sig-prename descclassname"><span class="pre">exc.</span></span><span class="sig-name descname"><span class="pre">line_num</span></span><a class="headerlink" href="#metomi.rose.config.ConfigSyntaxError.exc.line_num" title="Link to this definition"></a></dt>
+<dd><p>The line number (from 1) in the file with the error.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigSyntaxError.exc.col_num">
+<span class="sig-prename descclassname"><span class="pre">exc.</span></span><span class="sig-name descname"><span class="pre">col_num</span></span><a class="headerlink" href="#metomi.rose.config.ConfigSyntaxError.exc.col_num" title="Link to this definition"></a></dt>
+<dd><p>The column number (from 0) in the line with the error.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metomi.rose.config.ConfigSyntaxError.exc.line">
+<span class="sig-prename descclassname"><span class="pre">exc.</span></span><span class="sig-name descname"><span class="pre">line</span></span><a class="headerlink" href="#metomi.rose.config.ConfigSyntaxError.exc.line" title="Link to this definition"></a></dt>
+<dd><p>The content of the line that contains the error.</p>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;config.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">_</span> <span class="o">=</span> <span class="n">config_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;[foo][foo]&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loader</span> <span class="o">=</span> <span class="n">ConfigLoader</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;config.conf&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">ConfigSyntaxError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error (</span><span class="si">%s</span><span class="s1">) in file &quot;</span><span class="si">%s</span><span class="s1">&quot; at </span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+<span class="gp">... </span>        <span class="n">exc</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">exc</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="n">exc</span><span class="o">.</span><span class="n">line_num</span><span class="p">,</span> <span class="n">exc</span><span class="o">.</span><span class="n">col_num</span><span class="p">))</span>
+<span class="gp">... </span>
+<span class="go">Error (BAD_CHAR) in file &quot;...&quot; at 1:5</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="metomi.rose.config.dump">
+<span class="sig-prename descclassname"><span class="pre">metomi.rose.config.</span></span><span class="sig-name descname"><span class="pre">dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target=&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_sections=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_option_items=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_escape_ok=False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#dump"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.dump" title="Link to this definition"></a></dt>
+<dd><p>Shorthand for <a class="reference internal" href="#metomi.rose.config.ConfigDumper.dump" title="metomi.rose.config.ConfigDumper.dump"><code class="xref py py-func docutils literal notranslate"><span class="pre">ConfigDumper.dump()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="metomi.rose.config.load">
+<span class="sig-prename descclassname"><span class="pre">metomi.rose.config.</span></span><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.load" title="Link to this definition"></a></dt>
+<dd><p>Shorthand for <a class="reference internal" href="#metomi.rose.config.ConfigLoader.load" title="metomi.rose.config.ConfigLoader.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">ConfigLoader.load()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="metomi.rose.config.sort_element">
+<span class="sig-prename descclassname"><span class="pre">metomi.rose.config.</span></span><span class="sig-name descname"><span class="pre">sort_element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elem_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elem_2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#sort_element"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.sort_element" title="Link to this definition"></a></dt>
+<dd><p>Sort pieces of text, numerically if possible.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="metomi.rose.config.sort_settings">
+<span class="sig-prename descclassname"><span class="pre">metomi.rose.config.</span></span><span class="sig-name descname"><span class="pre">sort_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">setting_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setting_2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/metomi/rose/config.html#sort_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.config.sort_settings" title="Link to this definition"></a></dt>
+<dd><p>Sort sections and options, by numeric element if possible.</p>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">orphan<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="file-creation.html" class="btn btn-neutral float-left" title="File Creation Mode" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../command-reference.html" class="btn btn-neutral float-right" title="Command Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright : Copyright (C) British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2.3.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2.3.0";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "api/configuration/api";
+    </script>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+
+
+</body>
+</html>

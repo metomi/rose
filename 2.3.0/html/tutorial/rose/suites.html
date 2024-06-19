@@ -1,0 +1,658 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rose Suite Configurations &mdash; Rose Documentation 2.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=f63d8bfa" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/diff_selector.css?v=9704a72b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/grid_table.css?v=0285b42e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/hieroglyph_theme_addons.css?v=814c2015" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/tutorial.css?v=b869d33c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/addons.css?v=d1f804c3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=466af0f7" />
+
+  
+    <link rel="shortcut icon" href="../../_static/rose-favicon.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=c3c8ae58"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/js/diff_selector.js?v=3109bfa4"></script>
+        <script src="../../_static/js/minicylc.js?v=ddc882fd"></script>
+        <script src="../../_static/js/spoiler.js?v=12631137"></script>
+        <script src="../../_static/js/addons.js?v=39bd7dee"></script>
+        <script src="../../_static/js/versioning.js?v=df0214e8"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Summary" href="summary.html" />
+    <link rel="prev" title="Rose Metadata" href="metadata.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/rose-logo-crop.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                2.3.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Rose Tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="configurations.html">Rose Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications.html">Rose Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metadata.html">Rose Metadata</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Rose Suite Configurations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-format">Configuration Format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-a-rose-workflow-configuration-with-cylc-8">Using a Rose workflow configuration with Cylc 8</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rose-applications-in-rose-suite-configurations">Rose Applications In Rose Suite Configurations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="summary.html">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="furthertopics/index.html">Further Topics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rose API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/configuration/index.html">Rose Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/other.html">Other Python API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/rose-built-in-applications.html">Rose Built-In Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../terms.html">Rose Terms Of Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../course/um-ut.html">UM User Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Rose Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Rose Tutorial</a></li>
+      <li class="breadcrumb-item active">Rose Suite Configurations</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rose-suite-configurations">
+<span id="tutorial-rose-suites"></span><h1>Rose Suite Configurations<a class="headerlink" href="#rose-suite-configurations" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The following documentation reflects installing and running a Cylc
+workflow, and assumes that you have <a class="reference external" href="https://cylc.github.io/">Cylc</a> and the
+<a class="reference external" href="https://github.com/cylc/cylc-rose">Cylc Rose</a> plugin installed.</p>
+<p>To check:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>cylc<span class="w"> </span>version<span class="w"> </span>--long
+<span class="m">8</span>.0.0<span class="w"> </span><span class="o">(</span>/path/to/install<span class="o">)</span>
+
+Plugins:
+<span class="w">      </span>cylc-rose<span class="w">       </span><span class="m">1</span>.0.0<span class="w">   </span>~/cylc-rose
+...
+</pre></div>
+</div>
+</div>
+<p><a class="reference internal" href="../../glossary.html#term-Rose-application-configuration"><span class="xref std std-term">Rose application configurations</span></a>
+can be used to encapsulate the environment and resources required by a Cylc
+<a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-task" title="(in Cylc v8.2)"><span class="xref std std-term">task</span></a>.</p>
+<p>Similarly <a class="reference internal" href="../../glossary.html#term-Rose-suite-configuration"><span class="xref std std-term">Rose suite configurations</span></a> can
+be used to do the same for a <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-workflow" title="(in Cylc v8.2)"><span class="xref std std-term">workflow</span></a>.</p>
+<section id="configuration-format">
+<h2>Configuration Format<a class="headerlink" href="#configuration-format" title="Link to this heading"></a></h2>
+<p>A Rose suite configuration is a Cylc <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-source-directory" title="(in Cylc v8.2)"><span class="xref std std-term">source directory</span></a> containing a
+<a class="reference internal" href="../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> file.</p>
+<p>The <a class="reference internal" href="../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> file is written in the same
+<a class="reference internal" href="configurations.html#tutorial-rose-configurations"><span class="std std-ref">format</span></a> as the
+<a class="reference internal" href="../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file. Its main configuration sections are:</p>
+<dl class="simple">
+<dt><a class="reference internal" href="../../api/configuration/suite.html#rose:conf:rose-suite.conf[env]" title="rose:conf:rose-suite.conf[env]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-suite.conf[env]</span></code></a></dt><dd><p>Environment variables for use by the workflow <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-scheduler" title="(in Cylc v8.2)"><span class="xref std std-term">scheduler</span></a>.</p>
+</dd>
+<dt><a class="reference internal" href="../../api/configuration/suite.html#rose:conf:rose-suite.conf[template variables]" title="rose:conf:rose-suite.conf[template variables]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-suite.conf[template</span> <span class="pre">variables]</span></code></a></dt><dd><p>Generic variables for use in the <code class="docutils literal notranslate"><span class="pre">flow.cylc</span></code> file.</p>
+</dd>
+<dt><a class="reference internal" href="../../api/configuration/suite.html#rose:conf:rose-suite.conf[file:NAME]" title="rose:conf:rose-suite.conf[file:NAME]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-suite.conf[file:NAME]</span></code></a></dt><dd><p>Files and resources to be installed in the <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-run-directory" title="(in Cylc v8.2)"><span class="xref std std-term">run directory</span></a> when the
+suite is run.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>At Rose 2/Cylc 8, using the <a class="reference internal" href="../../api/configuration/suite.html#rose:conf:rose-suite.conf[template variables]" title="rose:conf:rose-suite.conf[template variables]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-suite.conf[template</span> <span class="pre">variables]</span></code></a>
+section is the recommended way of working. Cylc will select a templating
+language based on the hashbang line at the start of the the <code class="docutils literal notranslate"><span class="pre">flow.cylc</span></code>
+file.</p>
+<p>At Rose 2019/Cylc 7, these variables were instead set in sections called
+<a class="reference internal" href="../../api/configuration/suite.html#rose:conf:rose-suite.conf[jinja2:suite.rc]" title="rose:conf:rose-suite.conf[jinja2:suite.rc]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-suite.conf[jinja2:suite.rc]</span></code></a> and
+<a class="reference internal" href="../../api/configuration/suite.html#rose:conf:rose-suite.conf[empy:suite.rc]" title="rose:conf:rose-suite.conf[empy:suite.rc]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-suite.conf[empy:suite.rc]</span></code></a>. These are still supported
+to ease the transition to Rose 2, but should not be used for new
+suite configurations.</p>
+</div>
+<p>In the following example the template variable <code class="docutils literal notranslate"><span class="pre">WORLD</span></code> is set in
+the <a class="reference internal" href="../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> file.
+This can then be used in the <code class="docutils literal notranslate"><span class="pre">flow.cylc</span></code> file:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">rose-suite.conf</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[template variables]</span>
+<span class="nv">WORLD</span><span class="o">=</span><span class="s">Earth</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">flow.cylc</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="ch">#!jinja2</span>
+<span class="nt">[scheduling]</span>
+    <span class="nt">[[graph]]</span>
+        <span class="nv">R1 </span><span class="o">=</span> <span class="kd">hello_</span><span class="cp">{{ WORLD }}</span>
+
+<span class="nt">[runtime]</span>
+    <span class="nt">[[hello_</span><span class="cp">{{ WORLD }}</span><span class="nt">]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> echo &quot;hello </span><span class="cp">{{ WORLD }}</span><span class="s">&quot;</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="using-a-rose-workflow-configuration-with-cylc-8">
+<h2>Using a Rose workflow configuration with Cylc 8<a class="headerlink" href="#using-a-rose-workflow-configuration-with-cylc-8" title="Link to this heading"></a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>This section acts to demonstrate how Cylc 8 can be used to install Rose
+configurations for Cylc workflows. It is not designed to comprehensively
+explain the usage of Cylc.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/user-guide/writing-workflows/configuration.html#validation" title="(in Cylc v8.2)"><span class="xref std std-ref">cylc validate</span></a></p></li>
+<li><p><a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/user-guide/installing-workflows.html#install-workflow" title="(in Cylc v8.2)"><span class="xref std std-ref">cylc install</span></a></p></li>
+<li><p><a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/user-guide/running-workflows/scheduler-start-up.html#workflowstartup" title="(in Cylc v8.2)"><span class="xref std std-ref">cylc play</span></a></p></li>
+</ul>
+</div>
+<p>Rose configurations are installed alongside Cylc workflows by
+<a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/user-guide/installing-workflows.html#install-workflow" title="(in Cylc v8.2)"><span class="xref std std-ref">cylc install</span></a>, if a <code class="docutils literal notranslate"><span class="pre">rose-suite.conf</span></code> file is present.</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Using a Rose Configuration for a Cylc 8 workflow.</span><a class="headerlink" href="#id3" title="Link to this code"></a></div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Assuming that the example above was developed in ~/cylc-src/my-workflow</span>
+cylc<span class="w"> </span>validate<span class="w"> </span>my-workflow<span class="w">    </span><span class="c1"># Checks that the workflow configuration is valid</span>
+cylc<span class="w"> </span>install<span class="w"> </span>my-workflow<span class="w">     </span><span class="c1"># Installs workflow to ~/cylc-run/my-workflow</span>
+cylc<span class="w"> </span>play<span class="w"> </span>my-workflow<span class="w">        </span><span class="c1"># Plays the workflow.</span>
+cylc<span class="w"> </span>config<span class="w"> </span>my-workflow<span class="w">      </span><span class="c1"># Look at the workflow with template vars filled in.</span>
+</pre></div>
+</div>
+</div>
+<div class="note admonition" id="suites-practical">
+<p class="admonition-title">Practical</p>
+<p class="rubric">In this tutorial we will create a Rose Suite Configuration for
+the
+<a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/tutorial/runtime/runtime-configuration.html#tutorial-cylc-runtime-forecasting-workflow" title="(in Cylc v8.2)"><span class="xref std std-ref">weather-forecasting workflow</span></a>.</p>
+<ol class="arabic">
+<li><p><strong>Create a new Cylc workflow</strong></p>
+<p>Create a copy of the weather-forecasting workflow by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">tutorial</span> <span class="n">rose</span><span class="o">-</span><span class="n">suite</span><span class="o">-</span><span class="n">tutorial</span> <span class="o">~/</span><span class="n">cylc</span><span class="o">-</span><span class="n">src</span><span class="o">/</span><span class="n">rose</span><span class="o">-</span><span class="n">suite</span><span class="o">-</span><span class="n">tutorial</span>
+<span class="n">cd</span> <span class="o">~/</span><span class="n">cylc</span><span class="o">-</span><span class="n">src</span><span class="o">/</span><span class="n">rose</span><span class="o">-</span><span class="n">suite</span><span class="o">-</span><span class="n">tutorial</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you haven’t ever used Cylc 8 you may need to create the
+<a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-source-directory" title="(in Cylc v8.2)"><span class="xref std std-term">source directory</span></a>. (<code class="docutils literal notranslate"><span class="pre">mkdir</span> <span class="pre">~/cylc-src</span></code>)</p>
+</div>
+</li>
+<li><p><strong>Create a Rose suite configuration</strong></p>
+<p>Create a blank <a class="reference internal" href="../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">touch</span> <span class="n">rose</span><span class="o">-</span><span class="n">suite</span><span class="o">.</span><span class="n">conf</span>
+</pre></div>
+</div>
+<p>You now have a Rose suite configuration. A <a class="reference internal" href="../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a>
+file does not need to have anything in it.</p>
+<p>There are three things defined in the <code class="docutils literal notranslate"><span class="pre">flow.cylc</span></code> file which it might be
+useful to be able to configure:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">station</span></code></dt><dd><p>The list of weather stations to gather observations from.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">RESOLUTION</span></code></dt><dd><p>The spatial resolution of the forecast model.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">DOMAIN</span></code></dt><dd><p>The geographical limits of the model.</p>
+</dd>
+</dl>
+<p>Define these settings in the <a class="reference internal" href="../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> file by adding
+the following lines:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[template variables]</span>
+<span class="nv">station</span><span class="o">=</span><span class="s">&quot;camborne&quot;, &quot;heathrow&quot;, &quot;shetland&quot;, &quot;aldergrove&quot;</span>
+<span class="nv">RESOLUTION</span><span class="o">=</span><span class="s">0.2</span>
+<span class="nv">DOMAIN</span><span class="o">=</span><span class="s">-12,48,5,61</span>
+</pre></div>
+</div>
+<p>Note that template variable strings must be quoted.</p>
+</li>
+<li><p><strong>Tell the workflow what language to use when templating</strong></p>
+<p>Add a hashbang line to the flow.cylc file to tell it to use Jinja2 to
+process template variables:</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gi">+ #!jinja2</span>
+[scheduler]
+<span class="w"> </span>   UTC mode = True
+</pre></div>
+</div>
+</li>
+<li><p><strong>Write suite metadata</strong></p>
+<p>Create a <code class="docutils literal notranslate"><span class="pre">meta/rose-meta.conf</span></code> file and write some metadata for the
+settings defined in the <a class="reference internal" href="../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> file.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">station</span></code> is a list of unlimited length.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RESOLUTION</span></code> is a “real” number.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DOMAIN</span></code> is a list of four integers.</p></li>
+</ul>
+<div class="spoiler warning admonition">
+<p class="admonition-title">Solution</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[template variables=station]</span>
+<span class="nv">length</span><span class="o">=</span><span class="s">:</span>
+
+<span class="nt">[template variables=RESOLUTION]</span>
+<span class="nv">type</span><span class="o">=</span><span class="s">real</span>
+
+<span class="nt">[template variables=DOMAIN]</span>
+<span class="nv">length</span><span class="o">=</span><span class="s">4</span>
+<span class="nv">type</span><span class="o">=</span><span class="s">integer</span>
+</pre></div>
+</div>
+</div>
+<p>Validate the metadata:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rose</span> <span class="n">metadata</span><span class="o">-</span><span class="n">check</span> <span class="o">-</span><span class="n">C</span> <span class="n">meta</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>Open the <a class="reference internal" href="../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> GUI. You should see
+<span class="guilabel">suite conf</span> in the panel on the left-hand side of the window.
+This will contain the template variables we have just defined.</p>
+</li>
+<li><p><strong>Use suite variables in the</strong> <code class="docutils literal notranslate"><span class="pre">flow.cylc</span></code> <strong>file</strong></p>
+<p>Next we need to make use of these settings in the <code class="docutils literal notranslate"><span class="pre">flow.cylc</span></code> file.</p>
+<p>We need to change the <code class="docutils literal notranslate"><span class="pre">RESOLUTION</span></code> and <code class="docutils literal notranslate"><span class="pre">DOMAIN</span></code> settings in the
+<code class="docutils literal notranslate"><span class="pre">[runtime][root][environment]</span></code> section which would otherwise override
+the variables we have just defined in the <a class="reference internal" href="../../api/configuration/suite.html#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a>
+file, like so:</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>[runtime]
+<span class="w"> </span>    [[root]]
+<span class="w"> </span>        # These environment variables will be available to all tasks.
+<span class="w"> </span>        [[[environment]]]
+<span class="w"> </span>            # The dimensions of each grid cell in degrees.
+<span class="gd">-            RESOLUTION = 0.2</span>
+<span class="gi">+            RESOLUTION = {{ RESOLUTION }}</span>
+<span class="w"> </span>            # The area to generate forecasts for (lng1, lat1, lng2, lat2).
+<span class="gd">-            DOMAIN = -12,48,5,61  # Do not change!</span>
+<span class="gi">+            DOMAIN = {{ DOMAIN | join(&quot;, &quot;) }}</span>
+</pre></div>
+</div>
+<p>We have written out the <code class="docutils literal notranslate"><span class="pre">DOMAIN</span></code> list using the <a class="reference external" href="https://jinja.palletsprojects.com/en/2.11.x/">Jinja2</a> <code class="docutils literal notranslate"><span class="pre">join</span></code>
+filter to write the commas between the list items. We can do the same
+for <code class="docutils literal notranslate"><span class="pre">station</span></code>:</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>[scheduler]
+<span class="w"> </span>    UTC mode = True
+<span class="w"> </span>[task parameters]
+<span class="w"> </span>   # A list of the weather stations we will be fetching observations from.
+<span class="gd">-   station = camborne, heathrow, shetland, aldergrove</span>
+<span class="gi">+   station = {{ station | join(&quot;, &quot;) }}</span>
+<span class="w"> </span>   # A list of the sites we will be generating forecasts for.
+<span class="w"> </span>   site = exeter
+</pre></div>
+</div>
+</li>
+<li><p><strong>Install the workflow</strong></p>
+<p>This workflow is not ready to play yet but you can check that it is
+valid with <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/user-guide/writing-workflows/configuration.html#validation" title="(in Cylc v8.2)"><span class="xref std std-ref">cylc validate</span></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">validate</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>You can then install the workflow with <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/user-guide/installing-workflows.html#install-workflow" title="(in Cylc v8.2)"><span class="xref std std-ref">cylc install</span></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">install</span> <span class="n">rose</span><span class="o">-</span><span class="n">suite</span><span class="o">-</span><span class="n">tutorial</span>
+</pre></div>
+</div>
+<p>Inspect the installed workflow, which you will find in
+the <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-run-directory" title="(in Cylc v8.2)"><span class="xref std std-term">run directory</span></a>, i.e:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">~/</span><span class="n">cylc</span><span class="o">-</span><span class="n">run</span><span class="o">/</span><span class="n">rose</span><span class="o">-</span><span class="n">suite</span><span class="o">-</span><span class="n">tutorial</span>
+</pre></div>
+</div>
+<p>You should find all the files, plus the <code class="docutils literal notranslate"><span class="pre">log</span></code> directory,
+contained in the run directory.</p>
+</li>
+</ol>
+</div>
+</section>
+<section id="rose-applications-in-rose-suite-configurations">
+<h2>Rose Applications In Rose Suite Configurations<a class="headerlink" href="#rose-applications-in-rose-suite-configurations" title="Link to this heading"></a></h2>
+<p>In Cylc workflows, Rose applications are placed in an <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory which
+is copied across to the <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-run-directory" title="(in Cylc v8.2)"><span class="xref std std-term">run directory</span></a> with the rest of the suite by
+<a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/user-guide/installing-workflows.html#install-workflow" title="(in Cylc v8.2)"><span class="xref std std-ref">cylc install</span></a> when the workflow configuration is installed.</p>
+<p>When we run Rose applications from within Cylc workflows we use the
+<a class="reference internal" href="../../api/command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a> command rather than the
+<a class="reference internal" href="../../api/command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a> command.</p>
+<p>When run, <a class="reference internal" href="../../api/command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a> searches for an application with the
+same name as the Cylc task in the <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory.</p>
+<p>The <a class="reference internal" href="../../api/command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a> command also interfaces with Cylc to provide
+a few useful environment variables (see the
+<a class="reference internal" href="../../api/command-reference.html#command-rose-task-run"><span class="std std-ref">command-line reference</span></a> for details). The
+application will run in the <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-work-directory" title="(in Cylc v8.2)"><span class="xref std std-term">work directory</span></a>, just like for a
+regular Cylc task.</p>
+<p>In this example the <code class="docutils literal notranslate"><span class="pre">hello</span></code> task will run the application located in
+<code class="docutils literal notranslate"><span class="pre">app/hello/</span></code>:</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">flow.cylc</span><a class="headerlink" href="#id4" title="Link to this code"></a></div>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[hello]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> rose task-run</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">app/hello/rose-app.conf</span><a class="headerlink" href="#id5" title="Link to this code"></a></div>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[command]</span>
+<span class="nv">default</span><span class="o">=</span><span class="s">echo &quot;Hello World!&quot;</span>
+</pre></div>
+</div>
+</div>
+<p>The name of the application to run can be overridden using the <code class="docutils literal notranslate"><span class="pre">--app-key</span></code>
+command-line option or the <span class="target" id="index-0"></span><a class="reference internal" href="../../api/environment-variables.html#envvar-ROSE_TASK_APP"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_TASK_APP</span></code></a> environment variable. For
+example the <code class="docutils literal notranslate"><span class="pre">greetings</span></code> <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-task" title="(in Cylc v8.2)"><span class="xref std std-term">task</span></a> will run the <code class="docutils literal notranslate"><span class="pre">hello</span></code>
+<a class="reference internal" href="../../glossary.html#term-Rose-app"><span class="xref std std-term">app</span></a> in the task defined below.</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">flow.cylc</span><a class="headerlink" href="#id6" title="Link to this code"></a></div>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[runtime]</span>
+    <span class="nt">[[greetings]]</span>
+        <span class="nv">script </span><span class="o">=</span><span class="s"> rose task-run --app-key hello</span>
+</pre></div>
+</div>
+</div>
+<div class="note admonition" id="task-run-practical">
+<p class="admonition-title">Practical</p>
+<p class="rubric">In this practical we will take the <code class="docutils literal notranslate"><span class="pre">forecast</span></code> Rose application
+that we developed in the <a class="reference internal" href="metadata.html#tutorial-rose-metadata"><span class="std std-ref">Metadata Tutorial</span></a>
+and integrate it into the weather-forecasting workflow.</p>
+<p>Move into the workflow source directory from the previous practical:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">~/</span><span class="n">cylc</span><span class="o">-</span><span class="n">src</span><span class="o">/</span><span class="n">rose</span><span class="o">-</span><span class="n">suite</span><span class="o">-</span><span class="n">tutorial</span>
+</pre></div>
+</div>
+<p>You will find a copy of the <code class="docutils literal notranslate"><span class="pre">forecast</span></code> application located in
+<code class="docutils literal notranslate"><span class="pre">app/forecast</span></code>.</p>
+<ol class="arabic">
+<li><p><strong>Create a test configuration for the</strong> <code class="docutils literal notranslate"><span class="pre">forecast</span></code> <strong>application.</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">forecast</span></code> application comes with test data
+(in <code class="docutils literal notranslate"><span class="pre">file/test-date</span></code>), and is currently set up to work with
+this data.</p>
+<p>We will now adjust this configuration to make it work with
+real data generated by the Cylc workflow. It is useful to keep
+the ability to run the application using test data, so we won’t
+delete this configuration. Instead we will move it into an
+<a class="reference internal" href="../../api/configuration/rose-configuration-format.html#optional-configuration"><span class="std std-ref">Optional Configuration</span></a> so that we can run the
+application in “test mode” or “live mode”.</p>
+<p>Optional configurations are covered in more detail in the
+<a class="reference internal" href="furthertopics/optional-configurations.html#rose-tutorial-optional-configurations"><span class="std std-ref">Optional Configurations
+Tutorial</span></a>. For now all we need to
+know is that they enable us to store alternative configurations.</p>
+<p>Create an optional configuration called <code class="docutils literal notranslate"><span class="pre">test</span></code> inside the <code class="docutils literal notranslate"><span class="pre">forecast</span></code>
+application:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="n">app</span><span class="o">/</span><span class="n">forecast</span><span class="o">/</span><span class="n">opt</span>
+<span class="n">touch</span> <span class="n">app</span><span class="o">/</span><span class="n">forecast</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">rose</span><span class="o">-</span><span class="n">app</span><span class="o">-</span><span class="n">test</span><span class="o">.</span><span class="n">conf</span>
+</pre></div>
+</div>
+<p>This optional configuration is a regular Rose configuration file. Its
+settings will override those in the <a class="reference internal" href="../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file if
+requested.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Take care not to confuse the <code class="docutils literal notranslate"><span class="pre">rose-app.conf</span></code> and
+<code class="docutils literal notranslate"><span class="pre">rose-app-test.conf</span></code> files used within this practical.</p>
+</div>
+<p>Move the following environment variables from the
+<code class="docutils literal notranslate"><span class="pre">app/forecast/rose-app.conf</span></code> file into an <code class="docutils literal notranslate"><span class="pre">[env]</span></code>
+section in the <code class="docutils literal notranslate"><span class="pre">app/forecast/opt/rose-app-test.conf</span></code> file:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">WEIGHTING</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">WIND_CYCLES</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">WIND_FILE_TEMPLATE</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RAINFALL_FILE</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MAP_FILE</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CYLC_TASK_CYCLE_POINT</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RESOLUTION</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DOMAIN</span></code></p></li>
+</ul>
+<div class="spoiler warning admonition">
+<p class="admonition-title">Solution</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">rose-app-test.conf</span></code> file should look like this:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[env]</span>
+<span class="nv">WEIGHTING</span><span class="o">=</span><span class="s">1</span>
+<span class="nv">WIND_CYCLES</span><span class="o">=</span><span class="s">0</span>
+<span class="nv">WIND_FILE_TEMPLATE</span><span class="o">=</span><span class="s">test-data/wind_{cycle}_{xy}.csv</span>
+<span class="nv">RAINFALL_FILE</span><span class="o">=</span><span class="s">test-data/rainfall.csv</span>
+<span class="nv">MAP_FILE</span><span class="o">=</span><span class="s">map.html</span>
+<span class="nv">CYLC_TASK_CYCLE_POINT</span><span class="o">=</span><span class="s">20171101T0000Z</span>
+<span class="nv">RESOLUTION</span><span class="o">=</span><span class="s">0.2</span>
+<span class="nv">DOMAIN</span><span class="o">=</span><span class="s">-12,48,5,61</span>
+</pre></div>
+</div>
+</div>
+<p>Run the application in “test mode” by providing the option
+<code class="docutils literal notranslate"><span class="pre">--opt-conf-key=test</span></code> to the <a class="reference internal" href="../../api/command-reference.html#command-rose-app-run"><span class="std std-ref">rose app-run</span></a> command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="n">app</span><span class="o">/</span><span class="n">forecast</span><span class="o">/</span><span class="n">run</span>
+<span class="n">cd</span> <span class="n">app</span><span class="o">/</span><span class="n">forecast</span><span class="o">/</span><span class="n">run</span>
+<span class="n">rose</span> <span class="n">app</span><span class="o">-</span><span class="n">run</span> <span class="o">--</span><span class="n">opt</span><span class="o">-</span><span class="n">conf</span><span class="o">-</span><span class="n">key</span><span class="o">=</span><span class="n">test</span> <span class="o">-</span><span class="n">C</span> <span class="o">../</span>
+<span class="n">cd</span> <span class="o">../../../</span>
+</pre></div>
+</div>
+<p>You should see the stdout output of the Rose application. If there are
+any errors they will be marked with the <code class="docutils literal notranslate"><span class="pre">[FAIL]</span></code> prefix.</p>
+</li>
+<li><p><strong>Integrate the</strong> <code class="docutils literal notranslate"><span class="pre">forecast</span></code> <strong>application into the suite.</strong></p>
+<p>We can now configure the <code class="docutils literal notranslate"><span class="pre">forecast</span></code> application to work with real data.</p>
+<p>We have moved the map template file (<code class="docutils literal notranslate"><span class="pre">map-template.html</span></code>) into the
+<code class="docutils literal notranslate"><span class="pre">forecast</span></code> application so we can delete the <code class="docutils literal notranslate"><span class="pre">MAP_TEMPLATE</span></code>
+environment variable from the <code class="docutils literal notranslate"><span class="pre">[runtime]forecast</span></code> section of the
+<code class="docutils literal notranslate"><span class="pre">flow.cylc</span></code> file.</p>
+<p>Copy the remaining environment variables defined in the <code class="docutils literal notranslate"><span class="pre">forecast</span></code>
+task within the <code class="docutils literal notranslate"><span class="pre">flow.cylc</span></code> file into the <a class="reference internal" href="../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a>
+file of the <code class="docutils literal notranslate"><span class="pre">forecast</span></code> application, replacing any values already
+specified if necessary. Remove the lines from the <code class="docutils literal notranslate"><span class="pre">flow.cylc</span></code> file
+when you are done.</p>
+<p>Remember, in Rose configuration files:</p>
+<ul class="simple">
+<li><p>Spaces are not used around the equals (<code class="docutils literal notranslate"><span class="pre">=</span></code>) operator.</p></li>
+<li><p>Ensure the environment variables are not quoted.</p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">[env]</span></code> section of your <a class="reference internal" href="../../api/configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file should now
+look like this:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nt">[env]</span>
+<span class="nv">INTERVAL</span><span class="o">=</span><span class="s">60</span>
+<span class="nv">N_FORECASTS</span><span class="o">=</span><span class="s">5</span>
+<span class="nv">WEIGHTING</span><span class="o">=</span><span class="s">1</span>
+<span class="nv">MAP_TEMPLATE</span><span class="o">=</span><span class="s">map-template.html</span>
+<span class="nv">SPLINE_LEVEL</span><span class="o">=</span><span class="s">0</span>
+<span class="nv">WIND_FILE_TEMPLATE</span><span class="o">=</span><span class="s">$CYLC_WORKFLOW_WORK_DIR/{cycle}/consolidate_observations/wind_{xy}.csv</span>
+<span class="nv">WIND_CYCLES</span><span class="o">=</span><span class="s">0, -3, -6</span>
+<span class="nv">RAINFALL_FILE</span><span class="o">=</span><span class="s">$CYLC_WORKFLOW_WORK_DIR/$CYLC_TASK_CYCLE_POINT/get_rainfall/rainfall.csv</span>
+<span class="nv">MAP_FILE</span><span class="o">=</span><span class="s">${CYLC_TASK_LOG_ROOT}-map.html</span>
+</pre></div>
+</div>
+<p>Finally we need to change the <code class="docutils literal notranslate"><span class="pre">forecast</span></code> task to run
+<a class="reference internal" href="../../api/command-reference.html#command-rose-task-run"><span class="std std-ref">rose task-run</span></a>. The <code class="docutils literal notranslate"><span class="pre">[runtime]forecast</span></code> section of the
+<code class="docutils literal notranslate"><span class="pre">flow.cylc</span></code> file should now look like this:</p>
+<div class="highlight-cylc notranslate"><div class="highlight"><pre><span></span><span class="nt">[[forecast]]</span>
+    <span class="nv">script </span><span class="o">=</span><span class="s"> rose task-run</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Make changes to the configuration.</strong></p>
+<p>Open the <a class="reference internal" href="../../api/command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> GUI and navigate to the
+<span class="guilabel">suite conf &gt; template variables</span> panel.</p>
+<p>Change the <code class="docutils literal notranslate"><span class="pre">RESOLUTION</span></code> variable to <code class="docutils literal notranslate"><span class="pre">0.1</span></code></p>
+<p>Navigate to the <span class="guilabel">forecast &gt; env</span> panel.</p>
+<p>Edit the <code class="docutils literal notranslate"><span class="pre">WEIGHTING</span></code> variable so that it is equal to the following
+list of values:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.1</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Click the “Add array element” button (<span class="guilabel">+</span>) to extend the
+number of elements assigned to <code class="docutils literal notranslate"><span class="pre">WEIGHTING</span></code>.</p>
+</div>
+<p>Finally, save these settings via <span class="guilabel">File &gt; Save</span> in the menu.</p>
+</li>
+<li><p><strong>Run the workflow.</strong></p>
+<p>Validate, install, run and examine the workflow
+(use <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/tutorial/runtime/introduction.html#tutorial-gui" title="(in Cylc v8.2)"><span>The Cylc GUI</span></a> or <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/tutorial/runtime/introduction.html#tutorial-tui" title="(in Cylc v8.2)"><span>The Cylc TUI</span></a>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">validate</span> <span class="o">~/</span><span class="n">cylc</span><span class="o">-</span><span class="n">src</span><span class="o">/</span><span class="n">rose</span><span class="o">-</span><span class="n">suite</span><span class="o">-</span><span class="n">tutorial</span>
+<span class="n">cylc</span> <span class="n">install</span> <span class="n">rose</span><span class="o">-</span><span class="n">suite</span><span class="o">-</span><span class="n">tutorial</span>
+<span class="n">cylc</span> <span class="n">play</span> <span class="n">rose</span><span class="o">-</span><span class="n">suite</span><span class="o">-</span><span class="n">tutorial</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>View output in Cylc Review.</strong></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">cylc</span> <span class="pre">review</span></code> replaces the Rose Bush utility. It is a Cylc 7
+command that can view Cylc 7 and Cylc 8 workflows.</p>
+</div>
+<p>Either navigate to your site’s Cylc Review page if one has been set up, or
+start a Cylc Review server by running the following command and open
+the printed URL:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylc</span> <span class="n">review</span> <span class="n">start</span>
+</pre></div>
+</div>
+<p>Navigate to your latest rose-suite-tutorial run and click
+the “task jobs list”.
+On this page you will see the tasks run by the suite, ordered from most
+to least recent. Near the top you should see an entry for the
+<code class="docutils literal notranslate"><span class="pre">forecast</span></code> task. On the right-hand side of the screen click
+<span class="guilabel">job-map.html</span>.</p>
+<p>As this file has a <code class="docutils literal notranslate"><span class="pre">.html</span></code> extension Cylc Review will render it.
+The raw text would be displayed otherwise.</p>
+</li>
+</ol>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">orphan<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="metadata.html" class="btn btn-neutral float-left" title="Rose Metadata" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="summary.html" class="btn btn-neutral float-right" title="Summary" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright : Copyright (C) British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2.3.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2.3.0";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "tutorial/rose/suites";
+    </script>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+
+
+</body>
+</html>
