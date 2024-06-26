@@ -18,6 +18,8 @@
 import ast
 import re
 
+from functools import partial
+
 import jinja2
 import jinja2.exceptions
 
@@ -370,11 +372,8 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
         if log_ids is None:
             get_value_from_id = self._get_value_from_id
         else:
-            get_value_from_id = (
-                lambda id_, conf, m_conf, p_id: self._log_id_usage(
-                    id_, conf, m_conf, p_id, log_ids
-                )
-            )
+            get_value_from_id = partial(self._log_id_usage, id_set=log_ids)
+
         if not (rule.startswith('{%') or rule.startswith('{-%')):
             rule = "{% if " + rule + " %}True{% else %}False{% endif %}"
 
@@ -388,8 +387,13 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
         sci_num_count = -1
 
         # any/all processing.
+        rule = rule.replace('template variables', 'template_variables')
         for array_func_key, rec_regex in self.REC_ARRAY.items():
             for search_result in rec_regex.findall(rule):
+                search_result = (
+                    i.replace('template_variables', 'template variables')
+                    for i in search_result
+                )
                 start, var_id, operator, value, end = search_result
                 if var_id == "this":
                     var_id = setting_id
@@ -411,6 +415,10 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
 
         # len(...) processing.
         for search_result in self.REC_LEN_FUNC.findall(rule):
+            search_result = (
+                i.replace('template_variables', 'template variables')
+                for i in search_result
+            )
             start, var_id, end = search_result
             if var_id == "this":
                 var_id = setting_id
@@ -455,11 +463,17 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
                 x_id_num_str = search_result.replace("this", "").strip('()')
                 key = self.INTERNAL_ID_THIS_SETTING.format(x_id_num_str)
                 local_map[key] = value_string
+            search_result = search_result.replace(
+                'template variables', 'template_variables')
             rule = rule.replace(search_result, key, 1)
 
         # Replace ids (namelist:foo=bar) with their cast values.
         config_id_count = -1
+        rule = rule.replace('template variables', 'template_variables')
+
         for search_result in self.REC_CONFIG_ID.findall(rule):
+            search_result = search_result.replace(
+                'template_variables', 'template variables')
             value_string = get_value_from_id(
                 search_result, config, meta_config, setting_id
             )
@@ -470,6 +484,8 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
                 config_id_count += 1
                 key = self.INTERNAL_ID_SETTING.format(config_id_count)
                 local_map[key] = value_string
+            search_result = search_result.replace(
+                'template variables', 'template_variables')
             rule = rule.replace(search_result, key, 1)
 
         # Return the now valid Jinja2 template with a map of variables.
