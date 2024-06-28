@@ -68,7 +68,7 @@ jobs:
 
       - name: ESLint
         run: |
-          npx --package=eslint -- eslint -c .eslintrc.js sphinx/
+          npx --package=eslint@8.x -- eslint -c .eslintrc.js sphinx/
 
       - name: MyPy
         run: |
