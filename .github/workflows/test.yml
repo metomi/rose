@@ -59,7 +59,6 @@ jobs:
       - name: Install Rose
         run: |
           pip install ."[lint]"
-          yarn install
 
       - name: Flake8
         run: flake8
@@ -68,7 +67,8 @@ jobs:
         run: etc/bin/shellchecker
 
       - name: ESLint
-        run: yarn run lint
+        run: |
+          npx --package=eslint -- eslint -c .eslintrc.js sphinx/
 
       - name: MyPy
         run: |
@@ -144,7 +144,6 @@ jobs:
         working-directory: rose
         run: |
           pip install ."[tests,docs${{ (startsWith(matrix.os, 'ubuntu') && ',graph,rosa') || '' }}]"
-          yarn install
 
       - name: Install Cylc
         uses: cylc/release-actions/install-cylc-components@v1
