@@ -25,7 +25,7 @@
 branch=True
 cover_pylib=False
 concurrency=multiprocessing
-data_file=${TRAVIS_BUILD_DIR}/.coverage
+# data_file=.coverage
 disable_warnings=
     trace-changed
     module-not-python
@@ -45,12 +45,11 @@ debug=
 #    sys
 #    trace
 # Include can be used only if source is not used!
-note=
 parallel = True
 plugins=
 include=
-    *lib/python/rose*
-    *lib/python/rosie*
+    ./metomi/rose/*
+    ./metomi/rosie/*
 timid = False
 
 
