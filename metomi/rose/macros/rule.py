@@ -387,6 +387,9 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
         sci_num_count = -1
 
         # any/all processing.
+        # n.b. Because we've made "template variables" (with space) the
+        # section header at Rose 2 we need to hack the rose mini language
+        # to allow a space in this one case:
         rule = rule.replace('template variables', 'template_variables')
         for array_func_key, rec_regex in self.REC_ARRAY.items():
             for search_result in rec_regex.findall(rule):
@@ -469,6 +472,9 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
 
         # Replace ids (namelist:foo=bar) with their cast values.
         config_id_count = -1
+        # n.b. Because we've made "template variables" (with space) the
+        # section header at Rose 2 we need to hack the rose mini language
+        # to allow a space in this one case:
         rule = rule.replace('template variables', 'template_variables')
 
         for search_result in self.REC_CONFIG_ID.findall(rule):
