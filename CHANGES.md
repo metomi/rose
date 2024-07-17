@@ -11,7 +11,7 @@ ones in. -->
 
 --------------------------------------------------------------------------------
 
-## 2.3.0 (<span actions:bind='release-date'>Released 2024-06-18</span>)
+## 2.3.0 (<span actions:bind='release-date'>Released 2024-07-17</span>)
 
 Minor changes required for compatibility with cylc-flow 8.3.0 (via cylc-rose).
 
