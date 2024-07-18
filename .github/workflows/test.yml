@@ -100,6 +100,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Patch DNS
+        uses: cylc/release-actions/patch-dns@v1
+
       - name: Brew Install
         if: startsWith(matrix.os, 'macos')
         run: |
@@ -113,17 +116,13 @@ jobs:
 
           # add GNU coreutils and sed to the user PATH (for actions steps)
           # (see instructions in brew install output)
-          echo \
-            "$(brew --prefix)/opt/coreutils/libexec/gnubin" \
-            >> "${GITHUB_PATH}"
-          echo \
-            "/usr/local/opt/gnu-sed/libexec/gnubin" \
-            >> "${GITHUB_PATH}"
+          echo "$(brew --prefix)/opt/coreutils/libexec/gnubin" >> "${GITHUB_PATH}"
+          echo "$(brew --prefix)/opt/gnu-sed/libexec/gnubin" >> "${GITHUB_PATH}"
 
           # add GNU coreutils and sed to the user PATH (for Cylc jobs)
           cat >> "$HOME/.bashrc" <<__HERE__
-          PATH="/usr/local/opt/coreutils/libexec/gnubin:\$PATH"
-          PATH="/usr/local/opt/gnu-sed/libexec/gnubin:\$PATH"
+          PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$PATH"
+          PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH"
           PATH="$pythonLocation:\$PATH"
           export PATH
           # see NOTE in t/rosie-lookup/00-basic.t
