@@ -128,7 +128,13 @@ pygments_style = 'autumn'
 
 
 # -- Options for HTML output ----------------------------------------------
-
+# Make sourcelink point to GH source rather than the raw source.
+html_context = {
+    'display_github': True,
+    'github_user': 'metomi',
+    'github_repo': 'rose',
+    'github_version': 'master/sphinx/',
+}
 html_theme = 'sphinx_rtd_theme'
 # rtd_theme only handles 4 levels for the sidebar navigation.
 html_theme_options = {'navigation_depth': 4}
@@ -186,8 +192,8 @@ latex_logo = 'img/rose-logo.png'
 latex_show_pagerefs = True
 # If true, show URL addresses after external links.
 latex_show_urls = 'inline'
-# Don't link RST source page.
-html_show_sourcelink = False
+# Link to RST source page.
+html_show_sourcelink = True
 # Add a custom css file to make tables wrap correctly.
 html_css_files = ['custom.css']
 
