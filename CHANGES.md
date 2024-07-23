@@ -9,7 +9,13 @@ creating a new release entry be sure to copy & paste the span tag with the
 updated. Only the first match gets replaced, so it's fine to leave the old
 ones in. -->
 
---------------------------------------------------------------------------------
+
+## 2.3.1 (<span actions:bind='release-date'>Released 2024-07-18</span>)
+
+### Fixes
+
+[#2783](https://github.com/metomi/rose/pull/2783) -
+Fixes an issue where the `[template variables]` section in the `rose-suite.conf` file didn't work with Rose metadata.
 
 ## 2.3.0 (<span actions:bind='release-date'>Released 2024-06-18</span>)
 
@@ -19,7 +25,6 @@ Minor changes required for compatibility with cylc-flow 8.3.0 (via cylc-rose).
 
 [#2754](https://github.com/metomi/rose/pull/2754) - support for file creation from Git repositories
 
---------------------------------------------------------------------------------
 
 ## 2.2.0 (<span actions:bind='release-date'>Released 2024-01-18</span>)
 
@@ -43,7 +48,6 @@ later flow
 [#2700](https://github.com/metomi/rose/pull/2700) -
 Fix rosie password caching.
 
---------------------------------------------------------------------------------
 
 ## 2.0.4 (<span actions:bind='release-date'>Released 2023-04-27</span>)
 
@@ -52,7 +56,6 @@ Fix rosie password caching.
 [#2684](https://github.com/metomi/rose/pull/2684) -
 Fix an issue where file installation could fail due to high concurrency.
 
---------------------------------------------------------------------------------
 
 ## 2.0.3 (<span actions:bind='release-date'>Released 2023-02-13</span>)
 
@@ -65,7 +68,6 @@ Fix issues with `rose date` when run in integer cycling Cylc workflows.
 follow Python 2 type comparison rules.
 
 
---------------------------------------------------------------------------------
 
 ## 2.0.2 (<span actions:bind='release-date'>Released 2022-11-08</span>)
 
@@ -74,7 +76,6 @@ follow Python 2 type comparison rules.
 [#2608](https://github.com/metomi/rose/pull/2608) - Fix problems with the
 tutorials.
 
---------------------------------------------------------------------------------
 
 ## 2.0.1 (<span actions:bind='release-date'>Released 2022-09-14</span>)
 
@@ -83,7 +84,6 @@ tutorials.
 [#2612](https://github.com/metomi/rose/pull/2612) - Allows the pre
 remote install checks to use any Python version >= 2.7.
 
---------------------------------------------------------------------------------
 
 ## 2.0.0 (<span actions:bind='release-date'>Released 2022-07-28</span>)
 
@@ -91,7 +91,6 @@ For use with Cylc, see [Cylc-Rose](https://github.com/cylc/cylc-rose).
 
 Minor internal changes since 2.0rc3.
 
---------------------------------------------------------------------------------
 
 ## 2.0rc3 (<span actions:bind='release-date'>Released 2022-05-20</span>)
 
@@ -101,7 +100,6 @@ Minor internal changes since 2.0rc3.
 fix bug in rose mpi-launch that caused it to fail if the configured command
 contained spaces.
 
---------------------------------------------------------------------------------
 
 ## 2.0rc2 (<span actions:bind='release-date'>Released 2022-03-24</span>)
 
@@ -120,7 +118,6 @@ as a subshell.
 [#2548](https://github.com/metomi/rose/pull/2548) - Added back the
 `rose-conf.vim` syntax highlighting file for ViM that was accidentally removed.
 
---------------------------------------------------------------------------------
 
 ## 2.0rc1 (<span actions:bind='release-date'>Released 2022-02-17</span>)
 
@@ -143,7 +140,6 @@ Rose prune.
 Rose Date only emits a warning if running in interactive mode.
 
 
--------------------------------------------------------------------------------
 
 ## 2.0b3 (<span actions:bind='release-date'>Released 2021-11-10</span>)
 
@@ -155,7 +151,6 @@ For use with Cylc see [Cylc-Rose](https://github.com/cylc/cylc-rose).
 Disable the `rosie disco` web service pending a fix to the tornado version
 conflict with cylc-uiserver, see https://github.com/metomi/rose/pull/2493
 
---------------------------------------------------------------------------------
 
 ## 2.0b2 (<span actions:bind='release-date'>Released 2021-07-28</span>)
 
@@ -163,7 +158,6 @@ Rose release 61. This is a __beta pre-release__.
 
 For use with Cylc see [Cylc-Rose](https://github.com/cylc/cylc-rose).
 
---------------------------------------------------------------------------------
 
 ## 2.0b1 (2021-03-26)
 
@@ -206,7 +200,6 @@ The ability to tell where a Cylc task has or will run has not yet been
 re-implemented which can effect remote functionality of `fcm_make` and
 `rose_prune` - [#2445](https://github.com/metomi/rose/issues/2445).
 
---------------------------------------------------------------------------------
 
 ## 2.0a1 (2019-09-19)
 
@@ -237,7 +230,6 @@ Python3 Conversion of Rose Suite Run
 Rose and Rosie: Future versions of Rose will be deployed to PyPI and installed
 via Conda.
 
---------------------------------------------------------------------------------
 
 ## 2019.01.1 (2019-05-03)
 
@@ -259,7 +251,6 @@ rose suite-run: fix connection to suite that has just been started.
 [#2289](https://github.com/metomi/rose/pull/2289):
 rose config-edit: fix int spin box manual edit.
 
---------------------------------------------------------------------------------
 
 ## 2019.01.0 (2019-01-25)
 
@@ -299,7 +290,6 @@ Misc doc fixes.
 [#2230](https://github.com/metomi/rose/pull/2230):
 Report test coverage.
 
---------------------------------------------------------------------------------
 
 ## 2018.11.0 (2018-11-28)
 
@@ -358,7 +348,6 @@ Lots of improvements and fixes to documentation.
 
 Launch programs with `python2` instead of `python`.
 
---------------------------------------------------------------------------------
 
 ## 2018.06.0 (2018-06-27)
 
@@ -381,7 +370,6 @@ Rose User Guide: misc fixes and improvements.
 [#2194](https://github.com/metomi/rose/pull/2194):
 rose suite-run: improve handling of `root-dir` settings on remote machine.
 
---------------------------------------------------------------------------------
 
 ## 2018.05.0 (2018-05-22)
 
@@ -412,7 +400,6 @@ without installing the suite.
 Rose Bush: suites list, cycles list, task jobs list, and broadcast lists pages
 now refresh automatically every 2 minutes.
 
---------------------------------------------------------------------------------
 
 ## 2018.02.0 (2018-02-07)
 
