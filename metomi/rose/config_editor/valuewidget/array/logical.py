@@ -22,8 +22,8 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.gtk.util
-import rose.variable
+import metomi.rose.gtk.util
+import metomi.rose.variable
 
 
 class LogicalArrayValueWidget(Gtk.HBox):
@@ -40,29 +40,29 @@ class LogicalArrayValueWidget(Gtk.HBox):
         self.metadata = metadata
         self.set_value = set_value
         self.hook = hook
-        self.max_length = metadata[rose.META_PROP_LENGTH]
-        value_array = rose.variable.array_split(value)
-        if metadata.get(rose.META_PROP_TYPE) == "boolean":
+        self.max_length = metadata[metomi.rose.META_PROP_LENGTH]
+        value_array = metomi.rose.variable.array_split(value)
+        if metadata.get(metomi.rose.META_PROP_TYPE) == "boolean":
             # boolean -> true/false
-            self.allowed_values = [rose.TYPE_BOOLEAN_VALUE_FALSE,
-                                   rose.TYPE_BOOLEAN_VALUE_TRUE]
+            self.allowed_values = [metomi.rose.TYPE_BOOLEAN_VALUE_FALSE,
+                                   metomi.rose.TYPE_BOOLEAN_VALUE_TRUE]
             self.label_dict = dict(list(zip(self.allowed_values,
                                        self.allowed_values)))
-        elif metadata.get(rose.META_PROP_TYPE) == "python_boolean":
+        elif metadata.get(metomi.rose.META_PROP_TYPE) == "python_boolean":
             # python_boolean -> True/False
-            self.allowed_values = [rose.TYPE_PYTHON_BOOLEAN_VALUE_FALSE,
-                                   rose.TYPE_PYTHON_BOOLEAN_VALUE_TRUE]
+            self.allowed_values = [metomi.rose.TYPE_PYTHON_BOOLEAN_VALUE_FALSE,
+                                   metomi.rose.TYPE_PYTHON_BOOLEAN_VALUE_TRUE]
             self.label_dict = dict(list(zip(self.allowed_values,
                                        self.allowed_values)))
         else:
             # logical -> .true./.false.
-            self.allowed_values = [rose.TYPE_LOGICAL_VALUE_FALSE,
-                                   rose.TYPE_LOGICAL_VALUE_TRUE]
+            self.allowed_values = [metomi.rose.TYPE_LOGICAL_VALUE_FALSE,
+                                   metomi.rose.TYPE_LOGICAL_VALUE_TRUE]
             self.label_dict = {
-                rose.TYPE_LOGICAL_VALUE_FALSE:
-                rose.TYPE_LOGICAL_FALSE_TITLE,
-                rose.TYPE_LOGICAL_VALUE_TRUE:
-                rose.TYPE_LOGICAL_TRUE_TITLE}
+                metomi.rose.TYPE_LOGICAL_VALUE_FALSE:
+                metomi.rose.TYPE_LOGICAL_FALSE_TITLE,
+                metomi.rose.TYPE_LOGICAL_VALUE_TRUE:
+                metomi.rose.TYPE_LOGICAL_TRUE_TITLE}
 
         imgs = [(Gtk.STOCK_MEDIA_STOP, Gtk.IconSize.MENU),
                 (Gtk.STOCK_APPLY, Gtk.IconSize.MENU)]
@@ -134,10 +134,10 @@ class LogicalArrayValueWidget(Gtk.HBox):
         bad_img = Gtk.Image.new_from_stock(Gtk.STOCK_DIALOG_WARNING,
                                            Gtk.IconSize.MENU)
         button = Gtk.ToggleButton()
-        button.options = [rose.TYPE_LOGICAL_VALUE_FALSE,
-                          rose.TYPE_LOGICAL_VALUE_TRUE]
-        button.labels = [rose.TYPE_LOGICAL_FALSE_TITLE,
-                         rose.TYPE_LOGICAL_TRUE_TITLE]
+        button.options = [metomi.rose.TYPE_LOGICAL_VALUE_FALSE,
+                          metomi.rose.TYPE_LOGICAL_VALUE_TRUE]
+        button.labels = [metomi.rose.TYPE_LOGICAL_FALSE_TITLE,
+                         metomi.rose.TYPE_LOGICAL_TRUE_TITLE]
         button.set_tooltip_text(value_item)
         if value_item in self.allowed_values:
             index = self.allowed_values.index(value_item)
@@ -251,8 +251,8 @@ class LogicalArrayValueWidget(Gtk.HBox):
             if value is None:
                 value = ''
             val_array.append(value)
-        new_val = rose.variable.array_join(val_array)
+        new_val = metomi.rose.variable.array_join(val_array)
         self.value = new_val
         self.set_value(new_val)
-        self.value_array = rose.variable.array_split(self.value)
+        self.value_array = metomi.rose.variable.array_split(self.value)
         return False

@@ -20,12 +20,8 @@
 
 import re
 
-import rose
-from . import array.entry
-from . import array.mixed
-from . import array.logical
-from . import array.python_list
-from . import array.spaced_list
+import metomi.rose
+from . import array
 from . import booltoggle
 from . import character
 from . import combobox
@@ -70,7 +66,7 @@ class ValueWidgetHook(object):
 def chooser(value, metadata, error):
     """Select an appropriate widget class based on the arguments.
 
-    Note: metomi.rose.edit overrides this logic if a widget is hard coded.
+    Note: rose edit overrides this logic if a widget is hard coded.
 
     """
     m_type = metadata.get(metomi.rose.META_PROP_TYPE)

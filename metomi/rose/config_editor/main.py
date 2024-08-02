@@ -54,7 +54,7 @@ warnings.filterwarnings('ignore',
 
 import gi
 gi.require_version('Gtk', '3.0')
-import gtk  # Only used to run the main gtk loop.
+from gi.repository import Gtk
 
 import metomi.rose.config
 import metomi.rose.config_editor
@@ -352,7 +352,7 @@ class MainController(object):
                 (metomi.rose.config_editor.TOOLBAR_VIEW_OUTPUT,
                  'Gtk.STOCK_DIRECTORY'),
                 (metomi.rose.config_editor.TOOLBAR_SUITE_GCONTROL,
-                 'metomi.rose.gtk-scheduler')
+                 'rose-gtk-scheduler')
             ],
             sep_on_name=[
                 metomi.rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
@@ -1146,7 +1146,7 @@ class MainController(object):
             self.data.load_top_config(dirname)
             self.data.saved_config_names = set(self.data.config.keys())
             self.mainwindow.window.set_title(self.data.top_level_name +
-                                             ' - metomi.rose.config-editor')
+                                             ' - rose-config-editor')
             self.updater.update_all()
             self.updater.perform_startup_check()
         else:
@@ -1850,9 +1850,9 @@ def spawn_window(config_directory_path=None, debug_mode=False,
         warnings.filterwarnings('ignore')
     resourcer = metomi.rose.resource.ResourceLocator.default()
     metomi.rose.gtk.util.rc_setup(
-        resourcer.locate('metomi.rose.config-edit/.gtkrc-2.0'))
+        resourcer.locate('rose-config-edit/.gtkrc-2.0'))
     metomi.rose.gtk.util.setup_stock_icons()
-    logo = resourcer.locate('images/metomi.rose.splash-logo.png')
+    logo = resourcer.locate('images/rose-splash-logo.png')
     if metomi.rose.config_editor.ICON_PATH_SCHEDULER is None:
         gcontrol_icon = None
     else:
@@ -1953,18 +1953,18 @@ def get_number_of_configs(config_directory_path=None):
 
 def main():
     """Launch from the command line."""
-    if (Gtk.pygtk_version[0] < metomi.rose.config_editor.MIN_PYGTK_VERSION[0] or
-            Gtk.pygtk_version[1] < metomi.rose.config_editor.MIN_PYGTK_VERSION[1]):
-        this_version = '{0}.{1}.{2}'.format(*Gtk.pygtk_version)
-        required_version = '{0}.{1}.{2}'.format(
-            *metomi.rose.config_editor.MIN_PYGTK_VERSION)
-        metomi.rose.gtk.dialog.run_dialog(
-            metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
-            metomi.rose.config_editor.ERROR_MIN_PYGTK_VERSION.format(
-                required_version, this_version),
-            metomi.rose.config_editor.ERROR_MIN_PYGTK_VERSION_TITLE
-        )
-        sys.exit(1)
+    # if (Gtk.pygtk_version[0] < metomi.rose.config_editor.MIN_PYGTK_VERSION[0] or
+    #         Gtk.pygtk_version[1] < metomi.rose.config_editor.MIN_PYGTK_VERSION[1]):
+    #     this_version = '{0}.{1}.{2}'.format(*Gtk.pygtk_version)
+    #     required_version = '{0}.{1}.{2}'.format(
+    #         *metomi.rose.config_editor.MIN_PYGTK_VERSION)
+    #     metomi.rose.gtk.dialog.run_dialog(
+    #         metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
+    #         metomi.rose.config_editor.ERROR_MIN_PYGTK_VERSION.format(
+    #             required_version, this_version),
+    #         metomi.rose.config_editor.ERROR_MIN_PYGTK_VERSION_TITLE
+    #     )
+    #     sys.exit(1)
     sys.path.append(os.getenv('ROSE_HOME'))
     opt_parser = metomi.rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("conf_dir", "meta_path", "new_mode",

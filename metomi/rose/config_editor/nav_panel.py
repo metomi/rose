@@ -23,7 +23,7 @@ import sys
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk, GdkPixbuf
 from gi.repository import GObject
 
 import metomi.rose.config
@@ -93,7 +93,7 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
                                         str, str, int, int, int, int,
                                         bool, str, str, str)
         resource_loc = metomi.rose.resource.ResourceLocator(paths=sys.path)
-        image_path = resource_loc.locate('etc/images/metomi.rose.config-edit')
+        image_path = resource_loc.locate('etc/images/rose-config-edit')
         self.null_icon = GdkPixbuf.Pixbuf.new_from_file(image_path +
                                                       '/null_icon.xpm')
         self.changed_icon = GdkPixbuf.Pixbuf.new_from_file(image_path +

@@ -874,7 +874,7 @@ class ConfigDataManager(object):
         state.
 
         'Doc table' in the comments refers to
-        doc/metomi.rose.configuration-metadata.html#appendix-ignored-config-edit
+        doc/rose-configuration-metadata.html#appendix-ignored-config-edit
 
         """
         self.trigger[config_name] = metomi.rose.macros.trigger.TriggerMacro()

@@ -26,16 +26,16 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from . import entry
-import rose.gtk.util
-import rose.variable
+import metomi.rose.gtk.util
+import metomi.rose.variable
 
 
 class RowArrayValueWidget(Gtk.HBox):
 
     """This is a class to represent a value as part of a row."""
 
-    BAD_COLOUR = rose.gtk.util.color_parse(
-        rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
+    BAD_COLOUR = metomi.rose.gtk.util.color_parse(
+        metomi.rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
     CHECK_NAME_IS_ELEMENT = re.compile(r'.*\(\d+\)$').match
     TIP_ADD = 'Add array element'
     TIP_DELETE = 'Remove last array element'
@@ -49,14 +49,14 @@ class RowArrayValueWidget(Gtk.HBox):
         self.metadata = metadata
         self.set_value = set_value
         self.hook = hook
-        self.value_array = rose.variable.array_split(value)
+        self.value_array = metomi.rose.variable.array_split(value)
         self.extra_array = []  # For new rows
         self.element_values = []
         self.rows = []
         self.widgets = []
         self.has_length_error = False
-        self.length = metadata.get(rose.META_PROP_LENGTH)
-        self.type = metadata.get(rose.META_PROP_TYPE, "raw")
+        self.length = metadata.get(metomi.rose.META_PROP_LENGTH)
+        self.type = metadata.get(metomi.rose.META_PROP_TYPE, "raw")
         self.num_cols = len(self.value_array)
         if arg_str is None:
             if isinstance(self.type, list):
@@ -69,7 +69,7 @@ class RowArrayValueWidget(Gtk.HBox):
         if self.unlimited:
             self.array_length = 1
         else:
-            self.array_length = metadata.get(rose.META_PROP_LENGTH, 1)
+            self.array_length = metadata.get(metomi.rose.META_PROP_LENGTH, 1)
         log_imgs = [(Gtk.STOCK_MEDIA_STOP, Gtk.IconSize.MENU),
                     (Gtk.STOCK_APPLY, Gtk.IconSize.MENU),
                     (Gtk.STOCK_DIALOG_WARNING, Gtk.IconSize.MENU)]
@@ -140,10 +140,10 @@ class RowArrayValueWidget(Gtk.HBox):
 
     def add_element(self, *args):
         """Create a new element (non-derived types)."""
-        w_value = rose.variable.get_value_from_metadata(
-            {rose.META_PROP_TYPE: self.type})
+        w_value = metomi.rose.variable.get_value_from_metadata(
+            {metomi.rose.META_PROP_TYPE: self.type})
         self.value_array = self.value_array + [w_value]
-        self.value = rose.variable.array_join(self.value_array)
+        self.value = metomi.rose.variable.array_join(self.value_array)
         self.set_value(self.value)
         for child in self.entry_table.get_children():
             self.entry_table.remove(child)
@@ -160,7 +160,7 @@ class RowArrayValueWidget(Gtk.HBox):
         new_values = self.insert_row(nrows + 1)
         if any(new_values):
             self.value_array = self.value_array + new_values
-            self.value = rose.variable.array_join(self.value_array)
+            self.value = metomi.rose.variable.array_join(self.value_array)
             self.set_value(self.value)
             self.set_num_rows()
         self.normalise_width_widgets()
@@ -199,7 +199,7 @@ class RowArrayValueWidget(Gtk.HBox):
         """Set the focus and position within the table."""
         if focus_index is None:
             return
-        value_array = rose.variable.array_split(self.value)
+        value_array = metomi.rose.variable.array_split(self.value)
         text = ''
         widgets = []
         for widget_list in self.rows:
@@ -225,7 +225,7 @@ class RowArrayValueWidget(Gtk.HBox):
     def del_element(self, *args):
         """Create a new element (non-derived types)."""
         self.value_array.pop()
-        self.value = rose.variable.array_join(self.value_array)
+        self.value = metomi.rose.variable.array_join(self.value_array)
         self.set_value(self.value)
         for child in self.entry_table.get_children():
             self.entry_table.remove(child)
@@ -247,7 +247,7 @@ class RowArrayValueWidget(Gtk.HBox):
 
         chop_index = len(self.value_array) - len(self.get_types())
         self.value_array = self.value_array[:chop_index]
-        self.value = rose.variable.array_join(self.value_array)
+        self.value = metomi.rose.variable.array_join(self.value_array)
         self.set_value(self.value)
         self.set_num_rows()
         self.normalise_width_widgets()
@@ -303,8 +303,8 @@ class RowArrayValueWidget(Gtk.HBox):
             while value_index > len(self.value_array) - 1:
                 value_index -= actual_num_cols
             if value_index < 0:
-                w_value = rose.variable.get_value_from_metadata(
-                    {rose.META_PROP_TYPE: el_piece_type})
+                w_value = metomi.rose.variable.get_value_from_metadata(
+                    {metomi.rose.META_PROP_TYPE: el_piece_type})
             else:
                 w_value = self.value_array[value_index]
             new_values.append(w_value)
@@ -317,9 +317,9 @@ class RowArrayValueWidget(Gtk.HBox):
                     if w_value != '':
                         hover_text = self.TIP_INVALID_ENTRY.format(
                             el_piece_type)
-                        w_error = {rose.META_PROP_TYPE: hover_text}
-            w_meta = {rose.META_PROP_TYPE: el_piece_type}
-            widget_cls = rose.config_editor.valuewidget.chooser(
+                        w_error = {metomi.rose.META_PROP_TYPE: hover_text}
+            w_meta = {metomi.rose.META_PROP_TYPE: el_piece_type}
+            widget_cls = metomi.rose.config_editor.valuewidget.chooser(
                 w_value, w_meta, w_error)
             hook = self.hook
             setter = ArrayElementSetter(self.setter, unwrapped_index)
@@ -451,7 +451,7 @@ class RowArrayValueWidget(Gtk.HBox):
             self.extra_array = self.extra_array[ok_index:]
         else:
             self.value_array[array_index] = element_value
-        new_val = rose.variable.array_join(self.value_array)
+        new_val = metomi.rose.variable.array_join(self.value_array)
         if new_val != self.value:
             self.value = new_val
             self.set_value(new_val)

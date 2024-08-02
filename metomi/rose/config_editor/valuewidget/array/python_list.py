@@ -25,9 +25,9 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from . import entry
-import rose.config_editor.util
-import rose.gtk.util
-import rose.variable
+import metomi.rose.config_editor.util
+import metomi.rose.gtk.util
+import metomi.rose.variable
 
 
 class PythonListValueWidget(Gtk.HBox):
@@ -339,8 +339,8 @@ class PythonListValueWidget(Gtk.HBox):
         self.entries.append(widget)
         self._adjust_entry_length()
         self.populate_table(focus_widget=widget)
-        if (self.metadata.get(rose.META_PROP_COMPULSORY) !=
-                rose.META_PROP_VALUE_TRUE):
+        if (self.metadata.get(metomi.rose.META_PROP_COMPULSORY) !=
+                metomi.rose.META_PROP_VALUE_TRUE):
             self.setter(widget)
 
     def remove_entry(self):
@@ -355,8 +355,8 @@ class PythonListValueWidget(Gtk.HBox):
             text = self.entries[-1].get_text()
             widget = self.entries.pop()
         self.populate_table()
-        if (self.metadata.get(rose.META_PROP_COMPULSORY) !=
-                rose.META_PROP_VALUE_TRUE or text):
+        if (self.metadata.get(metomi.rose.META_PROP_COMPULSORY) !=
+                metomi.rose.META_PROP_VALUE_TRUE or text):
             # Optional, or compulsory but not blank.
             self.setter(widget)
 
@@ -443,7 +443,7 @@ def python_array_split(value):
         value_array = ast.literal_eval(value)
     except (SyntaxError, ValueError):
         value_no_brackets = value.lstrip("[").rstrip("]")
-        value_array = rose.variable.array_split(value_no_brackets)
+        value_array = metomi.rose.variable.array_split(value_no_brackets)
         return value_array
     cast_value_array = []
     for value in value_array:

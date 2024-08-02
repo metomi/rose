@@ -21,7 +21,7 @@
 from gi.repository import Pango
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 
 import metomi.rose.config
 import metomi.rose.config_editor
