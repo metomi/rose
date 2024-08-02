@@ -53,7 +53,7 @@ class BaseStashSummaryDataPanelv1(
     information.
 
     Subclasses *must* override the STASH_PACKAGE_PATH attribute with an
-    absolute path to a directory containing a metomi.rose.app.conf file with
+    absolute path to a directory containing a rose-app.conf file with
     STASH request package information.
 
     Subclasses should override the STASHMASTER_PATH attribute with an

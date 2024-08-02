@@ -23,14 +23,14 @@ This module contains constants that are only used in the config editor.
 
 To override constants at runtime, place a section:
 
-[metomi.rose.config-edit]
+[rose-config-edit]
 
 in your site or user configuration file for Rose, convert the name
 of the constants to lowercase, and place constant=value lines in the
 section. For example, to override the "ACCEL_HELP_GUI" constant, you
 could put the following in your site or user configuration:
 
-[metomi.rose.config-edit]
+[rose-config-edit]
 accel_help_gui="<Ctrl>H"
 
 The values you enter will be cast by Python's ast.literal_eval, so:
@@ -47,8 +47,8 @@ sed -n '/^# User-relevant: /,/^$/p' __init__.py | \
 's/^# \(.*\)\n\(^[^#].*\) = \(.*\)/'\
 '\<h4 id="\L\2"\>\2\E=\3\<\/h4\>\<p\>\1\<\/p\>\n/p;' | sort
 
-Use this text to update the doc/etc/metomi.rose.rug-config-edit/metomi.rose.conf.html
-text, remembering to add the [metomi.rose.config-edit] section.
+Use this text to update the doc/etc/rose-rug-config-edit/metomi.rose.conf.html
+text, remembering to add the [rose-config-edit] section.
 
 """
 
@@ -276,7 +276,7 @@ ERROR_METADATA_CHECKER_TITLE = "Flawed metadata warning"
 ERROR_METADATA_CHECKER_TEXT = (
     "{0} problem(s) found in metadata at {1}.\n" +
     "Some functionality has been switched off.\n\n" +
-    "Run metomi.rose.metadata-check for more info.")
+    "Run rose metadata-check for more info.")
 ERROR_MIN_PYGTK_VERSION = "Requires PyGTK version {0}, found {1}."
 ERROR_MIN_PYGTK_VERSION_TITLE = "Need later PyGTK version to run"
 ERROR_NO_OUTPUT = "No output found for {0}"
@@ -534,7 +534,7 @@ DIALOG_LABEL_PREFERENCES = ("Please edit your site and user " +
 DIALOG_LABEL_UPGRADE = (
     "Click Upgrade Version cells to change target versions.")
 DIALOG_LABEL_UPGRADE_ALL = "Populate all possible versions"
-DIALOG_TIP_SUITE_RUN_HELP = "Read the help for metomi.rose.suite-run"
+DIALOG_TIP_SUITE_RUN_HELP = "Read the help for rose suite-run"
 DIALOG_TEXT_MACRO_CHANGED = "changed"
 DIALOG_TEXT_MACRO_ERROR = "error"
 DIALOG_TEXT_MACRO_WARNING = "warning"
@@ -553,7 +553,7 @@ DIALOG_TITLE_CRITICAL_ERROR = "Error"
 DIALOG_TITLE_EDIT_COMMENTS = "Edit comments for {0}"
 DIALOG_TITLE_ENABLE = "Enable section"
 DIALOG_TITLE_ERROR = "Error"
-DIALOG_TITLE_GRAPH = "metomi.rose.metadata-graph"
+DIALOG_TITLE_GRAPH = "rose metadata-graph"
 DIALOG_TITLE_IGNORE = "Ignore section"
 DIALOG_TITLE_INFO = "Information"
 DIALOG_TITLE_OPEN = "Open configuration"
@@ -705,22 +705,22 @@ FLAG_TYPE_OPTIONAL = "Optional flag"
 
 # Relevant metadata properties
 
-META_PROP_WIDGET = "widget[metomi.rose.config-edit]"
-META_PROP_WIDGET_SUB_NS = "widget[metomi.rose.config-edit:sub-ns]"
+META_PROP_WIDGET = "widget[rose-config-edit]"
+META_PROP_WIDGET_SUB_NS = "widget[rose-config-edit:sub-ns]"
 
 # Miscellaneous
 COPYRIGHT = (
     "Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.")
-HELP_FILE = "metomi.rose.rug-config-edit.html"
-LAUNCH_COMMAND = "metomi.rose.config-edit"
-LAUNCH_COMMAND_CONFIG = "metomi.rose.config-edit -C"
-LAUNCH_COMMAND_GRAPH = "metomi.rose.metadata-graph -C"
-LAUNCH_SUITE_RUN = "metomi.rose.suite-run"
-LAUNCH_SUITE_RUN_HELP = "metomi.rose.help suite-run"
+HELP_FILE = "rose-rug-config-edit.html"
+LAUNCH_COMMAND = "rose config-edit"
+LAUNCH_COMMAND_CONFIG = "rose config-edit -C"
+LAUNCH_COMMAND_GRAPH = "rose metadata-graph -C"
+LAUNCH_SUITE_RUN = "rose suite-run"
+LAUNCH_SUITE_RUN_HELP = "rose help suite-run"
 MAX_APPS_THRESHOLD = 10
 MIN_PYGTK_VERSION = (2, 12, 0)
-PROGRAM_NAME = "metomi.rose.edit"
-PROJECT_URL = "http://github.com/metomi/metomi.rose."
+PROGRAM_NAME = "rose edit"
+PROJECT_URL = "http://github.com/metomi/rose/"
 UNTITLED_NAME = "Untitled"
 VAR_ID_IN_CONFIG = "Variable id {0} from the configuration {1}"
 
@@ -767,4 +767,4 @@ def load_override_config(sections, my_globals=None):
             my_globals[name] = cast_value
 
 
-load_override_config(["metomi.rose.config-edit"])
+load_override_config(["rose-config-edit"])

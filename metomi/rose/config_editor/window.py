@@ -149,7 +149,7 @@ class MainWindow(object):
         metomi.rose.gtk.dialog.run_about_dialog(
             name=metomi.rose.config_editor.PROGRAM_NAME,
             copyright_=metomi.rose.config_editor.COPYRIGHT,
-            logo_path="etc/images/metomi.rose.logo.png",
+            logo_path="etc/images/rose-logo.png",
             website=metomi.rose.config_editor.PROJECT_URL)
 
     def _reload_choices(self, liststore, top_name, add_choices):
@@ -262,7 +262,7 @@ class MainWindow(object):
     def launch_help_dialog(self, somewidget=None):
         """Launch a browser to open the help url."""
         webbrowser.open(
-            'https://metomi.github.io/metomi.rose.doc/html/index.html',
+            'https://metomi.github.io/rose/doc/html/index.html',
             new=True,
             autoraise=True
         )

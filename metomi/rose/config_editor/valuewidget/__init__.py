@@ -70,7 +70,7 @@ class ValueWidgetHook(object):
 def chooser(value, metadata, error):
     """Select an appropriate widget class based on the arguments.
 
-    Note: metomi.rose.edit overrides this logic if a widget is hard coded.
+    Note: rose edit overrides this logic if a widget is hard coded.
 
     """
     m_type = metadata.get(metomi.rose.META_PROP_TYPE)

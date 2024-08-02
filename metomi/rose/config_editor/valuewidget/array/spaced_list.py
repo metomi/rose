@@ -24,9 +24,9 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config_editor.util
-import rose.gtk.util
-import rose.variable
+import metomi.rose.config_editor.util
+import metomi.rose.gtk.util
+import metomi.rose.variable
 
 
 class SpacedListValueWidget(Gtk.HBox):
@@ -334,8 +334,8 @@ class SpacedListValueWidget(Gtk.HBox):
         self.entries.append(entry)
         self._adjust_entry_length()
         self.populate_table(focus_widget=entry)
-        if (self.metadata.get(rose.META_PROP_COMPULSORY) !=
-                rose.META_PROP_VALUE_TRUE):
+        if (self.metadata.get(metomi.rose.META_PROP_COMPULSORY) !=
+                metomi.rose.META_PROP_VALUE_TRUE):
             self.setter(entry)
 
     def remove_entry(self):
@@ -350,8 +350,8 @@ class SpacedListValueWidget(Gtk.HBox):
             text = self.entries[-1].get_text()
             entry = self.entries.pop()
         self.populate_table()
-        if (self.metadata.get(rose.META_PROP_COMPULSORY) !=
-                rose.META_PROP_VALUE_TRUE or text):
+        if (self.metadata.get(metomi.rose.META_PROP_COMPULSORY) !=
+                metomi.rose.META_PROP_VALUE_TRUE or text):
             # Optional, or compulsory but not blank.
             self.setter(entry)
 
@@ -446,5 +446,5 @@ def spaced_array_split(value):
     try:
         value_array = shlex.split(value)
     except (SyntaxError, ValueError):
-        value_array = rose.variable.array_split(value)
+        value_array = metomi.rose.variable.array_split(value)
     return value_array

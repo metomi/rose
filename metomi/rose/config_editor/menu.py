@@ -219,7 +219,7 @@ class MenuBar(object):
          metomi.rose.config_editor.ACCEL_TERMINAL),
         ('View Output', Gtk.STOCK_DIRECTORY,
          metomi.rose.config_editor.TOP_MENU_TOOLS_VIEW_OUTPUT),
-        ('Open Suite GControl', "metomi.rose.gtk-scheduler",
+        ('Open Suite GControl', "rose-gtk-scheduler",
          metomi.rose.config_editor.TOP_MENU_TOOLS_OPEN_SUITE_GCONTROL),
         ('Help', None,
          metomi.rose.config_editor.TOP_MENU_HELP),
@@ -338,10 +338,10 @@ class MenuBar(object):
         config_item.get_submenu().append(macro_item)
         if (methodname == metomi.rose.macro.VALIDATE_METHOD):
             for item in config_item.get_submenu().get_children():
-                if hasattr(item, "_metomi.rose.all_validators"):
+                if hasattr(item, "_rose_all_validators"):
                     return False
             all_item = Gtk.ImageMenuItem(Gtk.STOCK_DIALOG_QUESTION)
-            all_item._metomi.rose.all_validators = True
+            all_item._rose_all_validators = True
             all_item.set_label(metomi.rose.config_editor.MACRO_MENU_ALL_VALIDATORS)
             all_item.set_tooltip_text(
                 metomi.rose.config_editor.MACRO_MENU_ALL_VALIDATORS_TIP)

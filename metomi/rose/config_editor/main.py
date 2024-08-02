@@ -352,7 +352,7 @@ class MainController(object):
                 (metomi.rose.config_editor.TOOLBAR_VIEW_OUTPUT,
                  'Gtk.STOCK_DIRECTORY'),
                 (metomi.rose.config_editor.TOOLBAR_SUITE_GCONTROL,
-                 'metomi.rose.gtk-scheduler')
+                 'rose-gtk-scheduler')
             ],
             sep_on_name=[
                 metomi.rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
@@ -1146,7 +1146,7 @@ class MainController(object):
             self.data.load_top_config(dirname)
             self.data.saved_config_names = set(self.data.config.keys())
             self.mainwindow.window.set_title(self.data.top_level_name +
-                                             ' - metomi.rose.config-editor')
+                                             ' - rose-config-editor')
             self.updater.update_all()
             self.updater.perform_startup_check()
         else:
@@ -1850,9 +1850,9 @@ def spawn_window(config_directory_path=None, debug_mode=False,
         warnings.filterwarnings('ignore')
     resourcer = metomi.rose.resource.ResourceLocator.default()
     metomi.rose.gtk.util.rc_setup(
-        resourcer.locate('metomi.rose.config-edit/.gtkrc-2.0'))
+        resourcer.locate('rose-config-edit/.gtkrc-2.0'))
     metomi.rose.gtk.util.setup_stock_icons()
-    logo = resourcer.locate('images/metomi.rose.splash-logo.png')
+    logo = resourcer.locate('images/rose-splash-logo.png')
     if metomi.rose.config_editor.ICON_PATH_SCHEDULER is None:
         gcontrol_icon = None
     else:

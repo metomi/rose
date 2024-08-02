@@ -22,7 +22,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from metomi.rose.import META_PROP_TYPE
+from rose import META_PROP_TYPE
 import metomi.rose.config_editor.util
 
 

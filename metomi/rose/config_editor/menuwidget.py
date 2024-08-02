@@ -32,12 +32,12 @@ class MenuWidget(Gtk.HBox):
 
     """This class generates a button with a menu for variable actions."""
 
-    MENU_ICON_ERRORS = 'metomi.rose.gtk-gnome-package-system-errors'
-    MENU_ICON_WARNINGS = 'metomi.rose.gtk-gnome-package-system-warnings'
-    MENU_ICON_LATENT = 'metomi.rose.gtk-gnome-add'
-    MENU_ICON_LATENT_ERRORS = 'metomi.rose.gtk-gnome-add-errors'
-    MENU_ICON_LATENT_WARNINGS = 'metomi.rose.gtk-gnome-add-warnings'
-    MENU_ICON_NORMAL = 'metomi.rose.gtk-gnome-package-system-normal'
+    MENU_ICON_ERRORS = 'rose-gtk-gnome-package-system-errors'
+    MENU_ICON_WARNINGS = 'rose-gtk-gnome-package-system-warnings'
+    MENU_ICON_LATENT = 'rose-gtk-gnome-add'
+    MENU_ICON_LATENT_ERRORS = 'rose-gtk-gnome-add-errors'
+    MENU_ICON_LATENT_WARNINGS = 'rose-gtk-gnome-add-warnings'
+    MENU_ICON_NORMAL = 'rose-gtk-gnome-package-system-normal'
 
     def __init__(self, variable, var_ops, remove_func, update_func,
                  launch_help_func):
@@ -63,7 +63,7 @@ class MenuWidget(Gtk.HBox):
                            <separator name='sepRemove'/>
                            <menuitem action='Remove'/>
                            </popup> </ui>"""
-        actions = [('Options', 'metomi.rose.gtk-gnome-package-system', ''),
+        actions = [('Options', 'rose-gtk-gnome-package-system', ''),
                    ('Info', Gtk.STOCK_INFO,
                     metomi.rose.config_editor.VAR_MENU_INFO),
                    ('Help', Gtk.STOCK_HELP,
@@ -82,7 +82,7 @@ class MenuWidget(Gtk.HBox):
                     metomi.rose.config_editor.VAR_MENU_REMOVE),
                    ('Add', Gtk.STOCK_ADD,
                     metomi.rose.config_editor.VAR_MENU_ADD)]
-        menu_icon_id = 'metomi.rose.gtk-gnome-package-system'
+        menu_icon_id = 'rose-gtk-gnome-package-system'
         is_comp = (self.my_variable.metadata.get(metomi.rose.META_PROP_COMPULSORY) ==
                    metomi.rose.META_PROP_VALUE_TRUE)
         if self.is_ghost or is_comp:
