@@ -29,9 +29,9 @@ import copy
 import gi
 gi.require_version('Gtk', '3.0')
 
-import rose.config_editor.stack
-import rose.gtk.dialog
-import rose.gtk.util
+import metomi.rose.config_editor.stack
+import metomi.rose.gtk.dialog
+import metomi.rose.gtk.util
 
 
 class SectionOperations(object):
@@ -39,15 +39,15 @@ class SectionOperations(object):
     """A class to hold functions that act on sections and their storage."""
 
     def __init__(self, data, util, reporter, undo_stack, redo_stack,
-                 check_cannot_enable_func=rose.config_editor.false_function,
-                 update_ns_func=rose.config_editor.false_function,
-                 update_sub_data_func=rose.config_editor.false_function,
-                 update_info_func=rose.config_editor.false_function,
-                 update_comments_func=rose.config_editor.false_function,
-                 update_tree_func=rose.config_editor.false_function,
-                 search_id_func=rose.config_editor.false_function,
-                 view_page_func=rose.config_editor.false_function,
-                 kill_page_func=rose.config_editor.false_function):
+                 check_cannot_enable_func=metomi.rose.config_editor.false_function,
+                 update_ns_func=metomi.rose.config_editor.false_function,
+                 update_sub_data_func=metomi.rose.config_editor.false_function,
+                 update_info_func=metomi.rose.config_editor.false_function,
+                 update_comments_func=metomi.rose.config_editor.false_function,
+                 update_tree_func=metomi.rose.config_editor.false_function,
+                 search_id_func=metomi.rose.config_editor.false_function,
+                 view_page_func=metomi.rose.config_editor.false_function,
+                 kill_page_func=metomi.rose.config_editor.false_function):
         self.__data = data
         self.__util = util
         self.__reporter = reporter
@@ -69,10 +69,10 @@ class SectionOperations(object):
         config_data = self.__data.config[config_name]
         new_section_data = None
         if not section or section in config_data.sections.now:
-            rose.gtk.dialog.run_dialog(
-                rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                rose.config_editor.ERROR_SECTION_ADD.format(section),
-                title=rose.config_editor.ERROR_SECTION_ADD_TITLE,
+            metomi.rose.gtk.dialog.run_dialog(
+                metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                metomi.rose.config_editor.ERROR_SECTION_ADD.format(section),
+                title=metomi.rose.config_editor.ERROR_SECTION_ADD_TITLE,
                 modal=False)
             return
         if section in config_data.sections.latent:
@@ -80,7 +80,7 @@ class SectionOperations(object):
         else:
             metadata = self.__data.helper.get_metadata_for_config_id(
                 section, config_name)
-            new_section_data = rose.section.Section(section, [], metadata)
+            new_section_data = metomi.rose.section.Section(section, [], metadata)
         if comments is not None:
             new_section_data.comments = copy.deepcopy(comments)
         if ignored_reason is not None:
@@ -100,13 +100,13 @@ class SectionOperations(object):
         ns = new_section_data.metadata["full_ns"]
         if not skip_update:
             self.trigger_reload_tree(ns)
-        if rose.META_PROP_DUPLICATE in metadata:
+        if metomi.rose.META_PROP_DUPLICATE in metadata:
             self.__data.load_namespace_has_sub_data(config_name)
         if not skip_undo:
             copy_section_data = new_section_data.copy()
-            stack_item = rose.config_editor.stack.StackItem(
+            stack_item = metomi.rose.config_editor.stack.StackItem(
                 ns,
-                rose.config_editor.STACK_ACTION_ADDED,
+                metomi.rose.config_editor.STACK_ACTION_ADDED,
                 copy_section_data,
                 self.remove_section,
                 (config_name, section, skip_update))
@@ -136,53 +136,53 @@ class SectionOperations(object):
             # The section must be enabled and optional.
             if (not override and (
                     sect_data.ignored_reason or
-                    sect_data.metadata.get(rose.META_PROP_COMPULSORY) ==
-                    rose.META_PROP_VALUE_TRUE)):
-                rose.gtk.dialog.run_dialog(
-                    rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                    rose.config_editor.WARNING_CANNOT_USER_IGNORE.format(
+                    sect_data.metadata.get(metomi.rose.META_PROP_COMPULSORY) ==
+                    metomi.rose.META_PROP_VALUE_TRUE)):
+                metomi.rose.gtk.dialog.run_dialog(
+                    metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                    metomi.rose.config_editor.WARNING_CANNOT_USER_IGNORE.format(
                         section),
-                    rose.config_editor.WARNING_CANNOT_IGNORE_TITLE)
+                    metomi.rose.config_editor.WARNING_CANNOT_IGNORE_TITLE)
                 return [], []
-            for error in [rose.config_editor.WARNING_TYPE_USER_IGNORED,
-                          rose.config_editor.WARNING_TYPE_ENABLED]:
+            for error in [metomi.rose.config_editor.WARNING_TYPE_USER_IGNORED,
+                          metomi.rose.config_editor.WARNING_TYPE_ENABLED]:
                 if error in sect_data.error:
                     sect_data.ignored_reason.update({
-                        rose.variable.IGNORED_BY_SYSTEM:
-                        rose.config_editor.IGNORED_STATUS_MANUAL})
+                        metomi.rose.variable.IGNORED_BY_SYSTEM:
+                        metomi.rose.config_editor.IGNORED_STATUS_MANUAL})
                     sect_data.error.pop(error)
                     break
             else:
                 sect_data.ignored_reason.update({
-                    rose.variable.IGNORED_BY_USER:
-                    rose.config_editor.IGNORED_STATUS_MANUAL})
-            action = rose.config_editor.STACK_ACTION_IGNORED
+                    metomi.rose.variable.IGNORED_BY_USER:
+                    metomi.rose.config_editor.IGNORED_STATUS_MANUAL})
+            action = metomi.rose.config_editor.STACK_ACTION_IGNORED
         else:
             # Enable request for this section.
             # The section must not be justifiably triggered ignored.
-            ign_errors = [e for e in rose.config_editor.WARNING_TYPES_IGNORE
-                          if e != rose.config_editor.WARNING_TYPE_ENABLED]
+            ign_errors = [e for e in metomi.rose.config_editor.WARNING_TYPES_IGNORE
+                          if e != metomi.rose.config_editor.WARNING_TYPE_ENABLED]
             my_errors = list(sect_data.error.keys())
             if (not override and
-                    (rose.variable.IGNORED_BY_SYSTEM in
+                    (metomi.rose.variable.IGNORED_BY_SYSTEM in
                      sect_data.ignored_reason) and
                     all([e not in my_errors for e in ign_errors]) and
                     self.check_cannot_enable_setting(config_name, section)):
-                rose.gtk.dialog.run_dialog(
-                    rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                    rose.config_editor.WARNING_CANNOT_ENABLE.format(section),
-                    rose.config_editor.WARNING_CANNOT_ENABLE_TITLE)
+                metomi.rose.gtk.dialog.run_dialog(
+                    metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                    metomi.rose.config_editor.WARNING_CANNOT_ENABLE.format(section),
+                    metomi.rose.config_editor.WARNING_CANNOT_ENABLE_TITLE)
                 return [], []
             sect_data.ignored_reason.clear()
             for error in ign_errors:
                 if error in my_errors:
                     sect_data.error.pop(error)
-            action = rose.config_editor.STACK_ACTION_ENABLED
+            action = metomi.rose.config_editor.STACK_ACTION_ENABLED
 
         ns = sect_data.metadata["full_ns"]
         copy_sect_data = sect_data.copy()
         if not skip_undo:
-            stack_item = rose.config_editor.stack.StackItem(
+            stack_item = metomi.rose.config_editor.stack.StackItem(
                 ns,
                 action,
                 copy_sect_data,
@@ -199,10 +199,10 @@ class SectionOperations(object):
             ids_to_do.append(var.metadata['id'])
             if is_ignored:
                 var.ignored_reason.update(
-                    {rose.variable.IGNORED_BY_SECTION:
-                     rose.config_editor.IGNORED_STATUS_MANUAL})
-            elif rose.variable.IGNORED_BY_SECTION in var.ignored_reason:
-                var.ignored_reason.pop(rose.variable.IGNORED_BY_SECTION)
+                    {metomi.rose.variable.IGNORED_BY_SECTION:
+                     metomi.rose.config_editor.IGNORED_STATUS_MANUAL})
+            elif metomi.rose.variable.IGNORED_BY_SECTION in var.ignored_reason:
+                var.ignored_reason.pop(metomi.rose.variable.IGNORED_BY_SECTION)
             else:
                 continue
         if skip_update:
@@ -229,9 +229,9 @@ class SectionOperations(object):
                 if ns not in ns_list:
                     ns_list.append(ns)
         if not skip_undo:
-            stack_item = rose.config_editor.stack.StackItem(
+            stack_item = metomi.rose.config_editor.stack.StackItem(
                 namespace,
-                rose.config_editor.STACK_ACTION_REMOVED,
+                metomi.rose.config_editor.STACK_ACTION_REMOVED,
                 old_section_data.copy(),
                 self.add_section,
                 (config_name, section, skip_update)
@@ -254,9 +254,9 @@ class SectionOperations(object):
         sect_data.comments = comments
         if not skip_undo:
             ns = sect_data.metadata["full_ns"]
-            stack_item = rose.config_editor.stack.StackItem(
+            stack_item = metomi.rose.config_editor.stack.StackItem(
                 ns,
-                rose.config_editor.STACK_ACTION_CHANGED_COMMENTS,
+                metomi.rose.config_editor.STACK_ACTION_CHANGED_COMMENTS,
                 old_sect_data,
                 self.set_section_comments,
                 (config_name, section, last_comments)
@@ -295,21 +295,21 @@ class SectionOperations(object):
         save_section = config_data.sections.save.get(section)
         if this_section is None:
             if save_section is not None:
-                return rose.config_editor.KEY_TIP_MISSING
+                return metomi.rose.config_editor.KEY_TIP_MISSING
             # Ignore both-missing scenarios (no actual diff in output).
             return ""
         if save_section is None:
-            return rose.config_editor.KEY_TIP_ADDED
+            return metomi.rose.config_editor.KEY_TIP_ADDED
         if this_section.to_hashable() == save_section.to_hashable():
             return ""
         if this_section.comments != save_section.comments:
-            return rose.config_editor.KEY_TIP_CHANGED_COMMENTS
+            return metomi.rose.config_editor.KEY_TIP_CHANGED_COMMENTS
         # The difference must now be in the ignored state.
-        if rose.variable.IGNORED_BY_SYSTEM in this_section.ignored_reason:
-            return rose.config_editor.KEY_TIP_TRIGGER_IGNORED
-        if rose.variable.IGNORED_BY_USER in this_section.ignored_reason:
-            return rose.config_editor.KEY_TIP_USER_IGNORED
-        return rose.config_editor.KEY_TIP_ENABLED
+        if metomi.rose.variable.IGNORED_BY_SYSTEM in this_section.ignored_reason:
+            return metomi.rose.config_editor.KEY_TIP_TRIGGER_IGNORED
+        if metomi.rose.variable.IGNORED_BY_USER in this_section.ignored_reason:
+            return metomi.rose.config_editor.KEY_TIP_USER_IGNORED
+        return metomi.rose.config_editor.KEY_TIP_ENABLED
 
     def get_ns_metadata_files(self, namespace):
         """Retrieve filenames within the metadata for this namespace."""

@@ -38,24 +38,24 @@ class BoolToggleValueWidget(Gtk.HBox):
         self.hook = hook
         self.allowed_values = []
         self.label_dict = {}
-        if metadata.get(rose.META_PROP_TYPE) == "boolean":
-            self.allowed_values = [rose.TYPE_BOOLEAN_VALUE_FALSE,
-                                   rose.TYPE_BOOLEAN_VALUE_TRUE]
+        if metadata.get(metomi.rose.META_PROP_TYPE) == "boolean":
+            self.allowed_values = [metomi.rose.TYPE_BOOLEAN_VALUE_FALSE,
+                                   metomi.rose.TYPE_BOOLEAN_VALUE_TRUE]
             self.label_dict = dict(list(zip(self.allowed_values,
                                        self.allowed_values)))
-        elif metadata.get(rose.META_PROP_TYPE) == "python_boolean":
-            self.allowed_values = [rose.TYPE_PYTHON_BOOLEAN_VALUE_FALSE,
-                                   rose.TYPE_PYTHON_BOOLEAN_VALUE_TRUE]
+        elif metadata.get(metomi.rose.META_PROP_TYPE) == "python_boolean":
+            self.allowed_values = [metomi.rose.TYPE_PYTHON_BOOLEAN_VALUE_FALSE,
+                                   metomi.rose.TYPE_PYTHON_BOOLEAN_VALUE_TRUE]
             self.label_dict = dict(list(zip(self.allowed_values,
                                        self.allowed_values)))
         else:
-            self.allowed_values = [rose.TYPE_LOGICAL_VALUE_FALSE,
-                                   rose.TYPE_LOGICAL_VALUE_TRUE]
+            self.allowed_values = [metomi.rose.TYPE_LOGICAL_VALUE_FALSE,
+                                   metomi.rose.TYPE_LOGICAL_VALUE_TRUE]
             self.label_dict = {
-                rose.TYPE_LOGICAL_VALUE_FALSE:
-                rose.TYPE_LOGICAL_FALSE_TITLE,
-                rose.TYPE_LOGICAL_VALUE_TRUE:
-                rose.TYPE_LOGICAL_TRUE_TITLE}
+                metomi.rose.TYPE_LOGICAL_VALUE_FALSE:
+                metomi.rose.TYPE_LOGICAL_FALSE_TITLE,
+                metomi.rose.TYPE_LOGICAL_VALUE_TRUE:
+                metomi.rose.TYPE_LOGICAL_TRUE_TITLE}
 
         imgs = [Gtk.Image.new_from_stock(Gtk.STOCK_MEDIA_STOP,
                                          Gtk.IconSize.MENU),

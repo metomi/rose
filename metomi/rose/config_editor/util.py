@@ -30,8 +30,8 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 import rose
-import rose.gtk.dialog
-import rose.gtk.util
+import metomi.rose.gtk.dialog
+import metomi.rose.gtk.util
 
 
 class Lookup(object):
@@ -47,7 +47,7 @@ class Lookup(object):
         if option is None:
             id_ = section
         else:
-            id_ = section + rose.CONFIG_DELIMITER + option
+            id_ = section + metomi.rose.CONFIG_DELIMITER + option
         self.section_option_id_lookup[id_] = (section, option)
         return id_
 
@@ -60,7 +60,7 @@ class Lookup(object):
         """
         if var_id in self.section_option_id_lookup:
             return self.section_option_id_lookup[var_id]
-        split_char = rose.CONFIG_DELIMITER
+        split_char = metomi.rose.CONFIG_DELIMITER
         option_name = var_id.split(split_char)[-1]
         section = var_id.replace(split_char + option_name, '', 1)
         if option_name == section:
@@ -107,9 +107,9 @@ def launch_node_info_dialog(node, changes, search_function):
     title = node.__class__.__name__ + " " + node.metadata['id']
     text = ''
     if changes:
-        text += (rose.config_editor.DIALOG_NODE_INFO_CHANGES.format(changes) +
+        text += (metomi.rose.config_editor.DIALOG_NODE_INFO_CHANGES.format(changes) +
                  "\n")
-    text += rose.config_editor.DIALOG_NODE_INFO_DATA
+    text += metomi.rose.config_editor.DIALOG_NODE_INFO_DATA
     try:
         att_list = list(vars(node).items())
     except TypeError:
@@ -121,15 +121,15 @@ def launch_node_info_dialog(node, changes, search_function):
     metadata_start_index = len(att_list)
     for key, value in sorted(node.metadata.items()):
         att_list.append([key, value])
-    delim = rose.config_editor.DIALOG_NODE_INFO_DELIMITER
-    name = rose.config_editor.DIALOG_NODE_INFO_ATTRIBUTE
-    maxlen = rose.config_editor.DIALOG_NODE_INFO_MAX_LEN
+    delim = metomi.rose.config_editor.DIALOG_NODE_INFO_DELIMITER
+    name = metomi.rose.config_editor.DIALOG_NODE_INFO_ATTRIBUTE
+    maxlen = metomi.rose.config_editor.DIALOG_NODE_INFO_MAX_LEN
     for i, (att_name, att_val) in enumerate(att_list):
         if (att_name == 'metadata' or att_name.startswith("_") or
                 callable(att_val) or att_name == 'old_value'):
             continue
         if i == metadata_start_index:
-            text += "\n" + rose.config_editor.DIALOG_NODE_INFO_METADATA
+            text += "\n" + metomi.rose.config_editor.DIALOG_NODE_INFO_METADATA
         prefix = name.format(att_name) + delim
         indent0 = len(prefix)
         text += prefix
@@ -137,18 +137,18 @@ def launch_node_info_dialog(node, changes, search_function):
         text += _pretty_format_data(att_val, global_indent=indent0,
                                     width=lenval)
         text += "\n"
-    rose.gtk.dialog.run_hyperlink_dialog(Gtk.STOCK_DIALOG_INFO, text, title,
+    metomi.rose.gtk.dialog.run_hyperlink_dialog(Gtk.STOCK_DIALOG_INFO, text, title,
                                          search_function)
 
 
 def launch_error_dialog(exception=None, text=""):
-    """This will be replaced by rose.reporter utilities."""
+    """This will be replaced by metomi.rose.reporter utilities."""
     if text:
         text += "\n"
     if exception is not None:
         text += type(exception).__name__ + ": " + str(exception)
-    rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                               text, rose.config_editor.DIALOG_TITLE_ERROR,
+    metomi.rose.gtk.dialog.run_dialog(metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                               text, metomi.rose.config_editor.DIALOG_TITLE_ERROR,
                                modal=False)
 
 
@@ -183,7 +183,7 @@ def wrap_string(text, maxlen=72, indent0=0, maxlines=4, sep=","):
     lines = [""]
     linelen = maxlen - indent0
     for item in text.split(sep):
-        dtext = rose.gtk.util.safe_str(item) + sep
+        dtext = metomi.rose.gtk.util.safe_str(item) + sep
         if lines[-1] and len(lines[-1] + dtext) > linelen:
             lines.append("")
             linelen = maxlen
@@ -201,14 +201,14 @@ def null_cmp(x_item, y_item):
     if x_id == '' or y_id == '':
         return (x_id == '') - (y_id == '')
     if x_sort_key == y_sort_key:
-        return rose.config.sort_settings(x_id, y_id)
+        return metomi.rose.config.sort_settings(x_id, y_id)
     return cmp(x_sort_key, y_sort_key)
 
 
 def _pretty_format_data(data, global_indent=0, indent=4, width=60):
-    sub_name = rose.config_editor.DIALOG_NODE_INFO_SUB_ATTRIBUTE
-    safe_str = rose.gtk.util.safe_str
-    delim = rose.config_editor.DIALOG_NODE_INFO_DELIMITER
+    sub_name = metomi.rose.config_editor.DIALOG_NODE_INFO_SUB_ATTRIBUTE
+    safe_str = metomi.rose.gtk.util.safe_str
+    delim = metomi.rose.config_editor.DIALOG_NODE_INFO_DELIMITER
     if isinstance(data, dict) and data:
         text = ""
         for key, val in list(data.items()):

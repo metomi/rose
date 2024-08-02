@@ -25,10 +25,10 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config
-import rose.config_editor
-import rose.formats
-import rose.gtk.choice
+import metomi.rose.config
+import metomi.rose.config_editor
+import metomi.rose.formats
+import metomi.rose.gtk.choice
 
 
 class SourceValueWidget(Gtk.HBox):
@@ -48,7 +48,7 @@ class SourceValueWidget(Gtk.HBox):
         self.set_value = set_value
         self.hook = hook
         self.var_ops = arg_str
-        formats = [f for f in rose.formats.__dict__ if not f.startswith('__')]
+        formats = [f for f in metomi.rose.formats.__dict__ if not f.startswith('__')]
         self.formats = formats
         self.formats_ok = None
         self._ok_content_sections = set([None])
@@ -58,7 +58,7 @@ class SourceValueWidget(Gtk.HBox):
         vbox = Gtk.VBox()
         vbox.show()
         formats_check_button = Gtk.CheckButton(
-            rose.config_editor.FILE_CONTENT_PANEL_FORMAT_LABEL)
+            metomi.rose.config_editor.FILE_CONTENT_PANEL_FORMAT_LABEL)
         formats_check_button.set_active(not self.formats_ok)
         formats_check_button.connect("toggled", self._toggle_formats)
         formats_check_button.show()
@@ -69,14 +69,14 @@ class SourceValueWidget(Gtk.HBox):
         vbox.pack_start(formats_check_hbox, expand=False, fill=False)
         treeviews_hbox = Gtk.HPaned()
         treeviews_hbox.show()
-        self._listview = rose.gtk.choice.ChoicesListView(
+        self._listview = metomi.rose.gtk.choice.ChoicesListView(
             self._set_listview,
             self._get_included_sources,
             self._handle_search,
             get_custom_menu_items=self._get_custom_menu_items
         )
         self._listview.set_tooltip_text(
-            rose.config_editor.FILE_CONTENT_PANEL_TIP)
+            metomi.rose.config_editor.FILE_CONTENT_PANEL_TIP)
         frame = Gtk.Frame()
         frame.show()
         frame.add(self._listview)
@@ -92,13 +92,13 @@ class SourceValueWidget(Gtk.HBox):
         adder_value = ""
         adder_metadata = {}
         adder_set_value = lambda v: None
-        adder_hook = rose.config_editor.valuewidget.ValueWidgetHook()
+        adder_hook = metomi.rose.config_editor.valuewidget.ValueWidgetHook()
         self._adder = (
-            rose.config_editor.valuewidget.files.FileChooserValueWidget(
+            metomi.rose.config_editor.valuewidget.files.FileChooserValueWidget(
                 adder_value, adder_metadata, adder_set_value, adder_hook))
         self._adder.entry.connect("activate", self._add_file_source)
         self._adder.entry.set_tooltip_text(
-            rose.config_editor.TIP_VALUE_ADD_URI)
+            metomi.rose.config_editor.TIP_VALUE_ADD_URI)
         self._adder.show()
         treeviews_hbox.add1(value_vbox)
         treeviews_hbox.add2(self._available_frame)
@@ -120,16 +120,16 @@ class SourceValueWidget(Gtk.HBox):
         existing_widget = self._available_frame.get_child()
         if existing_widget is not None:
             self._available_frame.remove(existing_widget)
-        self._available_treeview = rose.gtk.choice.ChoicesTreeView(
+        self._available_treeview = metomi.rose.gtk.choice.ChoicesTreeView(
             self._set_available_treeview,
             self._get_included_sources,
             self._get_available_sections,
             self._get_groups,
-            title=rose.config_editor.FILE_CONTENT_PANEL_TITLE,
+            title=metomi.rose.config_editor.FILE_CONTENT_PANEL_TITLE,
             get_is_included=self._get_section_is_included
         )
         self._available_treeview.set_tooltip_text(
-            rose.config_editor.FILE_CONTENT_PANEL_OPT_TIP)
+            metomi.rose.config_editor.FILE_CONTENT_PANEL_OPT_TIP)
         self._available_frame.show()
         if not self.formats_ok:
             self._available_frame.hide()
@@ -138,7 +138,7 @@ class SourceValueWidget(Gtk.HBox):
     def _get_custom_menu_items(self):
         """Return some custom menuitems for use in the list view."""
         menuitem = Gtk.ImageMenuItem(
-            rose.config_editor.FILE_CONTENT_PANEL_MENU_OPTIONAL)
+            metomi.rose.config_editor.FILE_CONTENT_PANEL_MENU_OPTIONAL)
         image = Gtk.Image.new_from_stock(
             Gtk.STOCK_DIALOG_QUESTION, Gtk.IconSize.MENU)
         menuitem.set_image(image)
@@ -178,7 +178,7 @@ class SourceValueWidget(Gtk.HBox):
                 if section_all not in ok_content_sections:
                     ok_content_sections.append(section_all)
             ok_content_sections.append(section)
-        ok_content_sections.sort(rose.config.sort_settings)
+        ok_content_sections.sort(metomi.rose.config.sort_settings)
         ok_content_sections.sort(self._sort_settings_duplicate)
         return ok_content_sections
 

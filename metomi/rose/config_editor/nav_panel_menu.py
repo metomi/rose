@@ -26,9 +26,9 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config
-import rose.config_editor.util
-import rose.gtk.dialog
+import metomi.rose.config
+import metomi.rose.config_editor.util
+import metomi.rose.gtk.dialog
 
 
 class NavPanelHandler(object):
@@ -110,16 +110,16 @@ class NavPanelHandler(object):
 
     def create_request(self):
         """Handle a create configuration request."""
-        if not any(v.config_type == rose.TOP_CONFIG_NAME
+        if not any(v.config_type == metomi.rose.TOP_CONFIG_NAME
                    for v in list(self.data.config.values())):
-            text = rose.config_editor.WARNING_APP_CONFIG_CREATE
-            title = rose.config_editor.WARNING_APP_CONFIG_CREATE_TITLE
-            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+            text = metomi.rose.config_editor.WARNING_APP_CONFIG_CREATE
+            title = metomi.rose.config_editor.WARNING_APP_CONFIG_CREATE_TITLE
+            metomi.rose.gtk.dialog.run_dialog(metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                        text, title)
             return False
         # Need an application configuration to be created.
         root = os.path.join(self.data.top_level_directory,
-                            rose.SUB_CONFIGS_DIR)
+                            metomi.rose.SUB_CONFIGS_DIR)
         name, meta = self.mainwindow.launch_new_config_dialog(root)
         if name is None:
             return False
@@ -151,15 +151,15 @@ class NavPanelHandler(object):
                             continue
                     if not is_ignored:
                         mode = sect_data.metadata.get(
-                            rose.META_PROP_COMPULSORY)
+                            metomi.rose.META_PROP_COMPULSORY)
                         if (not sect_data.ignored_reason or
-                                mode == rose.META_PROP_VALUE_TRUE):
+                                mode == metomi.rose.META_PROP_VALUE_TRUE):
                             continue
                     config_sect_dict[config_name].append(section)
-            config_sect_dict[config_name].sort(rose.config.sort_settings)
+            config_sect_dict[config_name].sort(metomi.rose.config.sort_settings)
             if config_name in prefer_name_sections:
                 prefer_name_sections[config_name].sort(
-                    rose.config.sort_settings)
+                    metomi.rose.config.sort_settings)
         config_name, section = self.mainwindow.launch_ignore_dialog(
             config_sect_dict, prefer_name_sections, is_ignored)
         if config_name in self.data.config and section is not None:
@@ -179,19 +179,19 @@ class NavPanelHandler(object):
         if not sections:
             return False
         if len(sections) > 1:
-            section = rose.gtk.dialog.run_choices_dialog(
-                rose.config_editor.DIALOG_LABEL_CHOOSE_SECTION_EDIT,
+            section = metomi.rose.gtk.dialog.run_choices_dialog(
+                metomi.rose.config_editor.DIALOG_LABEL_CHOOSE_SECTION_EDIT,
                 sections,
-                rose.config_editor.DIALOG_TITLE_CHOOSE_SECTION)
+                metomi.rose.config_editor.DIALOG_TITLE_CHOOSE_SECTION)
         else:
             section = sections[0]
         if section is None:
             return False
-        title = rose.config_editor.DIALOG_TITLE_EDIT_COMMENTS.format(section)
+        title = metomi.rose.config_editor.DIALOG_TITLE_EDIT_COMMENTS.format(section)
         text = "\n".join(config_data.sections.now[section].comments)
         finish = lambda t: self.sect_ops.set_section_comments(
             config_name, section, t.splitlines())
-        rose.gtk.dialog.run_edit_dialog(text, finish_hook=finish, title=title)
+        metomi.rose.gtk.dialog.run_edit_dialog(text, finish_hook=finish, title=title)
 
     def fix_request(self, base_ns):
         """Handle a request to auto-fix a configuration."""
@@ -223,7 +223,7 @@ class NavPanelHandler(object):
         for section in sections:
             sect_data = config_data.sections.now.get(section)
             if sect_data is not None:
-                rose.config_editor.util.launch_node_info_dialog(
+                metomi.rose.config_editor.util.launch_node_info_dialog(
                     sect_data, "", search_function)
 
     def graph_request(self, namespace):
@@ -244,18 +244,18 @@ class NavPanelHandler(object):
         for config_name in config_names:
             config_data = self.data.config[config_name]
             config_sect_dict[config_name] = list(config_data.sections.now.keys())
-            config_sect_dict[config_name].sort(rose.config.sort_settings)
+            config_sect_dict[config_name].sort(metomi.rose.config.sort_settings)
             if config_name in prefer_name_sections:
                 prefer_name_sections[config_name].sort(
-                    rose.config.sort_settings)
+                    metomi.rose.config.sort_settings)
         config_name, section = self.mainwindow.launch_remove_dialog(
             config_sect_dict, prefer_name_sections)
         if config_name in self.data.config and section is not None:
             start_stack_index = len(self.undo_stack)
             group = (
-                rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time()))
+                metomi.rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time()))
             config_data = self.data.config[config_name]
-            variable_sorter = lambda v, w: rose.config.sort_settings(
+            variable_sorter = lambda v, w: metomi.rose.config.sort_settings(
                 v.metadata['id'], w.metadata['id'])
             variables = list(config_data.vars.now.get(section, []))
             variables.sort(variable_sorter)
@@ -279,10 +279,10 @@ class NavPanelHandler(object):
         for config_name in self.data.config:
             config_data = self.data.config[config_name]
             config_sect_dict[config_name] = list(config_data.sections.now.keys())
-            config_sect_dict[config_name].sort(rose.config.sort_settings)
+            config_sect_dict[config_name].sort(metomi.rose.config.sort_settings)
             if config_name in prefer_name_sections:
                 prefer_name_sections[config_name].sort(
-                    rose.config.sort_settings)
+                    metomi.rose.config.sort_settings)
         config_name, source_section, target_section = (
             self.mainwindow.launch_rename_dialog(
                 config_sect_dict, prefer_name_sections)
@@ -306,31 +306,31 @@ class NavPanelHandler(object):
 
         ui_config_string = """<ui> <popup name='Popup'>"""
         actions = [('New', Gtk.STOCK_NEW,
-                    rose.config_editor.TREE_PANEL_NEW_CONFIG),
+                    metomi.rose.config_editor.TREE_PANEL_NEW_CONFIG),
                    ('Add', Gtk.STOCK_ADD,
-                    rose.config_editor.TREE_PANEL_ADD_GENERIC),
+                    metomi.rose.config_editor.TREE_PANEL_ADD_GENERIC),
                    ('Autofix', Gtk.STOCK_CONVERT,
-                    rose.config_editor.TREE_PANEL_AUTOFIX_CONFIG),
+                    metomi.rose.config_editor.TREE_PANEL_AUTOFIX_CONFIG),
                    ('Clone', Gtk.STOCK_COPY,
-                    rose.config_editor.TREE_PANEL_CLONE_SECTION),
+                    metomi.rose.config_editor.TREE_PANEL_CLONE_SECTION),
                    ('Edit', Gtk.STOCK_EDIT,
-                    rose.config_editor.TREE_PANEL_EDIT_SECTION),
+                    metomi.rose.config_editor.TREE_PANEL_EDIT_SECTION),
                    ('Enable', Gtk.STOCK_YES,
-                    rose.config_editor.TREE_PANEL_ENABLE_GENERIC),
+                    metomi.rose.config_editor.TREE_PANEL_ENABLE_GENERIC),
                    ('Graph', Gtk.STOCK_SORT_ASCENDING,
-                    rose.config_editor.TREE_PANEL_GRAPH_SECTION),
+                    metomi.rose.config_editor.TREE_PANEL_GRAPH_SECTION),
                    ('Ignore', Gtk.STOCK_NO,
-                    rose.config_editor.TREE_PANEL_IGNORE_GENERIC),
+                    metomi.rose.config_editor.TREE_PANEL_IGNORE_GENERIC),
                    ('Info', Gtk.STOCK_INFO,
-                    rose.config_editor.TREE_PANEL_INFO_SECTION),
+                    metomi.rose.config_editor.TREE_PANEL_INFO_SECTION),
                    ('Help', Gtk.STOCK_HELP,
-                    rose.config_editor.TREE_PANEL_HELP_SECTION),
+                    metomi.rose.config_editor.TREE_PANEL_HELP_SECTION),
                    ('URL', Gtk.STOCK_HOME,
-                    rose.config_editor.TREE_PANEL_URL_SECTION),
+                    metomi.rose.config_editor.TREE_PANEL_URL_SECTION),
                    ('Remove', Gtk.STOCK_DELETE,
-                    rose.config_editor.TREE_PANEL_REMOVE_GENERIC),
+                    metomi.rose.config_editor.TREE_PANEL_REMOVE_GENERIC),
                    ('Rename', Gtk.STOCK_COPY,
-                    rose.config_editor.TREE_PANEL_RENAME_GENERIC)]
+                    metomi.rose.config_editor.TREE_PANEL_RENAME_GENERIC)]
         url = None
         help_ = None
         is_empty = (not self.data.config)
@@ -354,7 +354,7 @@ class NavPanelHandler(object):
                         action_name)
                     actions.append(
                         (action_name, Gtk.STOCK_ADD,
-                         rose.config_editor.TREE_PANEL_ADD_SECTION.format(
+                         metomi.rose.config_editor.TREE_PANEL_ADD_SECTION.format(
                              section.replace("_", "__")))
                     )
                 ui_config_string += '<separator name="addlatentsep"/>'
@@ -374,8 +374,8 @@ class NavPanelHandler(object):
                 ui_config_string += '<menuitem action="Edit"/>'
                 ui_config_string += '<separator name="graphsep"/>'
                 ui_config_string += '<menuitem action="Graph"/>'
-            url = metadata.get(rose.META_PROP_URL)
-            help_ = metadata.get(rose.META_PROP_HELP)
+            url = metadata.get(metomi.rose.META_PROP_URL)
+            help_ = metadata.get(metomi.rose.META_PROP_HELP)
             if url is not None or help_ is not None:
                 ui_config_string += '<separator name="helpsep"/>'
                 if url is not None:
@@ -446,12 +446,12 @@ class NavPanelHandler(object):
             if help_ is not None:
                 help_item = uimanager.get_widget('/Popup/Help')
                 help_title = namespace.split('/')[1:]
-                help_title = rose.config_editor.DIALOG_HELP_TITLE.format(
+                help_title = metomi.rose.config_editor.DIALOG_HELP_TITLE.format(
                     help_title)
                 search_function = lambda i: self.search_request(namespace, i)
                 help_item.connect(
                     "activate",
-                    lambda b: rose.gtk.dialog.run_hyperlink_dialog(
+                    lambda b: metomi.rose.gtk.dialog.run_hyperlink_dialog(
                         Gtk.STOCK_DIALOG_INFO, help_, help_title,
                         search_function))
             if url is not None:
@@ -482,8 +482,8 @@ class NavPanelHandler(object):
         sect_data = self.data.config[config_name].sections.now.get(section)
         if sect_data is None:
             return False
-        return (sect_data.metadata.get(rose.META_PROP_DUPLICATE) ==
-                rose.META_PROP_VALUE_TRUE)
+        return (sect_data.metadata.get(metomi.rose.META_PROP_DUPLICATE) ==
+                metomi.rose.META_PROP_VALUE_TRUE)
 
     def get_ns_errors(self, namespace):
         """Count the number of errors in a namespace."""
@@ -509,18 +509,18 @@ class NavPanelHandler(object):
             # Always show this.
             return True
         show_ignored = self.data.page_ns_show_modes[
-            rose.config_editor.SHOW_MODE_IGNORED]
+            metomi.rose.config_editor.SHOW_MODE_IGNORED]
         show_user_ignored = self.data.page_ns_show_modes[
-            rose.config_editor.SHOW_MODE_USER_IGNORED]
+            metomi.rose.config_editor.SHOW_MODE_USER_IGNORED]
         show_latent = self.data.page_ns_show_modes[
-            rose.config_editor.SHOW_MODE_LATENT]
+            metomi.rose.config_editor.SHOW_MODE_LATENT]
         if latent_status:
             if not show_latent:
                 # Latent page, no latent pages allowed.
                 return False
             # Latent page, latent pages allowed (but may be ignored...).
         if ignored_status:
-            if ignored_status == rose.config.ConfigNode.STATE_USER_IGNORED:
+            if ignored_status == metomi.rose.config.ConfigNode.STATE_USER_IGNORED:
                 if show_ignored or show_user_ignored:
                     # This is an allowed user-ignored page.
                     return True

@@ -26,16 +26,16 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config_editor.keywidget
-import rose.config_editor.menuwidget
-import rose.config_editor.valuewidget
-import rose.config_editor.valuewidget.array.row as row
-import rose.config_editor.valuewidget.source
-import rose.config_editor.util
-import rose.gtk.dialog
-import rose.gtk.util
-import rose.reporter
-import rose.resource
+import metomi.rose.config_editor.keywidget
+import metomi.rose.config_editor.menuwidget
+import metomi.rose.config_editor.valuewidget
+import metomi.rose.config_editor.valuewidget.array.row as row
+import metomi.rose.config_editor.valuewidget.source
+import metomi.rose.config_editor.util
+import metomi.rose.gtk.dialog
+import metomi.rose.gtk.util
+import metomi.rose.reporter
+import metomi.rose.resource
 
 
 class VariableWidget(object):
@@ -60,10 +60,10 @@ class VariableWidget(object):
             show_modes = {}
         self.show_modes = show_modes
         self.insensitive_colour = Gtk.Style().bg[0]
-        self.bad_colour = rose.gtk.util.color_parse(
-            rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
-        self.hidden_colour = rose.gtk.util.color_parse(
-            rose.config_editor.COLOUR_VARIABLE_TEXT_IRRELEVANT)
+        self.bad_colour = metomi.rose.gtk.util.color_parse(
+            metomi.rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
+        self.hidden_colour = metomi.rose.gtk.util.color_parse(
+            metomi.rose.config_editor.COLOUR_VARIABLE_TEXT_IRRELEVANT)
         self.keywidget = self.get_keywidget(variable, show_modes)
         self.generate_valuewidget(variable)
         self.is_inconsistent = False
@@ -90,7 +90,7 @@ class VariableWidget(object):
         Loads 'tooltips' or hover-over text based on the variable metadata.
 
         """
-        widget = rose.config_editor.keywidget.KeyWidget(
+        widget = metomi.rose.config_editor.keywidget.KeyWidget(
             variable, self.var_ops, self.launch_help, self.update_status,
             show_modes
         )
@@ -142,13 +142,13 @@ class VariableWidget(object):
         """Creates the valuewidget attribute, based on value and metadata."""
         custom_arg = None
         if (variable.metadata.get("type") ==
-                rose.config_editor.FILE_TYPE_NORMAL):
-            use_this_valuewidget = (rose.config_editor.
+                metomi.rose.config_editor.FILE_TYPE_NORMAL):
+            use_this_valuewidget = (metomi.rose.config_editor.
                                     valuewidget.source.SourceValueWidget)
             custom_arg = self.var_ops
         set_value = self._valuewidget_set_value
-        hook_object = rose.config_editor.valuewidget.ValueWidgetHook(
-            rose.config_editor.false_function,
+        hook_object = metomi.rose.config_editor.valuewidget.ValueWidgetHook(
+            metomi.rose.config_editor.false_function,
             self._get_focus)
         metadata = copy.deepcopy(variable.metadata)
         if use_this_valuewidget is not None:
@@ -157,9 +157,9 @@ class VariableWidget(object):
                                                     set_value,
                                                     hook_object,
                                                     arg_str=custom_arg)
-        elif (rose.config_editor.META_PROP_WIDGET in self.meta and
+        elif (metomi.rose.config_editor.META_PROP_WIDGET in self.meta and
                 not override_custom):
-            w_val = self.meta[rose.config_editor.META_PROP_WIDGET]
+            w_val = self.meta[metomi.rose.config_editor.META_PROP_WIDGET]
             info = w_val.split(None, 1)
             if len(info) > 1:
                 widget_path, custom_arg = info
@@ -168,11 +168,11 @@ class VariableWidget(object):
             files = self.var_ops.get_ns_metadata_files(metadata["full_ns"])
             error_handler = lambda e: self.handle_bad_valuewidget(
                 str(e), variable, set_value)
-            widget = rose.resource.import_object(widget_path,
+            widget = metomi.rose.resource.import_object(widget_path,
                                                  files,
                                                  error_handler)
             if widget is None:
-                text = rose.config_editor.ERROR_IMPORT_CLASS.format(w_val)
+                text = metomi.rose.config_editor.ERROR_IMPORT_CLASS.format(w_val)
                 self.handle_bad_valuewidget(text, variable, set_value)
             try:
                 self.valuewidget = widget(variable.value,
@@ -183,7 +183,7 @@ class VariableWidget(object):
             except Exception as exc:
                 self.handle_bad_valuewidget(str(exc), variable, set_value)
         else:
-            widget_maker = rose.config_editor.valuewidget.chooser(
+            widget_maker = metomi.rose.config_editor.valuewidget.chooser(
                 variable.value, variable.metadata,
                 variable.error)
             self.valuewidget = widget_maker(variable.value,
@@ -201,15 +201,15 @@ class VariableWidget(object):
 
     def handle_bad_valuewidget(self, error_info, variable, set_value):
         """Handle a bad custom valuewidget import."""
-        text = rose.config_editor.ERROR_IMPORT_WIDGET.format(error_info)
-        rose.reporter.Reporter()(
-            rose.config_editor.util.ImportWidgetError(text))
+        text = metomi.rose.config_editor.ERROR_IMPORT_WIDGET.format(error_info)
+        metomi.rose.reporter.Reporter()(
+            metomi.rose.config_editor.util.ImportWidgetError(text))
         self.generate_valuewidget(variable, override_custom=True)
 
     def handle_focus_in(self, widget, event):
         widget._first_colour = widget.style.base[Gtk.StateType.NORMAL]
-        new_colour = rose.gtk.util.color_parse(
-            rose.config_editor.COLOUR_VALUEWIDGET_BASE_SELECTED)
+        new_colour = metomi.rose.gtk.util.color_parse(
+            metomi.rose.config_editor.COLOUR_VALUEWIDGET_BASE_SELECTED)
         widget.modify_base(Gtk.StateType.NORMAL, new_colour)
 
     def handle_focus_out(self, widget, event):
@@ -219,7 +219,7 @@ class VariableWidget(object):
     def get_menuwidget(self, variable, menuclass=None):
         """Create the menuwidget attribute, an option menu button."""
         if menuclass is None:
-            menuclass = rose.config_editor.menuwidget.MenuWidget
+            menuclass = metomi.rose.config_editor.menuwidget.MenuWidget
         menuwidget = menuclass(variable,
                                self.var_ops,
                                lambda: self.remove_from(self.get_parent()),
@@ -288,7 +288,7 @@ class VariableWidget(object):
             for handler_id in self.force_signal_ids:
                 vadj.handler_block(handler_id)
             self.force_signal_ids = []
-            vadj.connect('changed', rose.config_editor.false_function)
+            vadj.connect('changed', metomi.rose.config_editor.false_function)
         if y_coordinate is None:
             vadj.upper = vadj.upper + 0.08 * vadj.page_size
             vadj.set_value(vadj.upper - vadj.page_size)
@@ -337,7 +337,7 @@ class VariableWidget(object):
             if "'Ignore'" not in self.menuwidget.option_ui:
                 self.menuwidget.old_option_ui = self.menuwidget.option_ui
                 self.menuwidget.old_actions = self.menuwidget.actions
-            if list(ign_map.keys()) == [rose.variable.IGNORED_BY_SECTION]:
+            if list(ign_map.keys()) == [metomi.rose.variable.IGNORED_BY_SECTION]:
                 # Not ignored in itself, so give Ignore option.
                 if "'Enable'" in self.menuwidget.option_ui:
                     self.menuwidget.option_ui = re.sub(
@@ -424,25 +424,25 @@ class VariableWidget(object):
         """Launch a help dialog or a URL in a web browser."""
         if url_mode:
             return self.var_ops.launch_url(self.variable)
-        if rose.META_PROP_HELP not in self.meta:
+        if metomi.rose.META_PROP_HELP not in self.meta:
             return
         help_text = None
         if self.show_modes.get(
-                rose.config_editor.SHOW_MODE_CUSTOM_HELP):
-            format_string = rose.config_editor.CUSTOM_FORMAT_HELP
-            help_text = rose.variable.expand_format_string(
+                metomi.rose.config_editor.SHOW_MODE_CUSTOM_HELP):
+            format_string = metomi.rose.config_editor.CUSTOM_FORMAT_HELP
+            help_text = metomi.rose.variable.expand_format_string(
                 format_string, self.variable)
         if help_text is None:
-            help_text = self.meta[rose.META_PROP_HELP]
+            help_text = self.meta[metomi.rose.META_PROP_HELP]
         self._launch_help_dialog(help_text)
 
     def _launch_help_dialog(self, help_text):
         """Launch a scrollable dialog for this variable's help text."""
-        title = rose.config_editor.DIALOG_HELP_TITLE.format(
+        title = metomi.rose.config_editor.DIALOG_HELP_TITLE.format(
             self.variable.metadata["id"])
         ns = self.variable.metadata["full_ns"]
         search_function = lambda i: self.var_ops.search_for_var(ns, i)
-        rose.gtk.dialog.run_hyperlink_dialog(
+        metomi.rose.gtk.dialog.run_hyperlink_dialog(
             Gtk.STOCK_DIALOG_INFO, help_text, title, search_function)
         return False
 
@@ -513,13 +513,13 @@ class VariableWidget(object):
 
     def type_error_refresh(self, variable):
         """Handle a type error."""
-        if rose.META_PROP_TYPE in variable.error:
+        if metomi.rose.META_PROP_TYPE in variable.error:
             self._set_inconsistent(self.valuewidget, variable)
         else:
             self._set_consistent(self.valuewidget, variable)
         self.variable = variable
         self.errors = list(variable.error.keys())
-        self.valuewidget.handle_type_error(rose.META_PROP_TYPE in self.errors)
+        self.valuewidget.handle_type_error(metomi.rose.META_PROP_TYPE in self.errors)
         self.menuwidget.refresh(variable)
         self.keywidget.refresh(variable)
 
@@ -534,8 +534,8 @@ class RowVariableWidget(VariableWidget):
 
     def generate_valuewidget(self, variable, override_custom=False):
         """Creates the valuewidget attribute, based on value and metadata."""
-        if (rose.META_PROP_LENGTH in variable.metadata or
-                isinstance(variable.metadata.get(rose.META_PROP_TYPE), list)):
+        if (metomi.rose.META_PROP_LENGTH in variable.metadata or
+                isinstance(variable.metadata.get(metomi.rose.META_PROP_TYPE), list)):
             use_this_valuewidget = self.make_row_valuewidget
         else:
             use_this_valuewidget = None

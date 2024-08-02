@@ -24,9 +24,9 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-import rose.config_editor
-import rose.external
-import rose.gtk.util
+import metomi.rose.config_editor
+import metomi.rose.external
+import metomi.rose.gtk.util
 
 
 class FileChooserValueWidget(Gtk.HBox):
@@ -42,7 +42,7 @@ class FileChooserValueWidget(Gtk.HBox):
         self.hook = hook
         self.generate_entry()
         self.generate_editor_launcher()
-        self.open_button = rose.gtk.util.CustomButton(
+        self.open_button = metomi.rose.gtk.util.CustomButton(
             stock_id=Gtk.STOCK_OPEN,
             size=Gtk.IconSize.MENU,
             as_tool=False,
@@ -78,14 +78,14 @@ class FileChooserValueWidget(Gtk.HBox):
         return False
 
     def generate_editor_launcher(self):
-        self.edit_button = rose.gtk.util.CustomButton(
+        self.edit_button = metomi.rose.gtk.util.CustomButton(
             stock_id=Gtk.STOCK_DND,
             size=Gtk.IconSize.MENU,
             as_tool=False,
             tip_text="Edit the file")
         self.edit_button.connect(
             "clicked",
-            lambda b: rose.external.launch_geditor(self.value))
+            lambda b: metomi.rose.external.launch_geditor(self.value))
         self.pack_end(self.edit_button, expand=False, fill=False)
 
     def setter(self, widget):
@@ -111,20 +111,20 @@ class FileEditorValueWidget(Gtk.HBox):
         self.generate_editor_launcher()
 
     def generate_editor_launcher(self):
-        self.edit_button = rose.gtk.util.CustomButton(
-            label=rose.config_editor.LABEL_EDIT,
+        self.edit_button = metomi.rose.gtk.util.CustomButton(
+            label=metomi.rose.config_editor.LABEL_EDIT,
             stock_id=Gtk.STOCK_DND,
             size=Gtk.IconSize.MENU,
             as_tool=False,
             tip_text="Edit the file")
         self.edit_button.connect("clicked", self.on_click)
         self.pack_start(self.edit_button, expand=False, fill=False,
-                        padding=rose.config_editor.SPACING_SUB_PAGE)
+                        padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
 
     def retrieve_path(self):
-        root = self.metadata[rose.config_editor.META_PROP_INTERNAL]
+        root = self.metadata[metomi.rose.config_editor.META_PROP_INTERNAL]
         return os.path.join(root, self.value)
 
     def on_click(self, button):
         path = self.retrieve_path()
-        rose.external.launch_geditor(path)
+        metomi.rose.external.launch_geditor(path)

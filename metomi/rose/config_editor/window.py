@@ -26,14 +26,14 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config
-import rose.gtk.dialog
-import rose.gtk.util
-import rose.resource
+import metomi.rose.config
+import metomi.rose.gtk.dialog
+import metomi.rose.gtk.util
+import metomi.rose.resource
 
 
 REC_SPLIT_MACRO_TEXT = re.compile(
-    '(.{' + str(rose.config_editor.DIALOG_BODY_MACRO_CHANGES_MAX_LENGTH) +
+    '(.{' + str(metomi.rose.config_editor.DIALOG_BODY_MACRO_CHANGES_MAX_LENGTH) +
     '})')
 
 
@@ -96,15 +96,15 @@ class MainWindow(object):
 
     def load(self, name='Untitled', menu=None, accelerators=None, toolbar=None,
              nav_panel=None, status_bar=None, notebook=None,
-             page_change_func=rose.config_editor.false_function,
-             save_func=rose.config_editor.false_function):
+             page_change_func=metomi.rose.config_editor.false_function,
+             save_func=metomi.rose.config_editor.false_function):
         self.window = Gtk.Window()
         self.window.set_title(name + ' - ' +
-                              rose.config_editor.LAUNCH_COMMAND)
-        self.util = rose.config_editor.util.Lookup()
-        self.window.set_icon(rose.gtk.util.get_icon())
+                              metomi.rose.config_editor.LAUNCH_COMMAND)
+        self.util = metomi.rose.config_editor.util.Lookup()
+        self.window.set_icon(metomi.rose.gtk.util.get_icon())
         Gtk.window_set_default_icon_list(self.window.get_icon())
-        self.window.set_default_size(*rose.config_editor.SIZE_WINDOW)
+        self.window.set_default_size(*metomi.rose.config_editor.SIZE_WINDOW)
         self.window.set_destroy_with_parent(False)
         self.save_func = save_func
         self.top_vbox = Gtk.VBox()
@@ -142,15 +142,15 @@ class MainWindow(object):
         self.main_hbox.show()
         self.main_hbox.pack2(notebook, resize=True, shrink=True)
         self.main_hbox.show()
-        self.main_hbox.set_position(rose.config_editor.WIDTH_TREE_PANEL)
+        self.main_hbox.set_position(metomi.rose.config_editor.WIDTH_TREE_PANEL)
 
     def launch_about_dialog(self, somewidget=None):
         """Create a dialog showing the 'About' information."""
-        rose.gtk.dialog.run_about_dialog(
-            name=rose.config_editor.PROGRAM_NAME,
-            copyright_=rose.config_editor.COPYRIGHT,
-            logo_path="etc/images/rose-logo.png",
-            website=rose.config_editor.PROJECT_URL)
+        metomi.rose.gtk.dialog.run_about_dialog(
+            name=metomi.rose.config_editor.PROGRAM_NAME,
+            copyright_=metomi.rose.config_editor.COPYRIGHT,
+            logo_path="etc/images/metomi.rose.logo.png",
+            website=metomi.rose.config_editor.PROJECT_URL)
 
     def _reload_choices(self, liststore, top_name, add_choices):
         liststore.clear()
@@ -161,16 +161,16 @@ class MainWindow(object):
 
     def launch_add_dialog(self, names, add_choices, section_help):
         """Launch a dialog asking for a section name."""
-        add_dialog = Gtk.Dialog(title=rose.config_editor.DIALOG_TITLE_ADD,
+        add_dialog = Gtk.Dialog(title=metomi.rose.config_editor.DIALOG_TITLE_ADD,
                                 parent=self.window,
                                 buttons=(Gtk.STOCK_CANCEL,
                                          Gtk.ResponseType.REJECT,
                                          Gtk.STOCK_OK,
                                          Gtk.ResponseType.ACCEPT))
         ok_button = add_dialog.action_area.get_children()[0]
-        config_label = Gtk.Label(label=rose.config_editor.DIALOG_BODY_ADD_CONFIG)
+        config_label = Gtk.Label(label=metomi.rose.config_editor.DIALOG_BODY_ADD_CONFIG)
         config_label.show()
-        label = Gtk.Label(label=rose.config_editor.DIALOG_BODY_ADD_SECTION)
+        label = Gtk.Label(label=metomi.rose.config_editor.DIALOG_BODY_ADD_SECTION)
         label.show()
         config_name_box = Gtk.ComboBoxText()
         for name in names:
@@ -229,7 +229,7 @@ class MainWindow(object):
         exit_dialog.add_buttons(Gtk.STOCK_NO, Gtk.ResponseType.REJECT,
                                 Gtk.STOCK_CANCEL, Gtk.ResponseType.CLOSE,
                                 Gtk.STOCK_YES, Gtk.ResponseType.ACCEPT)
-        exit_dialog.set_title(rose.config_editor.DIALOG_TITLE_SAVE_CHANGES)
+        exit_dialog.set_title(metomi.rose.config_editor.DIALOG_TITLE_SAVE_CHANGES)
         exit_dialog.set_modal(True)
         exit_dialog.set_keep_above(True)
         exit_dialog.action_area.get_children()[1].grab_focus()
@@ -253,16 +253,16 @@ class MainWindow(object):
         prefs = {}
         return self._launch_choose_section_dialog(
             name_section_dict, prefs,
-            rose.config_editor.DIALOG_TITLE_GRAPH,
-            rose.config_editor.DIALOG_BODY_GRAPH_CONFIG,
-            rose.config_editor.DIALOG_BODY_GRAPH_SECTION,
+            metomi.rose.config_editor.DIALOG_TITLE_GRAPH,
+            metomi.rose.config_editor.DIALOG_BODY_GRAPH_CONFIG,
+            metomi.rose.config_editor.DIALOG_BODY_GRAPH_SECTION,
             null_section_choice=True
         )
 
     def launch_help_dialog(self, somewidget=None):
         """Launch a browser to open the help url."""
         webbrowser.open(
-            'https://metomi.github.io/rose/doc/html/index.html',
+            'https://metomi.github.io/metomi.rose.doc/html/index.html',
             new=True,
             autoraise=True
         )
@@ -279,14 +279,14 @@ class MainWindow(object):
 
         """
         if is_ignored:
-            dialog_title = rose.config_editor.DIALOG_TITLE_IGNORE
+            dialog_title = metomi.rose.config_editor.DIALOG_TITLE_IGNORE
         else:
-            dialog_title = rose.config_editor.DIALOG_TITLE_ENABLE
-        config_title = rose.config_editor.DIALOG_BODY_IGNORE_ENABLE_CONFIG
+            dialog_title = metomi.rose.config_editor.DIALOG_TITLE_ENABLE
+        config_title = metomi.rose.config_editor.DIALOG_BODY_IGNORE_ENABLE_CONFIG
         if is_ignored:
-            section_title = rose.config_editor.DIALOG_BODY_IGNORE_SECTION
+            section_title = metomi.rose.config_editor.DIALOG_BODY_IGNORE_SECTION
         else:
-            section_title = rose.config_editor.DIALOG_BODY_ENABLE_SECTION
+            section_title = metomi.rose.config_editor.DIALOG_BODY_ENABLE_SECTION
         return self._launch_choose_section_dialog(
             name_section_dict, prefs,
             dialog_title, config_title,
@@ -318,7 +318,7 @@ class MainWindow(object):
         section_box = Gtk.VBox()
         section_box.show()
         null_section_checkbutton = Gtk.CheckButton(
-            rose.config_editor.DIALOG_LABEL_NULL_SECTION)
+            metomi.rose.config_editor.DIALOG_LABEL_NULL_SECTION)
         null_section_checkbutton.connect(
             "toggled",
             lambda b: section_box.set_sensitive(not b.get_active())
@@ -337,7 +337,7 @@ class MainWindow(object):
                 section_box,
                 name_section_dict[name_keys[c.get_active()]],
                 prefs.get(name_keys[c.get_active()], [])))
-        vbox = Gtk.VBox(spacing=rose.config_editor.SPACING_PAGE)
+        vbox = Gtk.VBox(spacing=metomi.rose.config_editor.SPACING_PAGE)
         vbox.pack_start(config_label, expand=False, fill=False)
         vbox.pack_start(config_name_box, expand=False, fill=False)
         vbox.pack_start(section_label, expand=False, fill=False)
@@ -362,10 +362,10 @@ class MainWindow(object):
         vbox.show()
         hbox = Gtk.HBox()
         hbox.pack_start(vbox, expand=True, fill=True,
-                        padding=rose.config_editor.SPACING_PAGE)
+                        padding=metomi.rose.config_editor.SPACING_PAGE)
         hbox.show()
         chooser_dialog.vbox.pack_start(
-            hbox, True, True, rose.config_editor.SPACING_PAGE)
+            hbox, True, True, metomi.rose.config_editor.SPACING_PAGE)
         section_box.grab_focus()
         response = chooser_dialog.run()
         if response in [Gtk.ResponseType.OK, Gtk.ResponseType.YES,
@@ -397,7 +397,7 @@ class MainWindow(object):
     def _reload_section_choices(self, vbox, sections, prefs):
         for child in vbox.get_children():
             vbox.remove(child)
-        sections.sort(rose.config.sort_settings)
+        sections.sort(metomi.rose.config.sort_settings)
         section_chooser = Gtk.ComboBoxText()
         for k, section in enumerate(sections):
             section_chooser.append_text(section)
@@ -418,7 +418,7 @@ class MainWindow(object):
 
     def launch_macro_changes_dialog(
             self, config_name, macro_name, changes_list, mode="transform",
-            search_func=rose.config_editor.false_function):
+            search_func=metomi.rose.config_editor.false_function):
         """Launch a dialog explaining macro changes."""
         dialog = MacroChangesDialog(self.window, config_name, macro_name,
                                     mode, search_func)
@@ -428,29 +428,29 @@ class MainWindow(object):
         """Launch a dialog allowing naming of a new configuration."""
         existing_apps = os.listdir(root_directory)
         checker_function = lambda t: t not in existing_apps
-        label = rose.config_editor.DIALOG_LABEL_CONFIG_CHOOSE_NAME
-        ok_tip_text = rose.config_editor.TIP_CONFIG_CHOOSE_NAME
-        err_tip_text = rose.config_editor.TIP_CONFIG_CHOOSE_NAME_ERROR
-        dialog, container, name_entry = rose.gtk.dialog.get_naming_dialog(
+        label = metomi.rose.config_editor.DIALOG_LABEL_CONFIG_CHOOSE_NAME
+        ok_tip_text = metomi.rose.config_editor.TIP_CONFIG_CHOOSE_NAME
+        err_tip_text = metomi.rose.config_editor.TIP_CONFIG_CHOOSE_NAME_ERROR
+        dialog, container, name_entry = metomi.rose.gtk.dialog.get_naming_dialog(
             label, checker_function, ok_tip_text, err_tip_text)
-        dialog.set_title(rose.config_editor.DIALOG_TITLE_CONFIG_CREATE)
+        dialog.set_title(metomi.rose.config_editor.DIALOG_TITLE_CONFIG_CREATE)
         meta_hbox = Gtk.HBox()
         meta_label = Gtk.Label(label=
-            rose.config_editor.DIALOG_LABEL_CONFIG_CHOOSE_META)
+            metomi.rose.config_editor.DIALOG_LABEL_CONFIG_CHOOSE_META)
         meta_label.show()
         meta_entry = Gtk.Entry()
-        tip_text = rose.config_editor.TIP_CONFIG_CHOOSE_META
+        tip_text = metomi.rose.config_editor.TIP_CONFIG_CHOOSE_META
         meta_entry.set_tooltip_text(tip_text)
         meta_entry.connect(
             "activate", lambda b: dialog.response(Gtk.ResponseType.ACCEPT))
         meta_entry.show()
         meta_hbox.pack_start(meta_label, expand=False, fill=False,
-                             padding=rose.config_editor.SPACING_SUB_PAGE)
+                             padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
         meta_hbox.pack_start(meta_entry, expand=False, fill=True,
-                             padding=rose.config_editor.SPACING_SUB_PAGE)
+                             padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
         meta_hbox.show()
         container.pack_start(meta_hbox, expand=False, fill=True,
-                             padding=rose.config_editor.SPACING_PAGE)
+                             padding=metomi.rose.config_editor.SPACING_PAGE)
         response = dialog.run()
         name = None
         meta = None
@@ -466,7 +466,7 @@ class MainWindow(object):
     def launch_open_dirname_dialog(self):
         """Launch a FileChooserDialog and return a directory, or None."""
         open_dialog = Gtk.FileChooserDialog(
-            title=rose.config_editor.DIALOG_TITLE_OPEN,
+            title=metomi.rose.config_editor.DIALOG_TITLE_OPEN,
             action=Gtk.FileChooserAction.OPEN,
             buttons=(Gtk.STOCK_CANCEL,
                      Gtk.ResponseType.CANCEL,
@@ -476,9 +476,9 @@ class MainWindow(object):
         open_dialog.set_icon(self.window.get_icon())
         open_dialog.set_default_response(Gtk.ResponseType.OK)
         config_filter = Gtk.FileFilter()
-        config_filter.add_pattern(rose.TOP_CONFIG_NAME)
-        config_filter.add_pattern(rose.SUB_CONFIG_NAME)
-        config_filter.add_pattern(rose.INFO_CONFIG_NAME)
+        config_filter.add_pattern(metomi.rose.TOP_CONFIG_NAME)
+        config_filter.add_pattern(metomi.rose.SUB_CONFIG_NAME)
+        config_filter.add_pattern(metomi.rose.INFO_CONFIG_NAME)
         open_dialog.set_filter(config_filter)
         response = open_dialog.run()
         if response in [Gtk.ResponseType.OK, Gtk.ResponseType.ACCEPT,
@@ -492,7 +492,7 @@ class MainWindow(object):
     def launch_load_metadata_dialog(self):
         """ Launches a dialoge for selecting a metadata path. """
         open_dialog = Gtk.FileChooserDialog(
-            title=rose.config_editor.DIALOG_TITLE_LOAD_METADATA,
+            title=metomi.rose.config_editor.DIALOG_TITLE_LOAD_METADATA,
             action=Gtk.FileChooserAction.SELECT_FOLDER,
             buttons=(Gtk.STOCK_CLOSE,
                      Gtk.ResponseType.CANCEL,
@@ -516,7 +516,7 @@ class MainWindow(object):
         paths.
         """
         dialog = Gtk.Dialog(
-            title=rose.config_editor.DIALOG_TITLE_MANAGE_METADATA,
+            title=metomi.rose.config_editor.DIALOG_TITLE_MANAGE_METADATA,
             buttons=(Gtk.STOCK_CANCEL,
                      Gtk.ResponseType.CANCEL,
                      Gtk.STOCK_OK,
@@ -556,9 +556,9 @@ class MainWindow(object):
 
     def launch_prefs(self, somewidget=None):
         """Launch a dialog explaining preferences."""
-        text = rose.config_editor.DIALOG_LABEL_PREFERENCES
-        title = rose.config_editor.DIALOG_TITLE_PREFERENCES
-        rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_INFO, text,
+        text = metomi.rose.config_editor.DIALOG_LABEL_PREFERENCES
+        title = metomi.rose.config_editor.DIALOG_TITLE_PREFERENCES
+        metomi.rose.gtk.dialog.run_dialog(metomi.rose.gtk.dialog.DIALOG_TYPE_INFO, text,
                                    title)
         return False
 
@@ -572,9 +572,9 @@ class MainWindow(object):
         """
         return self._launch_choose_section_dialog(
             name_section_dict, prefs,
-            rose.config_editor.DIALOG_TITLE_REMOVE,
-            rose.config_editor.DIALOG_BODY_REMOVE_CONFIG,
-            rose.config_editor.DIALOG_BODY_REMOVE_SECTION
+            metomi.rose.config_editor.DIALOG_TITLE_REMOVE,
+            metomi.rose.config_editor.DIALOG_BODY_REMOVE_CONFIG,
+            metomi.rose.config_editor.DIALOG_BODY_REMOVE_SECTION
         )
 
     def launch_rename_dialog(self, name_section_dict, prefs):
@@ -587,15 +587,15 @@ class MainWindow(object):
         """
         return self._launch_choose_section_dialog(
             name_section_dict, prefs,
-            rose.config_editor.DIALOG_TITLE_RENAME,
-            rose.config_editor.DIALOG_BODY_RENAME_CONFIG,
-            rose.config_editor.DIALOG_BODY_RENAME_SECTION,
+            metomi.rose.config_editor.DIALOG_TITLE_RENAME,
+            metomi.rose.config_editor.DIALOG_BODY_RENAME_CONFIG,
+            metomi.rose.config_editor.DIALOG_BODY_RENAME_SECTION,
             do_target_section=True
         )
 
     def launch_view_stack(self, undo_stack, redo_stack, undo_func):
         """Load a view of the stack."""
-        self.log_window = rose.config_editor.stack.StackViewer(
+        self.log_window = metomi.rose.config_editor.stack.StackViewer(
             undo_stack, redo_stack, undo_func)
         self.log_window.set_transient_for(self.window)
 
@@ -605,15 +605,15 @@ class MacroChangesDialog(Gtk.Dialog):
     """Class to hold a dialog summarising macro results."""
 
     COLUMNS = ["Section", "Option", "Type", "Value", "Info"]
-    MODE_COLOURS = {"transform": rose.config_editor.COLOUR_MACRO_CHANGED,
-                    "validate": rose.config_editor.COLOUR_MACRO_ERROR,
-                    "warn": rose.config_editor.COLOUR_MACRO_WARNING}
-    MODE_TEXT = {"transform": rose.config_editor.DIALOG_TEXT_MACRO_CHANGED,
-                 "validate": rose.config_editor.DIALOG_TEXT_MACRO_ERROR,
-                 "warn": rose.config_editor.DIALOG_TEXT_MACRO_WARNING}
+    MODE_COLOURS = {"transform": metomi.rose.config_editor.COLOUR_MACRO_CHANGED,
+                    "validate": metomi.rose.config_editor.COLOUR_MACRO_ERROR,
+                    "warn": metomi.rose.config_editor.COLOUR_MACRO_WARNING}
+    MODE_TEXT = {"transform": metomi.rose.config_editor.DIALOG_TEXT_MACRO_CHANGED,
+                 "validate": metomi.rose.config_editor.DIALOG_TEXT_MACRO_ERROR,
+                 "warn": metomi.rose.config_editor.DIALOG_TEXT_MACRO_WARNING}
 
     def __init__(self, window, config_name, macro_name, mode, search_func):
-        self.util = rose.config_editor.util.Lookup()
+        self.util = metomi.rose.config_editor.util.Lookup()
         self.short_config_name = config_name.rstrip('/').split('/')[-1]
         self.top_config_name = config_name.lstrip('/').split('/')[0]
         self.short_macro_name = macro_name.split('.')[-1]
@@ -623,10 +623,10 @@ class MacroChangesDialog(Gtk.Dialog):
         self.mode = mode
         self.search_func = search_func
         if self.for_validate:
-            title = rose.config_editor.DIALOG_TITLE_MACRO_VALIDATE
+            title = metomi.rose.config_editor.DIALOG_TITLE_MACRO_VALIDATE
             button_list = [Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT]
         else:
-            title = rose.config_editor.DIALOG_TITLE_MACRO_TRANSFORM
+            title = metomi.rose.config_editor.DIALOG_TITLE_MACRO_TRANSFORM
             button_list = [Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
                            Gtk.STOCK_APPLY, Gtk.ResponseType.ACCEPT]
         title = title.format(self.short_macro_name, self.short_config_name)
@@ -646,14 +646,14 @@ class MacroChangesDialog(Gtk.Dialog):
         image.show()
         hbox = Gtk.HBox()
         hbox.pack_start(image, expand=False, fill=False,
-                        padding=rose.config_editor.SPACING_PAGE)
+                        padding=metomi.rose.config_editor.SPACING_PAGE)
         hbox.pack_start(self.label, expand=False, fill=False,
-                        padding=rose.config_editor.SPACING_PAGE)
+                        padding=metomi.rose.config_editor.SPACING_PAGE)
         hbox.show()
         self.treewindow = Gtk.ScrolledWindow()
         self.treewindow.show()
         self.treewindow.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER)
-        self.treeview = rose.gtk.util.TooltipTreeView(
+        self.treeview = metomi.rose.gtk.util.TooltipTreeView(
             get_tooltip_func=self._get_tooltip)
         self.treeview.show()
         self.treemodel = Gtk.TreeStore(str, str, str, str, str)
@@ -677,35 +677,35 @@ class MacroChangesDialog(Gtk.Dialog):
             "row-activated", self._handle_treeview_activation)
         self.treewindow.add(self.treeview)
         self.vbox.pack_end(self.treewindow, expand=True, fill=True,
-                           padding=rose.config_editor.SPACING_PAGE)
+                           padding=metomi.rose.config_editor.SPACING_PAGE)
         self.vbox.pack_end(hbox, expand=False, fill=True,
-                           padding=rose.config_editor.SPACING_PAGE)
+                           padding=metomi.rose.config_editor.SPACING_PAGE)
         self.set_focus(self.action_area.get_children()[0])
 
     def display(self, changes):
         if not changes:
             # Shortcut, no changes.
             if self.for_validate:
-                title = rose.config_editor.DIALOG_TITLE_MACRO_VALIDATE_NONE
-                text = rose.config_editor.DIALOG_LABEL_MACRO_VALIDATE_NONE
+                title = metomi.rose.config_editor.DIALOG_TITLE_MACRO_VALIDATE_NONE
+                text = metomi.rose.config_editor.DIALOG_LABEL_MACRO_VALIDATE_NONE
             else:
-                title = rose.config_editor.DIALOG_TITLE_MACRO_TRANSFORM_NONE
-                text = rose.config_editor.DIALOG_LABEL_MACRO_TRANSFORM_NONE
+                title = metomi.rose.config_editor.DIALOG_TITLE_MACRO_TRANSFORM_NONE
+                text = metomi.rose.config_editor.DIALOG_LABEL_MACRO_TRANSFORM_NONE
             title = title.format(self.short_macro_name)
-            text = rose.gtk.util.safe_str(text)
-            return rose.gtk.dialog.run_dialog(
-                rose.gtk.dialog.DIALOG_TYPE_INFO, text, title)
+            text = metomi.rose.gtk.util.safe_str(text)
+            return metomi.rose.gtk.dialog.run_dialog(
+                metomi.rose.gtk.dialog.DIALOG_TYPE_INFO, text, title)
         if self.for_validate:
-            text = rose.config_editor.DIALOG_LABEL_MACRO_VALIDATE_ISSUES
+            text = metomi.rose.config_editor.DIALOG_LABEL_MACRO_VALIDATE_ISSUES
         else:
-            text = rose.config_editor.DIALOG_LABEL_MACRO_TRANSFORM_CHANGES
+            text = metomi.rose.config_editor.DIALOG_LABEL_MACRO_TRANSFORM_CHANGES
         nums_is_warning = {True: 0, False: 0}
         for item in changes:
             nums_is_warning[item.is_warning] += 1
         text = text.format(self.short_macro_name, self.short_config_name,
                            nums_is_warning[False])
         if nums_is_warning[True]:
-            extra_text = rose.config_editor.DIALOG_LABEL_MACRO_WARN_ISSUES
+            extra_text = metomi.rose.config_editor.DIALOG_LABEL_MACRO_WARN_ISSUES
             text = (text.rstrip() + " " +
                     extra_text.format(nums_is_warning[True]))
         self.label.set_markup(text)
@@ -728,7 +728,7 @@ class MacroChangesDialog(Gtk.Dialog):
                 last_section = item.section
                 self.treemodel.append(last_section_iter, item_att_list)
         self.treeview.expand_all()
-        max_size = rose.config_editor.SIZE_MACRO_DIALOG_MAX
+        max_size = metomi.rose.config_editor.SIZE_MACRO_DIALOG_MAX
         my_size = self.size_request()
         new_size = [-1, -1]
         for i in [0, 1]:
@@ -765,7 +765,7 @@ class MacroChangesDialog(Gtk.Dialog):
         if text is None:
             cell.set_property("markup", None)
         else:
-            cell.set_property("markup", rose.gtk.util.safe_str(text))
+            cell.set_property("markup", metomi.rose.gtk.util.safe_str(text))
         if col_index == 0:
             cell.set_property("visible", (len(model.get_path(r_iter)) == 1))
 

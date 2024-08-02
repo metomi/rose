@@ -26,22 +26,22 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config
-import rose.config_editor
-import rose.gtk.console
-import rose.reporter
+import metomi.rose.config
+import metomi.rose.config_editor
+import metomi.rose.gtk.console
+import metomi.rose.reporter
 
 
-class StatusReporter(rose.reporter.Reporter):
+class StatusReporter(metomi.rose.reporter.Reporter):
 
     """Handle event notification.
 
-    load_updater must be a rose.gtk.splash.SplashScreenProcess
+    load_updater must be a metomi.rose.gtk.splash.SplashScreenProcess
     instance (or have the same interface to update and stop methods).
 
     status_bar_update_func must be a function that accepts a
-    rose.reporter.Event, a rose.reporter kind-of-event string, and a
-    level of importance/verbosity. See rose.reporter for more details.
+    metomi.rose.reporter.Event, a metomi.rose.reporter kind-of-event string, and a
+    level of importance/verbosity. See metomi.rose.reporter for more details.
 
     """
 
@@ -56,7 +56,7 @@ class StatusReporter(rose.reporter.Reporter):
                       clip=None):
         """Handle a message or event."""
         message_kwargs = {}
-        if isinstance(message, rose.reporter.Event):
+        if isinstance(message, metomi.rose.reporter.Event):
             if kind is None:
                 kind = message.kind
             if level is None:
@@ -68,8 +68,8 @@ class StatusReporter(rose.reporter.Reporter):
 
     def report_load_event(
             self, text, no_progress=False, new_total_events=None):
-        """Report a load-related event (to rose.gtk.util.SplashScreen)."""
-        event = rose.reporter.Event(text,
+        """Report a load-related event (to metomi.rose.gtk.util.SplashScreen)."""
+        event = metomi.rose.reporter.Event(text,
                                     kind=self.EVENT_KIND_LOAD,
                                     no_progress=no_progress,
                                     new_total_events=new_total_events)
@@ -87,7 +87,7 @@ class StatusBar(Gtk.VBox):
 
     """Generate the status bar widget."""
 
-    def __init__(self, verbosity=rose.reporter.Reporter.DEFAULT):
+    def __init__(self, verbosity=metomi.rose.reporter.Reporter.DEFAULT):
         super(StatusBar, self).__init__()
         self.verbosity = verbosity
         self.num_errors = 0
@@ -105,12 +105,12 @@ class StatusBar(Gtk.VBox):
         hbox.pack_start(vsep_eb, expand=True, fill=True)
         self._generate_message_widget()
         hbox.pack_end(self._message_widget, expand=False, fill=False,
-                      padding=rose.config_editor.SPACING_SUB_PAGE)
+                      padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
         self.messages = []
         self.show()
 
     def set_message(self, message, kind=None, level=None):
-        if isinstance(message, rose.reporter.Event):
+        if isinstance(message, metomi.rose.reporter.Event):
             if kind is None:
                 kind = message.kind
             if level is None:
@@ -118,10 +118,10 @@ class StatusBar(Gtk.VBox):
         if level > self.verbosity:
             return
         if isinstance(message, Exception):
-            kind = rose.reporter.Reporter.KIND_ERR
-            level = rose.reporter.Reporter.FAIL
+            kind = metomi.rose.reporter.Reporter.KIND_ERR
+            level = metomi.rose.reporter.Reporter.FAIL
         self.messages.append((kind, str(message), time.time()))
-        if len(self.messages) > rose.config_editor.STATUS_BAR_MESSAGE_LIMIT:
+        if len(self.messages) > metomi.rose.config_editor.STATUS_BAR_MESSAGE_LIMIT:
             self.messages.pop(0)
         self._update_message_widget(str(message), kind=kind)
         self._update_console()
@@ -140,9 +140,9 @@ class StatusBar(Gtk.VBox):
         # Generate the error display widget.
         self._error_widget = Gtk.HBox()
         self._error_widget.show()
-        locator = rose.resource.ResourceLocator(paths=sys.path)
+        locator = metomi.rose.resource.ResourceLocator(paths=sys.path)
         icon_path = locator.locate(
-            'etc/images/rose-config-edit/error_icon.xpm')
+            'etc/images/metomi.rose.config-edit/error_icon.xpm')
         image = Gtk.image_new_from_file(icon_path)
         image.show()
         self._error_widget.pack_start(image, expand=False, fill=False)
@@ -150,7 +150,7 @@ class StatusBar(Gtk.VBox):
         self._error_widget_label.show()
         self._error_widget.pack_start(
             self._error_widget_label, expand=False, fill=False,
-            padding=rose.config_editor.SPACING_SUB_PAGE)
+            padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
         self._update_error_widget()
 
     def _generate_message_widget(self):
@@ -172,10 +172,10 @@ class StatusBar(Gtk.VBox):
         self._message_widget_label.show()
         vsep = Gtk.VSeparator()
         vsep.show()
-        self._console_launcher = rose.gtk.util.CustomButton(
+        self._console_launcher = metomi.rose.gtk.util.CustomButton(
             stock_id=Gtk.STOCK_INFO,
             size=Gtk.IconSize.MENU,
-            tip_text=rose.config_editor.STATUS_BAR_CONSOLE_TIP,
+            tip_text=metomi.rose.config_editor.STATUS_BAR_CONSOLE_TIP,
             as_tool=True)
         self._console_launcher.connect("clicked", self._launch_console)
         style = Gtk.RcStyle()
@@ -192,10 +192,10 @@ class StatusBar(Gtk.VBox):
         message_hbox.pack_start(
             self._message_widget_label,
             expand=False, fill=False,
-            padding=rose.config_editor.SPACING_SUB_PAGE)
+            padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
         message_hbox.pack_start(
             vsep, expand=False, fill=False,
-            padding=rose.config_editor.SPACING_SUB_PAGE)
+            padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
         message_hbox.pack_start(
             self._console_launcher, expand=False, fill=False)
 
@@ -206,7 +206,7 @@ class StatusBar(Gtk.VBox):
 
     def _update_message_widget(self, message_text, kind):
         # Update the message display widget.
-        if kind == rose.reporter.Reporter.KIND_ERR:
+        if kind == metomi.rose.reporter.Reporter.KIND_ERR:
             self._message_widget_error_image.show()
             self._message_widget_info_image.hide()
         else:
@@ -218,22 +218,22 @@ class StatusBar(Gtk.VBox):
     def _handle_enter_message_widget(self, *args):
         tooltip_text = ""
         for kind, message_text, message_time in self.messages[-5:]:
-            if kind == rose.reporter.Reporter.KIND_ERR:
-                prefix = rose.reporter.Reporter.PREFIX_FAIL
+            if kind == metomi.rose.reporter.Reporter.KIND_ERR:
+                prefix = metomi.rose.reporter.Reporter.PREFIX_FAIL
             else:
-                prefix = rose.reporter.Reporter.PREFIX_INFO
+                prefix = metomi.rose.reporter.Reporter.PREFIX_INFO
             suffix = datetime.datetime.fromtimestamp(message_time).strftime(
-                rose.config_editor.EVENT_TIME)
+                metomi.rose.config_editor.EVENT_TIME)
             tooltip_text += prefix + " " + message_text + " " + suffix + "\n"
         tooltip_text = tooltip_text.rstrip()
         self._message_widget_label.set_tooltip_text(tooltip_text)
 
     def _get_console_messages(self):
-        err_category = rose.config_editor.STATUS_BAR_CONSOLE_CATEGORY_ERROR
-        info_category = rose.config_editor.STATUS_BAR_CONSOLE_CATEGORY_INFO
+        err_category = metomi.rose.config_editor.STATUS_BAR_CONSOLE_CATEGORY_ERROR
+        info_category = metomi.rose.config_editor.STATUS_BAR_CONSOLE_CATEGORY_INFO
         message_tuples = []
         for kind, message, time_info in self.messages:
-            if kind == rose.reporter.Reporter.KIND_ERR:
+            if kind == metomi.rose.reporter.Reporter.KIND_ERR:
                 category = err_category
             else:
                 category = info_category
@@ -247,10 +247,10 @@ class StatusBar(Gtk.VBox):
         if self.console is not None:
             return self.console.present()
         message_tuples = self._get_console_messages()
-        err_category = rose.config_editor.STATUS_BAR_CONSOLE_CATEGORY_ERROR
-        info_category = rose.config_editor.STATUS_BAR_CONSOLE_CATEGORY_INFO
+        err_category = metomi.rose.config_editor.STATUS_BAR_CONSOLE_CATEGORY_ERROR
+        info_category = metomi.rose.config_editor.STATUS_BAR_CONSOLE_CATEGORY_INFO
         window = self.get_toplevel()
-        self.console = rose.gtk.console.ConsoleWindow(
+        self.console = metomi.rose.gtk.console.ConsoleWindow(
             [err_category, info_category], message_tuples,
             [Gtk.STOCK_DIALOG_ERROR, Gtk.STOCK_DIALOG_INFO],
             parent=window,

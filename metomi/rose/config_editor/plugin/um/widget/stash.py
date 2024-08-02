@@ -26,20 +26,20 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-import rose.config
-import rose.config_editor.panelwidget.summary_data
-import rose.config_tree
-import rose.gtk.dialog
-import rose.gtk.util
-import rose.reporter
-import rose.resource
+import metomi.rose.config
+import metomi.rose.config_editor.panelwidget.summary_data
+import metomi.rose.config_tree
+import metomi.rose.gtk.dialog
+import metomi.rose.gtk.util
+import metomi.rose.reporter
+import metomi.rose.resource
 
-import rose.config_editor.plugin.um.widget.stash_add as stash_add
-import rose.config_editor.plugin.um.widget.stash_util as stash_util
+import metomi.rose.config_editor.plugin.um.widget.stash_add as stash_add
+import metomi.rose.config_editor.plugin.um.widget.stash_util as stash_util
 
 
 class BaseStashSummaryDataPanelv1(
-        rose.config_editor.panelwidget.summary_data.BaseSummaryDataPanel):
+        metomi.rose.config_editor.panelwidget.summary_data.BaseSummaryDataPanel):
 
     """This is a base class for displaying and editing STASH requests.
 
@@ -53,7 +53,7 @@ class BaseStashSummaryDataPanelv1(
     information.
 
     Subclasses *must* override the STASH_PACKAGE_PATH attribute with an
-    absolute path to a directory containing a rose-app.conf file with
+    absolute path to a directory containing a metomi.rose.app.conf file with
     STASH request package information.
 
     Subclasses should override the STASHMASTER_PATH attribute with an
@@ -212,7 +212,7 @@ class BaseStashSummaryDataPanelv1(
             sort_list[3] = section
         sub_sect_names.sort(lambda x, y: cmp(section_sort_keys.get(x),
                                              section_sort_keys.get(y)))
-        sub_var_names.sort(rose.config.sort_settings)
+        sub_var_names.sort(metomi.rose.config.sort_settings)
         sub_var_names.sort(lambda x, y: (y != self.STREQ_NL_PACKAGE_OPT) -
                                         (x != self.STREQ_NL_PACKAGE_OPT))
         sub_var_names.sort(lambda x, y: (y == self.STREQ_NL_ITEM_OPT) -
@@ -238,7 +238,7 @@ class BaseStashSummaryDataPanelv1(
             else:
                 desc = stash_props[self.STASH_PARSE_DESC_OPT].strip()
                 row_data.append(desc)
-            is_enabled = (rose.variable.IGNORED_BY_USER not in
+            is_enabled = (metomi.rose.variable.IGNORED_BY_USER not in
                           self.sections[section].ignored_reason)
             row_data.append(str(is_enabled))
             for opt in sub_var_names:
@@ -247,7 +247,7 @@ class BaseStashSummaryDataPanelv1(
                 if var is None:
                     row_data.append(None)
                 else:
-                    row_data.append(rose.gtk.util.safe_str(var.value))
+                    row_data.append(metomi.rose.gtk.util.safe_str(var.value))
             row_data.append(section)
             data_rows.append(row_data)
         # Set the column names and their ordering.
@@ -282,15 +282,15 @@ class BaseStashSummaryDataPanelv1(
         if self.STASHMASTER_META_PATH is None:
             return {}
         try:
-            config = rose.config_tree.ConfigTreeLoader().load(
+            config = metomi.rose.config_tree.ConfigTreeLoader().load(
                 self.STASHMASTER_META_PATH,
                 self.STASHMASTER_META_FILENAME).node
-        except (rose.config.ConfigSyntaxError, IOError, OSError) as exc:
-            rose.reporter.Reporter()(
+        except (metomi.rose.config.ConfigSyntaxError, IOError, OSError) as exc:
+            metomi.rose.reporter.Reporter()(
                 "Error loading STASHmaster metadata resource: " +
                 type(exc).__name__ + ": " + str(exc) + "\n",
-                kind=rose.reporter.Reporter.KIND_ERR,
-                level=rose.reporter.Reporter.FAIL
+                kind=metomi.rose.reporter.Reporter.KIND_ERR,
+                level=metomi.rose.reporter.Reporter.FAIL
             )
             return {}
         stash_meta_dict = {}
@@ -352,7 +352,7 @@ class BaseStashSummaryDataPanelv1(
                     self._stashmaster_meta_lookup, stash_section, stash_item,
                     value
                 )
-                help_ = metadata.get(rose.META_PROP_HELP)
+                help_ = metadata.get(metomi.rose.META_PROP_HELP)
                 if help_ is not None:
                     tip_text += "\n\n" + help_
         else:
@@ -364,7 +364,7 @@ class BaseStashSummaryDataPanelv1(
                 return True
             id_data = self.var_id_map[id_]
             value = str(model.get_value(row_iter, col_index))
-            tip_text = rose.CONFIG_DELIMITER.join(
+            tip_text = metomi.rose.CONFIG_DELIMITER.join(
                 [section, option, value]) + "\n"
             if (option in self.OPTION_NL_MAP and
                     option in list(self._profile_location_map.keys())):
@@ -373,12 +373,12 @@ class BaseStashSummaryDataPanelv1(
                     profile_sect = self.util.get_section_option_from_id(
                         profile_id)[0]
                     tip_text += "See " + profile_sect
-        tip_text += id_data.metadata.get(rose.META_PROP_DESCRIPTION, "")
+        tip_text += id_data.metadata.get(metomi.rose.META_PROP_DESCRIPTION, "")
         if tip_text:
             tip_text += "\n"
         for key, value in list(id_data.error.items()):
             tip_text += (
-                rose.config_editor.SUMMARY_DATA_PANEL_ERROR_TIP.format(
+                metomi.rose.config_editor.SUMMARY_DATA_PANEL_ERROR_TIP.format(
                     key, value))
         for key in id_data.ignored_reason:
             tip_text += "({0})\n".format(key)
@@ -405,7 +405,7 @@ class BaseStashSummaryDataPanelv1(
         if col_title == self.DESCRIPTION_TITLE:
             meta_key = self.STASH_PARSE_DESC_OPT + "=" + str(value)
             metadata = self._stashmaster_meta_lookup.get(meta_key, {})
-            help_ = metadata.get(rose.META_PROP_HELP)
+            help_ = metadata.get(metomi.rose.META_PROP_HELP)
             if help_ is not None:
                 menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_HELP)
                 menuitem.set_label(label="Help")
@@ -453,8 +453,8 @@ class BaseStashSummaryDataPanelv1(
                        self.STREQ_NL_ITEM_OPT: item}
         new_section = self.add_section(None, opt_map=new_opt_map)
         if launch_dialog:
-            rose.gtk.dialog.run_dialog(
-                rose.gtk.dialog.DIALOG_TYPE_INFO,
+            metomi.rose.gtk.dialog.run_dialog(
+                metomi.rose.gtk.dialog.DIALOG_TYPE_INFO,
                 "Added request as {0}".format(new_section),
                 "New Request")
 
@@ -495,9 +495,9 @@ class BaseStashSummaryDataPanelv1(
         """Load a STASHmaster file into data structures for later use."""
         self._stash_lookup = self.get_stashmaster_lookup_dict()
         package_config_file = os.path.join(self.STASH_PACKAGE_PATH,
-                                           rose.SUB_CONFIG_NAME)
-        self.package_config = rose.config.ConfigNode()
-        rose.config.ConfigLoader().load_with_opts(package_config_file,
+                                           metomi.rose.SUB_CONFIG_NAME)
+        self.package_config = metomi.rose.config.ConfigNode()
+        metomi.rose.config.ConfigLoader().load_with_opts(package_config_file,
                                                   self.package_config)
         self.generate_package_lookup()
         self._stashmaster_meta_lookup = (
@@ -505,11 +505,11 @@ class BaseStashSummaryDataPanelv1(
 
     def _add_new_diagnostic_launcher(self):
         # Create a button for launching the "Add new STASH" dialog.
-        self._add_button = rose.gtk.util.CustomButton(
+        self._add_button = metomi.rose.gtk.util.CustomButton(
             label=self.ADD_NEW_STASH_LABEL,
             stock_id=Gtk.STOCK_ADD,
             tip_text=self.ADD_NEW_STASH_TIP)
-        package_button = rose.gtk.util.CustomButton(
+        package_button = metomi.rose.gtk.util.CustomButton(
             label=self.PACKAGE_MANAGER_LABEL,
             tip_text=self.PACKAGE_MANAGER_TIP,
             has_menu=True)
@@ -647,7 +647,7 @@ class BaseStashSummaryDataPanelv1(
 
     def _launch_record_help(self, menuitem):
         """Launch the help from a menu."""
-        rose.gtk.dialog.run_scrolled_dialog(menuitem._help_text,
+        metomi.rose.gtk.dialog.run_scrolled_dialog(menuitem._help_text,
                                             menuitem._help_title)
 
     def _refresh_diagnostic_window(self):
@@ -695,7 +695,7 @@ class BaseStashSummaryDataPanelv1(
         if value is None:
             cell.set_property("markup", None)
             cell.set_property("visible", False)
-        max_len = rose.config_editor.SUMMARY_DATA_PANEL_MAX_LEN
+        max_len = metomi.rose.config_editor.SUMMARY_DATA_PANEL_MAX_LEN
         if value is not None and len(value) > max_len and col_index != 0:
             cell.set_property("width-chars", max_len)
             cell.set_property("ellipsize", Pango.EllipsizeMode.END)
@@ -704,7 +704,7 @@ class BaseStashSummaryDataPanelv1(
             value = value.split("(")[-1].rstrip(")")
         if col_index == 0 and treemodel.iter_parent(iter_) is not None:
             cell.set_property("visible", False)
-        cell.set_property("markup", rose.gtk.util.safe_str(value))
+        cell.set_property("markup", metomi.rose.gtk.util.safe_str(value))
 
     def _update_available_profiles(self):
         # Retrieve which profiles (namelists like domain) are available.
@@ -754,7 +754,7 @@ class BaseStashSummaryDataPanelv1(
         for section, vars_ in list(self.variables.items()):
             for var in vars_:
                 if var.name == self.STREQ_NL_PACKAGE_OPT:
-                    is_ignored = (rose.variable.IGNORED_BY_USER in
+                    is_ignored = (metomi.rose.variable.IGNORED_BY_USER in
                                   self.sections[section].ignored_reason)
                     packages.setdefault(var.value, [])
                     packages[var.value].append(is_ignored)
@@ -861,7 +861,7 @@ class BaseStashSummaryDataPanelv1(
                         sect = self.util.get_section_option_from_id(
                             var.metadata["id"])[0]
                         if sect not in sections_for_changing:
-                            is_ignored = (rose.variable.IGNORED_BY_USER in
+                            is_ignored = (metomi.rose.variable.IGNORED_BY_USER in
                                           self.sections[sect].ignored_reason)
                             if is_ignored != disable:
                                 sections_for_changing.append(sect)
