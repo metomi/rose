@@ -56,30 +56,30 @@ import gi
 gi.require_version('Gtk', '3.0')
 import gtk  # Only used to run the main gtk loop.
 
-import metomi.metomi.rose.config
-import metomi.metomi.rose.config_editor
-import metomi.metomi.rose.config_editor.data
-import metomi.metomi.rose.config_editor.menu
-import metomi.metomi.rose.config_editor.nav_controller
-import metomi.metomi.rose.config_editor.nav_panel
-import metomi.metomi.rose.config_editor.nav_panel_menu
-import metomi.metomi.rose.config_editor.ops.group
-import metomi.metomi.rose.config_editor.ops.section
-import metomi.metomi.rose.config_editor.ops.variable
-import metomi.metomi.rose.config_editor.page
-import metomi.metomi.rose.config_editor.stack
-import metomi.metomi.rose.config_editor.status
-import metomi.metomi.rose.config_editor.updater
-import metomi.metomi.rose.config_editor.util
-import metomi.metomi.rose.config_editor.variable
-import metomi.metomi.rose.config_editor.window
-import metomi.metomi.rose.gtk.dialog
-import metomi.metomi.rose.gtk.splash
-import metomi.metomi.rose.gtk.util
-import metomi.metomi.rose.macro
-import metomi.metomi.rose.opt_parse
-import metomi.metomi.rose.resource
-import metomi.metomi.rose.macros
+import metomi.rose.config
+import metomi.rose.config_editor
+import metomi.rose.config_editor.data
+import metomi.rose.config_editor.menu
+import metomi.rose.config_editor.nav_controller
+import metomi.rose.config_editor.nav_panel
+import metomi.rose.config_editor.nav_panel_menu
+import metomi.rose.config_editor.ops.group
+import metomi.rose.config_editor.ops.section
+import metomi.rose.config_editor.ops.variable
+import metomi.rose.config_editor.page
+import metomi.rose.config_editor.stack
+import metomi.rose.config_editor.status
+import metomi.rose.config_editor.updater
+import metomi.rose.config_editor.util
+import metomi.rose.config_editor.variable
+import metomi.rose.config_editor.window
+import metomi.rose.gtk.dialog
+import metomi.rose.gtk.splash
+import metomi.rose.gtk.util
+import metomi.rose.macro
+import metomi.rose.opt_parse
+import metomi.rose.resource
+import metomi.rose.macros
 
 
 class MainController(object):
@@ -93,9 +93,9 @@ class MainController(object):
     plugging into other GTK applications. If pluggable is False,
     launch the standalone application.
 
-    load_updater is a metomi.metomi.rose.gtk.splash.SplashScreenProcess instance or
+    load_updater is a metomi.rose.gtk.splash.SplashScreenProcess instance or
     None, in which case it will be set to a
-    metomi.metomi.rose.gtk.splash.NullSplashScreenProcess.
+    metomi.rose.gtk.splash.NullSplashScreenProcess.
 
     load_all_apps is a boolean that overrides the load-on-demand
     automation to always load all sub configurations at start time.
@@ -117,69 +117,69 @@ class MainController(object):
         if config_objs is None:
             config_objs = {}
         if pluggable:
-            metomi.metomi.rose.macro.add_meta_paths()
+            metomi.rose.macro.add_meta_paths()
         if load_updater is None:
-            load_updater = metomi.metomi.rose.gtk.splash.NullSplashScreenProcess()
+            load_updater = metomi.rose.gtk.splash.NullSplashScreenProcess()
         self.is_pluggable = pluggable
         self.tab_windows = []  # No child windows yet
         self.orphan_pages = []
         self.undo_stack = []  # Nothing to undo yet
         self.redo_stack = []  # Nothing to redo yet
         self.find_hist = {'regex': '', 'ids': []}
-        self.util = metomi.metomi.rose.config_editor.util.Lookup()
+        self.util = metomi.rose.config_editor.util.Lookup()
         self.metadata_off = metadata_off
         if opt_meta_paths is None:
             opt_meta_paths = []
 
         # Set page variable 'verbosity' defaults.
         self.page_var_show_modes = {
-            metomi.metomi.rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION:
-            metomi.metomi.rose.config_editor.SHOULD_SHOW_CUSTOM_DESCRIPTION,
-            metomi.metomi.rose.config_editor.SHOW_MODE_CUSTOM_HELP:
-            metomi.metomi.rose.config_editor.SHOULD_SHOW_CUSTOM_HELP,
-            metomi.metomi.rose.config_editor.SHOW_MODE_CUSTOM_TITLE:
-            metomi.metomi.rose.config_editor.SHOULD_SHOW_CUSTOM_TITLE,
-            metomi.metomi.rose.config_editor.SHOW_MODE_FIXED:
-            metomi.metomi.rose.config_editor.SHOULD_SHOW_FIXED_VARS,
-            metomi.metomi.rose.config_editor.SHOW_MODE_FLAG_OPTIONAL:
-            metomi.metomi.rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL_VARS,
-            metomi.metomi.rose.config_editor.SHOW_MODE_FLAG_OPT_CONF:
-            metomi.metomi.rose.config_editor.SHOULD_SHOW_FLAG_OPT_CONF_VARS,
-            metomi.metomi.rose.config_editor.SHOW_MODE_FLAG_NO_META:
-            metomi.metomi.rose.config_editor.SHOULD_SHOW_FLAG_NO_META_VARS,
-            metomi.metomi.rose.config_editor.SHOW_MODE_IGNORED:
-            metomi.metomi.rose.config_editor.SHOULD_SHOW_IGNORED_VARS,
-            metomi.metomi.rose.config_editor.SHOW_MODE_USER_IGNORED:
-            metomi.metomi.rose.config_editor.SHOULD_SHOW_USER_IGNORED_VARS,
-            metomi.metomi.rose.config_editor.SHOW_MODE_LATENT:
-            metomi.metomi.rose.config_editor.SHOULD_SHOW_LATENT_VARS,
-            metomi.metomi.rose.config_editor.SHOW_MODE_NO_DESCRIPTION:
-            metomi.metomi.rose.config_editor.SHOULD_SHOW_NO_DESCRIPTION,
-            metomi.metomi.rose.config_editor.SHOW_MODE_NO_HELP:
-            metomi.metomi.rose.config_editor.SHOULD_SHOW_NO_HELP,
-            metomi.metomi.rose.config_editor.SHOW_MODE_NO_TITLE:
-            metomi.metomi.rose.config_editor.SHOULD_SHOW_NO_TITLE
+            metomi.rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION:
+            metomi.rose.config_editor.SHOULD_SHOW_CUSTOM_DESCRIPTION,
+            metomi.rose.config_editor.SHOW_MODE_CUSTOM_HELP:
+            metomi.rose.config_editor.SHOULD_SHOW_CUSTOM_HELP,
+            metomi.rose.config_editor.SHOW_MODE_CUSTOM_TITLE:
+            metomi.rose.config_editor.SHOULD_SHOW_CUSTOM_TITLE,
+            metomi.rose.config_editor.SHOW_MODE_FIXED:
+            metomi.rose.config_editor.SHOULD_SHOW_FIXED_VARS,
+            metomi.rose.config_editor.SHOW_MODE_FLAG_OPTIONAL:
+            metomi.rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL_VARS,
+            metomi.rose.config_editor.SHOW_MODE_FLAG_OPT_CONF:
+            metomi.rose.config_editor.SHOULD_SHOW_FLAG_OPT_CONF_VARS,
+            metomi.rose.config_editor.SHOW_MODE_FLAG_NO_META:
+            metomi.rose.config_editor.SHOULD_SHOW_FLAG_NO_META_VARS,
+            metomi.rose.config_editor.SHOW_MODE_IGNORED:
+            metomi.rose.config_editor.SHOULD_SHOW_IGNORED_VARS,
+            metomi.rose.config_editor.SHOW_MODE_USER_IGNORED:
+            metomi.rose.config_editor.SHOULD_SHOW_USER_IGNORED_VARS,
+            metomi.rose.config_editor.SHOW_MODE_LATENT:
+            metomi.rose.config_editor.SHOULD_SHOW_LATENT_VARS,
+            metomi.rose.config_editor.SHOW_MODE_NO_DESCRIPTION:
+            metomi.rose.config_editor.SHOULD_SHOW_NO_DESCRIPTION,
+            metomi.rose.config_editor.SHOW_MODE_NO_HELP:
+            metomi.rose.config_editor.SHOULD_SHOW_NO_HELP,
+            metomi.rose.config_editor.SHOW_MODE_NO_TITLE:
+            metomi.rose.config_editor.SHOULD_SHOW_NO_TITLE
         }
 
         # Set page tree 'verbosity' defaults.
         self.page_ns_show_modes = {
-            metomi.metomi.rose.config_editor.SHOW_MODE_IGNORED:
-            metomi.metomi.rose.config_editor.SHOULD_SHOW_IGNORED_PAGES,
-            metomi.metomi.rose.config_editor.SHOW_MODE_USER_IGNORED:
-            metomi.metomi.rose.config_editor.SHOULD_SHOW_USER_IGNORED_PAGES,
-            metomi.metomi.rose.config_editor.SHOW_MODE_LATENT:
-            metomi.metomi.rose.config_editor.SHOULD_SHOW_LATENT_PAGES,
-            metomi.metomi.rose.config_editor.SHOW_MODE_NO_TITLE:
-            metomi.metomi.rose.config_editor.SHOULD_SHOW_NO_TITLE
+            metomi.rose.config_editor.SHOW_MODE_IGNORED:
+            metomi.rose.config_editor.SHOULD_SHOW_IGNORED_PAGES,
+            metomi.rose.config_editor.SHOW_MODE_USER_IGNORED:
+            metomi.rose.config_editor.SHOULD_SHOW_USER_IGNORED_PAGES,
+            metomi.rose.config_editor.SHOW_MODE_LATENT:
+            metomi.rose.config_editor.SHOULD_SHOW_LATENT_PAGES,
+            metomi.rose.config_editor.SHOW_MODE_NO_TITLE:
+            metomi.rose.config_editor.SHOULD_SHOW_NO_TITLE
         }
 
-        self.reporter = metomi.metomi.rose.config_editor.status.StatusReporter(
+        self.reporter = metomi.rose.config_editor.status.StatusReporter(
             load_updater,
             self.update_status_text
         )
 
         # Load the top configuration directory
-        self.data = metomi.metomi.rose.config_editor.data.ConfigDataManager(
+        self.data = metomi.rose.config_editor.data.ConfigDataManager(
             self.util,
             self.reporter,
             self.page_ns_show_modes,
@@ -189,16 +189,16 @@ class MainController(object):
         )
 
         self.nav_controller = (
-            metomi.metomi.rose.config_editor.nav_controller.NavTreeManager(
+            metomi.rose.config_editor.nav_controller.NavTreeManager(
                 self.data,
                 self.util,
                 self.reporter,
                 self.tree_trigger_update
             ))
 
-        self.mainwindow = metomi.metomi.rose.config_editor.window.MainWindow()
+        self.mainwindow = metomi.rose.config_editor.window.MainWindow()
 
-        self.section_ops = metomi.metomi.rose.config_editor.ops.section.SectionOperations(
+        self.section_ops = metomi.rose.config_editor.ops.section.SectionOperations(
             self.data, self.util, self.reporter,
             self.undo_stack, self.redo_stack,
             self.check_cannot_enable_setting,
@@ -211,7 +211,7 @@ class MainController(object):
         )
 
         self.variable_ops = (
-            metomi.metomi.rose.config_editor.ops.variable.VariableOperations(
+            metomi.rose.config_editor.ops.variable.VariableOperations(
                 self.data, self.util, self.reporter,
                 self.undo_stack, self.redo_stack,
                 self.section_ops.add_section,
@@ -220,7 +220,7 @@ class MainController(object):
                 search_id_func=self.perform_find_by_id
             ))
 
-        self.group_ops = metomi.metomi.rose.config_editor.ops.group.GroupOperations(
+        self.group_ops = metomi.rose.config_editor.ops.group.GroupOperations(
             self.data, self.util, self.reporter,
             self.undo_stack, self.redo_stack,
             self.section_ops,
@@ -231,7 +231,7 @@ class MainController(object):
         )
 
         # Add in the main menu bar and tool bar handler.
-        self.main_handle = metomi.metomi.rose.config_editor.menu.MainMenuHandler(
+        self.main_handle = metomi.rose.config_editor.menu.MainMenuHandler(
             self.data, self.util, self.reporter,
             self.mainwindow,
             self.undo_stack, self.redo_stack,
@@ -246,7 +246,7 @@ class MainController(object):
         )
 
         # Add in the navigation panel menu handler.
-        self.nav_handle = metomi.metomi.rose.config_editor.nav_panel_menu.NavPanelHandler(
+        self.nav_handle = metomi.rose.config_editor.nav_panel_menu.NavPanelHandler(
             self.data, self.util, self.reporter,
             self.mainwindow,
             self.undo_stack, self.redo_stack,
@@ -260,7 +260,7 @@ class MainController(object):
             self.main_handle.launch_graph
         )
 
-        self.updater = metomi.metomi.rose.config_editor.updater.Updater(
+        self.updater = metomi.rose.config_editor.updater.Updater(
             self.data, self.util, self.reporter,
             self.mainwindow, self.main_handle,
             self.nav_controller,
@@ -276,7 +276,7 @@ class MainController(object):
                        load_no_apps=load_no_apps)
 
         self.reporter.report_load_event(
-            metomi.metomi.rose.config_editor.EVENT_LOAD_STATUSES.format(
+            metomi.rose.config_editor.EVENT_LOAD_STATUSES.format(
                 self.data.top_level_name)
         )
 
@@ -286,7 +286,7 @@ class MainController(object):
             self.generate_nav_panel()
             self.generate_status_bar()
             # Create notebook (tabbed container) and connect signals.
-            self.notebook = metomi.metomi.rose.gtk.util.Notebook()
+            self.notebook = metomi.rose.gtk.util.Notebook()
 
         self.updater.nav_panel = getattr(self, "nav_panel", None)
 
@@ -310,13 +310,13 @@ class MainController(object):
                                                  self.handle_page_change)
         self.updater.update_all(is_loading=True)
         self.reporter.report_load_event(
-            metomi.metomi.rose.config_editor.EVENT_LOAD_ERRORS.format(
+            metomi.rose.config_editor.EVENT_LOAD_ERRORS.format(
                 self.data.top_level_name,
                 self.updater.load_errors
             ))
         self.updater.perform_startup_check()
         self.reporter.report_load_event(
-            metomi.metomi.rose.config_editor.EVENT_LOAD_DONE.format(
+            metomi.rose.config_editor.EVENT_LOAD_DONE.format(
                 self.data.top_level_name
             ))
         if (self.data.top_level_directory is None and not self.data.config):
@@ -330,88 +330,88 @@ class MainController(object):
 
     def generate_toolbar(self):
         """Link in the toolbar functionality."""
-        self.toolbar = metomi.metomi.rose.gtk.util.ToolBar(
+        self.toolbar = metomi.rose.gtk.util.ToolBar(
             widgets=[
-                (metomi.metomi.rose.config_editor.TOOLBAR_OPEN, 'Gtk.STOCK_OPEN'),
-                (metomi.metomi.rose.config_editor.TOOLBAR_SAVE, 'Gtk.STOCK_SAVE'),
-                (metomi.metomi.rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
+                (metomi.rose.config_editor.TOOLBAR_OPEN, 'Gtk.STOCK_OPEN'),
+                (metomi.rose.config_editor.TOOLBAR_SAVE, 'Gtk.STOCK_SAVE'),
+                (metomi.rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
                  'Gtk.STOCK_SPELL_CHECK'),
-                (metomi.metomi.rose.config_editor.TOOLBAR_LOAD_APPS, 'Gtk.STOCK_CDROM'),
-                (metomi.metomi.rose.config_editor.TOOLBAR_BROWSE, 'Gtk.STOCK_DIRECTORY'),
-                (metomi.metomi.rose.config_editor.TOOLBAR_UNDO, 'Gtk.STOCK_UNDO'),
-                (metomi.metomi.rose.config_editor.TOOLBAR_REDO, 'Gtk.STOCK_REDO'),
-                (metomi.metomi.rose.config_editor.TOOLBAR_ADD, 'Gtk.STOCK_ADD'),
-                (metomi.metomi.rose.config_editor.TOOLBAR_REVERT,
+                (metomi.rose.config_editor.TOOLBAR_LOAD_APPS, 'Gtk.STOCK_CDROM'),
+                (metomi.rose.config_editor.TOOLBAR_BROWSE, 'Gtk.STOCK_DIRECTORY'),
+                (metomi.rose.config_editor.TOOLBAR_UNDO, 'Gtk.STOCK_UNDO'),
+                (metomi.rose.config_editor.TOOLBAR_REDO, 'Gtk.STOCK_REDO'),
+                (metomi.rose.config_editor.TOOLBAR_ADD, 'Gtk.STOCK_ADD'),
+                (metomi.rose.config_editor.TOOLBAR_REVERT,
                  'Gtk.STOCK_REVERT_TO_SAVED'),
-                (metomi.metomi.rose.config_editor.TOOLBAR_FIND, 'Gtk.Entry'),
-                (metomi.metomi.rose.config_editor.TOOLBAR_FIND_NEXT, 'Gtk.STOCK_FIND'),
-                (metomi.metomi.rose.config_editor.TOOLBAR_VALIDATE,
+                (metomi.rose.config_editor.TOOLBAR_FIND, 'Gtk.Entry'),
+                (metomi.rose.config_editor.TOOLBAR_FIND_NEXT, 'Gtk.STOCK_FIND'),
+                (metomi.rose.config_editor.TOOLBAR_VALIDATE,
                  'Gtk.STOCK_DIALOG_QUESTION'),
-                (metomi.metomi.rose.config_editor.TOOLBAR_TRANSFORM,
+                (metomi.rose.config_editor.TOOLBAR_TRANSFORM,
                  'Gtk.STOCK_CONVERT'),
-                (metomi.metomi.rose.config_editor.TOOLBAR_VIEW_OUTPUT,
+                (metomi.rose.config_editor.TOOLBAR_VIEW_OUTPUT,
                  'Gtk.STOCK_DIRECTORY'),
-                (metomi.metomi.rose.config_editor.TOOLBAR_SUITE_GCONTROL,
-                 'metomi.metomi.rose.gtk-scheduler')
+                (metomi.rose.config_editor.TOOLBAR_SUITE_GCONTROL,
+                 'metomi.rose.gtk-scheduler')
             ],
             sep_on_name=[
-                metomi.metomi.rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
-                metomi.metomi.rose.config_editor.TOOLBAR_BROWSE,
-                metomi.metomi.rose.config_editor.TOOLBAR_REDO,
-                metomi.metomi.rose.config_editor.TOOLBAR_REVERT,
-                metomi.metomi.rose.config_editor.TOOLBAR_FIND_NEXT,
-                metomi.metomi.rose.config_editor.TOOLBAR_TRANSFORM
+                metomi.rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
+                metomi.rose.config_editor.TOOLBAR_BROWSE,
+                metomi.rose.config_editor.TOOLBAR_REDO,
+                metomi.rose.config_editor.TOOLBAR_REVERT,
+                metomi.rose.config_editor.TOOLBAR_FIND_NEXT,
+                metomi.rose.config_editor.TOOLBAR_TRANSFORM
             ]
         )
         assign = self.toolbar.set_widget_function
-        assign(metomi.metomi.rose.config_editor.TOOLBAR_OPEN, self.load_from_file)
-        assign(metomi.metomi.rose.config_editor.TOOLBAR_SAVE, self.save_to_file)
-        assign(metomi.metomi.rose.config_editor.TOOLBAR_CHECK_AND_SAVE, self.save_to_file,
+        assign(metomi.rose.config_editor.TOOLBAR_OPEN, self.load_from_file)
+        assign(metomi.rose.config_editor.TOOLBAR_SAVE, self.save_to_file)
+        assign(metomi.rose.config_editor.TOOLBAR_CHECK_AND_SAVE, self.save_to_file,
                [None, True])
-        assign(metomi.metomi.rose.config_editor.TOOLBAR_LOAD_APPS, self.handle_load_all)
-        assign(metomi.metomi.rose.config_editor.TOOLBAR_BROWSE,
+        assign(metomi.rose.config_editor.TOOLBAR_LOAD_APPS, self.handle_load_all)
+        assign(metomi.rose.config_editor.TOOLBAR_BROWSE,
                self.main_handle.launch_browser)
-        assign(metomi.metomi.rose.config_editor.TOOLBAR_UNDO, self.perform_undo)
-        assign(metomi.metomi.rose.config_editor.TOOLBAR_REDO, self.perform_undo, [True])
-        assign(metomi.metomi.rose.config_editor.TOOLBAR_REVERT, self.revert_to_saved_data)
-        assign(metomi.metomi.rose.config_editor.TOOLBAR_FIND_NEXT, self._launch_find)
-        assign(metomi.metomi.rose.config_editor.TOOLBAR_VALIDATE,
+        assign(metomi.rose.config_editor.TOOLBAR_UNDO, self.perform_undo)
+        assign(metomi.rose.config_editor.TOOLBAR_REDO, self.perform_undo, [True])
+        assign(metomi.rose.config_editor.TOOLBAR_REVERT, self.revert_to_saved_data)
+        assign(metomi.rose.config_editor.TOOLBAR_FIND_NEXT, self._launch_find)
+        assign(metomi.rose.config_editor.TOOLBAR_VALIDATE,
                self.main_handle.check_all_extra)
-        assign(metomi.metomi.rose.config_editor.TOOLBAR_TRANSFORM,
+        assign(metomi.rose.config_editor.TOOLBAR_TRANSFORM,
                self.main_handle.transform_default)
-        assign(metomi.metomi.rose.config_editor.TOOLBAR_VIEW_OUTPUT,
+        assign(metomi.rose.config_editor.TOOLBAR_VIEW_OUTPUT,
                self.main_handle.launch_output_viewer)
-        assign(metomi.metomi.rose.config_editor.TOOLBAR_SUITE_GCONTROL,
+        assign(metomi.rose.config_editor.TOOLBAR_SUITE_GCONTROL,
                self.main_handle.launch_scheduler)
         self.find_entry = self.toolbar.item_dict.get(
-            metomi.metomi.rose.config_editor.TOOLBAR_FIND)['widget']
+            metomi.rose.config_editor.TOOLBAR_FIND)['widget']
         self.find_entry.connect("activate", self._launch_find)
         self.find_entry.connect("changed", self._clear_find)
         add_icon = self.toolbar.item_dict.get(
-            metomi.metomi.rose.config_editor.TOOLBAR_ADD)['widget']
+            metomi.rose.config_editor.TOOLBAR_ADD)['widget']
         add_icon.connect('button_press_event', self.add_page_variable)
-        custom_text = metomi.metomi.rose.config_editor.TOOLBAR_SUITE_RUN_MENU
-        self._toolbar_run_button = metomi.metomi.rose.gtk.util.CustomMenuButton(
+        custom_text = metomi.rose.config_editor.TOOLBAR_SUITE_RUN_MENU
+        self._toolbar_run_button = metomi.rose.gtk.util.CustomMenuButton(
             stock_id=Gtk.STOCK_MEDIA_PLAY,
             menu_items=[(custom_text, Gtk.STOCK_MEDIA_PLAY)],
             menu_funcs=[self.main_handle.get_run_suite_args],
-            tip_text=metomi.metomi.rose.config_editor.TOOLBAR_SUITE_RUN)
+            tip_text=metomi.rose.config_editor.TOOLBAR_SUITE_RUN)
         self._toolbar_run_button.connect("clicked", self.main_handle.run_suite)
         self.toolbar.insert(self._toolbar_run_button, -1)
 
         self.toolbar.set_widget_sensitive(
-            metomi.metomi.rose.config_editor.TOOLBAR_SUITE_GCONTROL,
-            any(c.config_type == metomi.metomi.rose.TOP_CONFIG_NAME
+            metomi.rose.config_editor.TOOLBAR_SUITE_GCONTROL,
+            any(c.config_type == metomi.rose.TOP_CONFIG_NAME
                 for c in list(self.data.config.values())))
 
         self.toolbar.set_widget_sensitive(
-            metomi.metomi.rose.config_editor.TOOLBAR_VIEW_OUTPUT,
-            any(c.config_type == metomi.metomi.rose.TOP_CONFIG_NAME
+            metomi.rose.config_editor.TOOLBAR_VIEW_OUTPUT,
+            any(c.config_type == metomi.rose.TOP_CONFIG_NAME
                 for c in list(self.data.config.values())))
 
     def generate_menubar(self):
         """Link in the menu functionality and accelerators."""
-        self.menubar = metomi.metomi.rose.config_editor.menu.MenuBar()
+        self.menubar = metomi.rose.config_editor.menu.MenuBar()
         self.menu_widgets = {}
         menu_list = [
             ('/TopMenuBar/File/Open...', self.load_from_file),
@@ -432,74 +432,74 @@ class MainController(object):
             ('/TopMenuBar/Edit/Stack', self.main_handle.view_stack),
             ('/TopMenuBar/View/View fixed vars',
              lambda m: self._set_page_var_show_modes(
-                 metomi.metomi.rose.config_editor.SHOW_MODE_FIXED,
+                 metomi.rose.config_editor.SHOW_MODE_FIXED,
                  m.get_active()
              )),
             ('/TopMenuBar/View/View ignored vars',
              lambda m: self._set_page_var_show_modes(
-                 metomi.metomi.rose.config_editor.SHOW_MODE_IGNORED,
+                 metomi.rose.config_editor.SHOW_MODE_IGNORED,
                  m.get_active()
              )),
             ('/TopMenuBar/View/View user-ignored vars',
              lambda m: self._set_page_var_show_modes(
-                 metomi.metomi.rose.config_editor.SHOW_MODE_USER_IGNORED,
+                 metomi.rose.config_editor.SHOW_MODE_USER_IGNORED,
                  m.get_active()
              )),
             ('/TopMenuBar/View/View latent vars',
              lambda m: self._set_page_var_show_modes(
-                 metomi.metomi.rose.config_editor.SHOW_MODE_LATENT,
+                 metomi.rose.config_editor.SHOW_MODE_LATENT,
                  m.get_active()
              )),
             ('/TopMenuBar/View/View ignored pages',
              lambda m: self._set_page_ns_show_modes(
-                 metomi.metomi.rose.config_editor.SHOW_MODE_IGNORED,
+                 metomi.rose.config_editor.SHOW_MODE_IGNORED,
                  m.get_active()
              )),
             ('/TopMenuBar/View/View user-ignored pages',
              lambda m: self._set_page_ns_show_modes(
-                 metomi.metomi.rose.config_editor.SHOW_MODE_USER_IGNORED,
+                 metomi.rose.config_editor.SHOW_MODE_USER_IGNORED,
                  m.get_active()
              )),
             ('/TopMenuBar/View/View latent pages',
              lambda m: self._set_page_ns_show_modes(
-                 metomi.metomi.rose.config_editor.SHOW_MODE_LATENT,
+                 metomi.rose.config_editor.SHOW_MODE_LATENT,
                  m.get_active()
              )),
             ('/TopMenuBar/View/Flag no-metadata vars',
              lambda m: self._set_page_var_show_modes(
-                 metomi.metomi.rose.config_editor.SHOW_MODE_FLAG_NO_META,
+                 metomi.rose.config_editor.SHOW_MODE_FLAG_NO_META,
                  m.get_active()
              )),
             ('/TopMenuBar/View/Flag opt config vars',
              lambda m: self._set_page_var_show_modes(
-                 metomi.metomi.rose.config_editor.SHOW_MODE_FLAG_OPT_CONF,
+                 metomi.rose.config_editor.SHOW_MODE_FLAG_OPT_CONF,
                  m.get_active()
              )),
             ('/TopMenuBar/View/Flag optional vars',
              lambda m: self._set_page_var_show_modes(
-                 metomi.metomi.rose.config_editor.SHOW_MODE_FLAG_OPTIONAL,
+                 metomi.rose.config_editor.SHOW_MODE_FLAG_OPTIONAL,
                  m.get_active()
              )),
             ('/TopMenuBar/View/View status bar',
              lambda m: self._set_show_status_bar(m.get_active())),
             ('/TopMenuBar/Metadata/Prefs/View without descriptions',
              lambda m: self._set_page_show_modes(
-                 metomi.metomi.rose.config_editor.SHOW_MODE_NO_DESCRIPTION,
+                 metomi.rose.config_editor.SHOW_MODE_NO_DESCRIPTION,
                  m.get_active()
              )),
             ('/TopMenuBar/Metadata/Prefs/View without help',
              lambda m: self._set_page_show_modes(
-                 metomi.metomi.rose.config_editor.SHOW_MODE_NO_HELP,
+                 metomi.rose.config_editor.SHOW_MODE_NO_HELP,
                  m.get_active()
              )),
             ('/TopMenuBar/Metadata/Prefs/View without titles',
              lambda m: self._set_page_show_modes(
-                 metomi.metomi.rose.config_editor.SHOW_MODE_NO_TITLE,
+                 metomi.rose.config_editor.SHOW_MODE_NO_TITLE,
                  m.get_active()
              )),
             ('/TopMenuBar/Metadata/All V',
              lambda m: self.main_handle.handle_run_custom_macro(
-                 method_name=metomi.metomi.rose.macro.VALIDATE_METHOD
+                 method_name=metomi.rose.macro.VALIDATE_METHOD
              )),
             ('/TopMenuBar/Metadata/Autofix',
              lambda m: self.main_handle.transform_default()),
@@ -542,33 +542,33 @@ class MainController(object):
         ]
         is_toggled = dict(
             [('/TopMenuBar/View/View fixed vars',
-              metomi.metomi.rose.config_editor.SHOULD_SHOW_FIXED_VARS),
+              metomi.rose.config_editor.SHOULD_SHOW_FIXED_VARS),
              ('/TopMenuBar/View/View ignored vars',
-              metomi.metomi.rose.config_editor.SHOULD_SHOW_IGNORED_VARS),
+              metomi.rose.config_editor.SHOULD_SHOW_IGNORED_VARS),
              ('/TopMenuBar/View/View user-ignored vars',
-              metomi.metomi.rose.config_editor.SHOULD_SHOW_USER_IGNORED_VARS),
+              metomi.rose.config_editor.SHOULD_SHOW_USER_IGNORED_VARS),
              ('/TopMenuBar/View/View latent vars',
-              metomi.metomi.rose.config_editor.SHOULD_SHOW_LATENT_VARS),
+              metomi.rose.config_editor.SHOULD_SHOW_LATENT_VARS),
              ('/TopMenuBar/Metadata/Prefs/View without descriptions',
-              metomi.metomi.rose.config_editor.SHOULD_SHOW_NO_DESCRIPTION),
+              metomi.rose.config_editor.SHOULD_SHOW_NO_DESCRIPTION),
              ('/TopMenuBar/Metadata/Prefs/View without help',
-              metomi.metomi.rose.config_editor.SHOULD_SHOW_NO_HELP),
+              metomi.rose.config_editor.SHOULD_SHOW_NO_HELP),
              ('/TopMenuBar/Metadata/Prefs/View without titles',
-              metomi.metomi.rose.config_editor.SHOULD_SHOW_NO_TITLE),
+              metomi.rose.config_editor.SHOULD_SHOW_NO_TITLE),
              ('/TopMenuBar/View/View ignored pages',
-              metomi.metomi.rose.config_editor.SHOULD_SHOW_IGNORED_PAGES),
+              metomi.rose.config_editor.SHOULD_SHOW_IGNORED_PAGES),
              ('/TopMenuBar/View/View user-ignored pages',
-              metomi.metomi.rose.config_editor.SHOULD_SHOW_USER_IGNORED_PAGES),
+              metomi.rose.config_editor.SHOULD_SHOW_USER_IGNORED_PAGES),
              ('/TopMenuBar/View/View latent pages',
-              metomi.metomi.rose.config_editor.SHOULD_SHOW_LATENT_PAGES),
+              metomi.rose.config_editor.SHOULD_SHOW_LATENT_PAGES),
              ('/TopMenuBar/View/Flag opt config vars',
-              metomi.metomi.rose.config_editor.SHOULD_SHOW_FLAG_OPT_CONF_VARS),
+              metomi.rose.config_editor.SHOULD_SHOW_FLAG_OPT_CONF_VARS),
              ('/TopMenuBar/View/Flag optional vars',
-              metomi.metomi.rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL_VARS),
+              metomi.rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL_VARS),
              ('/TopMenuBar/View/Flag no-metadata vars',
-              metomi.metomi.rose.config_editor.SHOULD_SHOW_FLAG_NO_META_VARS),
+              metomi.rose.config_editor.SHOULD_SHOW_FLAG_NO_META_VARS),
              ('/TopMenuBar/View/View status bar',
-              metomi.metomi.rose.config_editor.SHOULD_SHOW_STATUS_BAR),
+              metomi.rose.config_editor.SHOULD_SHOW_STATUS_BAR),
              ('/TopMenuBar/Metadata/Switch off metadata',
               self.metadata_off)]
         )
@@ -578,10 +578,10 @@ class MainController(object):
             if address in is_toggled:
                 widget.set_active(is_toggled[address])
                 if (address.endswith("View user-ignored pages") and
-                        metomi.metomi.rose.config_editor.SHOULD_SHOW_IGNORED_PAGES):
+                        metomi.rose.config_editor.SHOULD_SHOW_IGNORED_PAGES):
                     widget.set_sensitive(False)
                 if (address.endswith("View user-ignored vars") and
-                        metomi.metomi.rose.config_editor.SHOULD_SHOW_IGNORED_VARS):
+                        metomi.rose.config_editor.SHOULD_SHOW_IGNORED_VARS):
                     widget.set_sensitive(False)
             if address.endswith("Reload metadata") and self.metadata_off:
                 widget.set_sensitive(False)
@@ -603,7 +603,7 @@ class MainController(object):
                 add_menuitem
             ))
         self.main_handle.load_macro_menu(self.menubar)
-        if not any(c.config_type == metomi.metomi.rose.TOP_CONFIG_NAME
+        if not any(c.config_type == metomi.rose.TOP_CONFIG_NAME
                    for c in list(self.data.config.values())):
             self.menubar.uimanager.get_widget(
                 "/TopMenuBar/Tools/Run Suite").set_sensitive(False)
@@ -611,36 +611,36 @@ class MainController(object):
         self.top_menu = self.menubar.uimanager.get_widget('/TopMenuBar')
         # Load the keyboard accelerators.
         accel = {
-            metomi.metomi.rose.config_editor.ACCEL_UNDO:
+            metomi.rose.config_editor.ACCEL_UNDO:
             self.perform_undo,
-            metomi.metomi.rose.config_editor.ACCEL_REDO:
+            metomi.rose.config_editor.ACCEL_REDO:
             lambda: self.perform_undo(redo_mode_on=True),
-            metomi.metomi.rose.config_editor.ACCEL_FIND:
+            metomi.rose.config_editor.ACCEL_FIND:
             self.find_entry.grab_focus,
-            metomi.metomi.rose.config_editor.ACCEL_FIND_NEXT:
+            metomi.rose.config_editor.ACCEL_FIND_NEXT:
             lambda: self.perform_find(self.find_hist['regex']),
-            metomi.metomi.rose.config_editor.ACCEL_HELP_GUI:
+            metomi.rose.config_editor.ACCEL_HELP_GUI:
             self.main_handle.help,
-            metomi.metomi.rose.config_editor.ACCEL_OPEN:
+            metomi.rose.config_editor.ACCEL_OPEN:
             self.load_from_file,
-            metomi.metomi.rose.config_editor.ACCEL_SAVE:
+            metomi.rose.config_editor.ACCEL_SAVE:
             self.save_to_file,
-            metomi.metomi.rose.config_editor.ACCEL_QUIT:
+            metomi.rose.config_editor.ACCEL_QUIT:
             self.main_handle.destroy,
-            metomi.metomi.rose.config_editor.ACCEL_METADATA_REFRESH:
+            metomi.rose.config_editor.ACCEL_METADATA_REFRESH:
             self._refresh_metadata_if_on,
-            metomi.metomi.rose.config_editor.ACCEL_SUITE_RUN:
+            metomi.rose.config_editor.ACCEL_SUITE_RUN:
             self.main_handle.run_suite,
-            metomi.metomi.rose.config_editor.ACCEL_BROWSER:
+            metomi.rose.config_editor.ACCEL_BROWSER:
             self.main_handle.launch_browser,
-            metomi.metomi.rose.config_editor.ACCEL_TERMINAL:
+            metomi.rose.config_editor.ACCEL_TERMINAL:
             self.main_handle.launch_terminal,
         }
         self.menubar.set_accelerators(accel)
 
     def generate_nav_panel(self):
         """"Create tree panel and link functions."""
-        self.nav_panel = metomi.metomi.rose.config_editor.nav_panel.PageNavigationPanel(
+        self.nav_panel = metomi.rose.config_editor.nav_panel.PageNavigationPanel(
             self.nav_controller.namespace_tree,
             self.handle_launch_request,
             self.nav_handle.get_ns_metadata_and_comments,
@@ -651,9 +651,9 @@ class MainController(object):
 
     def generate_status_bar(self):
         """Create a status bar."""
-        self.status_bar = metomi.metomi.rose.config_editor.status.StatusBar(
-            verbosity=metomi.metomi.rose.config_editor.STATUS_BAR_VERBOSITY)
-        self._set_show_status_bar(metomi.metomi.rose.config_editor.SHOULD_SHOW_STATUS_BAR)
+        self.status_bar = metomi.rose.config_editor.status.StatusBar(
+            verbosity=metomi.rose.config_editor.STATUS_BAR_VERBOSITY)
+        self._set_show_status_bar(metomi.rose.config_editor.SHOULD_SHOW_STATUS_BAR)
 
 # ----------------- Page manipulation functions ------------------------------
 
@@ -665,7 +665,7 @@ class MainController(object):
                 load_these.append(item)
         load_these.sort()
         number_of_events = (len(load_these) *
-                            metomi.metomi.rose.config_editor.LOAD_NUMBER_OF_EVENTS + 2)
+                            metomi.rose.config_editor.LOAD_NUMBER_OF_EVENTS + 2)
         self.reporter.report_load_event(
             "Loading all preview apps",
             new_total_events=number_of_events
@@ -675,7 +675,7 @@ class MainController(object):
             self.data.load_config(config_data.directory, preview=False,
                                   metadata_off=self.metadata_off)
             self.reporter.report_load_event(
-                metomi.metomi.rose.config_editor.EVENT_LOADED.format(namespace_name[1:]),
+                metomi.rose.config_editor.EVENT_LOADED.format(namespace_name[1:]),
                 no_progress=True
             )
         self.reload_namespace_tree()
@@ -704,7 +704,7 @@ class MainController(object):
 
         if config_data.is_preview:
             self.reporter.report_load_event(
-                metomi.metomi.rose.config_editor.EVENT_LOAD_ATTEMPT.format(
+                metomi.rose.config_editor.EVENT_LOAD_ATTEMPT.format(
                     namespace_name),
                 new_total_events=3)
             self.data.load_config(config_data.directory, preview=False,
@@ -712,7 +712,7 @@ class MainController(object):
             self.reload_namespace_tree()
             self.nav_panel.update_row_tooltips()
             self.reporter.report_load_event(
-                metomi.metomi.rose.config_editor.EVENT_LOADED.format(namespace_name),
+                metomi.rose.config_editor.EVENT_LOADED.format(namespace_name),
                 no_progress=True)
             self.reporter.stop()
             if hasattr(self, 'menubar'):
@@ -750,18 +750,18 @@ class MainController(object):
             namespace_name)
         config_data = self.data.config[config_name]
         ns_metadata = self.data.namespace_meta_lookup.get(namespace_name, {})
-        description = ns_metadata.get(metomi.metomi.rose.META_PROP_DESCRIPTION, '')
-        duplicate = ns_metadata.get(metomi.metomi.rose.META_PROP_DUPLICATE)
-        help_ = ns_metadata.get(metomi.metomi.rose.META_PROP_HELP)
-        url = ns_metadata.get(metomi.metomi.rose.META_PROP_URL)
-        custom_widget = ns_metadata.get(metomi.metomi.rose.config_editor.META_PROP_WIDGET)
+        description = ns_metadata.get(metomi.rose.META_PROP_DESCRIPTION, '')
+        duplicate = ns_metadata.get(metomi.rose.META_PROP_DUPLICATE)
+        help_ = ns_metadata.get(metomi.rose.META_PROP_HELP)
+        url = ns_metadata.get(metomi.rose.META_PROP_URL)
+        custom_widget = ns_metadata.get(metomi.rose.config_editor.META_PROP_WIDGET)
         custom_sub_widget = ns_metadata.get(
-            metomi.metomi.rose.config_editor.META_PROP_WIDGET_SUB_NS)
+            metomi.rose.config_editor.META_PROP_WIDGET_SUB_NS)
         has_sub_data = self.data.helper.is_ns_sub_data(namespace_name)
-        label = ns_metadata.get(metomi.metomi.rose.META_PROP_TITLE)
+        label = ns_metadata.get(metomi.rose.META_PROP_TITLE)
         if label is None:
             label = subspace.split('/')[-1]
-        if duplicate == metomi.metomi.rose.META_PROP_VALUE_TRUE and not has_sub_data:
+        if duplicate == metomi.rose.META_PROP_VALUE_TRUE and not has_sub_data:
             # For example, namelist/foo/1 should be shown as foo(1).
             label = "(".join(subspace.split('/')[-2:]) + ")"
         section_data_objects, latent_section_data_objects = (
@@ -770,20 +770,20 @@ class MainController(object):
         see_also = ''
         sections = [s for s in ns_metadata.get('sections', [])]
         for section_name in [s for s in sections if s.startswith('namelist')]:
-            no_num_name = metomi.metomi.rose.macro.REC_ID_STRIP_DUPL.sub("", section_name)
-            no_mod_name = metomi.metomi.rose.macro.REC_ID_STRIP.sub("", section_name)
+            no_num_name = metomi.rose.macro.REC_ID_STRIP_DUPL.sub("", section_name)
+            no_mod_name = metomi.rose.macro.REC_ID_STRIP.sub("", section_name)
             ok_names = [section_name, no_num_name + "(:)",
                         no_mod_name + "(:)"]
             if no_mod_name != no_num_name:
                 # There's a modifier in the section name.
                 ok_names.append(no_num_name)
             for section, variables in list(config_data.vars.now.items()):
-                if not section.startswith(metomi.metomi.rose.SUB_CONFIG_FILE_DIR):
+                if not section.startswith(metomi.rose.SUB_CONFIG_FILE_DIR):
                     continue
                 for variable in variables:
-                    if variable.name != metomi.metomi.rose.FILE_VAR_SOURCE:
+                    if variable.name != metomi.rose.FILE_VAR_SOURCE:
                         continue
-                    var_values = metomi.metomi.rose.variable.array_split(variable.value)
+                    var_values = metomi.rose.variable.array_split(variable.value)
                     for i, val in enumerate(var_values):
                         if val.startswith("(") and val.endswith(")"):
                             # It is optional - e.g. "(namelist:baz)".
@@ -821,7 +821,7 @@ class MainController(object):
         }
         if len(sections) == 1:
             page_metadata.update({"id": sections.pop()})
-        sect_ops = metomi.metomi.rose.config_editor.ops.section.SectionOperations(
+        sect_ops = metomi.rose.config_editor.ops.section.SectionOperations(
             self.data, self.util, self.reporter,
             self.undo_stack, self.redo_stack,
             self.check_cannot_enable_setting,
@@ -832,7 +832,7 @@ class MainController(object):
             view_page_func=self.view_page,
             kill_page_func=self.kill_page
         )
-        var_ops = metomi.metomi.rose.config_editor.ops.variable.VariableOperations(
+        var_ops = metomi.rose.config_editor.ops.variable.VariableOperations(
             self.data, self.util, self.reporter,
             self.undo_stack, self.redo_stack,
             sect_ops.add_section,
@@ -847,7 +847,7 @@ class MainController(object):
             namespace_name)
         launch_edit = lambda: self.nav_handle.edit_request(
             namespace_name)
-        page = metomi.metomi.rose.config_editor.page.ConfigPage(
+        page = metomi.rose.config_editor.page.ConfigPage(
             page_metadata,
             data,
             latent_data,
@@ -883,22 +883,22 @@ class MainController(object):
             tab_window = Gtk.Window()
             tab_window.set_icon(self.mainwindow.window.get_icon())
             tab_window.add_accel_group(self.menubar.accelerators)
-            tab_window.set_default_size(*metomi.metomi.rose.config_editor.SIZE_PAGE_DETACH)
+            tab_window.set_default_size(*metomi.rose.config_editor.SIZE_PAGE_DETACH)
             tab_window.connect('destroy-event', lambda w, e:
                                self.tab_windows.remove(w) and False)
             tab_window.connect('delete-event', lambda w, e:
                                self.tab_windows.remove(w) and False)
         else:
             tab_window = old_window
-        add_button = metomi.metomi.rose.gtk.util.CustomButton(
+        add_button = metomi.rose.gtk.util.CustomButton(
             stock_id=Gtk.STOCK_ADD,
-            tip_text=metomi.metomi.rose.config_editor.TIP_ADD_TO_PAGE,
+            tip_text=metomi.rose.config_editor.TIP_ADD_TO_PAGE,
             size=Gtk.IconSize.LARGE_TOOLBAR,
             as_tool=True
         )
-        revert_button = metomi.metomi.rose.gtk.util.CustomButton(
+        revert_button = metomi.rose.gtk.util.CustomButton(
             stock_id=Gtk.STOCK_REVERT_TO_SAVED,
-            tip_text=metomi.metomi.rose.config_editor.TIP_REVERT_PAGE,
+            tip_text=metomi.rose.config_editor.TIP_REVERT_PAGE,
             size=Gtk.IconSize.LARGE_TOOLBAR,
             as_tool=True
         )
@@ -911,7 +911,7 @@ class MainController(object):
             parent = old_window
         page.reshuffle_for_detached(add_button, revert_button, parent)
         tab_window.set_title(' - '.join([page.label, self.data.top_level_name,
-                                         metomi.metomi.rose.config_editor.PROGRAM_NAME]))
+                                         metomi.rose.config_editor.PROGRAM_NAME]))
         tab_window.add(page)
         tab_window.connect_after('focus-in-event', self.handle_page_change)
         if old_window is None:
@@ -952,9 +952,9 @@ class MainController(object):
             ns = current_page.namespace
             metadata = self.data.namespace_meta_lookup.get(ns, {})
             get_widget("/TopMenuBar/Page/Page Help").set_sensitive(
-                metomi.metomi.rose.META_PROP_HELP in metadata)
+                metomi.rose.META_PROP_HELP in metadata)
             get_widget("/TopMenuBar/Page/Page Web Help").set_sensitive(
-                metomi.metomi.rose.META_PROP_URL in metadata)
+                metomi.rose.META_PROP_URL in metadata)
 
     def set_current_page_indicator(self, namespace):
         """Make sure the current page is highlighted in the nav panel."""
@@ -981,7 +981,7 @@ class MainController(object):
         page.reload_from_data(config_data, ghost_data)
         self.data.load_node_namespaces(config_name)
         self.updater.update_status(page)
-        self.reporter.report(metomi.metomi.rose.config_editor.EVENT_REVERT.format(
+        self.reporter.report(metomi.rose.config_editor.EVENT_REVERT.format(
             namespace.lstrip("/")))
 
     def _get_pagelist(self):
@@ -1038,7 +1038,7 @@ class MainController(object):
         """Set namespace view options."""
         self.page_ns_show_modes[key] = is_key_allowed
         if (hasattr(self, "menubar") and
-                key == metomi.metomi.rose.config_editor.SHOW_MODE_IGNORED):
+                key == metomi.rose.config_editor.SHOW_MODE_IGNORED):
             user_ign_item = self.menubar.uimanager.get_widget(
                 "/TopMenuBar/View/View user-ignored pages")
             user_ign_item.set_sensitive(not is_key_allowed)
@@ -1050,7 +1050,7 @@ class MainController(object):
         for page in self.pagelist:
             page.react_to_show_modes(key, is_key_allowed)
         if (hasattr(self, "menubar") and
-                key == metomi.metomi.rose.config_editor.SHOW_MODE_IGNORED):
+                key == metomi.rose.config_editor.SHOW_MODE_IGNORED):
             user_ign_item = self.menubar.uimanager.get_widget(
                 "/TopMenuBar/View/View user-ignored vars")
             user_ign_item.set_sensitive(not is_key_allowed)
@@ -1146,7 +1146,7 @@ class MainController(object):
             self.data.load_top_config(dirname)
             self.data.saved_config_names = set(self.data.config.keys())
             self.mainwindow.window.set_title(self.data.top_level_name +
-                                             ' - metomi.metomi.rose.config-editor')
+                                             ' - metomi.rose.config-editor')
             self.updater.update_all()
             self.updater.perform_startup_check()
         else:
@@ -1176,13 +1176,13 @@ class MainController(object):
                     self.view_page(var.metadata["full_ns"],
                                    var.metadata["id"])
                     page_address = var.metadata["full_ns"].lstrip("/")
-                    metomi.metomi.rose.gtk.dialog.run_dialog(
-                        metomi.metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                        metomi.metomi.rose.config_editor.ERROR_SAVE_BLANK.format(
+                    metomi.rose.gtk.dialog.run_dialog(
+                        metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                        metomi.rose.config_editor.ERROR_SAVE_BLANK.format(
                             short_config_name,
                             page_address
                         ),
-                        title=metomi.metomi.rose.config_editor.ERROR_SAVE_TITLE.format(
+                        title=metomi.rose.config_editor.ERROR_SAVE_TITLE.format(
                             short_config_name),
                         modal=False
                     )
@@ -1208,7 +1208,7 @@ class MainController(object):
                         None
                     )
                     dialog.set_markup(
-                        metomi.metomi.rose.config_editor.WARNING_ERRORS_FOUND_ON_SAVE.format(
+                        metomi.rose.config_editor.WARNING_ERRORS_FOUND_ON_SAVE.format(
                             short_config_name
                         ))
                     res = dialog.run()
@@ -1219,17 +1219,17 @@ class MainController(object):
             # Dump the configuration.
             filename = config_data.config_type
             if (directory is None and
-                    config_data.config_type == metomi.metomi.rose.INFO_CONFIG_NAME):
+                    config_data.config_type == metomi.rose.INFO_CONFIG_NAME):
                 directory = self.data.top_level_directory
             save_path = os.path.join(directory, filename)
-            metomi.metomi.rose.macro.pretty_format_config(config, ignore_error=True)
+            metomi.rose.macro.pretty_format_config(config, ignore_error=True)
             try:
-                metomi.metomi.rose.config.dump(config, save_path)
+                metomi.rose.config.dump(config, save_path)
             except (OSError, IOError) as exc:
-                metomi.metomi.rose.gtk.dialog.run_dialog(
-                    metomi.metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                    metomi.metomi.rose.config_editor.ERROR_SAVE_PATH_FAIL.format(exc),
-                    title=metomi.metomi.rose.config_editor.ERROR_SAVE_TITLE.format(
+                metomi.rose.gtk.dialog.run_dialog(
+                    metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                    metomi.rose.config_editor.ERROR_SAVE_PATH_FAIL.format(exc),
+                    title=metomi.rose.config_editor.ERROR_SAVE_TITLE.format(
                         short_config_name),
                     modal=False
                 )
@@ -1290,30 +1290,30 @@ class MainController(object):
         """Add a configuration, optionally with META=TYPE=meta."""
         config_short_name = config_name.split("/")[-1]
         root = os.path.join(self.data.top_level_directory,
-                            metomi.metomi.rose.SUB_CONFIGS_DIR)
-        new_path = os.path.join(root, config_short_name, metomi.metomi.rose.SUB_CONFIG_NAME)
-        new_config = metomi.metomi.rose.config.ConfigNode()
+                            metomi.rose.SUB_CONFIGS_DIR)
+        new_path = os.path.join(root, config_short_name, metomi.rose.SUB_CONFIG_NAME)
+        new_config = metomi.rose.config.ConfigNode()
         if meta is not None:
             new_config.set(
-                [metomi.metomi.rose.CONFIG_SECT_TOP, metomi.metomi.rose.CONFIG_OPT_META_TYPE],
+                [metomi.rose.CONFIG_SECT_TOP, metomi.rose.CONFIG_OPT_META_TYPE],
                 meta
             )
         try:
             os.mkdir(os.path.dirname(new_path))
-            metomi.metomi.rose.config.dump(new_config, new_path)
+            metomi.rose.config.dump(new_config, new_path)
         except (OSError, IOError) as exc:
-            text = metomi.metomi.rose.config_editor.ERROR_CONFIG_CREATE.format(
+            text = metomi.rose.config_editor.ERROR_CONFIG_CREATE.format(
                 new_path, type(exc), str(exc))
-            title = metomi.metomi.rose.config_editor.ERROR_CONFIG_CREATE_TITLE
-            metomi.metomi.rose.gtk.dialog.run_dialog(metomi.metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
+            title = metomi.rose.config_editor.ERROR_CONFIG_CREATE_TITLE
+            metomi.rose.gtk.dialog.run_dialog(metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                        text, title)
             return False
         self.data.load_config(os.path.dirname(new_path), reload_tree_on=True,
                               skip_load_event=True)
-        stack_item = metomi.metomi.rose.config_editor.stack.StackItem(
+        stack_item = metomi.rose.config_editor.stack.StackItem(
             config_name,
-            metomi.metomi.rose.config_editor.STACK_ACTION_ADDED,
-            metomi.metomi.rose.variable.Variable('', '', {}),
+            metomi.rose.config_editor.STACK_ACTION_ADDED,
+            metomi.rose.variable.Variable('', '', {}),
             self._remove_config,
             (config_name, meta)
         )
@@ -1346,18 +1346,18 @@ class MainController(object):
             try:
                 shutil.rmtree(dirpath)
             except (shutil.Error, OSError, IOError) as exc:
-                text = metomi.metomi.rose.config_editor.ERROR_CONFIG_DELETE.format(
+                text = metomi.rose.config_editor.ERROR_CONFIG_DELETE.format(
                     dirpath, type(exc), str(exc))
-                title = metomi.metomi.rose.config_editor.ERROR_CONFIG_CREATE_TITLE
-                metomi.metomi.rose.gtk.dialog.run_dialog(metomi.metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                title = metomi.rose.config_editor.ERROR_CONFIG_CREATE_TITLE
+                metomi.rose.gtk.dialog.run_dialog(metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                            text, title)
                 return False
         self.data.config.pop(config_name)
         self.reload_namespace_tree()
-        stack_item = metomi.metomi.rose.config_editor.stack.StackItem(
+        stack_item = metomi.rose.config_editor.stack.StackItem(
             config_name,
-            metomi.metomi.rose.config_editor.STACK_ACTION_REMOVED,
-            metomi.metomi.rose.variable.Variable('', '', {}),
+            metomi.rose.config_editor.STACK_ACTION_REMOVED,
+            metomi.rose.variable.Variable('', '', {}),
             self._add_config,
             (config_name, meta)
         )
@@ -1384,9 +1384,9 @@ class MainController(object):
         """Update bar functionality like Undo and Redo."""
         if not hasattr(self, 'toolbar'):
             return False
-        self.toolbar.set_widget_sensitive(metomi.metomi.rose.config_editor.TOOLBAR_UNDO,
+        self.toolbar.set_widget_sensitive(metomi.rose.config_editor.TOOLBAR_UNDO,
                                           len(self.undo_stack) > 0)
-        self.toolbar.set_widget_sensitive(metomi.metomi.rose.config_editor.TOOLBAR_REDO,
+        self.toolbar.set_widget_sensitive(metomi.rose.config_editor.TOOLBAR_REDO,
                                           len(self.redo_stack) > 0)
         self._get_menu_widget('/Undo').set_sensitive(len(self.undo_stack) > 0)
         self._get_menu_widget('/Redo').set_sensitive(len(self.redo_stack) > 0)
@@ -1394,14 +1394,14 @@ class MainController(object):
             len(self.find_hist['ids']) > 0)
         self._get_menu_widget('/Load All Apps').set_sensitive(
             self._has_preview_apps())
-        self.toolbar.set_widget_sensitive(metomi.metomi.rose.config_editor.TOOLBAR_LOAD_APPS,
+        self.toolbar.set_widget_sensitive(metomi.rose.config_editor.TOOLBAR_LOAD_APPS,
                                           self._has_preview_apps())
         if not hasattr(self, "nav_panel"):
             return False
         changes, errors = self.nav_panel.get_change_error_totals()
         self.status_bar.set_num_errors(errors)
         self._get_menu_widget('/Autofix').set_sensitive(bool(errors))
-        self.toolbar.set_widget_sensitive(metomi.metomi.rose.config_editor.TOOLBAR_TRANSFORM,
+        self.toolbar.set_widget_sensitive(metomi.rose.config_editor.TOOLBAR_TRANSFORM,
                                           bool(errors))
         self._update_changed_sensitivity(is_changed=bool(changes))
 
@@ -1412,10 +1412,10 @@ class MainController(object):
 
     def _update_changed_sensitivity(self, is_changed=False):
         """Alter sensitivity of 'unsaved changes' related widgets."""
-        self.toolbar.set_widget_sensitive(metomi.metomi.rose.config_editor.TOOLBAR_SAVE,
+        self.toolbar.set_widget_sensitive(metomi.rose.config_editor.TOOLBAR_SAVE,
                                           is_changed)
         self.toolbar.set_widget_sensitive(
-            metomi.metomi.rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
+            metomi.rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
             is_changed
         )
         self._get_menu_widget('/Save').set_sensitive(is_changed)
@@ -1467,7 +1467,7 @@ class MainController(object):
                 meta_files = self.data.load_meta_files(meta_config_tree)
                 macro_module_prefix = (
                     self.data.helper.get_macro_module_prefix(config_name))
-                macros = metomi.metomi.rose.macro.load_meta_macro_modules(
+                macros = metomi.rose.macro.load_meta_macro_modules(
                     meta_files, module_prefix=macro_module_prefix)
             config_data.meta = meta_config
             self.data.load_builtin_macros(config_name)
@@ -1477,12 +1477,12 @@ class MainController(object):
             sects, l_sects = self.data.load_sections_from_config(config_name)
             s_sects, s_l_sects = self.data.load_sections_from_config(
                 config_name, save=True)
-            config_data.sections = metomi.metomi.rose.config_editor.data.SectData(
+            config_data.sections = metomi.rose.config_editor.data.SectData(
                 sects, l_sects, s_sects, s_l_sects)
             var, l_var = self.data.load_vars_from_config(config_name)
             s_var, s_l_var = self.data.load_vars_from_config(
                 config_name, save=True)
-            config_data.vars = metomi.metomi.rose.config_editor.data.VarData(
+            config_data.vars = metomi.rose.config_editor.data.VarData(
                 var, l_var, s_var, s_l_var)
             config_data.meta_files = meta_files
             config_data.macros = macros
@@ -1574,21 +1574,21 @@ class MainController(object):
         if expression is not None and expression != '':
             page, var_id = self.perform_find(expression, start_page)
             if page is None:
-                text = metomi.metomi.rose.config_editor.WARNING_NOT_FOUND
+                text = metomi.rose.config_editor.WARNING_NOT_FOUND
                 try:  # Needs PyGTK >= 2.16
                     self.find_entry.set_icon_from_stock(
                         0, Gtk.STOCK_DIALOG_WARNING)
                     self.find_entry.set_icon_tooltip_text(0, text)
                 except AttributeError:
-                    metomi.metomi.rose.gtk.dialog.run_dialog(
-                        metomi.metomi.rose.gtk.dialog.DIALOG_TYPE_INFO,
+                    metomi.rose.gtk.dialog.run_dialog(
+                        metomi.rose.gtk.dialog.DIALOG_TYPE_INFO,
                         text,
-                        metomi.metomi.rose.config_editor.WARNING_NOT_FOUND_TITLE
+                        metomi.rose.config_editor.WARNING_NOT_FOUND_TITLE
                     )
             else:
                 if var_id is not None:
                     self.reporter.report(
-                        metomi.metomi.rose.config_editor.EVENT_FOUND_ID.format(var_id))
+                        metomi.rose.config_editor.EVENT_FOUND_ID.format(var_id))
                 self._clear_find()
 
     def _clear_find(self, *args):
@@ -1632,11 +1632,11 @@ class MainController(object):
         try:
             reg_find = re.compile(expression).search
         except sre_constants.error as exc:
-            metomi.metomi.rose.gtk.dialog.run_dialog(
-                metomi.metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                metomi.metomi.rose.config_editor.ERROR_NOT_REGEX.format(
+            metomi.rose.gtk.dialog.run_dialog(
+                metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                metomi.rose.config_editor.ERROR_NOT_REGEX.format(
                     expression, str(exc)),
-                metomi.metomi.rose.config_editor.ERROR_BAD_FIND)
+                metomi.rose.config_editor.ERROR_BAD_FIND)
             return None, None
         if self.find_hist['regex'] != expression:
             self.find_hist['ids'] = []
@@ -1660,8 +1660,8 @@ class MainController(object):
             for variable in search_vars:
                 var_id = variable.metadata.get('id')
                 ns = variable.metadata.get('full_ns')
-                if (metomi.metomi.rose.META_PROP_TITLE in variable.metadata and
-                        reg_find(variable.metadata[metomi.metomi.rose.META_PROP_TITLE])):
+                if (metomi.rose.META_PROP_TITLE in variable.metadata and
+                        reg_find(variable.metadata[metomi.rose.META_PROP_TITLE])):
                     found_ns_vars.setdefault(ns, [])
                     found_ns_vars[ns].append(variable)
                     continue
@@ -1732,9 +1732,9 @@ class MainController(object):
         is_group = len(do_list) > 1
         stack_info = []
         namespace_id_map = {}
-        event_text = metomi.metomi.rose.config_editor.EVENT_UNDO
+        event_text = metomi.rose.config_editor.EVENT_UNDO
         if redo_mode_on:
-            event_text = metomi.metomi.rose.config_editor.EVENT_REDO
+            event_text = metomi.rose.config_editor.EVENT_REDO
         for stack_item in do_list:
             action = stack_item.action
             node = stack_item.node
@@ -1820,7 +1820,7 @@ class MainController(object):
                     title = stack_item.name
                 else:
                     title = node_id
-                id_text = metomi.metomi.rose.config_editor.EVENT_UNDO_ACTION_ID.format(
+                id_text = metomi.rose.config_editor.EVENT_UNDO_ACTION_ID.format(
                     action, title)
                 self.reporter.report(event_text.format(id_text))
         if is_group:
@@ -1848,27 +1848,27 @@ def spawn_window(config_directory_path=None, debug_mode=False,
         opt_meta_paths = []
     if not debug_mode:
         warnings.filterwarnings('ignore')
-    resourcer = metomi.metomi.rose.resource.ResourceLocator.default()
-    metomi.metomi.rose.gtk.util.rc_setup(
-        resourcer.locate('metomi.metomi.rose.config-edit/.gtkrc-2.0'))
-    metomi.metomi.rose.gtk.util.setup_stock_icons()
-    logo = resourcer.locate('images/metomi.metomi.rose.splash-logo.png')
-    if metomi.metomi.rose.config_editor.ICON_PATH_SCHEDULER is None:
+    resourcer = metomi.rose.resource.ResourceLocator.default()
+    metomi.rose.gtk.util.rc_setup(
+        resourcer.locate('metomi.rose.config-edit/.gtkrc-2.0'))
+    metomi.rose.gtk.util.setup_stock_icons()
+    logo = resourcer.locate('images/metomi.rose.splash-logo.png')
+    if metomi.rose.config_editor.ICON_PATH_SCHEDULER is None:
         gcontrol_icon = None
     else:
         try:
             gcontrol_icon = resourcer.locate(
-                metomi.metomi.rose.config_editor.ICON_PATH_SCHEDULER)
-        except metomi.metomi.rose.resource.ResourceError:
+                metomi.rose.config_editor.ICON_PATH_SCHEDULER)
+        except metomi.rose.resource.ResourceError:
             gcontrol_icon = None
-    metomi.metomi.rose.gtk.util.setup_scheduler_icon(gcontrol_icon)
+    metomi.rose.gtk.util.setup_scheduler_icon(gcontrol_icon)
     number_of_events = (get_number_of_configs(config_directory_path) *
-                        metomi.metomi.rose.config_editor.LOAD_NUMBER_OF_EVENTS + 2)
+                        metomi.rose.config_editor.LOAD_NUMBER_OF_EVENTS + 2)
     if config_directory_path is None:
-        title = metomi.metomi.rose.config_editor.UNTITLED_NAME
+        title = metomi.rose.config_editor.UNTITLED_NAME
     else:
         title = config_directory_path.split("/")[-1]
-    splash_screen = metomi.metomi.rose.gtk.splash.SplashScreenProcess(logo, title,
+    splash_screen = metomi.rose.gtk.splash.SplashScreenProcess(logo, title,
                                                         number_of_events)
     try:
         ctrl = MainController(config_directory_path,
@@ -1927,11 +1927,11 @@ def spawn_window(config_directory_path=None, debug_mode=False,
 def spawn_subprocess_window(config_directory_path=None):
     """Launch a subprocess for a new config editor. Is it safe?"""
     if config_directory_path is None:
-        os.system(metomi.metomi.rose.config_editor.LAUNCH_COMMAND + ' --new &')
+        os.system(metomi.rose.config_editor.LAUNCH_COMMAND + ' --new &')
         return
     elif not os.path.isdir(str(config_directory_path)):
         return
-    os.system(metomi.metomi.rose.config_editor.LAUNCH_COMMAND_CONFIG +
+    os.system(metomi.rose.config_editor.LAUNCH_COMMAND_CONFIG +
               config_directory_path + " &")
 
 
@@ -1940,9 +1940,9 @@ def get_number_of_configs(config_directory_path=None):
     number_to_load = 0
     if config_directory_path is not None:
         for listing in set(os.listdir(config_directory_path)):
-            if listing in metomi.metomi.rose.CONFIG_NAMES:
+            if listing in metomi.rose.CONFIG_NAMES:
                 number_to_load += 1
-        app_dir = os.path.join(config_directory_path, metomi.metomi.rose.SUB_CONFIGS_DIR)
+        app_dir = os.path.join(config_directory_path, metomi.rose.SUB_CONFIGS_DIR)
         if os.path.exists(app_dir):
             for entry in os.listdir(app_dir):
                 if (os.path.isdir(os.path.join(app_dir, entry)) and
@@ -1953,25 +1953,25 @@ def get_number_of_configs(config_directory_path=None):
 
 def main():
     """Launch from the command line."""
-    if (Gtk.pygtk_version[0] < metomi.metomi.rose.config_editor.MIN_PYGTK_VERSION[0] or
-            Gtk.pygtk_version[1] < metomi.metomi.rose.config_editor.MIN_PYGTK_VERSION[1]):
+    if (Gtk.pygtk_version[0] < metomi.rose.config_editor.MIN_PYGTK_VERSION[0] or
+            Gtk.pygtk_version[1] < metomi.rose.config_editor.MIN_PYGTK_VERSION[1]):
         this_version = '{0}.{1}.{2}'.format(*Gtk.pygtk_version)
         required_version = '{0}.{1}.{2}'.format(
-            *metomi.metomi.rose.config_editor.MIN_PYGTK_VERSION)
-        metomi.metomi.rose.gtk.dialog.run_dialog(
-            metomi.metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
-            metomi.metomi.rose.config_editor.ERROR_MIN_PYGTK_VERSION.format(
+            *metomi.rose.config_editor.MIN_PYGTK_VERSION)
+        metomi.rose.gtk.dialog.run_dialog(
+            metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
+            metomi.rose.config_editor.ERROR_MIN_PYGTK_VERSION.format(
                 required_version, this_version),
-            metomi.metomi.rose.config_editor.ERROR_MIN_PYGTK_VERSION_TITLE
+            metomi.rose.config_editor.ERROR_MIN_PYGTK_VERSION_TITLE
         )
         sys.exit(1)
     sys.path.append(os.getenv('ROSE_HOME'))
-    opt_parser = metomi.metomi.rose.opt_parse.RoseOptionParser()
+    opt_parser = metomi.rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("conf_dir", "meta_path", "new_mode",
                               "load_no_apps", "load_all_apps", "no_metadata",
                               "no_warn")
     opts, args = opt_parser.parse_args()
-    metomi.metomi.rose.macro.add_meta_paths()
+    metomi.rose.macro.add_meta_paths()
     opt_meta_paths = []
     if opts.meta_path:
         for meta_path in opts.meta_path:
@@ -1983,7 +1983,7 @@ def main():
     if opts.conf_dir:
         os.chdir(opts.conf_dir)
     path = os.getcwd()
-    name_set = set([metomi.metomi.rose.SUB_CONFIG_NAME, metomi.metomi.rose.TOP_CONFIG_NAME])
+    name_set = set([metomi.rose.SUB_CONFIG_NAME, metomi.rose.TOP_CONFIG_NAME])
     while True:
         if set(os.listdir(path)) & name_set:
             break
@@ -1996,7 +1996,7 @@ def main():
     cwd = os.getcwd()
     if opts.new_mode:
         cwd = None
-    metomi.metomi.rose.gtk.dialog.set_exception_hook_dialog(keep_alive=True)
+    metomi.rose.gtk.dialog.set_exception_hook_dialog(keep_alive=True)
     if opts.profile_mode:
         handle = tempfile.NamedTemporaryFile()
         cProfile.runctx("""spawn_window(cwd, debug_mode=opts.debug_mode,
