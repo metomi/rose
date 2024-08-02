@@ -25,10 +25,10 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config_editor
-import rose.gtk.dialog
-import rose.gtk.util
-import rose.variable
+import metomi.rose.config_editor
+import metomi.rose.gtk.dialog
+import metomi.rose.gtk.util
+import metomi.rose.variable
 
 
 class KeyWidget(Gtk.VBox):
@@ -36,16 +36,16 @@ class KeyWidget(Gtk.VBox):
     """This class generates a label or entry box for a variable name."""
 
     FLAG_ICON_MAP = {
-        rose.config_editor.FLAG_TYPE_DEFAULT: Gtk.STOCK_INFO,
-        rose.config_editor.FLAG_TYPE_ERROR: Gtk.STOCK_DIALOG_WARNING,
-        rose.config_editor.FLAG_TYPE_FIXED: Gtk.STOCK_DIALOG_AUTHENTICATION,
-        rose.config_editor.FLAG_TYPE_OPT_CONF: Gtk.STOCK_INDEX,
-        rose.config_editor.FLAG_TYPE_OPTIONAL: Gtk.STOCK_ABOUT,
-        rose.config_editor.FLAG_TYPE_NO_META: Gtk.STOCK_DIALOG_QUESTION,
+        metomi.rose.config_editor.FLAG_TYPE_DEFAULT: Gtk.STOCK_INFO,
+        metomi.rose.config_editor.FLAG_TYPE_ERROR: Gtk.STOCK_DIALOG_WARNING,
+        metomi.rose.config_editor.FLAG_TYPE_FIXED: Gtk.STOCK_DIALOG_AUTHENTICATION,
+        metomi.rose.config_editor.FLAG_TYPE_OPT_CONF: Gtk.STOCK_INDEX,
+        metomi.rose.config_editor.FLAG_TYPE_OPTIONAL: Gtk.STOCK_ABOUT,
+        metomi.rose.config_editor.FLAG_TYPE_NO_META: Gtk.STOCK_DIALOG_QUESTION,
     }
 
-    MODIFIED_COLOUR = rose.gtk.util.color_parse(
-        rose.config_editor.COLOUR_VARIABLE_CHANGED)
+    MODIFIED_COLOUR = metomi.rose.gtk.util.color_parse(
+        metomi.rose.config_editor.COLOUR_VARIABLE_CHANGED)
 
     LABEL_X_OFFSET = 0.01
 
@@ -96,14 +96,14 @@ class KeyWidget(Gtk.VBox):
         self.update_comment_display()
         self.entry.show()
         for key, value in list(self.show_modes.items()):
-            if key not in [rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION,
-                           rose.config_editor.SHOW_MODE_CUSTOM_HELP,
-                           rose.config_editor.SHOW_MODE_CUSTOM_TITLE]:
+            if key not in [metomi.rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION,
+                           metomi.rose.config_editor.SHOW_MODE_CUSTOM_HELP,
+                           metomi.rose.config_editor.SHOW_MODE_CUSTOM_TITLE]:
                 self.set_show_mode(key, value)
-        if (rose.META_PROP_VALUES in self.meta and
-                len(self.meta[rose.META_PROP_VALUES]) == 1):
-            self.add_flag(rose.config_editor.FLAG_TYPE_FIXED,
-                          rose.config_editor.VAR_FLAG_TIP_FIXED)
+        if (metomi.rose.META_PROP_VALUES in self.meta and
+                len(self.meta[metomi.rose.META_PROP_VALUES]) == 1):
+            self.add_flag(metomi.rose.config_editor.FLAG_TYPE_FIXED,
+                          metomi.rose.config_editor.VAR_FLAG_TIP_FIXED)
         event_box.show()
         self.show()
 
@@ -122,7 +122,7 @@ class KeyWidget(Gtk.VBox):
         event_box.show()
         event_box.connect("button-press-event", self._toggle_flag_label)
         self.hbox.pack_end(event_box, expand=False, fill=False,
-                           padding=rose.config_editor.SPACING_SUB_PAGE)
+                           padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
 
     def get_centre_height(self):
         """Return the vertical displacement of the centre of this widget."""
@@ -131,15 +131,15 @@ class KeyWidget(Gtk.VBox):
     def handle_launch_help(self, widget, event):
         """Handle launching help."""
         if event.type == Gdk.EventType.BUTTON_PRESS and event.button != 3:
-            url_mode = (rose.META_PROP_HELP not in self.meta)
+            url_mode = (metomi.rose.META_PROP_HELP not in self.meta)
             self.launch_help(url_mode=url_mode)
 
     def launch_edit_comments(self, *args):
         """Launch an edit comments dialog."""
         text = "\n".join(self.my_variable.comments)
-        title = rose.config_editor.DIALOG_TITLE_EDIT_COMMENTS.format(
+        title = metomi.rose.config_editor.DIALOG_TITLE_EDIT_COMMENTS.format(
             self.my_variable.metadata['id'])
-        rose.gtk.dialog.run_edit_dialog(text,
+        metomi.rose.gtk.dialog.run_edit_dialog(text,
                                         finish_hook=self._edit_finish_hook,
                                         title=title)
 
@@ -160,7 +160,7 @@ class KeyWidget(Gtk.VBox):
     def set_ignored(self):
         """Update the ignored display."""
         self.ignored_label.set_markup(
-            rose.variable.get_ignored_markup(self.my_variable))
+            metomi.rose.variable.get_ignored_markup(self.my_variable))
         hover_string = ""
         if not self.my_variable.ignored_reason:
             self.ignored_label.set_tooltip_text(None)
@@ -195,47 +195,47 @@ class KeyWidget(Gtk.VBox):
 
     def set_show_mode(self, show_mode, should_show_mode):
         """Set the display of a mode on or off."""
-        if show_mode in [rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION,
-                         rose.config_editor.SHOW_MODE_CUSTOM_HELP,
-                         rose.config_editor.SHOW_MODE_CUSTOM_TITLE]:
+        if show_mode in [metomi.rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION,
+                         metomi.rose.config_editor.SHOW_MODE_CUSTOM_HELP,
+                         metomi.rose.config_editor.SHOW_MODE_CUSTOM_TITLE]:
             return self._set_show_custom_meta_text(show_mode, should_show_mode)
-        if show_mode == rose.config_editor.SHOW_MODE_NO_TITLE:
+        if show_mode == metomi.rose.config_editor.SHOW_MODE_NO_TITLE:
             return self._set_show_title(not should_show_mode)
-        if show_mode == rose.config_editor.SHOW_MODE_NO_DESCRIPTION:
-            return self._set_show_meta_text_mode(rose.META_PROP_DESCRIPTION,
+        if show_mode == metomi.rose.config_editor.SHOW_MODE_NO_DESCRIPTION:
+            return self._set_show_meta_text_mode(metomi.rose.META_PROP_DESCRIPTION,
                                                  not should_show_mode)
-        if show_mode == rose.config_editor.SHOW_MODE_NO_HELP:
-            return self._set_show_meta_text_mode(rose.META_PROP_HELP,
+        if show_mode == metomi.rose.config_editor.SHOW_MODE_NO_HELP:
+            return self._set_show_meta_text_mode(metomi.rose.META_PROP_HELP,
                                                  not should_show_mode)
-        if show_mode == rose.config_editor.SHOW_MODE_FLAG_OPTIONAL:
+        if show_mode == metomi.rose.config_editor.SHOW_MODE_FLAG_OPTIONAL:
             if (should_show_mode and
-                    self.meta.get(rose.META_PROP_COMPULSORY) !=
-                    rose.META_PROP_VALUE_TRUE):
+                    self.meta.get(metomi.rose.META_PROP_COMPULSORY) !=
+                    metomi.rose.META_PROP_VALUE_TRUE):
                 return self.add_flag(
-                    rose.config_editor.FLAG_TYPE_OPTIONAL,
-                    rose.config_editor.VAR_FLAG_TIP_OPTIONAL)
-            return self.remove_flag(rose.config_editor.FLAG_TYPE_OPTIONAL)
-        if show_mode == rose.config_editor.SHOW_MODE_FLAG_NO_META:
+                    metomi.rose.config_editor.FLAG_TYPE_OPTIONAL,
+                    metomi.rose.config_editor.VAR_FLAG_TIP_OPTIONAL)
+            return self.remove_flag(metomi.rose.config_editor.FLAG_TYPE_OPTIONAL)
+        if show_mode == metomi.rose.config_editor.SHOW_MODE_FLAG_NO_META:
             if should_show_mode and len(self.meta) <= 2:
-                return self.add_flag(rose.config_editor.FLAG_TYPE_NO_META,
-                                     rose.config_editor.VAR_FLAG_TIP_NO_META)
-            return self.remove_flag(rose.config_editor.FLAG_TYPE_NO_META)
-        if show_mode == rose.config_editor.SHOW_MODE_FLAG_OPT_CONF:
-            if (should_show_mode and rose.config_editor.FLAG_TYPE_OPT_CONF in
+                return self.add_flag(metomi.rose.config_editor.FLAG_TYPE_NO_META,
+                                     metomi.rose.config_editor.VAR_FLAG_TIP_NO_META)
+            return self.remove_flag(metomi.rose.config_editor.FLAG_TYPE_NO_META)
+        if show_mode == metomi.rose.config_editor.SHOW_MODE_FLAG_OPT_CONF:
+            if (should_show_mode and metomi.rose.config_editor.FLAG_TYPE_OPT_CONF in
                     self.my_variable.flags):
                 opts_info = self.my_variable.flags[
-                    rose.config_editor.FLAG_TYPE_OPT_CONF]
+                    metomi.rose.config_editor.FLAG_TYPE_OPT_CONF]
                 info_text = ""
-                info_format = rose.config_editor.VAR_FLAG_TIP_OPT_CONF_INFO
+                info_format = metomi.rose.config_editor.VAR_FLAG_TIP_OPT_CONF_INFO
                 for opt, diff in sorted(opts_info.items()):
                     info_text += info_format.format(opt, diff)
                 info_text = info_text.rstrip()
                 if info_text:
-                    text = rose.config_editor.VAR_FLAG_TIP_OPT_CONF.format(
+                    text = metomi.rose.config_editor.VAR_FLAG_TIP_OPT_CONF.format(
                         info_text)
                     return self.add_flag(
-                        rose.config_editor.FLAG_TYPE_OPT_CONF, text)
-            return self.remove_flag(rose.config_editor.FLAG_TYPE_OPT_CONF)
+                        metomi.rose.config_editor.FLAG_TYPE_OPT_CONF, text)
+            return self.remove_flag(metomi.rose.config_editor.FLAG_TYPE_OPT_CONF)
 
     def update_comment_display(self):
         """Update the display of variable comments."""
@@ -243,8 +243,8 @@ class KeyWidget(Gtk.VBox):
             return
         self._last_var_comments = self.my_variable.comments
         if (self.my_variable.comments or
-                rose.config_editor.SHOULD_SHOW_ALL_COMMENTS):
-            tip_fmt = rose.config_editor.VAR_COMMENT_TIP
+                metomi.rose.config_editor.SHOULD_SHOW_ALL_COMMENTS):
+            tip_fmt = metomi.rose.config_editor.VAR_COMMENT_TIP
             comments = [tip_fmt.format(c) for c in self.my_variable.comments]
             tooltip_text = "\n".join(comments)
             comment_widgets = self.comments_box.get_children()
@@ -265,7 +265,7 @@ class KeyWidget(Gtk.VBox):
                                 self._handle_comment_enter_leave, False)
                 self.comments_box.pack_start(
                     edit_eb, expand=False, fill=False,
-                    padding=rose.config_editor.SPACING_SUB_PAGE)
+                    padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
             self.comments_box.show()
         else:
             self.comments_box.hide()
@@ -273,17 +273,17 @@ class KeyWidget(Gtk.VBox):
     def _get_metadata_formatting(self, mode):
         """Apply the correct formatting for a metadata property."""
         mode_format = "{" + mode + "}"
-        if (mode == rose.META_PROP_DESCRIPTION and
+        if (mode == metomi.rose.META_PROP_DESCRIPTION and
                 self.show_modes[
-                    rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION]):
-            mode_format = rose.config_editor.CUSTOM_FORMAT_DESCRIPTION
-        if (mode == rose.META_PROP_HELP and
-                self.show_modes[rose.config_editor.SHOW_MODE_CUSTOM_HELP]):
-            mode_format = rose.config_editor.CUSTOM_FORMAT_HELP
-        if (mode == rose.META_PROP_TITLE and
-                self.show_modes[rose.config_editor.SHOW_MODE_CUSTOM_TITLE]):
-            mode_format = rose.config_editor.CUSTOM_FORMAT_TITLE
-        mode_string = rose.variable.expand_format_string(mode_format,
+                    metomi.rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION]):
+            mode_format = metomi.rose.config_editor.CUSTOM_FORMAT_DESCRIPTION
+        if (mode == metomi.rose.META_PROP_HELP and
+                self.show_modes[metomi.rose.config_editor.SHOW_MODE_CUSTOM_HELP]):
+            mode_format = metomi.rose.config_editor.CUSTOM_FORMAT_HELP
+        if (mode == metomi.rose.META_PROP_TITLE and
+                self.show_modes[metomi.rose.config_editor.SHOW_MODE_CUSTOM_TITLE]):
+            mode_format = metomi.rose.config_editor.CUSTOM_FORMAT_TITLE
+        mode_string = metomi.rose.variable.expand_format_string(mode_format,
                                                          self.my_variable)
         if mode_string is None:
             return self.my_variable.metadata[mode]
@@ -291,23 +291,23 @@ class KeyWidget(Gtk.VBox):
 
     def _set_show_custom_meta_text(self, mode, should_show_mode):
         """Set the display of a custom format for a metadata property."""
-        if mode == rose.config_editor.SHOW_MODE_CUSTOM_TITLE:
+        if mode == metomi.rose.config_editor.SHOW_MODE_CUSTOM_TITLE:
             return self._set_show_title(
-                not self.show_modes[rose.config_editor.SHOW_MODE_NO_TITLE])
-        if mode == rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION:
+                not self.show_modes[metomi.rose.config_editor.SHOW_MODE_NO_TITLE])
+        if mode == metomi.rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION:
             is_shown = not self.show_modes[
-                rose.config_editor.SHOW_MODE_NO_DESCRIPTION]
+                metomi.rose.config_editor.SHOW_MODE_NO_DESCRIPTION]
             if is_shown:
-                self._set_show_meta_text_mode(rose.META_PROP_DESCRIPTION,
+                self._set_show_meta_text_mode(metomi.rose.META_PROP_DESCRIPTION,
                                               False)
-                self._set_show_meta_text_mode(rose.META_PROP_DESCRIPTION,
+                self._set_show_meta_text_mode(metomi.rose.META_PROP_DESCRIPTION,
                                               True)
-        if mode == rose.config_editor.SHOW_MODE_CUSTOM_HELP:
+        if mode == metomi.rose.config_editor.SHOW_MODE_CUSTOM_HELP:
             is_shown = not self.show_modes[
-                rose.config_editor.SHOW_MODE_NO_HELP]
+                metomi.rose.config_editor.SHOW_MODE_NO_HELP]
             if is_shown:
-                self._set_show_meta_text_mode(rose.META_PROP_HELP, False)
-                self._set_show_meta_text_mode(rose.META_PROP_HELP, True)
+                self._set_show_meta_text_mode(metomi.rose.META_PROP_HELP, False)
+                self._set_show_meta_text_mode(metomi.rose.META_PROP_HELP, True)
 
     def _set_show_meta_text_mode(self, mode, should_show_mode):
         """Set the display of description or help below the title/name."""
@@ -317,9 +317,9 @@ class KeyWidget(Gtk.VBox):
             if mode not in self.meta:
                 return
             mode_text = self._get_metadata_formatting(mode)
-            mode_text = rose.gtk.util.safe_str(mode_text)
-            mode_text = rose.config_editor.VAR_FLAG_MARKUP.format(mode_text)
-            label = rose.gtk.util.get_hyperlink_label(mode_text, search_func)
+            mode_text = metomi.rose.gtk.util.safe_str(mode_text)
+            mode_text = metomi.rose.config_editor.VAR_FLAG_MARKUP.format(mode_text)
+            label = metomi.rose.gtk.util.get_hyperlink_label(mode_text, search_func)
             label.show()
             hbox = Gtk.HBox()
             hbox.show()
@@ -327,7 +327,7 @@ class KeyWidget(Gtk.VBox):
             hbox.set_sensitive(self.entry.get_property("sensitive"))
             hbox._show_mode = mode
             self.pack_start(hbox, expand=False, fill=False,
-                            padding=rose.config_editor.SPACING_SUB_PAGE)
+                            padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
             show_mode_widget_indices = []
             for i, widget in enumerate(self.get_children()):
                 if hasattr(widget, "_show_mode"):
@@ -351,9 +351,9 @@ class KeyWidget(Gtk.VBox):
         if not self.my_variable.name:
             return False
         if should_show_title:
-            if rose.META_PROP_TITLE in self.meta:
+            if metomi.rose.META_PROP_TITLE in self.meta:
                 title_string = self._get_metadata_formatting(
-                    rose.META_PROP_TITLE)
+                    metomi.rose.META_PROP_TITLE)
                 if title_string != self.entry.get_text():
                     return self.entry.set_text(title_string)
         if self.entry.get_text() != self.my_variable.name:
@@ -369,8 +369,8 @@ class KeyWidget(Gtk.VBox):
                     widget._flag_type == flag_type):
                 return self.remove(widget)
         label = Gtk.Label()
-        markup = rose.gtk.util.safe_str(text)
-        markup = rose.config_editor.VAR_FLAG_MARKUP.format(markup)
+        markup = metomi.rose.gtk.util.safe_str(text)
+        markup = metomi.rose.config_editor.VAR_FLAG_MARKUP.format(markup)
         label.set_markup(markup)
         label.show()
         hbox = Gtk.HBox()
@@ -395,23 +395,23 @@ class KeyWidget(Gtk.VBox):
     def _handle_enter(self, event_box):
         label_text = self.entry.get_text()
         tooltip_text = ""
-        if rose.META_PROP_DESCRIPTION in self.meta:
+        if metomi.rose.META_PROP_DESCRIPTION in self.meta:
             tooltip_text = self._get_metadata_formatting(
-                rose.META_PROP_DESCRIPTION)
-        if rose.META_PROP_TITLE in self.meta:
-            if self.show_modes[rose.config_editor.SHOW_MODE_NO_TITLE]:
+                metomi.rose.META_PROP_DESCRIPTION)
+        if metomi.rose.META_PROP_TITLE in self.meta:
+            if self.show_modes[metomi.rose.config_editor.SHOW_MODE_NO_TITLE]:
                 # Titles are hidden, so show them in the hover-over.
                 tooltip_text += ("\n (" +
-                                 rose.META_PROP_TITLE.capitalize() +
+                                 metomi.rose.META_PROP_TITLE.capitalize() +
                                  ": '" +
-                                 self.meta[rose.META_PROP_TITLE] + "')")
+                                 self.meta[metomi.rose.META_PROP_TITLE] + "')")
             elif (self.my_variable.name not in label_text or
                   not self.show_modes[
-                      rose.config_editor.SHOW_MODE_CUSTOM_TITLE]):
+                      metomi.rose.config_editor.SHOW_MODE_CUSTOM_TITLE]):
                 # No custom title, or a custom title without the name.
                 tooltip_text += ("\n (" + self.my_variable.name + ")")
         if self.my_variable.comments:
-            tip_fmt = rose.config_editor.VAR_COMMENT_TIP
+            tip_fmt = metomi.rose.config_editor.VAR_COMMENT_TIP
             if tooltip_text:
                 tooltip_text += "\n"
             comments = [tip_fmt.format(c) for c in self.my_variable.comments]
@@ -425,13 +425,13 @@ class KeyWidget(Gtk.VBox):
         if tooltip_text == '':
             tooltip_text = None
         event_box.set_tooltip_text(tooltip_text)
-        if (rose.META_PROP_URL not in self.meta and
+        if (metomi.rose.META_PROP_URL not in self.meta and
                 'http://' in self.my_variable.value):
             new_url = re.search('(http://[^ ]+)',
                                 self.my_variable.value).group()
             # This is not very nice.
-            self.meta.update({rose.META_PROP_URL: new_url})
-        if rose.META_PROP_HELP in self.meta or rose.META_PROP_URL in self.meta:
+            self.meta.update({metomi.rose.META_PROP_URL: new_url})
+        if metomi.rose.META_PROP_HELP in self.meta or metomi.rose.META_PROP_URL in self.meta:
             if isinstance(self.entry, Gtk.Label):
                 self._set_underline(self.entry, underline=True)
         return False
@@ -468,19 +468,19 @@ class KeyWidget(Gtk.VBox):
         """Re-set the name of the variable in the dictionary object."""
         new_name = widget.get_text()
         if variable.name != new_name:
-            section = variable.metadata['id'].split(rose.CONFIG_DELIMITER)[0]
+            section = variable.metadata['id'].split(metomi.rose.CONFIG_DELIMITER)[0]
             if section.startswith("namelist:"):
                 if new_name.lower() != new_name:
-                    text = rose.config_editor.DIALOG_BODY_NL_CASE_CHANGE
+                    text = metomi.rose.config_editor.DIALOG_BODY_NL_CASE_CHANGE
                     text = text.format(new_name.lower())
-                    title = rose.config_editor.DIALOG_TITLE_NL_CASE_WARNING
-                    new_name = rose.gtk.dialog.run_choices_dialog(
+                    title = metomi.rose.config_editor.DIALOG_TITLE_NL_CASE_WARNING
+                    new_name = metomi.rose.gtk.dialog.run_choices_dialog(
                         text, [new_name.lower(), new_name],
                         title)
                     if new_name is None:
                         return None
             self.var_ops.remove_var(variable)
             variable.name = new_name
-            variable.metadata['id'] = (section + rose.CONFIG_DELIMITER +
+            variable.metadata['id'] = (section + metomi.rose.CONFIG_DELIMITER +
                                        variable.name)
             self.var_ops.add_var(variable)

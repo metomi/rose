@@ -23,10 +23,10 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
-import rose.config
-import rose.config_editor
-import rose.config_editor.util
-import rose.gtk.util
+import metomi.rose.config
+import metomi.rose.config_editor
+import metomi.rose.config_editor.util
+import metomi.rose.gtk.util
 
 
 class BaseSummaryDataPanel(Gtk.VBox):
@@ -62,16 +62,16 @@ class BaseSummaryDataPanel(Gtk.VBox):
         self.sub_ops = sub_ops
         self.is_duplicate = is_duplicate
         self.group_index = None
-        self.util = rose.config_editor.util.Lookup()
+        self.util = metomi.rose.config_editor.util.Lookup()
         self.control_widget_hbox = self._get_control_widget_hbox()
         self.pack_start(self.control_widget_hbox, expand=False, fill=False)
         self._prev_store = None
         self._prev_sort_model = None
-        self._view = rose.gtk.util.TooltipTreeView(
+        self._view = metomi.rose.gtk.util.TooltipTreeView(
             get_tooltip_func=self.set_tree_tip,
             multiple_selection=True)
         self._view.set_rules_hint(True)
-        self.sort_util = rose.gtk.util.TreeModelSortUtil(
+        self.sort_util = metomi.rose.gtk.util.TreeModelSortUtil(
             self._view.get_model, multi_sort_num=2)
         self._view.show()
         self._view.connect("button-press-event",
@@ -147,15 +147,15 @@ class BaseSummaryDataPanel(Gtk.VBox):
 
     def _get_control_widget_hbox(self):
         filter_label = Gtk.Label(label=
-            rose.config_editor.SUMMARY_DATA_PANEL_FILTER_LABEL)
+            metomi.rose.config_editor.SUMMARY_DATA_PANEL_FILTER_LABEL)
         filter_label.show()
         self._filter_widget = Gtk.Entry()
         self._filter_widget.set_width_chars(
-            rose.config_editor.SUMMARY_DATA_PANEL_FILTER_MAX_CHAR)
+            metomi.rose.config_editor.SUMMARY_DATA_PANEL_FILTER_MAX_CHAR)
         self._filter_widget.connect("changed", self._refilter)
         self._filter_widget.show()
         group_label = Gtk.Label(label=
-            rose.config_editor.SUMMARY_DATA_PANEL_GROUP_LABEL)
+            metomi.rose.config_editor.SUMMARY_DATA_PANEL_GROUP_LABEL)
         group_label.show()
         self._group_widget = Gtk.ComboBox()
         cell = Gtk.CellRendererText()
@@ -167,7 +167,7 @@ class BaseSummaryDataPanel(Gtk.VBox):
         filter_hbox.pack_start(group_label, expand=False, fill=False)
         filter_hbox.pack_start(self._group_widget, expand=False, fill=False)
         filter_hbox.pack_start(filter_label, expand=False, fill=False,
-                               padding=rose.config_editor.SPACING_SUB_PAGE)
+                               padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
         filter_hbox.pack_start(self._filter_widget, expand=False, fill=False)
         filter_hbox.show()
         return filter_hbox
@@ -307,17 +307,17 @@ class BaseSummaryDataPanel(Gtk.VBox):
     def get_status_from_data(self, node_data):
         """Return markup corresponding to changes since the last save."""
         text = ""
-        mod_markup = rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP
-        err_markup = rose.config_editor.SUMMARY_DATA_PANEL_ERROR_MARKUP
+        mod_markup = metomi.rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP
+        err_markup = metomi.rose.config_editor.SUMMARY_DATA_PANEL_ERROR_MARKUP
         if node_data is None:
             return None
-        if rose.variable.IGNORED_BY_SYSTEM in node_data.ignored_reason:
-            text += rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_SYST_MARKUP
-        elif rose.variable.IGNORED_BY_USER in node_data.ignored_reason:
-            text += rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_USER_MARKUP
-        if rose.variable.IGNORED_BY_SECTION in node_data.ignored_reason:
-            text += rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_SECT_MARKUP
-        if isinstance(node_data, rose.section.Section):
+        if metomi.rose.variable.IGNORED_BY_SYSTEM in node_data.ignored_reason:
+            text += metomi.rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_SYST_MARKUP
+        elif metomi.rose.variable.IGNORED_BY_USER in node_data.ignored_reason:
+            text += metomi.rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_USER_MARKUP
+        if metomi.rose.variable.IGNORED_BY_SECTION in node_data.ignored_reason:
+            text += metomi.rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_SECT_MARKUP
+        if isinstance(node_data, metomi.rose.section.Section):
             # Modified status
             section = node_data.metadata["id"]
             if self.sect_ops.is_section_modified(node_data):
@@ -335,7 +335,7 @@ class BaseSummaryDataPanel(Gtk.VBox):
                     if var.error:
                         text += err_markup
                         break
-        elif isinstance(node_data, rose.variable.Variable):
+        elif isinstance(node_data, metomi.rose.variable.Variable):
             if self.var_ops.is_var_modified(node_data):
                 text += mod_markup
             if node_data.error:
@@ -435,29 +435,29 @@ class BaseSummaryDataPanel(Gtk.VBox):
         # Ignore all.
         ign_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_NO)
         ign_menuitem.set_label(
-            rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE_MULTI)
+            metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE_MULTI)
         ign_menuitem.connect("activate", self._ignore_selected_sections, True)
         ign_menuitem.show()
         menu.append(ign_menuitem)
-        shortcuts.append((rose.config_editor.ACCEL_IGNORE,
+        shortcuts.append((metomi.rose.config_editor.ACCEL_IGNORE,
                           ign_menuitem))
         # Enable all.
         ign_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_YES)
         ign_menuitem.set_label(
-            rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE_MULTI)
+            metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE_MULTI)
         ign_menuitem.connect("activate", self._ignore_selected_sections, False)
         ign_menuitem.show()
         menu.append(ign_menuitem)
-        shortcuts.append((rose.config_editor.ACCEL_IGNORE,
+        shortcuts.append((metomi.rose.config_editor.ACCEL_IGNORE,
                           ign_menuitem))
         # Remove all.
         rem_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_REMOVE)
         rem_menuitem.set_label(
-            rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE_MULTI)
+            metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE_MULTI)
         rem_menuitem.connect("activate", self._remove_selected_sections)
         rem_menuitem.show()
         menu.append(rem_menuitem)
-        shortcuts.append((rose.config_editor.ACCEL_REMOVE, rem_menuitem))
+        shortcuts.append((metomi.rose.config_editor.ACCEL_REMOVE, rem_menuitem))
 
         # list shortcut keys
         accel = Gtk.AccelGroup()
@@ -487,7 +487,7 @@ class BaseSummaryDataPanel(Gtk.VBox):
         if this_section is not None:
             # Jump to section.
             menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_JUMP_TO)
-            label = rose.config_editor.SUMMARY_DATA_PANEL_MENU_GO_TO.format(
+            label = metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_GO_TO.format(
                 this_section.replace("_", "__"))
             menuitem.set_label(label)
             menuitem._section = this_section
@@ -512,7 +512,7 @@ class BaseSummaryDataPanel(Gtk.VBox):
                 # Add section.
                 add_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_ADD)
                 add_menuitem.set_label(
-                    rose.config_editor.SUMMARY_DATA_PANEL_MENU_ADD)
+                    metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_ADD)
                 add_menuitem.connect("activate",
                                      lambda i: self.add_section())
                 add_menuitem.show()
@@ -520,80 +520,80 @@ class BaseSummaryDataPanel(Gtk.VBox):
                 # Copy section.
                 copy_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_COPY)
                 copy_menuitem.set_label(
-                    rose.config_editor.SUMMARY_DATA_PANEL_MENU_COPY)
+                    metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_COPY)
                 copy_menuitem.connect(
                     "activate", lambda i: self.copy_section(this_section))
                 copy_menuitem.show()
                 menu.append(copy_menuitem)
-                if (rose.variable.IGNORED_BY_USER in
+                if (metomi.rose.variable.IGNORED_BY_USER in
                         self.sections[this_section].ignored_reason):
                     # Enable section.
                     enab_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_YES)
                     enab_menuitem.set_label(
-                        rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE)
+                        metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE)
                     enab_menuitem.connect(
                         "activate",
                         lambda i: self.sub_ops.ignore_section(this_section,
                                                               False))
                     enab_menuitem.show()
                     menu.append(enab_menuitem)
-                    shortcuts.append((rose.config_editor.ACCEL_IGNORE,
+                    shortcuts.append((metomi.rose.config_editor.ACCEL_IGNORE,
                                       enab_menuitem))
                 else:
                     # Ignore section.
                     ign_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_NO)
                     ign_menuitem.set_label(
-                        rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE)
+                        metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE)
                     ign_menuitem.connect(
                         "activate",
                         lambda i: self.sub_ops.ignore_section(this_section,
                                                               True))
                     ign_menuitem.show()
                     menu.append(ign_menuitem)
-                    shortcuts.append((rose.config_editor.ACCEL_IGNORE,
+                    shortcuts.append((metomi.rose.config_editor.ACCEL_IGNORE,
                                       ign_menuitem))
                 # Remove section.
                 rem_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_REMOVE)
                 rem_menuitem.set_label(
-                    rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE)
+                    metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE)
                 rem_menuitem.connect(
                     "activate", lambda i: self.remove_section(this_section))
                 rem_menuitem.show()
                 menu.append(rem_menuitem)
-                shortcuts.append((rose.config_editor.ACCEL_REMOVE,
+                shortcuts.append((metomi.rose.config_editor.ACCEL_REMOVE,
                                   rem_menuitem))
             else:  # A group is currently selected.
                 # Ignore all
                 ign_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_NO)
                 ign_menuitem.set_label(
-                    rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE)
+                    metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE)
                 ign_menuitem.connect("activate",
                                      self._ignore_selected_sections,
                                      True)
                 ign_menuitem.show()
                 menu.append(ign_menuitem)
-                shortcuts.append((rose.config_editor.ACCEL_IGNORE,
+                shortcuts.append((metomi.rose.config_editor.ACCEL_IGNORE,
                                   ign_menuitem))
                 # Enable all
                 ign_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_YES)
                 ign_menuitem.set_label(
-                    rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE)
+                    metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE)
                 ign_menuitem.connect("activate",
                                      self._ignore_selected_sections,
                                      False)
                 ign_menuitem.show()
                 menu.append(ign_menuitem)
-                shortcuts.append((rose.config_editor.ACCEL_IGNORE,
+                shortcuts.append((metomi.rose.config_editor.ACCEL_IGNORE,
                                   ign_menuitem))
                 # Delete all.
                 rem_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_REMOVE)
                 rem_menuitem.set_label(
-                    rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE)
+                    metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE)
                 rem_menuitem.connect(
                     "activate", self._remove_selected_sections)
                 rem_menuitem.show()
                 menu.append(rem_menuitem)
-                shortcuts.append((rose.config_editor.ACCEL_REMOVE,
+                shortcuts.append((metomi.rose.config_editor.ACCEL_REMOVE,
                                   rem_menuitem))
 
             # list shortcut keys
@@ -665,7 +665,7 @@ class BaseSummaryDataPanel(Gtk.VBox):
                    then enable all sections inserted.
         """
         sections_ = self._get_selected_sections()
-        ignored = [rose.variable.IGNORED_BY_USER in
+        ignored = [metomi.rose.variable.IGNORED_BY_USER in
                    self.sections[section_].ignored_reason for
                    section_ in sections_]
         # If ignore mode is not specified decide whether to ignore or enable.
@@ -785,8 +785,8 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
                 self.var_id_map[variable.metadata["id"]] = variable
                 if variable.name not in sub_var_names:
                     sub_var_names.append(variable.name)
-        sub_sect_names.sort(rose.config.sort_settings)
-        sub_var_names.sort(rose.config.sort_settings)
+        sub_sect_names.sort(metomi.rose.config.sort_settings)
+        sub_var_names.sort(metomi.rose.config.sort_settings)
         data_rows = []
         for section in sub_sect_names:
             row_data = [section]
@@ -796,12 +796,12 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
                 if var is None:
                     row_data.append(None)
                 else:
-                    row_data.append(rose.gtk.util.safe_str(var.value))
+                    row_data.append(metomi.rose.gtk.util.safe_str(var.value))
             data_rows.append(row_data)
         if self.is_duplicate:
-            sect_name = rose.config_editor.SUMMARY_DATA_PANEL_INDEX_TITLE
+            sect_name = metomi.rose.config_editor.SUMMARY_DATA_PANEL_INDEX_TITLE
         else:
-            sect_name = rose.config_editor.SUMMARY_DATA_PANEL_SECTION_TITLE
+            sect_name = metomi.rose.config_editor.SUMMARY_DATA_PANEL_SECTION_TITLE
         column_names = [sect_name]
         column_names += sub_var_names
         return data_rows, column_names
@@ -810,7 +810,7 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
         cell.set_property("visible", True)
         col_index = self._view.get_columns().index(column)
         value = self._view.get_model().get_value(iter_, col_index)
-        max_len = rose.config_editor.SUMMARY_DATA_PANEL_MAX_LEN
+        max_len = metomi.rose.config_editor.SUMMARY_DATA_PANEL_MAX_LEN
         if value is not None and len(value) > max_len and col_index != 0:
             cell.set_property("width-chars", max_len)
             cell.set_property("ellipsize", Pango.EllipsizeMode.END)
@@ -841,13 +841,13 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
                 return False
             id_data = self.var_id_map[id_]
             value = str(view.get_model().get_value(row_iter, col_index))
-            tip_text = rose.CONFIG_DELIMITER.join([section, option, value])
-        tip_text += id_data.metadata.get(rose.META_PROP_DESCRIPTION, "")
+            tip_text = metomi.rose.CONFIG_DELIMITER.join([section, option, value])
+        tip_text += id_data.metadata.get(metomi.rose.META_PROP_DESCRIPTION, "")
         if tip_text:
             tip_text += "\n"
         for key, value in list(id_data.error.items()):
             tip_text += (
-                rose.config_editor.SUMMARY_DATA_PANEL_ERROR_TIP.format(
+                metomi.rose.config_editor.SUMMARY_DATA_PANEL_ERROR_TIP.format(
                     key, value))
         for key in id_data.ignored_reason:
             tip_text += key + "\n"

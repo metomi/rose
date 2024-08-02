@@ -27,16 +27,16 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
-import rose.config_editor.panelwidget
-import rose.config_editor.pagewidget
-import rose.config_editor.stack
-import rose.config_editor.util
-import rose.config_editor.variable
-import rose.formats
-import rose.gtk.dialog
-import rose.gtk.util
-import rose.resource
-import rose.variable
+import metomi.rose.config_editor.panelwidget
+import metomi.rose.config_editor.pagewidget
+import metomi.rose.config_editor.stack
+import metomi.rose.config_editor.util
+import metomi.rose.config_editor.variable
+import metomi.rose.formats
+import metomi.rose.gtk.dialog
+import metomi.rose.gtk.util
+import metomi.rose.resource
+import metomi.rose.variable
 
 
 class ConfigPage(Gtk.VBox):
@@ -62,7 +62,7 @@ class ConfigPage(Gtk.VBox):
         self.custom_sub_widget = page_metadata.get('widget_sub_ns')
         self.show_modes = page_metadata.get('show_modes')
         self.is_duplicate = (page_metadata.get('duplicate') ==
-                             rose.META_PROP_VALUE_TRUE)
+                             metomi.rose.META_PROP_VALUE_TRUE)
         self.section = None
         if sections:
             self.section = sections[0]
@@ -111,7 +111,7 @@ class ConfigPage(Gtk.VBox):
         self.scrolled_main_window.add_with_viewport(self.scrolled_vbox)
         self.scrolled_main_window.get_child().set_shadow_type(Gtk.ShadowType.NONE)
         self.scrolled_main_window.set_border_width(
-            rose.config_editor.SPACING_SUB_PAGE)
+            metomi.rose.config_editor.SPACING_SUB_PAGE)
         self.scrolled_vbox.pack_start(self.main_container,
                                       expand=False, fill=True)
         self.scrolled_main_window.show()
@@ -136,7 +136,7 @@ class ConfigPage(Gtk.VBox):
             self.vpaned.pack1(self.scrolled_main_window, resize=False,
                               shrink=True)
             self.vpaned.pack2(second_panel, resize=True, shrink=True)
-            self.vpaned.set_position(rose.config_editor.FILE_PANEL_EXPAND)
+            self.vpaned.set_position(metomi.rose.config_editor.FILE_PANEL_EXPAND)
         else:
             self.vpaned.pack1(self.scrolled_main_window, resize=True,
                               shrink=True)
@@ -181,8 +181,8 @@ class ConfigPage(Gtk.VBox):
             self.label_icon.set_from_file(self.icon_path)
             self.label_icon.show()
             label_box.pack_start(self.label_icon, expand=False, fill=False,
-                                 padding=rose.config_editor.SPACING_SUB_PAGE)
-        close_button = rose.gtk.util.CustomButton(
+                                 padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
+        close_button = metomi.rose.gtk.util.CustomButton(
             stock_id=Gtk.STOCK_CLOSE, size=Gtk.IconSize.MENU, as_tool=True)
         style = Gtk.RcStyle()
         style.xthickness = 0
@@ -191,7 +191,7 @@ class ConfigPage(Gtk.VBox):
         close_button.modify_style(style)
 
         label_box.pack_start(label_event_box, expand=False, fill=False,
-                             padding=rose.config_editor.SPACING_SUB_PAGE)
+                             padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
         if not is_detached:
             label_box.pack_end(close_button, expand=False, fill=False)
         label_box.show()
@@ -231,7 +231,7 @@ class ConfigPage(Gtk.VBox):
         if self.info is not None:
             tip_text += self.info
         if self.section is not None:
-            comment_format = rose.config_editor.VAR_COMMENT_TIP.format
+            comment_format = metomi.rose.config_editor.VAR_COMMENT_TIP.format
             for comment_line in self.section.comments:
                 tip_text += "\n" + comment_format(comment_line)
         event_box.set_tooltip_text(tip_text)
@@ -258,13 +258,13 @@ class ConfigPage(Gtk.VBox):
         ui_config_string_start += """<menuitem action="Info"/>
                                      <menuitem action="Edit"/>"""
         actions = [
-            ('Open', Gtk.STOCK_NEW, rose.config_editor.TAB_MENU_OPEN_NEW),
-            ('Info', Gtk.STOCK_INFO, rose.config_editor.TAB_MENU_INFO),
-            ('Edit', Gtk.STOCK_EDIT, rose.config_editor.TAB_MENU_EDIT),
-            ('Help', Gtk.STOCK_HELP, rose.config_editor.TAB_MENU_HELP),
+            ('Open', Gtk.STOCK_NEW, metomi.rose.config_editor.TAB_MENU_OPEN_NEW),
+            ('Info', Gtk.STOCK_INFO, metomi.rose.config_editor.TAB_MENU_INFO),
+            ('Edit', Gtk.STOCK_EDIT, metomi.rose.config_editor.TAB_MENU_EDIT),
+            ('Help', Gtk.STOCK_HELP, metomi.rose.config_editor.TAB_MENU_HELP),
             ('Web_Help', Gtk.STOCK_HOME,
-             rose.config_editor.TAB_MENU_WEB_HELP),
-            ('Close', Gtk.STOCK_CLOSE, rose.config_editor.TAB_MENU_CLOSE)]
+             metomi.rose.config_editor.TAB_MENU_WEB_HELP),
+            ('Close', Gtk.STOCK_CLOSE, metomi.rose.config_editor.TAB_MENU_CLOSE)]
         if self.help is not None:
             help_string = """<separator name="helpsep"/>
                              <menuitem action="Help"/>"""
@@ -312,22 +312,22 @@ class ConfigPage(Gtk.VBox):
         sep.show()
         sep_vbox = Gtk.VBox()
         sep_vbox.pack_start(sep, expand=True, fill=True)
-        sep_vbox.set_border_width(rose.config_editor.SPACING_SUB_PAGE)
+        sep_vbox.set_border_width(metomi.rose.config_editor.SPACING_SUB_PAGE)
         sep_vbox.show()
-        info_button = rose.gtk.util.CustomButton(
+        info_button = metomi.rose.gtk.util.CustomButton(
             stock_id=Gtk.STOCK_INFO,
             as_tool=True,
-            tip_text=rose.config_editor.TAB_MENU_INFO)
+            tip_text=metomi.rose.config_editor.TAB_MENU_INFO)
         info_button.connect("clicked", lambda m: self.launch_info())
-        help_button = rose.gtk.util.CustomButton(
+        help_button = metomi.rose.gtk.util.CustomButton(
             stock_id=Gtk.STOCK_HELP,
             as_tool=True,
-            tip_text=rose.config_editor.TAB_MENU_HELP)
+            tip_text=metomi.rose.config_editor.TAB_MENU_HELP)
         help_button.connect("clicked", self.launch_help)
-        url_button = rose.gtk.util.CustomButton(
+        url_button = metomi.rose.gtk.util.CustomButton(
             stock_id=Gtk.STOCK_HOME,
             as_tool=True,
-            tip_text=rose.config_editor.TAB_MENU_WEB_HELP)
+            tip_text=metomi.rose.config_editor.TAB_MENU_WEB_HELP)
         url_button.connect("clicked", self.launch_url)
         button_hbox.pack_start(add_button, expand=False, fill=False)
         button_hbox.pack_start(revert_button, expand=False, fill=False)
@@ -344,7 +344,7 @@ class ConfigPage(Gtk.VBox):
         button_frame.show()
         self.tool_hbox.pack_start(button_frame, expand=False, fill=False)
         label_box = Gtk.HBox(homogeneous=False,
-                             spacing=rose.config_editor.SPACING_PAGE)
+                             spacing=metomi.rose.config_editor.SPACING_PAGE)
         label_box.pack_start(self.get_label_widget(is_detached=True, True, True, 0))
         label_box.show()
         self.tool_hbox.pack_start(
@@ -361,7 +361,7 @@ class ConfigPage(Gtk.VBox):
             focus_child.grab_focus()
 
     def close_self(self):
-        """Delete this instance from a rose.gtk.util.Notebook."""
+        """Delete this instance from a metomi.rose.gtk.util.Notebook."""
         parent = self.get_parent()
         my_index = parent.get_page_ids().index(self.namespace)
         parent.remove_page(my_index)
@@ -369,8 +369,8 @@ class ConfigPage(Gtk.VBox):
 
     def launch_help(self, *args):
         """Launch the page help."""
-        title = rose.config_editor.DIALOG_HELP_TITLE.format(self.label)
-        rose.gtk.dialog.run_hyperlink_dialog(
+        title = metomi.rose.config_editor.DIALOG_HELP_TITLE.format(self.label)
+        metomi.rose.gtk.dialog.run_hyperlink_dialog(
             Gtk.STOCK_DIALOG_INFO, str(self.help), title)
 
     def launch_url(self, *args):
@@ -403,12 +403,12 @@ class ConfigPage(Gtk.VBox):
             var_hbox = Gtk.HBox(homogeneous=False)
             var_hbox.pack_start(button, expand=False, fill=False)
             var_hbox.pack_start(label, expand=False, fill=True,
-                                padding=rose.config_editor.SPACING_SUB_PAGE)
+                                padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
             var_hbox.show()
             info_container.pack_start(var_hbox, expand=False, fill=True)
         # Add page help.
         if self.description:
-            help_label = rose.gtk.util.get_hyperlink_label(
+            help_label = metomi.rose.gtk.util.get_hyperlink_label(
                 self.description, search_func=self.search_for_id)
             help_label_window = Gtk.ScrolledWindow()
             help_label_window.set_policy(Gtk.PolicyType.AUTOMATIC,
@@ -426,18 +426,18 @@ class ConfigPage(Gtk.VBox):
             width, height = help_label_window.size_request()
             if info == "Blank page - no data":
                 self.main_vpaned.set_position(
-                    rose.config_editor.SIZE_WINDOW[1] * 100)
+                    metomi.rose.config_editor.SIZE_WINDOW[1] * 100)
             else:
-                height = min([rose.config_editor.SIZE_WINDOW[1] / 3,
+                height = min([metomi.rose.config_editor.SIZE_WINDOW[1] / 3,
                               help_label.size_request()[1]])
             help_label_window.set_size_request(width, height)
             help_hbox = Gtk.HBox()
             help_hbox.pack_start(help_label_window, expand=True, fill=True,
-                                 padding=rose.config_editor.SPACING_SUB_PAGE)
+                                 padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
             help_hbox.show()
             info_container.pack_start(
                 help_hbox, expand=True, fill=True,
-                padding=rose.config_editor.SPACING_SUB_PAGE)
+                padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
         for child in self.info_panel.get_children():
             self.info_panel.remove(child)
         self.info_panel.pack_start(info_container, expand=True, fill=True)
@@ -445,7 +445,7 @@ class ConfigPage(Gtk.VBox):
     def generate_filesystem_panel(self):
         """Generate a widget to view the file hierarchy."""
         self.filesystem_panel = (
-            rose.config_editor.panelwidget.filesystem.FileSystemPanel(
+            metomi.rose.config_editor.panelwidget.filesystem.FileSystemPanel(
                 self.directory))
 
     def generate_sub_data_panel(self, override_custom=False):
@@ -465,18 +465,18 @@ class ConfigPage(Gtk.VBox):
                 widget_path, widget_args = widget_name_args[0], None
             metadata_files = self.section_ops.get_ns_metadata_files(
                 self.namespace)
-            widget_dir = rose.META_DIR_WIDGET
+            widget_dir = metomi.rose.META_DIR_WIDGET
             metadata_files.sort(
                 lambda x, y: (widget_dir in y) - (widget_dir in x))
             prefix = re.sub(r"[^\w]", "_", self.config_name.strip("/"))
-            prefix += "/" + rose.META_DIR_WIDGET + "/"
-            custom_widget = rose.resource.import_object(
+            prefix += "/" + metomi.rose.META_DIR_WIDGET + "/"
+            custom_widget = metomi.rose.resource.import_object(
                 widget_path,
                 metadata_files,
                 self.handle_bad_custom_sub_widget,
                 module_prefix=prefix)
             if custom_widget is None:
-                text = rose.config_editor.ERROR_IMPORT_CLASS.format(
+                text = metomi.rose.config_editor.ERROR_IMPORT_CLASS.format(
                     self.custom_sub_widget)
                 self.handle_bad_custom_sub_widget(text)
                 return False
@@ -485,15 +485,15 @@ class ConfigPage(Gtk.VBox):
             except Exception as exc:
                 self.handle_bad_custom_sub_widget(str(exc))
         else:
-            panel_module = rose.config_editor.panelwidget.summary_data
+            panel_module = metomi.rose.config_editor.panelwidget.summary_data
             self.sub_data_panel = (
                 panel_module.StandardSummaryDataPanel(*args))
 
     def handle_bad_custom_sub_widget(self, error_info):
-        text = rose.config_editor.ERROR_IMPORT_WIDGET.format(
+        text = metomi.rose.config_editor.ERROR_IMPORT_WIDGET.format(
             error_info)
         self.reporter(
-            rose.config_editor.util.ImportWidgetError(text))
+            metomi.rose.config_editor.util.ImportWidgetError(text))
         self.generate_sub_data_panel(override_custom=True)
 
     def update_sub_data(self):
@@ -528,29 +528,29 @@ class ConfigPage(Gtk.VBox):
                          <menu action="Add meta">"""
         add_ui_end = """</menu> </popup> </ui>"""
         actions = [('Add meta', Gtk.STOCK_DIRECTORY,
-                    rose.config_editor.ADD_MENU_META)]
+                    metomi.rose.config_editor.ADD_MENU_META)]
         section_choices = []
         for sect_data in self.sections:
             if not sect_data.ignored_reason:
                 section_choices.append(sect_data.name)
-        section_choices.sort(rose.config.sort_settings)
+        section_choices.sort(metomi.rose.config.sort_settings)
         if self.ns_is_default and section_choices:
             add_ui_start = add_ui_start.replace(
                 "'Popup'>",
                 """'Popup'><menuitem action="Add blank"/>""")
-            text = rose.config_editor.ADD_MENU_BLANK
+            text = metomi.rose.config_editor.ADD_MENU_BLANK
             if len(section_choices) > 1:
-                text = rose.config_editor.ADD_MENU_BLANK_MULTIPLE
+                text = metomi.rose.config_editor.ADD_MENU_BLANK_MULTIPLE
             actions.insert(0, ('Add blank', Gtk.STOCK_NEW, text))
         ghost_list = [v for v in self.ghost_data]
-        sorter = rose.config.sort_settings
+        sorter = metomi.rose.config.sort_settings
         ghost_list.sort(lambda v, w: sorter(v.metadata['id'],
                                             w.metadata['id']))
         for variable in ghost_list:
             label_text = variable.name
-            if (not self.show_modes[rose.config_editor.SHOW_MODE_NO_TITLE] and
-                    rose.META_PROP_TITLE in variable.metadata):
-                label_text = variable.metadata[rose.META_PROP_TITLE]
+            if (not self.show_modes[metomi.rose.config_editor.SHOW_MODE_NO_TITLE] and
+                    metomi.rose.META_PROP_TITLE in variable.metadata):
+                label_text = variable.metadata[metomi.rose.META_PROP_TITLE]
             label_text = label_text.replace("_", "__")
             add_ui_start += ('<menuitem action="' +
                              variable.metadata['id'] + '"/>')
@@ -577,7 +577,7 @@ class ConfigPage(Gtk.VBox):
                 return None
             named_item.var_id = variable.metadata['id']
             tooltip_text = ""
-            description = variable.metadata.get(rose.META_PROP_DESCRIPTION)
+            description = variable.metadata.get(metomi.rose.META_PROP_DESCRIPTION)
             if description:
                 tooltip_text += description + "\n"
             tooltip_text += "(" + variable.metadata["id"] + ")"
@@ -589,10 +589,10 @@ class ConfigPage(Gtk.VBox):
 
     def _launch_section_chooser(self, section_choices):
         """Choose a section to add a blank variable to."""
-        section = rose.gtk.dialog.run_choices_dialog(
-            rose.config_editor.DIALOG_LABEL_CHOOSE_SECTION_ADD_VAR,
+        section = metomi.rose.gtk.dialog.run_choices_dialog(
+            metomi.rose.config_editor.DIALOG_LABEL_CHOOSE_SECTION_ADD_VAR,
             section_choices,
-            rose.config_editor.DIALOG_TITLE_CHOOSE_SECTION)
+            metomi.rose.config_editor.DIALOG_TITLE_CHOOSE_SECTION)
         if section is not None:
             self.add_row(section=section)
 
@@ -614,7 +614,7 @@ class ConfigPage(Gtk.VBox):
             else:
                 sect = section
             v_id = sect + '=null' + creation_time
-            variable = rose.variable.Variable('', '',
+            variable = metomi.rose.variable.Variable('', '',
                                               {'id': v_id,
                                                'full_ns': self.namespace})
             if section is None and self.section.ignored_reason:
@@ -640,12 +640,12 @@ class ConfigPage(Gtk.VBox):
                 widget_path, widget_args = widget_name_args[0], None
             metadata_files = self.section_ops.get_ns_metadata_files(
                 self.namespace)
-            custom_widget = rose.resource.import_object(
+            custom_widget = metomi.rose.resource.import_object(
                 widget_path,
                 metadata_files,
                 self.handle_bad_custom_main_widget)
             if custom_widget is None:
-                text = rose.config_editor.ERROR_IMPORT_CLASS.format(
+                text = metomi.rose.config_editor.ERROR_IMPORT_CLASS.format(
                     widget_path)
                 self.handle_bad_custom_main_widget(text)
                 return
@@ -659,8 +659,8 @@ class ConfigPage(Gtk.VBox):
                 self.handle_bad_custom_main_widget(exc)
             else:
                 return
-        std_table = rose.config_editor.pagewidget.table.PageTable
-        disc_table = rose.config_editor.pagewidget.table.PageLatentTable
+        std_table = metomi.rose.config_editor.pagewidget.table.PageTable
+        disc_table = metomi.rose.config_editor.pagewidget.table.PageLatentTable
         if self.namespace == "/discovery":
             self.main_container = disc_table(self.panel_data,
                                              self.ghost_data,
@@ -674,10 +674,10 @@ class ConfigPage(Gtk.VBox):
 
     def handle_bad_custom_main_widget(self, error_info):
         """Handle a bad custom page widget import."""
-        text = rose.config_editor.ERROR_IMPORT_WIDGET.format(
+        text = metomi.rose.config_editor.ERROR_IMPORT_WIDGET.format(
             error_info)
         self.reporter.report(
-            rose.config_editor.util.ImportWidgetError(text))
+            metomi.rose.config_editor.util.ImportWidgetError(text))
         self.generate_main_container(override_custom=True)
 
     def validate_errors(self, variable_id=None):
@@ -699,7 +699,7 @@ class ConfigPage(Gtk.VBox):
         """Select a widget to have the focus on page generation."""
         if self.custom_widget is not None:
             return
-        if self.show_modes[rose.config_editor.SHOW_MODE_LATENT]:
+        if self.show_modes[metomi.rose.config_editor.SHOW_MODE_LATENT]:
             for widget in self.get_main_variable_widgets():
                 if hasattr(widget.get_parent(), 'variable'):
                     if widget.get_parent().variable.name == '':
@@ -746,8 +746,8 @@ class ConfigPage(Gtk.VBox):
                     # Then it is an added ghost variable.
                     return self.handle_add_var_widget(variable)
                 # Then it has an existing variable widget.
-                if ((rose.META_PROP_TYPE in widget.errors) !=
-                        (rose.META_PROP_TYPE in variable.error) and
+                if ((metomi.rose.META_PROP_TYPE in widget.errors) !=
+                        (metomi.rose.META_PROP_TYPE in variable.error) and
                         hasattr(widget, "needs_type_error_refresh") and
                         not widget.needs_type_error_refresh()):
                     return widget.type_error_refresh(variable)
@@ -870,8 +870,8 @@ class ConfigPage(Gtk.VBox):
             self.update_ignored()
             react_func = getattr(self.main_container, 'show_mode_change')
             react_func(mode_key, is_mode_on)
-        elif mode_key in [rose.config_editor.SHOW_MODE_IGNORED,
-                          rose.config_editor.SHOW_MODE_USER_IGNORED]:
+        elif mode_key in [metomi.rose.config_editor.SHOW_MODE_IGNORED,
+                          metomi.rose.config_editor.SHOW_MODE_USER_IGNORED]:
             self.update_ignored()
         else:
             self.refresh()
@@ -893,7 +893,7 @@ class ConfigPage(Gtk.VBox):
                                    variable.ignored_reason.copy()))
         target_widgets_done = []
         refresh_list = []
-        relevant_errs = rose.config_editor.WARNING_TYPES_IGNORE
+        relevant_errs = metomi.rose.config_editor.WARNING_TYPES_IGNORE
         for widget in self.get_main_variable_widgets():
             if hasattr(widget.get_parent(), 'variable'):
                 target = widget.get_parent()
@@ -928,10 +928,10 @@ class ConfigPage(Gtk.VBox):
     def _check_show_ignored_reason(self, ignored_reason):
         """Return whether we should show this state."""
         mode = self.show_modes
-        if list(ignored_reason.keys()) == [rose.variable.IGNORED_BY_USER]:
-            return (mode[rose.config_editor.SHOW_MODE_IGNORED] or
-                    mode[rose.config_editor.SHOW_MODE_USER_IGNORED])
-        return mode[rose.config_editor.SHOW_MODE_IGNORED]
+        if list(ignored_reason.keys()) == [metomi.rose.variable.IGNORED_BY_USER]:
+            return (mode[metomi.rose.config_editor.SHOW_MODE_IGNORED] or
+                    mode[metomi.rose.config_editor.SHOW_MODE_USER_IGNORED])
+        return mode[metomi.rose.config_editor.SHOW_MODE_IGNORED]
 
     def _set_widget_ignored(self, widget, help_text, enabled=False):
         if self._check_show_ignored_reason(widget.variable.ignored_reason):
@@ -1025,19 +1025,19 @@ class ConfigPage(Gtk.VBox):
         else:
             datavars = self.panel_data
         for variable in datavars:
-            title = variable.metadata.get(rose.META_PROP_TITLE, variable.name)
+            title = variable.metadata.get(metomi.rose.META_PROP_TITLE, variable.name)
             var_id = variable.metadata.get('id', variable.name)
             key = (
-                variable.metadata.get(rose.META_PROP_SORT_KEY, '~'),
+                variable.metadata.get(metomi.rose.META_PROP_SORT_KEY, '~'),
                 var_id
             )
             if variable.name == '':
                 key = ('~', '')
             sorted_data.append((key, title, variable.name,
                                 variable.value, variable))
-        ascending_cmp = lambda x, y: rose.config_editor.util.null_cmp(
+        ascending_cmp = lambda x, y: metomi.rose.config_editor.util.null_cmp(
             x[0], y[0])
-        descending_cmp = lambda x, y: rose.config_editor.util.null_cmp(
+        descending_cmp = lambda x, y: metomi.rose.config_editor.util.null_cmp(
             x[0], y[0])
         if ascending:
             sorted_data.sort(ascending_cmp)
@@ -1054,7 +1054,7 @@ class ConfigPage(Gtk.VBox):
         menu = Gtk.Menu()
         for macro_name, info in sorted(self.custom_macros.items()):
             method, description = info
-            if method == rose.macro.TRANSFORM_METHOD:
+            if method == metomi.rose.macro.TRANSFORM_METHOD:
                 stock_id = Gtk.STOCK_CONVERT
             else:
                 stock_id = Gtk.STOCK_DIALOG_QUESTION
@@ -1104,9 +1104,9 @@ class ConfigPage(Gtk.VBox):
                           self.sub_data is None and
                           not self.latent_sections)
         if has_no_content:
-            info = rose.config_editor.PAGE_WARNING_NO_CONTENT
-            tip = rose.config_editor.PAGE_WARNING_NO_CONTENT_TIP
-            error_button = rose.gtk.util.CustomButton(
+            info = metomi.rose.config_editor.PAGE_WARNING_NO_CONTENT
+            tip = metomi.rose.config_editor.PAGE_WARNING_NO_CONTENT_TIP
+            error_button = metomi.rose.gtk.util.CustomButton(
                 stock_id=Gtk.STOCK_INFO,
                 as_tool=True,
                 tip_text=tip)
@@ -1117,10 +1117,10 @@ class ConfigPage(Gtk.VBox):
             label_list.append(error_label)
         if self.section is not None and self.section.ignored_reason:
             # This adds an ignored warning.
-            info = rose.config_editor.PAGE_WARNING_IGNORED_SECTION.format(
+            info = metomi.rose.config_editor.PAGE_WARNING_IGNORED_SECTION.format(
                 self.section.name)
-            tip = rose.config_editor.PAGE_WARNING_IGNORED_SECTION_TIP
-            error_button = rose.gtk.util.CustomButton(
+            tip = metomi.rose.config_editor.PAGE_WARNING_IGNORED_SECTION_TIP
+            error_button = metomi.rose.gtk.util.CustomButton(
                 stock_id=Gtk.STOCK_NO,
                 as_tool=True,
                 tip_text=tip)
@@ -1129,16 +1129,16 @@ class ConfigPage(Gtk.VBox):
             error_label.show()
             button_list.append(error_button)
             label_list.append(error_label)
-        elif self.see_also == '' or rose.FILE_VAR_SOURCE not in self.see_also:
+        elif self.see_also == '' or metomi.rose.FILE_VAR_SOURCE not in self.see_also:
             # This adds an 'orphaned' warning, only if the section is enabled.
             if (self.section is not None and
                     self.section.name.startswith('namelist:')):
-                error_button = rose.gtk.util.CustomButton(
+                error_button = metomi.rose.gtk.util.CustomButton(
                     stock_id=Gtk.STOCK_DIALOG_WARNING,
                     as_tool=True,
-                    tip_text=rose.config_editor.ERROR_ORPHAN_SECTION_TIP)
+                    tip_text=metomi.rose.config_editor.ERROR_ORPHAN_SECTION_TIP)
                 error_label = Gtk.Label()
-                info = rose.config_editor.ERROR_ORPHAN_SECTION.format(
+                info = metomi.rose.config_editor.ERROR_ORPHAN_SECTION.format(
                     self.section.name)
                 error_label.set_text(info)
                 error_label.show()
@@ -1154,33 +1154,33 @@ class ConfigPage(Gtk.VBox):
                     break
         if not has_data:
             # This is a latent namespace page.
-            latent_button = rose.gtk.util.CustomButton(
+            latent_button = metomi.rose.gtk.util.CustomButton(
                 stock_id=Gtk.STOCK_INFO,
                 as_tool=True,
-                tip_text=rose.config_editor.TIP_LATENT_PAGE)
+                tip_text=metomi.rose.config_editor.TIP_LATENT_PAGE)
             latent_label = Gtk.Label()
-            latent_label.set_text(rose.config_editor.PAGE_WARNING_LATENT)
+            latent_label.set_text(metomi.rose.config_editor.PAGE_WARNING_LATENT)
             latent_label.show()
             button_list.append(latent_button)
             label_list.append(latent_label)
         # This adds error notification for sections.
         for sect_data in self.sections + self.latent_sections:
             for err, info in list(sect_data.error.items()):
-                error_button = rose.gtk.util.CustomButton(
+                error_button = metomi.rose.gtk.util.CustomButton(
                     stock_id=Gtk.STOCK_DIALOG_ERROR,
                     as_tool=True,
                     tip_text=info)
                 error_label = Gtk.Label()
-                error_label.set_text(rose.config_editor.PAGE_WARNING.format(
+                error_label.set_text(metomi.rose.config_editor.PAGE_WARNING.format(
                     err, sect_data.name))
                 error_label.show()
                 button_list.append(error_button)
                 label_list.append(error_label)
         if list(self.custom_macros.items()):
-            macro_button = rose.gtk.util.CustomButton(
-                label=rose.config_editor.LABEL_PAGE_MACRO_BUTTON,
+            macro_button = metomi.rose.gtk.util.CustomButton(
+                label=metomi.rose.config_editor.LABEL_PAGE_MACRO_BUTTON,
                 stock_id=Gtk.STOCK_EXECUTE,
-                tip_text=rose.config_editor.TIP_MACRO_RUN_PAGE,
+                tip_text=metomi.rose.config_editor.TIP_MACRO_RUN_PAGE,
                 as_tool=True, icon_at_start=True,
                 has_menu=True)
             macro_button.connect("button-press-event",

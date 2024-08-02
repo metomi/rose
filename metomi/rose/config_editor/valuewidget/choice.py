@@ -25,11 +25,11 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config_editor
-import rose.gtk.choice
-import rose.gtk.dialog
-import rose.opt_parse
-import rose.variable
+import metomi.rose.config_editor
+import metomi.rose.gtk.choice
+import metomi.rose.gtk.dialog
+import metomi.rose.opt_parse
+import metomi.rose.variable
 
 
 class ChoicesValueWidget(Gtk.HBox):
@@ -41,10 +41,10 @@ class ChoicesValueWidget(Gtk.HBox):
     syntax:
 
     # NAME
-    #     rose.config_editor.valuewidget.choice.ChoicesValueWidget
+    #     metomi.rose.config_editor.valuewidget.choice.ChoicesValueWidget
     #
     # SYNOPSIS
-    #     rose...Widget [OPTIONS] [CUSTOM_CHOICE_HINT ...]
+    #     metomi.rose...Widget [OPTIONS] [CUSTOM_CHOICE_HINT ...]
     #
     # DESCRIPTION
     #     Represent available choices as a widget.
@@ -64,7 +64,7 @@ class ChoicesValueWidget(Gtk.HBox):
     #         choices into the variable value.
     #         The only supported format is "python" which outputs the
     #         result of repr(my_list) - e.g. VARIABLE=["A", "B"].
-    #         If not specified, the format will default to rose array
+    #         If not specified, the format will default to metomi.rose.array
     #         standard e.g. VARIABLE=A, B.
     #     --guess-groups
     #         Extrapolate inter-choice dependencies from their names.
@@ -106,7 +106,7 @@ class ChoicesValueWidget(Gtk.HBox):
         self.set_value = set_value
         self.hook = hook
 
-        self.opt_parser = rose.opt_parse.RoseOptionParser()
+        self.opt_parser = metomi.rose.opt_parse.RoseOptionParser()
         self.opt_parser.OPTIONS = self.OPTIONS
         self.opt_parser.add_my_options(*list(self.OPTIONS.keys()))
         opts, args = self.opt_parser.parse_args(shlex.split(arg_str))
@@ -114,7 +114,7 @@ class ChoicesValueWidget(Gtk.HBox):
         self.groups = []
         if opts.choices is not None:
             for choices in opts.choices:
-                self.groups.extend(rose.variable.array_split(choices))
+                self.groups.extend(metomi.rose.variable.array_split(choices))
         self.should_edit = opts.editable
         self.value_format = opts.format
         self.should_guess_groups = opts.guess_groups
@@ -123,7 +123,7 @@ class ChoicesValueWidget(Gtk.HBox):
         self.should_show_kinship = self._calc_should_show_kinship()
         list_vbox = Gtk.VBox()
         list_vbox.show()
-        self._listview = rose.gtk.choice.ChoicesListView(
+        self._listview = metomi.rose.gtk.choice.ChoicesListView(
             self._set_value_listview,
             self._get_value_values,
             self._handle_search)
@@ -135,7 +135,7 @@ class ChoicesValueWidget(Gtk.HBox):
         self.pack_start(list_vbox, expand=True, fill=True)
         tree_vbox = Gtk.VBox()
         tree_vbox.show()
-        self._treeview = rose.gtk.choice.ChoicesTreeView(
+        self._treeview = metomi.rose.gtk.choice.ChoicesTreeView(
             self._set_value_treeview,
             self._get_value_values,
             self._get_available_values,
@@ -166,7 +166,7 @@ class ChoicesValueWidget(Gtk.HBox):
         add_entry.get_child().connect(
             "key-press-event",
             lambda w, e: self._handle_text_choice(add_entry, e))
-        add_entry.set_tooltip_text(rose.config_editor.CHOICE_TIP_ENTER_CUSTOM)
+        add_entry.set_tooltip_text(metomi.rose.config_editor.CHOICE_TIP_ENTER_CUSTOM)
         add_entry.show()
         self._set_available_hints(add_entry)
         add_hbox.pack_end(add_entry, expand=True, fill=True)
@@ -197,9 +197,9 @@ class ChoicesValueWidget(Gtk.HBox):
     def _add_custom_choice(self, comboboxentry, new_name):
         entry = comboboxentry.get_child()
         if not new_name:
-            text = rose.config_editor.ERROR_BAD_NAME.format("''")
-            title = rose.config_editor.DIALOG_TITLE_ERROR
-            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+            text = metomi.rose.config_editor.ERROR_BAD_NAME.format("''")
+            title = metomi.rose.config_editor.DIALOG_TITLE_ERROR
+            metomi.rose.gtk.dialog.run_dialog(metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                        text, title)
             return False
         new_values = self._get_value_values() + [entry.get_text()]
@@ -216,7 +216,7 @@ class ChoicesValueWidget(Gtk.HBox):
             except (SyntaxError, TypeError, ValueError):
                 values = []
             return values
-        return rose.variable.array_split(self.value)
+        return metomi.rose.variable.array_split(self.value)
 
     def _get_available_values(self):
         return self.groups
@@ -271,6 +271,6 @@ class ChoicesValueWidget(Gtk.HBox):
         if self.value_format == "python":
             new_value = repr(shlex.split(new_value))
         else:
-            new_value = rose.variable.array_join(shlex.split(new_value))
+            new_value = metomi.rose.variable.array_join(shlex.split(new_value))
         self.value = new_value
         self.set_value(new_value)

@@ -22,7 +22,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config_editor
+import metomi.rose.config_editor
 
 
 class RadioButtonsValueWidget(Gtk.HBox):
@@ -37,8 +37,8 @@ class RadioButtonsValueWidget(Gtk.HBox):
         self.set_value = set_value
         self.hook = hook
 
-        var_values = metadata[rose.META_PROP_VALUES]
-        var_titles = metadata.get(rose.META_PROP_VALUE_TITLES)
+        var_values = metadata[metomi.rose.META_PROP_VALUES]
+        var_titles = metadata.get(metomi.rose.META_PROP_VALUE_TITLES)
 
         if var_titles:
             vbox = Gtk.VBox()

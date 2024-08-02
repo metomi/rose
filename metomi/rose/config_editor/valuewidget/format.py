@@ -22,7 +22,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config
+import metomi.rose.config
 
 
 class FormatsChooserValueWidget(Gtk.HBox):
@@ -129,7 +129,7 @@ class FormatsChooserValueWidget(Gtk.HBox):
     def load_data_chooser(self):
         data_model = Gtk.ListStore(str)
         options = self.values_getter()
-        options.sort(rose.config.sort_settings)
+        options.sort(metomi.rose.config.sort_settings)
         for value in options:
             if value not in [e.get_text() for e in self.entries]:
                 data_model.append([str(value)])

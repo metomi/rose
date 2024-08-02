@@ -70,14 +70,14 @@ class ValueWidgetHook(object):
 def chooser(value, metadata, error):
     """Select an appropriate widget class based on the arguments.
 
-    Note: rose edit overrides this logic if a widget is hard coded.
+    Note: metomi.rose.edit overrides this logic if a widget is hard coded.
 
     """
-    m_type = metadata.get(rose.META_PROP_TYPE)
-    m_values = metadata.get(rose.META_PROP_VALUES)
-    m_length = metadata.get(rose.META_PROP_LENGTH)
-    m_hint = metadata.get(rose.META_PROP_VALUE_HINTS)
-    contains_env = rose.env.contains_env_var(value)
+    m_type = metadata.get(metomi.rose.META_PROP_TYPE)
+    m_values = metadata.get(metomi.rose.META_PROP_VALUES)
+    m_length = metadata.get(metomi.rose.META_PROP_LENGTH)
+    m_hint = metadata.get(metomi.rose.META_PROP_VALUE_HINTS)
+    contains_env = metomi.rose.env.contains_env_var(value)
     is_list = m_length is not None or isinstance(m_type, list)
 
     # determine widget by presence of environment variables

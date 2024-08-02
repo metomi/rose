@@ -29,8 +29,8 @@ import copy
 import re
 import time
 
-import rose.config
-import rose.config_editor
+import metomi.rose.config
+import metomi.rose.config_editor
 
 
 class GroupOperations(object):
@@ -55,16 +55,16 @@ class GroupOperations(object):
 
     def apply_diff(self, config_name, config_diff, origin_name=None,
                    triggers_ok=False, is_reversed=False):
-        """Apply a rose.config.ConfigNodeDiff object to the config."""
+        """Apply a metomi.rose.config.ConfigNodeDiff object to the config."""
         state_reason_dict = {
-            rose.config.ConfigNode.STATE_NORMAL: {},
-            rose.config.ConfigNode.STATE_USER_IGNORED: {
-                rose.variable.IGNORED_BY_USER:
-                rose.config_editor.IGNORED_STATUS_MACRO
+            metomi.rose.config.ConfigNode.STATE_NORMAL: {},
+            metomi.rose.config.ConfigNode.STATE_USER_IGNORED: {
+                metomi.rose.variable.IGNORED_BY_USER:
+                metomi.rose.config_editor.IGNORED_STATUS_MACRO
             },
-            rose.config.ConfigNode.STATE_SYST_IGNORED: {
-                rose.variable.IGNORED_BY_SYSTEM:
-                rose.config_editor.IGNORED_STATUS_MACRO
+            metomi.rose.config.ConfigNode.STATE_SYST_IGNORED: {
+                metomi.rose.variable.IGNORED_BY_SYSTEM:
+                metomi.rose.config_editor.IGNORED_STATUS_MACRO
             }
         }
         nses = []
@@ -91,7 +91,7 @@ class GroupOperations(object):
                 ids.append(var_id)
                 metadata = self.data.helper.get_metadata_for_config_id(
                     var_id, config_name)
-                variable = rose.variable.Variable(opt, value, metadata)
+                variable = metomi.rose.variable.Variable(opt, value, metadata)
                 variable.comments = copy.deepcopy(comments)
                 variable.ignored_reason = copy.deepcopy(reason)
                 self.data.load_ns_for_node(variable, config_name)
@@ -146,29 +146,29 @@ class GroupOperations(object):
             if opt is None:
                 ignored_changed = True
                 is_ignored = False
-                if (rose.variable.IGNORED_BY_USER in old_reason and
-                        rose.variable.IGNORED_BY_USER not in reason):
+                if (metomi.rose.variable.IGNORED_BY_USER in old_reason and
+                        metomi.rose.variable.IGNORED_BY_USER not in reason):
                     # Enable from user-ignored.
                     is_ignored = False
-                elif (rose.variable.IGNORED_BY_USER not in old_reason and
-                        rose.variable.IGNORED_BY_USER in reason):
+                elif (metomi.rose.variable.IGNORED_BY_USER not in old_reason and
+                        metomi.rose.variable.IGNORED_BY_USER in reason):
                     # User-ignore from enabled.
                     is_ignored = True
                 elif (triggers_ok and
-                        rose.variable.IGNORED_BY_SYSTEM not in old_reason and
-                        rose.variable.IGNORED_BY_SYSTEM in reason):
+                        metomi.rose.variable.IGNORED_BY_SYSTEM not in old_reason and
+                        metomi.rose.variable.IGNORED_BY_SYSTEM in reason):
                     # Trigger-ignore.
                     sect_data.error.setdefault(
-                        rose.config_editor.WARNING_TYPE_ENABLED,
-                        rose.config_editor.IGNORED_STATUS_MACRO)
+                        metomi.rose.config_editor.WARNING_TYPE_ENABLED,
+                        metomi.rose.config_editor.IGNORED_STATUS_MACRO)
                     is_ignored = True
                 elif (triggers_ok and
-                        rose.variable.IGNORED_BY_SYSTEM in old_reason and
-                        rose.variable.IGNORED_BY_SYSTEM not in reason):
+                        metomi.rose.variable.IGNORED_BY_SYSTEM in old_reason and
+                        metomi.rose.variable.IGNORED_BY_SYSTEM not in reason):
                     # Enabled from trigger-ignore.
                     sect_data.error.setdefault(
-                        rose.config_editor.WARNING_TYPE_TRIGGER_IGNORED,
-                        rose.config_editor.IGNORED_STATUS_MACRO)
+                        metomi.rose.config_editor.WARNING_TYPE_TRIGGER_IGNORED,
+                        metomi.rose.config_editor.IGNORED_STATUS_MACRO)
                     is_ignored = False
                 else:
                     ignored_changed = False
@@ -211,10 +211,10 @@ class GroupOperations(object):
                 )
         reverse_diff = config_diff.get_reversed()
         if is_reversed:
-            action = rose.config_editor.STACK_ACTION_REVERSED
+            action = metomi.rose.config_editor.STACK_ACTION_REVERSED
         else:
-            action = rose.config_editor.STACK_ACTION_APPLIED
-        stack_item = rose.config_editor.stack.StackItem(
+            action = metomi.rose.config_editor.STACK_ACTION_APPLIED
+        stack_item = metomi.rose.config_editor.stack.StackItem(
             None,
             action,
             reverse_diff,
@@ -244,7 +244,7 @@ class GroupOperations(object):
 
         """
         start_stack_index = len(self.undo_stack)
-        group = rose.config_editor.STACK_GROUP_ADD + "-" + str(time.time())
+        group = metomi.rose.config_editor.STACK_GROUP_ADD + "-" + str(time.time())
         self.sect_ops.add_section(config_name, new_section_name,
                                   skip_update=True)
         namespace = self.data.helper.get_default_section_namespace(
@@ -256,8 +256,8 @@ class GroupOperations(object):
             if var.name in opt_map:
                 var.value = opt_map.pop(var.name)
             if (var.name in opt_map or
-                (var.metadata.get(rose.META_PROP_COMPULSORY) ==
-                 rose.META_PROP_VALUE_TRUE)):
+                (var.metadata.get(metomi.rose.META_PROP_COMPULSORY) ==
+                 metomi.rose.META_PROP_VALUE_TRUE)):
                 self.var_ops.add_var(var, skip_update=True)
         for opt_name, value in list(opt_map.items()):
             var_id = self.util.get_id_from_section_option(
@@ -268,7 +268,7 @@ class GroupOperations(object):
             flags = self.data.load_option_flags(config_name,
                                                 new_section_name, opt_name)
             ignored_reason = {}  # This may not be safe.
-            var = rose.variable.Variable(opt_name, value,
+            var = metomi.rose.variable.Variable(opt_name, value,
                                          metadata, ignored_reason,
                                          error={},
                                          flags=flags)
@@ -282,7 +282,7 @@ class GroupOperations(object):
                      skip_update=False):
         """Copy a section and its options."""
         start_stack_index = len(self.undo_stack)
-        group = rose.config_editor.STACK_GROUP_COPY + "-" + str(time.time())
+        group = metomi.rose.config_editor.STACK_GROUP_COPY + "-" + str(time.time())
         config_data = self.data.config[config_name]
         section_base = re.sub(r'(.*)\(\w+\)$', r"\1", section)
         existing_sections = []
@@ -309,7 +309,7 @@ class GroupOperations(object):
                 var_id, config_name)
             var.process_metadata(metadata)
             var.metadata['full_ns'] = new_namespace
-        sorter = rose.config.sort_settings
+        sorter = metomi.rose.config.sort_settings
         clone_vars.sort(lambda v, w: sorter(v.name, w.name))
         if skip_update:
             for var in clone_vars:
@@ -326,7 +326,7 @@ class GroupOperations(object):
                         skip_update=False, skip_sub_data_update=True):
         """Implement a mass user-ignore or enable of sections."""
         start_stack_index = len(self.undo_stack)
-        group = rose.config_editor.STACK_GROUP_IGNORE + "-" + str(time.time())
+        group = metomi.rose.config_editor.STACK_GROUP_IGNORE + "-" + str(time.time())
         nses = []
         for section in sections:
             ns = self.data.helper.get_default_section_namespace(
@@ -351,7 +351,7 @@ class GroupOperations(object):
     def remove_section(self, config_name, section, skip_update=False):
         """Implement a remove of a section and its options."""
         start_stack_index = len(self.undo_stack)
-        group = rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time())
+        group = metomi.rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time())
         config_data = self.data.config[config_name]
         variables = config_data.vars.now.get(section, [])
         for variable in list(variables):
@@ -365,7 +365,7 @@ class GroupOperations(object):
                        skip_update=False):
         """Implement a rename of a section and its options."""
         start_stack_index = len(self.undo_stack)
-        group = rose.config_editor.STACK_GROUP_RENAME + "-" + str(time.time())
+        group = metomi.rose.config_editor.STACK_GROUP_RENAME + "-" + str(time.time())
         added_section = self.copy_section(config_name, section,
                                           target_section,
                                           skip_update=skip_update)
@@ -379,7 +379,7 @@ class GroupOperations(object):
     def remove_sections(self, config_name, sections, skip_update=False):
         """Implement a mass removal of sections."""
         start_stack_index = len(self.undo_stack)
-        group = rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time())
+        group = metomi.rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time())
         nses = []
         for section in sections:
             ns = self.data.helper.get_default_section_namespace(

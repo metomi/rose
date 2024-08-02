@@ -22,13 +22,13 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config_editor
-import rose.config_editor.valuewidget
-import rose.env
-import rose.gtk.util
+import metomi.rose.config_editor
+import metomi.rose.config_editor.valuewidget
+import metomi.rose.env
+import metomi.rose.gtk.util
 
-ENV_COLOUR = rose.gtk.util.color_parse(
-    rose.config_editor.COLOUR_VARIABLE_TEXT_VAL_ENV)
+ENV_COLOUR = metomi.rose.gtk.util.color_parse(
+    metomi.rose.config_editor.COLOUR_VARIABLE_TEXT_VAL_ENV)
 
 
 class RawValueWidget(Gtk.HBox):
@@ -45,9 +45,9 @@ class RawValueWidget(Gtk.HBox):
         insensitive_colour = Gtk.Style().bg[0]
         self.entry.modify_bg(Gtk.StateType.INSENSITIVE, insensitive_colour)
         self.normal_colour = Gtk.Style().fg[Gtk.StateType.NORMAL]
-        if rose.env.contains_env_var(self.value):
+        if metomi.rose.env.contains_env_var(self.value):
             self.entry.modify_text(Gtk.StateType.NORMAL, ENV_COLOUR)
-            self.entry.set_tooltip_text(rose.config_editor.VAR_WIDGET_ENV_INFO)
+            self.entry.set_tooltip_text(metomi.rose.config_editor.VAR_WIDGET_ENV_INFO)
         self.entry.set_text(self.value)
         self.entry.connect("button-release-event",
                            self._handle_middle_click_paste)
@@ -68,9 +68,9 @@ class RawValueWidget(Gtk.HBox):
             return False
         self.value = new_value
         self.set_value(self.value)
-        if rose.env.contains_env_var(self.value):
+        if metomi.rose.env.contains_env_var(self.value):
             self.entry.modify_text(Gtk.StateType.NORMAL, ENV_COLOUR)
-            self.entry.set_tooltip_text(rose.config_editor.VAR_WIDGET_ENV_INFO)
+            self.entry.set_tooltip_text(metomi.rose.config_editor.VAR_WIDGET_ENV_INFO)
         else:
             self.entry.set_tooltip_text(None)
         return False
@@ -106,8 +106,8 @@ class TextMultilineValueWidget(Gtk.HBox):
         self.entrybuffer.set_text(self.value)
         self.entry = Gtk.TextView(self.entrybuffer)
         self.entry.set_wrap_mode(Gtk.WrapMode.WORD)
-        self.entry.set_left_margin(rose.config_editor.SPACING_SUB_PAGE)
-        self.entry.set_right_margin(rose.config_editor.SPACING_SUB_PAGE)
+        self.entry.set_left_margin(metomi.rose.config_editor.SPACING_SUB_PAGE)
+        self.entry.set_right_margin(metomi.rose.config_editor.SPACING_SUB_PAGE)
         self.entry.connect('focus-in-event', self.hook.trigger_scroll)
         self.entry.show()
 
