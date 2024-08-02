@@ -22,9 +22,9 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config_editor.util
-import rose.gtk.util
-import rose.variable
+import metomi.rose.config_editor.util
+import metomi.rose.gtk.util
+import metomi.rose.variable
 
 
 class EntryArrayValueWidget(Gtk.HBox):
@@ -45,33 +45,33 @@ class EntryArrayValueWidget(Gtk.HBox):
         self.metadata = metadata
         self.set_value = set_value
         self.hook = hook
-        self.max_length = self.metadata[rose.META_PROP_LENGTH]
+        self.max_length = self.metadata[metomi.rose.META_PROP_LENGTH]
 
-        value_array = rose.variable.array_split(self.value)
+        value_array = metomi.rose.variable.array_split(self.value)
         self.chars_width = max([len(v) for v in value_array] + [1]) + 1
         self.last_selected_src = None
-        arr_type = self.metadata.get(rose.META_PROP_TYPE)
+        arr_type = self.metadata.get(metomi.rose.META_PROP_TYPE)
         self.is_char_array = (arr_type == "character")
         self.is_quoted_array = (arr_type == "quoted")
         # Do not treat character or quoted arrays specially when incorrect.
         if self.is_char_array:
-            checker = rose.macros.value.ValueChecker()
+            checker = metomi.rose.macros.value.ValueChecker()
             for val in value_array:
                 if not checker.check_character(val):
                     self.is_char_array = False
         if self.is_quoted_array:
-            checker = rose.macros.value.ValueChecker()
+            checker = metomi.rose.macros.value.ValueChecker()
             for val in value_array:
                 if not checker.check_quoted(val):
                     self.is_quoted_array = False
         if self.is_char_array:
             for i, val in enumerate(value_array):
                 value_array[i] = (
-                    rose.config_editor.util.text_for_character_widget(val))
+                    metomi.rose.config_editor.util.text_for_character_widget(val))
         if self.is_quoted_array:
             for i, val in enumerate(value_array):
                 value_array[i] = (
-                    rose.config_editor.util.text_for_quoted_widget(val))
+                    metomi.rose.config_editor.util.text_for_quoted_widget(val))
         # Designate the number of allowed columns - 10 for 4 chars width
         self.num_allowed_columns = 3
         self.entry_table = Gtk.Table(rows=1,
@@ -110,9 +110,9 @@ class EntryArrayValueWidget(Gtk.HBox):
         for entry in self.entries:
             val = entry.get_text()
             if self.is_char_array:
-                val = rose.config_editor.util.text_from_character_widget(val)
+                val = metomi.rose.config_editor.util.text_from_character_widget(val)
             elif self.is_quoted_array:
-                val = rose.config_editor.util.text_from_quoted_widget(val)
+                val = metomi.rose.config_editor.util.text_from_quoted_widget(val)
             prefix = get_next_delimiter(self.value[len(text):], val)
             if prefix is None:
                 return None
@@ -125,7 +125,7 @@ class EntryArrayValueWidget(Gtk.HBox):
         """Set the focus and position within the table of entries."""
         if focus_index is None:
             return
-        value_array = rose.variable.array_split(self.value)
+        value_array = metomi.rose.variable.array_split(self.value)
         text = ''
         for i, val in enumerate(value_array):
             prefix = get_next_delimiter(self.value[len(text):],
@@ -146,7 +146,7 @@ class EntryArrayValueWidget(Gtk.HBox):
     def generate_entries(self, value_array=None):
         """Create the Gtk.Entry objects for elements in the array."""
         if value_array is None:
-            value_array = rose.variable.array_split(self.value)
+            value_array = metomi.rose.variable.array_split(self.value)
         entries = []
         for value_item in value_array:
             for entry in self.entries:
@@ -370,8 +370,8 @@ class EntryArrayValueWidget(Gtk.HBox):
         self.entries.append(entry)
         self._adjust_entry_length()
         self.populate_table(focus_widget=entry)
-        if (self.metadata.get(rose.META_PROP_COMPULSORY) !=
-                rose.META_PROP_VALUE_TRUE):
+        if (self.metadata.get(metomi.rose.META_PROP_COMPULSORY) !=
+                metomi.rose.META_PROP_VALUE_TRUE):
             self.setter(entry)
 
     def remove_entry(self):
@@ -401,26 +401,26 @@ class EntryArrayValueWidget(Gtk.HBox):
         if self.is_char_array:
             for i, val in enumerate(val_array):
                 val_array[i] = (
-                    rose.config_editor.util.text_from_character_widget(val))
+                    metomi.rose.config_editor.util.text_from_character_widget(val))
         elif self.is_quoted_array:
             for i, val in enumerate(val_array):
                 val_array[i] = (
-                    rose.config_editor.util.text_from_quoted_widget(val))
+                    metomi.rose.config_editor.util.text_from_quoted_widget(val))
         entries_have_commas = any("," in v for v in val_array)
-        new_value = rose.variable.array_join(val_array)
+        new_value = metomi.rose.variable.array_join(val_array)
         if new_value != self.value:
             self.value = new_value
             self.set_value(new_value)
             if (entries_have_commas and
                     not (self.is_char_array or self.is_quoted_array)):
-                new_val_array = rose.variable.array_split(new_value)
+                new_val_array = metomi.rose.variable.array_split(new_value)
                 if len(new_val_array) != len(self.entries):
                     self.generate_entries()
                     focus_index = None
                     for i, val in enumerate(val_array):
                         if "," in val:
                             val_post_comma = val[:val.index(",") + 1]
-                            focus_index = len(rose.variable.array_join(
+                            focus_index = len(metomi.rose.variable.array_join(
                                 new_val_array[:i] + [val_post_comma]))
                     self.populate_table()
                     self.set_focus_index(focus_index)

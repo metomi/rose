@@ -345,7 +345,8 @@ class ConfigPage(Gtk.VBox):
         self.tool_hbox.pack_start(button_frame, expand=False, fill=False)
         label_box = Gtk.HBox(homogeneous=False,
                              spacing=metomi.rose.config_editor.SPACING_PAGE)
-        label_box.pack_start(self.get_label_widget(is_detached=True, True, True, 0))
+        # Had to remove True, True, 0 in below like Ben F
+        label_box.pack_start(self.get_label_widget(is_detached=True))
         label_box.show()
         self.tool_hbox.pack_start(
             label_box, expand=True, fill=True, padding=10)
