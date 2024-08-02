@@ -26,11 +26,11 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GObject
 
-import rose.config
-import rose.config_editor
-import rose.config_editor.util
-import rose.gtk.util
-import rose.resource
+import metomi.rose.config
+import metomi.rose.config_editor
+import metomi.rose.config_editor.util
+import metomi.rose.gtk.util
+import metomi.rose.resource
 
 
 class PageNavigationPanel(Gtk.ScrolledWindow):
@@ -68,9 +68,9 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
         self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.set_shadow_type(Gtk.ShadowType.OUT)
         self._rec_no_expand_leaves = re.compile(
-            rose.config_editor.TREE_PANEL_NO_EXPAND_LEAVES_REGEX)
+            metomi.rose.config_editor.TREE_PANEL_NO_EXPAND_LEAVES_REGEX)
         self.panel_top = Gtk.TreeViewColumn()
-        self.panel_top.set_title(rose.config_editor.TREE_PANEL_TITLE)
+        self.panel_top.set_title(metomi.rose.config_editor.TREE_PANEL_TITLE)
         self.cell_error_icon = Gtk.CellRendererPixbuf()
         self.cell_changed_icon = Gtk.CellRendererPixbuf()
         self.cell_title = Gtk.CellRendererText()
@@ -92,15 +92,15 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
         self.data_store = Gtk.TreeStore(GdkPixbuf.Pixbuf, GdkPixbuf.Pixbuf,
                                         str, str, int, int, int, int,
                                         bool, str, str, str)
-        resource_loc = rose.resource.ResourceLocator(paths=sys.path)
-        image_path = resource_loc.locate('etc/images/rose-config-edit')
+        resource_loc = metomi.rose.resource.ResourceLocator(paths=sys.path)
+        image_path = resource_loc.locate('etc/images/metomi.rose.config-edit')
         self.null_icon = GdkPixbuf.Pixbuf.new_from_file(image_path +
                                                       '/null_icon.xpm')
         self.changed_icon = GdkPixbuf.Pixbuf.new_from_file(image_path +
                                                          '/change_icon.xpm')
         self.error_icon = GdkPixbuf.Pixbuf.new_from_file(image_path +
                                                        '/error_icon.xpm')
-        self.tree = rose.gtk.util.TooltipTreeView(
+        self.tree = metomi.rose.gtk.util.TooltipTreeView(
             get_tooltip_func=self.get_treeview_tooltip)
         self.tree.append_column(self.panel_top)
         self.filter_model = self.data_store.filter_new()
@@ -147,7 +147,7 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
     def _handle_cursor_change(self, *args):
         current_path = self.tree.get_cursor()[0]
         if current_path != self._last_tree_activation_path:
-            GObject.timeout_add(rose.config_editor.TREE_PANEL_KBD_TIMEOUT,
+            GObject.timeout_add(metomi.rose.config_editor.TREE_PANEL_KBD_TIMEOUT,
                                 self._timeout_launch, current_path)
 
     def _timeout_launch(self, timeout_path):
@@ -169,7 +169,7 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
     def set_expansion(self):
         """Set the default expanded rows."""
         top_rows = self.filter_model.iter_n_children(None)
-        if top_rows > rose.config_editor.TREE_PANEL_MAX_EXPANDED_ROOTS:
+        if top_rows > metomi.rose.config_editor.TREE_PANEL_MAX_EXPANDED_ROOTS:
             return False
         if top_rows == 1:
             return self.expand_recursive(no_duplicates=True)
@@ -201,9 +201,9 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
         while stack:
             row, keylist, key, value_meta_tuple = stack[0]
             value, meta, statuses, change = value_meta_tuple
-            title = meta[rose.META_PROP_TITLE]
-            latent_status = statuses[rose.config_editor.SHOW_MODE_LATENT]
-            ignored_status = statuses[rose.config_editor.SHOW_MODE_IGNORED]
+            title = meta[metomi.rose.META_PROP_TITLE]
+            latent_status = statuses[metomi.rose.config_editor.SHOW_MODE_LATENT]
+            ignored_status = statuses[metomi.rose.config_editor.SHOW_MODE_IGNORED]
             new_row = self.data_store.append(row, [self.null_icon,
                                                    self.null_icon,
                                                    title,
@@ -224,35 +224,35 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
 
     def _set_title_markup(self, column, cell, model, r_iter, index):
         title = model.get_value(r_iter, index)
-        title = rose.gtk.util.safe_str(title)
+        title = metomi.rose.gtk.util.safe_str(title)
         if len(model.get_path(r_iter)) == 1:
-            title = rose.config_editor.TITLE_PAGE_ROOT_MARKUP.format(title)
+            title = metomi.rose.config_editor.TITLE_PAGE_ROOT_MARKUP.format(title)
         latent_status = model.get_value(r_iter, self.COLUMN_LATENT_STATUS)
         ignored_status = model.get_value(r_iter, self.COLUMN_IGNORED_STATUS)
         name = self.get_name(model.get_path(r_iter))
         preview_status = self._ask_is_preview(name)
         if preview_status:
-            title = rose.config_editor.TITLE_PAGE_PREVIEW_MARKUP.format(title)
+            title = metomi.rose.config_editor.TITLE_PAGE_PREVIEW_MARKUP.format(title)
         if latent_status:
             if self._get_is_latent_sub_tree(model, r_iter):
-                title = rose.config_editor.TITLE_PAGE_LATENT_MARKUP.format(
+                title = metomi.rose.config_editor.TITLE_PAGE_LATENT_MARKUP.format(
                     title)
         if ignored_status:
-            title = rose.config_editor.TITLE_PAGE_IGNORED_MARKUP.format(
+            title = metomi.rose.config_editor.TITLE_PAGE_IGNORED_MARKUP.format(
                 ignored_status, title)
         cell.set_property("markup", title)
 
     def sort_tree_items(self, row_item_1, row_item_2):
         """Sort tree items according to name and sort key."""
-        sort_key_1 = row_item_1[1][1].get(rose.META_PROP_SORT_KEY, '~')
-        sort_key_2 = row_item_2[1][1].get(rose.META_PROP_SORT_KEY, '~')
+        sort_key_1 = row_item_1[1][1].get(metomi.rose.META_PROP_SORT_KEY, '~')
+        sort_key_2 = row_item_2[1][1].get(metomi.rose.META_PROP_SORT_KEY, '~')
         var_id_1 = row_item_1[0]
         var_id_2 = row_item_2[0]
 
         x_key = (sort_key_1, var_id_1)
         y_key = (sort_key_2, var_id_2)
 
-        return rose.config_editor.util.null_cmp(x_key, y_key)
+        return metomi.rose.config_editor.util.null_cmp(x_key, y_key)
 
     def set_row_icon(self, names, ind_count=0, ind_type='changed'):
         """Set the icons for row status on or off. Check parent icons.
@@ -335,21 +335,21 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
                                              self.COLUMN_CHANGE_INTERNAL)
             proper_name = self.get_name(path, unfiltered=True)
             metadata, comment = self._get_metadata_comments_func(proper_name)
-            description = metadata.get(rose.META_PROP_DESCRIPTION, "")
+            description = metadata.get(metomi.rose.META_PROP_DESCRIPTION, "")
             change = self.data_store.get_value(
                 path_iter, self.COLUMN_CHANGE_TEXT)
             text = title
             if name != title:
                 text += " (" + name + ")"
             if mods > 0:
-                text += " - " + rose.config_editor.TREE_PANEL_MODIFIED
+                text += " - " + metomi.rose.config_editor.TREE_PANEL_MODIFIED
             if description:
                 text += ":\n" + description
             if num_errors > 0:
                 if num_errors == 1:
-                    text += rose.config_editor.TREE_PANEL_ERROR
+                    text += metomi.rose.config_editor.TREE_PANEL_ERROR
                 else:
-                    text += rose.config_editor.TREE_PANEL_ERRORS.format(
+                    text += metomi.rose.config_editor.TREE_PANEL_ERRORS.format(
                         num_errors)
             if comment:
                 text += "\n" + comment
@@ -554,7 +554,7 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
             start_path = treemodel.get_path(start_iter)
         if not no_duplicates:
             return self.tree.expand_row(start_path, open_all=True)
-        max_depth = rose.config_editor.TREE_PANEL_MAX_EXPANDED_DEPTH
+        max_depth = metomi.rose.config_editor.TREE_PANEL_MAX_EXPANDED_DEPTH
         stack = [treemodel.get_iter(start_path)]
         while stack:
             iter_ = stack.pop(0)
@@ -567,8 +567,8 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
             while child_iter is not None:
                 child_name = self.get_name(treemodel.get_path(child_iter))
                 metadata = self._get_metadata_comments_func(child_name)[0]
-                dupl = metadata.get(rose.META_PROP_DUPLICATE)
-                child_dups.append(dupl == rose.META_PROP_VALUE_TRUE)
+                dupl = metadata.get(metomi.rose.META_PROP_DUPLICATE)
+                child_dups.append(dupl == metomi.rose.META_PROP_VALUE_TRUE)
                 child_iter = treemodel.iter_next(child_iter)
             if path != start_path:
                 stack.append(treemodel.iter_next(iter_))

@@ -22,22 +22,22 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config_editor
-import rose.config_editor.util
-import rose.gtk.dialog
-import rose.gtk.util
+import metomi.rose.config_editor
+import metomi.rose.config_editor.util
+import metomi.rose.gtk.dialog
+import metomi.rose.gtk.util
 
 
 class MenuWidget(Gtk.HBox):
 
     """This class generates a button with a menu for variable actions."""
 
-    MENU_ICON_ERRORS = 'rose-gtk-gnome-package-system-errors'
-    MENU_ICON_WARNINGS = 'rose-gtk-gnome-package-system-warnings'
-    MENU_ICON_LATENT = 'rose-gtk-gnome-add'
-    MENU_ICON_LATENT_ERRORS = 'rose-gtk-gnome-add-errors'
-    MENU_ICON_LATENT_WARNINGS = 'rose-gtk-gnome-add-warnings'
-    MENU_ICON_NORMAL = 'rose-gtk-gnome-package-system-normal'
+    MENU_ICON_ERRORS = 'metomi.rose.gtk-gnome-package-system-errors'
+    MENU_ICON_WARNINGS = 'metomi.rose.gtk-gnome-package-system-warnings'
+    MENU_ICON_LATENT = 'metomi.rose.gtk-gnome-add'
+    MENU_ICON_LATENT_ERRORS = 'metomi.rose.gtk-gnome-add-errors'
+    MENU_ICON_LATENT_WARNINGS = 'metomi.rose.gtk-gnome-add-warnings'
+    MENU_ICON_NORMAL = 'metomi.rose.gtk-gnome-package-system-normal'
 
     def __init__(self, variable, var_ops, remove_func, update_func,
                  launch_help_func):
@@ -63,35 +63,35 @@ class MenuWidget(Gtk.HBox):
                            <separator name='sepRemove'/>
                            <menuitem action='Remove'/>
                            </popup> </ui>"""
-        actions = [('Options', 'rose-gtk-gnome-package-system', ''),
+        actions = [('Options', 'metomi.rose.gtk-gnome-package-system', ''),
                    ('Info', Gtk.STOCK_INFO,
-                    rose.config_editor.VAR_MENU_INFO),
+                    metomi.rose.config_editor.VAR_MENU_INFO),
                    ('Help', Gtk.STOCK_HELP,
-                    rose.config_editor.VAR_MENU_HELP),
+                    metomi.rose.config_editor.VAR_MENU_HELP),
                    ('Web Help', Gtk.STOCK_HOME,
-                    rose.config_editor.VAR_MENU_URL),
+                    metomi.rose.config_editor.VAR_MENU_URL),
                    ('Edit', Gtk.STOCK_EDIT,
-                    rose.config_editor.VAR_MENU_EDIT_COMMENTS),
+                    metomi.rose.config_editor.VAR_MENU_EDIT_COMMENTS),
                    ('Fix Ignore', Gtk.STOCK_CONVERT,
-                    rose.config_editor.VAR_MENU_FIX_IGNORE),
+                    metomi.rose.config_editor.VAR_MENU_FIX_IGNORE),
                    ('Ignore', Gtk.STOCK_NO,
-                    rose.config_editor.VAR_MENU_IGNORE),
+                    metomi.rose.config_editor.VAR_MENU_IGNORE),
                    ('Enable', Gtk.STOCK_YES,
-                    rose.config_editor.VAR_MENU_ENABLE),
+                    metomi.rose.config_editor.VAR_MENU_ENABLE),
                    ('Remove', Gtk.STOCK_DELETE,
-                    rose.config_editor.VAR_MENU_REMOVE),
+                    metomi.rose.config_editor.VAR_MENU_REMOVE),
                    ('Add', Gtk.STOCK_ADD,
-                    rose.config_editor.VAR_MENU_ADD)]
-        menu_icon_id = 'rose-gtk-gnome-package-system'
-        is_comp = (self.my_variable.metadata.get(rose.META_PROP_COMPULSORY) ==
-                   rose.META_PROP_VALUE_TRUE)
+                    metomi.rose.config_editor.VAR_MENU_ADD)]
+        menu_icon_id = 'metomi.rose.gtk-gnome-package-system'
+        is_comp = (self.my_variable.metadata.get(metomi.rose.META_PROP_COMPULSORY) ==
+                   metomi.rose.META_PROP_VALUE_TRUE)
         if self.is_ghost or is_comp:
             option_ui_middle = (
                 option_ui_middle.replace("<menuitem action='Ignore'/>", ''))
-        error_types = rose.config_editor.WARNING_TYPES_IGNORE
+        error_types = metomi.rose.config_editor.WARNING_TYPES_IGNORE
         if (set(error_types) & set(variable.error.keys()) or
             set(error_types) & set(variable.warning.keys()) or
-            (rose.META_PROP_COMPULSORY in variable.error and
+            (metomi.rose.META_PROP_COMPULSORY in variable.error and
              not self.is_ghost)):
             option_ui_middle = ("<menuitem action='Fix Ignore'/>" +
                                 "<separator name='sepFixIgnore'/>" +
@@ -132,11 +132,11 @@ class MenuWidget(Gtk.HBox):
             option_ui_middle = ("<menuitem action='Add'/>" +
                                 "<separator name='sepAdd'/>" +
                                 option_ui_middle)
-        if rose.META_PROP_URL in variable.metadata:
+        if metomi.rose.META_PROP_URL in variable.metadata:
             url_ui = "<separator name='sepWeb'/><menuitem action='Web Help'/>"
             option_ui_middle += url_ui
         option_ui = option_ui_start + option_ui_middle + option_ui_end
-        self.button = rose.gtk.util.CustomButton(
+        self.button = metomi.rose.gtk.util.CustomButton(
             stock_id=menu_icon_id,
             size=Gtk.IconSize.MENU,
             as_tool=True)
@@ -177,18 +177,18 @@ class MenuWidget(Gtk.HBox):
     def _set_hover_over(self, variable):
         hover_string = 'Variable options'
         if variable.warning:
-            hover_string = rose.config_editor.VAR_MENU_TIP_WARNING
+            hover_string = metomi.rose.config_editor.VAR_MENU_TIP_WARNING
             for warn, warn_info in list(variable.warning.items()):
                 hover_string += "(" + warn + "): " + warn_info + '\n'
             hover_string = hover_string.rstrip('\n')
         if variable.error:
-            hover_string = rose.config_editor.VAR_MENU_TIP_ERROR
+            hover_string = metomi.rose.config_editor.VAR_MENU_TIP_ERROR
             for err, err_info in list(variable.error.items()):
                 hover_string += "(" + err + "): " + err_info + '\n'
             hover_string = hover_string.rstrip('\n')
         if self.is_ghost:
             if not variable.error:
-                hover_string = rose.config_editor.VAR_MENU_TIP_LATENT
+                hover_string = metomi.rose.config_editor.VAR_MENU_TIP_LATENT
         self.hover_text = hover_string
         self.button.set_tooltip_text(self.hover_text)
         self.button.show()
@@ -212,14 +212,14 @@ class MenuWidget(Gtk.HBox):
         warnings = list(self.my_variable.warning.keys())
         ns = self.my_variable.metadata["full_ns"]
         search_function = lambda i: self.var_ops.search_for_var(ns, i)
-        dialog_func = rose.gtk.dialog.run_hyperlink_dialog
+        dialog_func = metomi.rose.gtk.dialog.run_hyperlink_dialog
         for error in errors:
             err_name = error.replace("/", "_")
             action_name = "Error_" + err_name
             if "action='" + action_name + "'" not in option_ui:
                 continue
             err_item = uimanager.get_widget('/Options/' + action_name)
-            title = rose.config_editor.DIALOG_VARIABLE_ERROR_TITLE.format(
+            title = metomi.rose.config_editor.DIALOG_VARIABLE_ERROR_TITLE.format(
                 error, self.my_variable.metadata["id"])
             err_item.set_tooltip_text(self.my_variable.error[error])
             err_item.connect(
@@ -232,7 +232,7 @@ class MenuWidget(Gtk.HBox):
             if "action='" + action_name + "'" not in option_ui:
                 continue
             warn_item = uimanager.get_widget('/Options/' + action_name)
-            title = rose.config_editor.DIALOG_VARIABLE_WARNING_TITLE.format(
+            title = metomi.rose.config_editor.DIALOG_VARIABLE_WARNING_TITLE.format(
                 warning, self.my_variable.metadata["id"])
             warn_item.set_tooltip_text(self.my_variable.warning[warning])
             warn_item.connect(
@@ -244,12 +244,12 @@ class MenuWidget(Gtk.HBox):
         enable_item = None
         if "action='Ignore'" in option_ui:
             ignore_item = uimanager.get_widget('/Options/Ignore')
-            if (self.my_variable.metadata.get(rose.META_PROP_COMPULSORY) ==
-                    rose.META_PROP_VALUE_TRUE or self.is_ghost):
+            if (self.my_variable.metadata.get(metomi.rose.META_PROP_COMPULSORY) ==
+                    metomi.rose.META_PROP_VALUE_TRUE or self.is_ghost):
                 ignore_item.set_sensitive(False)
             # It is a non-trigger, optional, enabled variable.
-            new_reason = {rose.variable.IGNORED_BY_USER:
-                          rose.config_editor.IGNORED_STATUS_MANUAL}
+            new_reason = {metomi.rose.variable.IGNORED_BY_USER:
+                          metomi.rose.config_editor.IGNORED_STATUS_MANUAL}
             ignore_item.connect(
                 "activate",
                 lambda b: self.var_ops.set_var_ignored(
@@ -262,7 +262,7 @@ class MenuWidget(Gtk.HBox):
         if "action='Fix Ignore'" in option_ui:
             fix_ignore_item = uimanager.get_widget('/Options/Fix Ignore')
             fix_ignore_item.set_tooltip_text(
-                rose.config_editor.VAR_MENU_TIP_FIX_IGNORE)
+                metomi.rose.config_editor.VAR_MENU_TIP_FIX_IGNORE)
             fix_ignore_item.connect(
                 "activate",
                 lambda e: self.var_ops.fix_var_ignored(self.my_variable))
@@ -272,13 +272,13 @@ class MenuWidget(Gtk.HBox):
                 enable_item.set_sensitive(False)
         info_item = uimanager.get_widget('/Options/Info')
         info_item.connect("activate", self._launch_info_dialog)
-        if (self.my_variable.metadata.get(rose.META_PROP_COMPULSORY) ==
-                rose.META_PROP_VALUE_TRUE or self.is_ghost):
+        if (self.my_variable.metadata.get(metomi.rose.META_PROP_COMPULSORY) ==
+                metomi.rose.META_PROP_VALUE_TRUE or self.is_ghost):
             remove_item.set_sensitive(False)
         help_item = uimanager.get_widget('/Options/Help')
         help_item.connect("activate",
                           lambda b: self.launch_help())
-        if rose.META_PROP_HELP not in self.my_variable.metadata:
+        if metomi.rose.META_PROP_HELP not in self.my_variable.metadata:
             help_item.set_sensitive(False)
         url_item = uimanager.get_widget('/Options/Web Help')
         if url_item is not None and 'url' in self.my_variable.metadata:
@@ -299,15 +299,15 @@ class MenuWidget(Gtk.HBox):
         changes = self.var_ops.get_var_changes(self.my_variable)
         ns = self.my_variable.metadata["full_ns"]
         search_function = lambda i: self.var_ops.search_for_var(ns, i)
-        rose.config_editor.util.launch_node_info_dialog(self.my_variable,
+        metomi.rose.config_editor.util.launch_node_info_dialog(self.my_variable,
                                                         changes,
                                                         search_function)
 
     def launch_edit(self, *args):
         text = "\n".join(self.my_variable.comments)
-        title = rose.config_editor.DIALOG_TITLE_EDIT_COMMENTS.format(
+        title = metomi.rose.config_editor.DIALOG_TITLE_EDIT_COMMENTS.format(
             self.my_variable.metadata['id'])
-        rose.gtk.dialog.run_edit_dialog(text,
+        metomi.rose.gtk.dialog.run_edit_dialog(text,
                                         finish_hook=self._edit_finish_hook,
                                         title=title)
 
@@ -331,7 +331,7 @@ class CheckedMenuWidget(MenuWidget):
         self.checkbutton.set_active(not self.is_ghost)
         meta = self.my_variable.metadata
         if not self.is_ghost and meta.get(
-                rose.META_PROP_COMPULSORY) == rose.META_PROP_VALUE_TRUE:
+                metomi.rose.META_PROP_COMPULSORY) == metomi.rose.META_PROP_VALUE_TRUE:
             self.checkbutton.set_sensitive(False)
         self.pack_start(self.checkbutton, expand=False, fill=False, padding=0)
         self.pack_start(self.button, expand=False, fill=False, padding=0)

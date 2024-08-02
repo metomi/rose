@@ -18,7 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import rose.config_editor
+import metomi.rose.config_editor
 
 
 class Updater(object):
@@ -54,7 +54,7 @@ class Updater(object):
         if config_name == namespace:
             # This is the top-level.
             if config_name not in self.data.saved_config_names:
-                return rose.config_editor.TREE_PANEL_TIP_ADDED_CONFIG
+                return metomi.rose.config_editor.TREE_PANEL_TIP_ADDED_CONFIG
             section_hashes = []
             for sect_data in list(config_sections.now.values()):
                 section_hashes.append(sect_data.to_hashable())
@@ -62,7 +62,7 @@ class Updater(object):
             for sect_data in list(config_sections.save.values()):
                 old_section_hashes.append(sect_data.to_hashable())
             if set(section_hashes) ^ set(old_section_hashes):
-                return rose.config_editor.TREE_PANEL_TIP_CHANGED_CONFIG
+                return metomi.rose.config_editor.TREE_PANEL_TIP_CHANGED_CONFIG
         allowed_sections = self.data.helper.get_sections_from_namespace(
             namespace)
         save_var_map = {}
@@ -75,25 +75,25 @@ class Updater(object):
                     var_id = var.metadata['id']
                     save_var = save_var_map.get(var_id)
                     if save_var is None:
-                        return rose.config_editor.TREE_PANEL_TIP_ADDED_VARS
+                        return metomi.rose.config_editor.TREE_PANEL_TIP_ADDED_VARS
                     if save_var.to_hashable() != var.to_hashable():
                         # Variable has changed in some form.
-                        return rose.config_editor.TREE_PANEL_TIP_CHANGED_VARS
+                        return metomi.rose.config_editor.TREE_PANEL_TIP_CHANGED_VARS
                     save_var_map.pop(var_id)
         if save_var_map:
             # Some variables are now absent.
-            return rose.config_editor.TREE_PANEL_TIP_REMOVED_VARS
+            return metomi.rose.config_editor.TREE_PANEL_TIP_REMOVED_VARS
         if self.data.helper.get_ns_is_default(namespace):
             sections = self.data.helper.get_sections_from_namespace(namespace)
             for section in sections:
                 sect_data = config_sections.now.get(section)
                 save_sect_data = config_sections.save.get(section)
                 if (sect_data is None) != (save_sect_data is None):
-                    return rose.config_editor.TREE_PANEL_TIP_DIFF_SECTIONS
+                    return metomi.rose.config_editor.TREE_PANEL_TIP_DIFF_SECTIONS
                 if sect_data is not None and save_sect_data is not None:
                     if sect_data.to_hashable() != save_sect_data.to_hashable():
                         return (
-                            rose.config_editor.TREE_PANEL_TIP_CHANGED_SECTIONS)
+                            metomi.rose.config_editor.TREE_PANEL_TIP_CHANGED_SECTIONS)
         return ""
 
     def update_ns_tree_states(self, namespace):
@@ -439,44 +439,44 @@ class Updater(object):
             sect_data = config_sections.now.get(section)
             if sect_data is None:
                 sect_data = config_sections.latent[section]
-            for attribute in rose.config_editor.WARNING_TYPES_IGNORE:
+            for attribute in metomi.rose.config_editor.WARNING_TYPES_IGNORE:
                 if attribute in sect_data.error:
                     sect_data.error.pop(attribute)
             reason = sect_data.ignored_reason
             if section in enabled_sections:
                 # Trigger-enabled sections
-                if (rose.variable.IGNORED_BY_USER in reason):
+                if (metomi.rose.variable.IGNORED_BY_USER in reason):
                     # User-ignored but trigger-enabled
                     if (meta_config.get(
-                            [section, rose.META_PROP_COMPULSORY]).value ==
-                            rose.META_PROP_VALUE_TRUE):
+                            [section, metomi.rose.META_PROP_COMPULSORY]).value ==
+                            metomi.rose.META_PROP_VALUE_TRUE):
                         # Doc table: I_u -> E -> compulsory
                         sect_data.error.update(
-                            {rose.config_editor.WARNING_TYPE_USER_IGNORED:
-                             rose.config_editor.WARNING_NOT_USER_IGNORABLE})
-                elif (rose.variable.IGNORED_BY_SYSTEM in reason):
+                            {metomi.rose.config_editor.WARNING_TYPE_USER_IGNORED:
+                             metomi.rose.config_editor.WARNING_NOT_USER_IGNORABLE})
+                elif (metomi.rose.variable.IGNORED_BY_SYSTEM in reason):
                     # Normal trigger-enabled sections
-                    reason.pop(rose.variable.IGNORED_BY_SYSTEM)
+                    reason.pop(metomi.rose.variable.IGNORED_BY_SYSTEM)
                     for var in sect_vars:
                         name = var.metadata['full_ns']
                         if name not in triggered_ns_list:
                             triggered_ns_list.append(name)
                         var.ignored_reason.pop(
-                            rose.variable.IGNORED_BY_SECTION, None)
+                            metomi.rose.variable.IGNORED_BY_SECTION, None)
             elif section in trigger.ignored_dict:
                 # Trigger-ignored sections
                 parents = trigger.ignored_dict.get(section, {})
                 if parents:
                     help_text = "; ".join(list(parents.values()))
                 else:
-                    help_text = rose.config_editor.IGNORED_STATUS_DEFAULT
-                reason.update({rose.variable.IGNORED_BY_SYSTEM: help_text})
+                    help_text = metomi.rose.config_editor.IGNORED_STATUS_DEFAULT
+                reason.update({metomi.rose.variable.IGNORED_BY_SYSTEM: help_text})
                 for var in sect_vars:
                     name = var.metadata['full_ns']
                     if name not in triggered_ns_list:
                         triggered_ns_list.append(name)
                     var.ignored_reason.update(
-                        {rose.variable.IGNORED_BY_SECTION: help_text})
+                        {metomi.rose.variable.IGNORED_BY_SECTION: help_text})
         # Update the variables.
         for var in update_vars:
             var_id = var.metadata.get('id')
@@ -485,34 +485,34 @@ class Updater(object):
                 triggered_ns_list.append(name)
             if var_id == this_id:
                 continue
-            for attribute in rose.config_editor.WARNING_TYPES_IGNORE:
+            for attribute in metomi.rose.config_editor.WARNING_TYPES_IGNORE:
                 if attribute in var.error:
                     var.error.pop(attribute)
             if (var_id in trigger.enabled_dict and
                     var_id not in trigger.ignored_dict):
                 # Trigger-enabled variables
-                if rose.variable.IGNORED_BY_USER in var.ignored_reason:
+                if metomi.rose.variable.IGNORED_BY_USER in var.ignored_reason:
                     # User-ignored but trigger-enabled
                     # Doc table: I_u -> E
-                    if (var.metadata.get(rose.META_PROP_COMPULSORY) ==
-                            rose.META_PROP_VALUE_TRUE):
+                    if (var.metadata.get(metomi.rose.META_PROP_COMPULSORY) ==
+                            metomi.rose.META_PROP_VALUE_TRUE):
                         # Doc table: I_u -> E -> compulsory
                         var.error.update(
-                            {rose.config_editor.WARNING_TYPE_USER_IGNORED:
-                             rose.config_editor.WARNING_NOT_USER_IGNORABLE})
-                elif (rose.variable.IGNORED_BY_SYSTEM in
+                            {metomi.rose.config_editor.WARNING_TYPE_USER_IGNORED:
+                             metomi.rose.config_editor.WARNING_NOT_USER_IGNORABLE})
+                elif (metomi.rose.variable.IGNORED_BY_SYSTEM in
                       var.ignored_reason):
                     # Normal trigger-enabled variables
-                    var.ignored_reason.pop(rose.variable.IGNORED_BY_SYSTEM)
+                    var.ignored_reason.pop(metomi.rose.variable.IGNORED_BY_SYSTEM)
             elif var_id in trigger.ignored_dict:
                 # Trigger-ignored variables
                 parents = trigger.ignored_dict.get(var_id, {})
                 if parents:
                     help_text = "; ".join(list(parents.values()))
                 else:
-                    help_text = rose.config_editor.IGNORED_STATUS_DEFAULT
+                    help_text = metomi.rose.config_editor.IGNORED_STATUS_DEFAULT
                 var.ignored_reason.update(
-                    {rose.variable.IGNORED_BY_SYSTEM: help_text})
+                    {metomi.rose.variable.IGNORED_BY_SYSTEM: help_text})
         for namespace in triggered_ns_list:
             self.update_tree_status(namespace)
         return update_ids
@@ -562,7 +562,7 @@ class Updater(object):
         if self.is_pluggable:
             return False
         if isinstance(self.mainwindow.log_window,
-                      rose.config_editor.stack.StackViewer):
+                      metomi.rose.config_editor.stack.StackViewer):
             self.mainwindow.log_window.update()
 
     def focus_sub_page_if_open(self, namespace, node_id):
@@ -591,14 +591,14 @@ class Updater(object):
             macro_config = self.data.dump_to_internal_config(config_name)
             meta_config = self.data.config[config_name].meta
             # Duplicate checking
-            dupl_checker = rose.macros.duplicate.DuplicateChecker()
+            dupl_checker = metomi.rose.macros.duplicate.DuplicateChecker()
             problem_list = dupl_checker.validate(macro_config, meta_config)
             if problem_list:
                 self.main_handle.handle_macro_validation(
                     config_name,
                     'duplicate.DuplicateChecker.validate',
                     macro_config, problem_list, no_display=True)
-            format_checker = rose.macros.format.FormatChecker()
+            format_checker = metomi.rose.macros.format.FormatChecker()
             problem_list = format_checker.validate(macro_config, meta_config)
             if problem_list:
                 self.main_handle.handle_macro_validation(
@@ -618,7 +618,7 @@ class Updater(object):
             meta = config_data.meta
             checker = (
                 self.data.builtin_macros[config_name][
-                    rose.META_PROP_COMPULSORY])
+                    metomi.rose.META_PROP_COMPULSORY])
             only_these_sections = None
             if namespace is not None:
                 only_these_sections = (
@@ -632,7 +632,7 @@ class Updater(object):
                 only_these_sections=only_these_sections
             )
             self.apply_macro_validation(config_name,
-                                        rose.META_PROP_COMPULSORY, bad_list,
+                                        metomi.rose.META_PROP_COMPULSORY, bad_list,
                                         namespace, is_loading=is_loading,
                                         is_macro_dynamic=True)
         # Value checking.
@@ -640,14 +640,14 @@ class Updater(object):
             config_data = self.data.config[config_name]
             meta = config_data.meta
             checker = (
-                self.data.builtin_macros[config_name][rose.META_PROP_TYPE])
+                self.data.builtin_macros[config_name][metomi.rose.META_PROP_TYPE])
             if namespace is None:
                 real_variables = config_data.vars.get_all(skip_latent=True)
             else:
                 real_variables = (
                     self.data.helper.get_data_for_namespace(namespace)[0])
             bad_list = checker.validate_variables(real_variables, meta)
-            self.apply_macro_validation(config_name, rose.META_PROP_TYPE,
+            self.apply_macro_validation(config_name, metomi.rose.META_PROP_TYPE,
                                         bad_list,
                                         namespace, is_loading=is_loading,
                                         is_macro_dynamic=True)
@@ -738,7 +738,7 @@ class Updater(object):
                 map_ = id_error_dict
                 if is_loading:
                     self.load_errors += 1
-                    update_text = rose.config_editor.EVENT_LOAD_ERRORS.format(
+                    update_text = metomi.rose.config_editor.EVENT_LOAD_ERRORS.format(
                         self.data.top_level_name, self.load_errors)
 
                     self.reporter.report_load_event(update_text,

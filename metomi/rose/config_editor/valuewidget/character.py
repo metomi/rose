@@ -22,8 +22,8 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from rose import META_PROP_TYPE
-import rose.config_editor.util
+from metomi.rose.import META_PROP_TYPE
+import metomi.rose.config_editor.util
 
 
 class QuotedTextValueWidget(Gtk.HBox):
@@ -34,23 +34,23 @@ class QuotedTextValueWidget(Gtk.HBox):
         super(QuotedTextValueWidget, self).__init__(homogeneous=False,
                                                     spacing=0)
         # Importing here prevents cyclic imports
-        import rose.macros.value
+        import metomi.rose.macros.value
         self.type = metadata.get(META_PROP_TYPE)
-        checker = rose.macros.value.ValueChecker()
+        checker = metomi.rose.macros.value.ValueChecker()
         if self.type == "character":
             self.type_checker = checker.check_character
             self.format_text_in = (
-                rose.config_editor.util.text_for_character_widget)
+                metomi.rose.config_editor.util.text_for_character_widget)
             self.format_text_out = (
-                rose.config_editor.util.text_from_character_widget)
+                metomi.rose.config_editor.util.text_from_character_widget)
             self.quote_char = "'"
             self.esc_quote_chars = "''"
         elif self.type == "quoted":
             self.type_checker = checker.check_quoted
             self.format_text_in = (
-                rose.config_editor.util.text_for_quoted_widget)
+                metomi.rose.config_editor.util.text_for_quoted_widget)
             self.format_text_out = (
-                rose.config_editor.util.text_from_quoted_widget)
+                metomi.rose.config_editor.util.text_from_quoted_widget)
             self.quote_char = '"'
             self.esc_quote_chars = '\\"'
         self.value = value

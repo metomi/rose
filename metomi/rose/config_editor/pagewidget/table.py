@@ -24,11 +24,11 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config
-import rose.config_editor.util
-import rose.config_editor.variable
-import rose.formats
-import rose.variable
+import metomi.rose.config
+import metomi.rose.config_editor.util
+import metomi.rose.config_editor.variable
+import metomi.rose.formats
+import metomi.rose.variable
 
 
 class PageTable(Gtk.Table):
@@ -43,7 +43,7 @@ class PageTable(Gtk.Table):
 
     MAX_ROWS = 2000
     MAX_COLS = 3
-    BORDER_WIDTH = rose.config_editor.SPACING_SUB_PAGE
+    BORDER_WIDTH = metomi.rose.config_editor.SPACING_SUB_PAGE
 
     def __init__(self, panel_data, ghost_data, var_ops, show_modes,
                  arg_str=None):
@@ -112,7 +112,7 @@ class PageTable(Gtk.Table):
 
     def get_variable_widget(self, variable, is_ghost=False):
         """Create a variable widget for this variable."""
-        return rose.config_editor.variable.VariableWidget(
+        return metomi.rose.config_editor.variable.VariableWidget(
             variable,
             self.var_ops,
             is_ghost=is_ghost,
@@ -156,7 +156,7 @@ class PageTable(Gtk.Table):
                 (val.metadata.get("sort-key", "~")), val.metadata["id"])
             is_ghost = val in self.ghost_data
             sort_key_vars.append((sort_key, val, is_ghost))
-        sort_key_vars.sort(rose.config_editor.util.null_cmp)
+        sort_key_vars.sort(metomi.rose.config_editor.util.null_cmp)
         sort_key_vars.sort(lambda x, y: cmp("=null" in x[1].metadata["id"],
                                             "=null" in y[1].metadata["id"]))
         return [(x[1], x[2]) for x in sort_key_vars]
@@ -177,19 +177,19 @@ class PageTable(Gtk.Table):
             if variable.error:
                 variable_widget.show()
             elif (len(variable.metadata.get(
-                    rose.META_PROP_VALUES, [])) == 1 and
-                    not modes[rose.config_editor.SHOW_MODE_FIXED]):
+                    metomi.rose.META_PROP_VALUES, [])) == 1 and
+                    not modes[metomi.rose.config_editor.SHOW_MODE_FIXED]):
                 variable_widget.hide()
             elif (variable_widget.is_ghost and
-                  not modes[rose.config_editor.SHOW_MODE_LATENT]):
+                  not modes[metomi.rose.config_editor.SHOW_MODE_LATENT]):
                 variable_widget.hide()
-            elif ((rose.variable.IGNORED_BY_SYSTEM in ign_reason or
-                   rose.variable.IGNORED_BY_SECTION in ign_reason) and
-                  not modes[rose.config_editor.SHOW_MODE_IGNORED]):
+            elif ((metomi.rose.variable.IGNORED_BY_SYSTEM in ign_reason or
+                   metomi.rose.variable.IGNORED_BY_SECTION in ign_reason) and
+                  not modes[metomi.rose.config_editor.SHOW_MODE_IGNORED]):
                 variable_widget.hide()
-            elif (rose.variable.IGNORED_BY_USER in ign_reason and
-                  not (modes[rose.config_editor.SHOW_MODE_IGNORED] or
-                       modes[rose.config_editor.SHOW_MODE_USER_IGNORED])):
+            elif (metomi.rose.variable.IGNORED_BY_USER in ign_reason and
+                  not (modes[metomi.rose.config_editor.SHOW_MODE_IGNORED] or
+                       modes[metomi.rose.config_editor.SHOW_MODE_USER_IGNORED])):
                 variable_widget.hide()
             else:
                 variable_widget.show()
@@ -232,15 +232,15 @@ class PageArrayTable(PageTable):
 
     def get_variable_widget(self, variable, is_ghost=False):
         """Create a variable widget for this variable."""
-        if (rose.META_PROP_LENGTH in variable.metadata or
-                isinstance(variable.metadata.get(rose.META_PROP_TYPE), list)):
-            return rose.config_editor.variable.RowVariableWidget(
+        if (metomi.rose.META_PROP_LENGTH in variable.metadata or
+                isinstance(variable.metadata.get(metomi.rose.META_PROP_TYPE), list)):
+            return metomi.rose.config_editor.variable.RowVariableWidget(
                 variable,
                 self.var_ops,
                 is_ghost=is_ghost,
                 show_modes=self.show_modes,
                 length=self.array_length)
-        return rose.config_editor.variable.VariableWidget(
+        return metomi.rose.config_editor.variable.VariableWidget(
             variable,
             self.var_ops,
             is_ghost=is_ghost,
@@ -250,14 +250,14 @@ class PageArrayTable(PageTable):
         max_meta_length = 0
         max_values_length = 0
         for variable in self.panel_data + self.ghost_data:
-            length = variable.metadata.get(rose.META_PROP_LENGTH)
+            length = variable.metadata.get(metomi.rose.META_PROP_LENGTH)
             if (length is not None and length.isdigit() and
                     int(length) > max_meta_length):
                 max_meta_length = int(length)
-            types = variable.metadata.get(rose.META_PROP_TYPE)
+            types = variable.metadata.get(metomi.rose.META_PROP_TYPE)
             if isinstance(types, list) and len(types) > max_meta_length:
                 max_meta_length = len(types)
-            values_length = len(rose.variable.array_split(variable.value))
+            values_length = len(metomi.rose.variable.array_split(variable.value))
             if values_length > max_values_length:
                 max_values_length = values_length
         self.array_length = max([max_meta_length, max_values_length])
@@ -289,15 +289,15 @@ class PageLatentTable(Gtk.Table):
         self.var_ops = var_ops
         self.show_modes = show_modes
         self.title_on = (
-            not self.show_modes[rose.config_editor.SHOW_MODE_NO_TITLE])
-        self.alt_menu_class = rose.config_editor.menuwidget.CheckedMenuWidget
+            not self.show_modes[metomi.rose.config_editor.SHOW_MODE_NO_TITLE])
+        self.alt_menu_class = metomi.rose.config_editor.menuwidget.CheckedMenuWidget
         rownum = 0
         v_sort_ids = []
         for val in self.panel_data + self.ghost_data:
             v_sort_ids.append((val.metadata.get("sort-key", ""),
                                val.metadata["id"]))
         v_sort_ids.sort(
-            lambda x, y: rose.config.sort_settings(
+            lambda x, y: metomi.rose.config.sort_settings(
                 x[0] + "~" + x[1], y[0] + "~" + y[1]))
         v_sort_ids.sort(lambda x, y: cmp("=null" in x[1], "=null" in y[1]))
         for _, var_id in v_sort_ids:
@@ -318,7 +318,7 @@ class PageLatentTable(Gtk.Table):
 
     def get_variable_widget(self, variable, is_ghost=False):
         """Create a variable widget for this variable."""
-        return rose.config_editor.variable.VariableWidget(
+        return metomi.rose.config_editor.variable.VariableWidget(
             variable, self.var_ops, is_ghost=is_ghost,
             show_modes=self.show_modes)
 

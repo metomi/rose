@@ -22,7 +22,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config_editor
+import metomi.rose.config_editor
 from . import radiobuttons
 
 
@@ -39,17 +39,17 @@ class BoolValueWidget(radiobuttons.RadioButtonsValueWidget):
         self.hook = hook
         self.allowed_values = []
         self.label_dict = {}
-        if metadata.get(rose.META_PROP_TYPE) == "boolean":
-            self.allowed_values = [rose.TYPE_BOOLEAN_VALUE_TRUE,
-                                   rose.TYPE_BOOLEAN_VALUE_FALSE]
+        if metadata.get(metomi.rose.META_PROP_TYPE) == "boolean":
+            self.allowed_values = [metomi.rose.TYPE_BOOLEAN_VALUE_TRUE,
+                                   metomi.rose.TYPE_BOOLEAN_VALUE_FALSE]
         else:
-            self.allowed_values = [rose.TYPE_LOGICAL_VALUE_TRUE,
-                                   rose.TYPE_LOGICAL_VALUE_FALSE]
+            self.allowed_values = [metomi.rose.TYPE_LOGICAL_VALUE_TRUE,
+                                   metomi.rose.TYPE_LOGICAL_VALUE_FALSE]
             self.label_dict = {
-                rose.TYPE_LOGICAL_VALUE_TRUE:
-                rose.TYPE_LOGICAL_TRUE_TITLE,
-                rose.TYPE_LOGICAL_VALUE_FALSE:
-                rose.TYPE_LOGICAL_FALSE_TITLE}
+                metomi.rose.TYPE_LOGICAL_VALUE_TRUE:
+                metomi.rose.TYPE_LOGICAL_TRUE_TITLE,
+                metomi.rose.TYPE_LOGICAL_VALUE_FALSE:
+                metomi.rose.TYPE_LOGICAL_FALSE_TITLE}
 
         for k, item in enumerate(self.allowed_values):
             if item in self.label_dict:

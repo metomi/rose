@@ -19,7 +19,7 @@
 # -----------------------------------------------------------------------------
 
 
-import rose.config_editor
+import metomi.rose.config_editor
 
 
 class NavTreeManager(object):
@@ -64,11 +64,11 @@ class NavTreeManager(object):
         # Reload the information into the tree.
         if only_this_config is None:
             configs = list(self.data.config.keys())
-            configs.sort(rose.config.sort_settings)
+            configs.sort(metomi.rose.config.sort_settings)
             configs.sort(
                 lambda x, y: cmp(
-                    self.data.config[y].config_type == rose.TOP_CONFIG_NAME,
-                    self.data.config[x].config_type == rose.TOP_CONFIG_NAME
+                    self.data.config[y].config_type == metomi.rose.TOP_CONFIG_NAME,
+                    self.data.config[x].config_type == metomi.rose.TOP_CONFIG_NAME
                 )
             )
         else:
@@ -135,8 +135,8 @@ class NavTreeManager(object):
             meta.setdefault('title', spaces[0])
             latent_status = self.data.helper.get_ns_latent_status(this_ns)
             ignored_status = self.data.helper.get_ns_ignored_status(this_ns)
-            statuses = {rose.config_editor.SHOW_MODE_LATENT: latent_status,
-                        rose.config_editor.SHOW_MODE_IGNORED: ignored_status}
+            statuses = {metomi.rose.config_editor.SHOW_MODE_LATENT: latent_status,
+                        metomi.rose.config_editor.SHOW_MODE_IGNORED: ignored_status}
             subtree.setdefault(spaces[0], [{}, meta, statuses, change])
             prev_spaces += [spaces[0]]
             self.update_namespace_tree(spaces[1:], subtree[spaces[0]][0],

@@ -24,10 +24,10 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config_editor
-import rose.external
-import rose.gtk.dialog
-import rose.gtk.util
+import metomi.rose.config_editor
+import metomi.rose.external
+import metomi.rose.gtk.dialog
+import metomi.rose.gtk.util
 
 
 class FileSystemPanel(Gtk.ScrolledWindow):
@@ -50,18 +50,18 @@ class FileSystemPanel(Gtk.ScrolledWindow):
             this_iter = dirpath_iters[dirpath]
             filenames.sort()
             for name in filenames:
-                if name in rose.CONFIG_NAMES:
+                if name in metomi.rose.CONFIG_NAMES:
                     continue
                 filepath = os.path.join(dirpath, name)
                 store.append(this_iter, [name, os.path.abspath(filepath)])
             for dirname in list(dirnames):
                 if (dirname.startswith(".") or dirname in [
-                        rose.SUB_CONFIGS_DIR, rose.CONFIG_META_DIR]):
+                        metomi.rose.SUB_CONFIGS_DIR, metomi.rose.CONFIG_META_DIR]):
                     dirnames.remove(dirname)
             dirnames.sort()
         view.set_model(store)
         col = Gtk.TreeViewColumn()
-        col.set_title(rose.config_editor.TITLE_FILE_PANEL)
+        col.set_title(metomi.rose.config_editor.TITLE_FILE_PANEL)
         cell = Gtk.CellRendererText()
         col.pack_start(cell, True, True, 0)
         col.set_cell_data_func(cell,
@@ -77,11 +77,11 @@ class FileSystemPanel(Gtk.ScrolledWindow):
 
     def _set_path_markup(self, column, cell, model, r_iter, treestore):
         title = model.get_value(r_iter, 0)
-        title = rose.gtk.util.safe_str(title)
+        title = metomi.rose.gtk.util.safe_str(title)
         cell.set_property("markup", title)
 
     def _handle_activation(self, view=None, path=None, col=None):
-        target_func = rose.external.launch_fs_browser
+        target_func = metomi.rose.external.launch_fs_browser
         if path is None:
             target = self.directory
         else:
@@ -90,11 +90,11 @@ class FileSystemPanel(Gtk.ScrolledWindow):
             fs_path = model.get_value(row_iter, 1)
             target = fs_path
             if not os.path.isdir(target):
-                target_func = rose.external.launch_geditor
+                target_func = metomi.rose.external.launch_geditor
         try:
             target_func(target)
         except Exception as exc:
-            rose.gtk.dialog.run_exception_dialog(exc)
+            metomi.rose.gtk.dialog.run_exception_dialog(exc)
 
     def _handle_click(self, view, event):
         pathinfo = view.get_path_at_pos(int(event.x), int(event.y))
@@ -106,7 +106,7 @@ class FileSystemPanel(Gtk.ScrolledWindow):
                            <menuitem action='Open'/>
                            </popup> </ui>"""
             actions = [('Open', Gtk.STOCK_OPEN,
-                        rose.config_editor.FILE_PANEL_MENU_OPEN)]
+                        metomi.rose.config_editor.FILE_PANEL_MENU_OPEN)]
             uimanager = Gtk.UIManager()
             actiongroup = Gtk.ActionGroup('Popup')
             actiongroup.add_actions(actions)

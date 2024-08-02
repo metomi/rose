@@ -24,7 +24,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config_editor
+import metomi.rose.config_editor
 
 
 class IntSpinButtonValueWidget(Gtk.HBox):
@@ -73,7 +73,7 @@ class IntSpinButtonValueWidget(Gtk.HBox):
             self.warning_img.set_from_stock(Gtk.STOCK_DIALOG_WARNING,
                                             Gtk.IconSize.MENU)
             self.warning_img.set_tooltip_text(
-                rose.config_editor.WARNING_INTEGER_OUT_OF_BOUNDS)
+                metomi.rose.config_editor.WARNING_INTEGER_OUT_OF_BOUNDS)
             self.warning_img.show()
             self.pack_start(self.warning_img, False, False, 0)
 

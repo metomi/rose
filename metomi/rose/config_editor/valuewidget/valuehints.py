@@ -23,9 +23,9 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config_editor.util
-import rose.gtk.util
-import rose.variable
+import metomi.rose.config_editor.util
+import metomi.rose.gtk.util
+import metomi.rose.variable
 
 
 class HintsValueWidget(Gtk.HBox):
@@ -70,7 +70,7 @@ class HintsValueWidget(Gtk.HBox):
         """ Return a predictive text model for value-hints."""
         completion = Gtk.EntryCompletion()
         model = Gtk.ListStore(str)
-        var_hints = metadata.get(rose.META_PROP_VALUE_HINTS)
+        var_hints = metadata.get(metomi.rose.META_PROP_VALUE_HINTS)
         for hint in var_hints:
             model.append([hint])
         completion.set_model(model)

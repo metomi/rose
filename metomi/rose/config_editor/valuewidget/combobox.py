@@ -22,7 +22,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config_editor
+import metomi.rose.config_editor
 
 
 class ComboBoxValueWidget(Gtk.HBox):
@@ -49,8 +49,8 @@ class ComboBoxValueWidget(Gtk.HBox):
         comboboxentry.pack_start(cell, True, True, 0)
         comboboxentry.add_attribute(cell, 'text', 0)
 
-        var_values = self.metadata[rose.META_PROP_VALUES]
-        var_titles = self.metadata.get(rose.META_PROP_VALUE_TITLES)
+        var_values = self.metadata[metomi.rose.META_PROP_VALUES]
+        var_titles = self.metadata.get(metomi.rose.META_PROP_VALUE_TITLES)
         for k, entry in enumerate(var_values):
             if var_titles is not None and var_titles[k]:
                 liststore.append([var_titles[k] + " (" + entry + ")"])
@@ -72,6 +72,6 @@ class ComboBoxValueWidget(Gtk.HBox):
 
     def setter(self, widget):
         index = widget.get_active()
-        self.value = self.metadata[rose.META_PROP_VALUES][index]
+        self.value = self.metadata[metomi.rose.META_PROP_VALUES][index]
         self.set_value(self.value)
         return False

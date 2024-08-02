@@ -24,7 +24,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config_editor
+import metomi.rose.config_editor
 
 
 class StackItem(object):
@@ -65,28 +65,28 @@ class StackViewer(Gtk.Window):
     def __init__(self, undo_stack, redo_stack, undo_func):
         """Load a view of the stack."""
         super(StackViewer, self).__init__()
-        self.set_title(rose.config_editor.STACK_VIEW_TITLE)
+        self.set_title(metomi.rose.config_editor.STACK_VIEW_TITLE)
         self.action_colour_map = {
-            rose.config_editor.STACK_ACTION_ADDED:
-            rose.config_editor.COLOUR_STACK_ADDED,
-            rose.config_editor.STACK_ACTION_APPLIED:
-            rose.config_editor.COLOUR_STACK_APPLIED,
-            rose.config_editor.STACK_ACTION_CHANGED:
-            rose.config_editor.COLOUR_STACK_CHANGED,
-            rose.config_editor.STACK_ACTION_CHANGED_COMMENTS:
-            rose.config_editor.COLOUR_STACK_CHANGED_COMMENTS,
-            rose.config_editor.STACK_ACTION_ENABLED:
-            rose.config_editor.COLOUR_STACK_ENABLED,
-            rose.config_editor.STACK_ACTION_IGNORED:
-            rose.config_editor.COLOUR_STACK_IGNORED,
-            rose.config_editor.STACK_ACTION_REMOVED:
-            rose.config_editor.COLOUR_STACK_REMOVED,
-            rose.config_editor.STACK_ACTION_REVERSED:
-            rose.config_editor.COLOUR_STACK_REVERSED}
+            metomi.rose.config_editor.STACK_ACTION_ADDED:
+            metomi.rose.config_editor.COLOUR_STACK_ADDED,
+            metomi.rose.config_editor.STACK_ACTION_APPLIED:
+            metomi.rose.config_editor.COLOUR_STACK_APPLIED,
+            metomi.rose.config_editor.STACK_ACTION_CHANGED:
+            metomi.rose.config_editor.COLOUR_STACK_CHANGED,
+            metomi.rose.config_editor.STACK_ACTION_CHANGED_COMMENTS:
+            metomi.rose.config_editor.COLOUR_STACK_CHANGED_COMMENTS,
+            metomi.rose.config_editor.STACK_ACTION_ENABLED:
+            metomi.rose.config_editor.COLOUR_STACK_ENABLED,
+            metomi.rose.config_editor.STACK_ACTION_IGNORED:
+            metomi.rose.config_editor.COLOUR_STACK_IGNORED,
+            metomi.rose.config_editor.STACK_ACTION_REMOVED:
+            metomi.rose.config_editor.COLOUR_STACK_REMOVED,
+            metomi.rose.config_editor.STACK_ACTION_REVERSED:
+            metomi.rose.config_editor.COLOUR_STACK_REVERSED}
         self.undo_func = undo_func
         self.undo_stack = undo_stack
         self.redo_stack = redo_stack
-        self.set_border_width(rose.config_editor.SPACING_SUB_PAGE)
+        self.set_border_width(metomi.rose.config_editor.SPACING_SUB_PAGE)
         self.main_vbox = Gtk.VPaned()
         accelerators = Gtk.AccelGroup()
         accel_key, accel_mods = Gtk.accelerator_parse("<Ctrl>Z")
@@ -97,7 +97,7 @@ class StackViewer(Gtk.Window):
                                    lambda a, b, c, d:
                                    self.undo_from_log(redo_mode_on=True))
         self.add_accel_group(accelerators)
-        self.set_default_size(*rose.config_editor.SIZE_STACK)
+        self.set_default_size(*metomi.rose.config_editor.SIZE_STACK)
         self.undo_view = self.get_stack_view(redo_mode_on=False)
         self.redo_view = self.get_stack_view(redo_mode_on=True)
         undo_vbox = self.get_stack_view_box(self.undo_view,
@@ -132,9 +132,9 @@ class StackViewer(Gtk.Window):
             label.set_text('UNDO STACK')
             self.undo_text_view = text_view
         label.show()
-        vbox.set_border_width(rose.config_editor.SPACING_SUB_PAGE)
+        vbox.set_border_width(metomi.rose.config_editor.SPACING_SUB_PAGE)
         vbox.pack_start(label, expand=False, fill=True,
-                        padding=rose.config_editor.SPACING_SUB_PAGE)
+                        padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
         vbox.pack_start(text_scroller, expand=True, fill=True)
         vbox.show()
         return vbox
@@ -150,11 +150,11 @@ class StackViewer(Gtk.Window):
         stack_view = Gtk.TreeView(stack_model)
         columns = {}
         cell_text = {}
-        for title in [rose.config_editor.STACK_COL_NS,
-                      rose.config_editor.STACK_COL_ACT,
-                      rose.config_editor.STACK_COL_NAME,
-                      rose.config_editor.STACK_COL_VALUE,
-                      rose.config_editor.STACK_COL_OLD_VALUE]:
+        for title in [metomi.rose.config_editor.STACK_COL_NS,
+                      metomi.rose.config_editor.STACK_COL_ACT,
+                      metomi.rose.config_editor.STACK_COL_NAME,
+                      metomi.rose.config_editor.STACK_COL_VALUE,
+                      metomi.rose.config_editor.STACK_COL_OLD_VALUE]:
             columns[title] = Gtk.TreeViewColumn()
             columns[title].set_title(title)
             cell_text[title] = Gtk.CellRendererText()

@@ -23,11 +23,11 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-import rose.config
-import rose.config_editor
-import rose.gtk.util
+import metomi.rose.config
+import metomi.rose.config_editor
+import metomi.rose.gtk.util
 
-import rose.config_editor.plugin.um.widget.stash_util as stash_util
+import metomi.rose.config_editor.plugin.um.widget.stash_util as stash_util
 
 
 class AddStashDiagnosticsPanelv1(Gtk.VBox):
@@ -99,17 +99,17 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
         for key, metadata in list(self.stash_meta_lookup.items()):
             if "=" in key:
                 continue
-            values_string = metadata.get(rose.META_PROP_VALUES, "0, 1")
-            if len(rose.variable.array_split(values_string)) == 1:
+            values_string = metadata.get(metomi.rose.META_PROP_VALUES, "0, 1")
+            if len(metomi.rose.variable.array_split(values_string)) == 1:
                 self._hidden_column_names.append(key)
 
         self._should_show_meta_column_titles = False
         self.control_widget_hbox = self._get_control_widget_hbox()
         self.pack_start(self.control_widget_hbox, expand=False, fill=False)
-        self._view = rose.gtk.util.TooltipTreeView(
+        self._view = metomi.rose.gtk.util.TooltipTreeView(
             get_tooltip_func=self.set_tree_tip)
         self._view.set_rules_hint(True)
-        self.sort_util = rose.gtk.util.TreeModelSortUtil(
+        self.sort_util = metomi.rose.gtk.util.TreeModelSortUtil(
             self._view.get_model, 2)
         self._view.show()
         self._view.connect("button-press-event",
@@ -148,7 +148,7 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
             col_title = column_name.replace("_", "__")
             if self._should_show_meta_column_titles:
                 col_meta = self.stash_meta_lookup.get(column_name, {})
-                title = col_meta.get(rose.META_PROP_TITLE)
+                title = col_meta.get(metomi.rose.META_PROP_TITLE)
                 if title is not None:
                     col_title = title
             col.set_title(col_title)
@@ -251,7 +251,7 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
             return False
         if name == "?":
             name = "Requests Status"
-            if value == rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP:
+            if value == metomi.rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP:
                 value = "changed"
             else:
                 value = "no changes"
@@ -260,7 +260,7 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
             if stash_request_num != "None":
                 sect_streqs = self.request_lookup.get(stash_section, {})
                 streqs = list(sect_streqs.get(stash_item, {}).keys())
-                streqs.sort(rose.config.sort_settings)
+                streqs.sort(metomi.rose.config.sort_settings)
                 if streqs:
                     value = "\n    " + "\n    ".join(streqs)
                 else:
@@ -271,18 +271,18 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
             metadata = stash_util.get_stash_section_meta(
                 self.stash_meta_lookup, stash_section, stash_item, value
             )
-            help_ = metadata.get(rose.META_PROP_HELP)
+            help_ = metadata.get(metomi.rose.META_PROP_HELP)
             meta_key = self.STASH_PARSE_DESC_OPT + "=" + value
         else:
             meta_key = name + "=" + value
         value_meta = self.stash_meta_lookup.get(meta_key, {})
-        title = value_meta.get(rose.META_PROP_TITLE, "")
+        title = value_meta.get(metomi.rose.META_PROP_TITLE, "")
         if help_ is None:
-            help_ = value_meta.get(rose.META_PROP_HELP, "")
+            help_ = value_meta.get(metomi.rose.META_PROP_HELP, "")
         if title and not help_:
             value += "\n" + title
         if help_:
-            value += "\n" + rose.gtk.util.safe_str(help_)
+            value += "\n" + metomi.rose.gtk.util.safe_str(help_)
         text = name + ": " + str(value) + "\n\n"
         text += "Section: " + str(stash_section) + "\n"
         text += "Item: " + str(stash_item) + "\n"
@@ -344,7 +344,7 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
         streqs = self.request_lookup.get(section, {}).get(item, {})
         model.set_value(iter_, num_streqs_index, str(len(streqs)))
         streq_info = ""
-        mod_markup = rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP
+        mod_markup = metomi.rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP
         for streq_section in streqs:
             if streq_section in self.changed_request_lookup:
                 streq_info = mod_markup + streq_info
@@ -399,23 +399,23 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
     def _get_control_widget_hbox(self):
         # Build the control widgets for the dialog.
         filter_label = Gtk.Label(label=
-            rose.config_editor.SUMMARY_DATA_PANEL_FILTER_LABEL)
+            metomi.rose.config_editor.SUMMARY_DATA_PANEL_FILTER_LABEL)
         filter_label.show()
         self._filter_widget = Gtk.Entry()
         self._filter_widget.set_width_chars(
-            rose.config_editor.SUMMARY_DATA_PANEL_FILTER_MAX_CHAR)
+            metomi.rose.config_editor.SUMMARY_DATA_PANEL_FILTER_MAX_CHAR)
         self._filter_widget.connect("changed", self._filter_refresh)
         self._filter_widget.set_tooltip_text("Filter by literal values")
         self._filter_widget.show()
         group_label = Gtk.Label(label=
-            rose.config_editor.SUMMARY_DATA_PANEL_GROUP_LABEL)
+            metomi.rose.config_editor.SUMMARY_DATA_PANEL_GROUP_LABEL)
         group_label.show()
         self._group_widget = Gtk.ComboBox()
         cell = Gtk.CellRendererText()
         self._group_widget.pack_start(cell, True, True, 0)
         self._group_widget.add_attribute(cell, 'text', 0)
         self._group_widget.show()
-        self._add_button = rose.gtk.util.CustomButton(
+        self._add_button = metomi.rose.gtk.util.CustomButton(
             label="Add",
             stock_id=Gtk.STOCK_ADD,
             tip_text="Add a new request for this entry")
@@ -423,7 +423,7 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
                                  lambda b: self._handle_add_current_row())
         self._add_button.connect("clicked",
                                  lambda b: self._handle_add_current_row())
-        self._refresh_button = rose.gtk.util.CustomButton(
+        self._refresh_button = metomi.rose.gtk.util.CustomButton(
             label="Refresh",
             stock_id=Gtk.STOCK_REFRESH,
             tip_text="Refresh namelist:streq statuses")
@@ -431,7 +431,7 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
                                      lambda b: self.refresh_stash_requests())
         self._refresh_button.connect("clicked",
                                      lambda b: self.refresh_stash_requests())
-        self._view_button = rose.gtk.util.CustomButton(
+        self._view_button = metomi.rose.gtk.util.CustomButton(
             label="View",
             tip_text="Select view options",
             has_menu=True)
@@ -526,7 +526,7 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
 
     def _launch_record_help(self, menuitem):
         """Launch the help from a menu."""
-        rose.gtk.dialog.run_scrolled_dialog(menuitem._help_text,
+        metomi.rose.gtk.dialog.run_scrolled_dialog(menuitem._help_text,
                                             menuitem._help_title)
 
     def _popup_tree_menu(self, path, col, event):
@@ -548,7 +548,7 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
         stash_desc_value = model.get_value(row_iter, stash_desc_index)
         desc_meta = self.stash_meta_lookup.get(
             self.STASH_PARSE_DESC_OPT + "=" + str(stash_desc_value), {})
-        desc_meta_help = desc_meta.get(rose.META_PROP_HELP)
+        desc_meta_help = desc_meta.get(metomi.rose.META_PROP_HELP)
         if desc_meta_help is not None:
             help_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_HELP)
             help_menuitem.set_label("Help")
@@ -565,7 +565,7 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
             view_menu = Gtk.Menu()
             view_menu.show()
             view_menuitem.set_submenu(view_menu)
-            streqs.sort(rose.config.sort_settings)
+            streqs.sort(metomi.rose.config.sort_settings)
             for streq in streqs:
                 view_streq_menuitem = Gtk.MenuItem(label=streq)
                 view_streq_menuitem._section = streq
@@ -612,7 +612,7 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
             col_title = col_name.replace("_", "__")
             if self._should_show_meta_column_titles:
                 col_meta = self.stash_meta_lookup.get(col_name, {})
-                title = col_meta.get(rose.META_PROP_TITLE)
+                title = col_meta.get(metomi.rose.META_PROP_TITLE)
                 if title is not None:
                     col_title = title
             col_menuitem = Gtk.CheckMenuItem(label=col_title,
@@ -639,10 +639,10 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
             else:
                 key = col_title + "=" + value
             value_meta = self.stash_meta_lookup.get(key, {})
-            title = value_meta.get(rose.META_PROP_TITLE, "")
+            title = value_meta.get(metomi.rose.META_PROP_TITLE, "")
             if title:
                 value = title
-            desc = value_meta.get(rose.META_PROP_DESCRIPTION, "")
+            desc = value_meta.get(metomi.rose.META_PROP_DESCRIPTION, "")
             if desc:
                 value += ": " + desc
         max_len = 36
@@ -652,7 +652,7 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
         if col_index == 0 and treemodel.iter_parent(iter_) is not None:
             cell.set_property("visible", False)
         if value is not None and col_title != "?":
-            value = rose.gtk.util.safe_str(value)
+            value = metomi.rose.gtk.util.safe_str(value)
         cell.set_property("markup", value)
 
     def _sort_row_data(self, row1, row2, sort_index, descending=False):

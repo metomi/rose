@@ -30,17 +30,17 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import rose.config
-import rose.config_editor
-import rose.config_editor.upgrade_controller
-import rose.external
-import rose.gtk.dialog
-import rose.gtk.run
-import rose.macro
-import rose.macros
-import rose.popen
-import rose.suite_control
-import rose.suite_engine_proc
+import metomi.rose.config
+import metomi.rose.config_editor
+import metomi.rose.config_editor.upgrade_controller
+import metomi.rose.external
+import metomi.rose.gtk.dialog
+import metomi.rose.gtk.run
+import metomi.rose.macro
+import metomi.rose.macros
+import metomi.rose.popen
+import metomi.rose.suite_control
+import metomi.rose.suite_engine_proc
 
 
 class MenuBar(object):
@@ -137,129 +137,129 @@ class MenuBar(object):
 
     action_details = [
         ('File', None,
-         rose.config_editor.TOP_MENU_FILE),
+         metomi.rose.config_editor.TOP_MENU_FILE),
         ('Open...', Gtk.STOCK_OPEN,
-         rose.config_editor.TOP_MENU_FILE_OPEN,
-         rose.config_editor.ACCEL_OPEN),
+         metomi.rose.config_editor.TOP_MENU_FILE_OPEN,
+         metomi.rose.config_editor.ACCEL_OPEN),
         ('Save', Gtk.STOCK_SAVE,
-         rose.config_editor.TOP_MENU_FILE_SAVE,
-         rose.config_editor.ACCEL_SAVE),
+         metomi.rose.config_editor.TOP_MENU_FILE_SAVE,
+         metomi.rose.config_editor.ACCEL_SAVE),
         ('Check and save', Gtk.STOCK_SPELL_CHECK,
-         rose.config_editor.TOP_MENU_FILE_CHECK_AND_SAVE),
+         metomi.rose.config_editor.TOP_MENU_FILE_CHECK_AND_SAVE),
         ('Load All Apps', Gtk.STOCK_CDROM,
-         rose.config_editor.TOP_MENU_FILE_LOAD_APPS),
+         metomi.rose.config_editor.TOP_MENU_FILE_LOAD_APPS),
         ('Quit', Gtk.STOCK_QUIT,
-         rose.config_editor.TOP_MENU_FILE_QUIT,
-         rose.config_editor.ACCEL_QUIT),
+         metomi.rose.config_editor.TOP_MENU_FILE_QUIT,
+         metomi.rose.config_editor.ACCEL_QUIT),
         ('Edit', None,
-         rose.config_editor.TOP_MENU_EDIT),
+         metomi.rose.config_editor.TOP_MENU_EDIT),
         ('Undo', Gtk.STOCK_UNDO,
-         rose.config_editor.TOP_MENU_EDIT_UNDO,
-         rose.config_editor.ACCEL_UNDO),
+         metomi.rose.config_editor.TOP_MENU_EDIT_UNDO,
+         metomi.rose.config_editor.ACCEL_UNDO),
         ('Redo', Gtk.STOCK_REDO,
-         rose.config_editor.TOP_MENU_EDIT_REDO,
-         rose.config_editor.ACCEL_REDO),
+         metomi.rose.config_editor.TOP_MENU_EDIT_REDO,
+         metomi.rose.config_editor.ACCEL_REDO),
         ('Stack', Gtk.STOCK_INFO,
-         rose.config_editor.TOP_MENU_EDIT_STACK),
+         metomi.rose.config_editor.TOP_MENU_EDIT_STACK),
         ('Find', Gtk.STOCK_FIND,
-         rose.config_editor.TOP_MENU_EDIT_FIND,
-         rose.config_editor.ACCEL_FIND),
+         metomi.rose.config_editor.TOP_MENU_EDIT_FIND,
+         metomi.rose.config_editor.ACCEL_FIND),
         ('Find Next', Gtk.STOCK_FIND,
-         rose.config_editor.TOP_MENU_EDIT_FIND_NEXT,
-         rose.config_editor.ACCEL_FIND_NEXT),
+         metomi.rose.config_editor.TOP_MENU_EDIT_FIND_NEXT,
+         metomi.rose.config_editor.ACCEL_FIND_NEXT),
         ('Preferences', Gtk.STOCK_PREFERENCES,
-         rose.config_editor.TOP_MENU_EDIT_PREFERENCES),
+         metomi.rose.config_editor.TOP_MENU_EDIT_PREFERENCES),
         ('View', None,
-         rose.config_editor.TOP_MENU_VIEW),
+         metomi.rose.config_editor.TOP_MENU_VIEW),
         ('Page', None,
-         rose.config_editor.TOP_MENU_PAGE),
+         metomi.rose.config_editor.TOP_MENU_PAGE),
         ('Add variable', Gtk.STOCK_ADD,
-         rose.config_editor.TOP_MENU_PAGE_ADD),
+         metomi.rose.config_editor.TOP_MENU_PAGE_ADD),
         ('Revert', Gtk.STOCK_REVERT_TO_SAVED,
-         rose.config_editor.TOP_MENU_PAGE_REVERT),
+         metomi.rose.config_editor.TOP_MENU_PAGE_REVERT),
         ('Page Info', Gtk.STOCK_INFO,
-         rose.config_editor.TOP_MENU_PAGE_INFO),
+         metomi.rose.config_editor.TOP_MENU_PAGE_INFO),
         ('Page Help', Gtk.STOCK_HELP,
-         rose.config_editor.TOP_MENU_PAGE_HELP),
+         metomi.rose.config_editor.TOP_MENU_PAGE_HELP),
         ('Page Web Help', Gtk.STOCK_HOME,
-         rose.config_editor.TOP_MENU_PAGE_WEB_HELP),
+         metomi.rose.config_editor.TOP_MENU_PAGE_WEB_HELP),
         ('Metadata', None,
-         rose.config_editor.TOP_MENU_METADATA),
+         metomi.rose.config_editor.TOP_MENU_METADATA),
         ('Reload metadata', Gtk.STOCK_REFRESH,
-         rose.config_editor.TOP_MENU_METADATA_REFRESH,
-         rose.config_editor.ACCEL_METADATA_REFRESH),
+         metomi.rose.config_editor.TOP_MENU_METADATA_REFRESH,
+         metomi.rose.config_editor.ACCEL_METADATA_REFRESH),
         ('Load custom metadata', Gtk.STOCK_DIRECTORY,
-         rose.config_editor.TOP_MENU_METADATA_LOAD),
+         metomi.rose.config_editor.TOP_MENU_METADATA_LOAD),
         ('Prefs', Gtk.STOCK_PREFERENCES,
-         rose.config_editor.TOP_MENU_METADATA_PREFERENCES),
+         metomi.rose.config_editor.TOP_MENU_METADATA_PREFERENCES),
         ('Upgrade', Gtk.STOCK_GO_UP,
-         rose.config_editor.TOP_MENU_METADATA_UPGRADE),
+         metomi.rose.config_editor.TOP_MENU_METADATA_UPGRADE),
         ('All V', Gtk.STOCK_DIALOG_QUESTION,
-         rose.config_editor.TOP_MENU_METADATA_MACRO_ALL_V),
+         metomi.rose.config_editor.TOP_MENU_METADATA_MACRO_ALL_V),
         ('Autofix', Gtk.STOCK_CONVERT,
-         rose.config_editor.TOP_MENU_METADATA_MACRO_AUTOFIX),
+         metomi.rose.config_editor.TOP_MENU_METADATA_MACRO_AUTOFIX),
         ('Extra checks', Gtk.STOCK_DIALOG_QUESTION,
-         rose.config_editor.TOP_MENU_METADATA_CHECK),
+         metomi.rose.config_editor.TOP_MENU_METADATA_CHECK),
         ('Graph', Gtk.STOCK_SORT_ASCENDING,
-         rose.config_editor.TOP_MENU_METADATA_GRAPH),
+         metomi.rose.config_editor.TOP_MENU_METADATA_GRAPH),
         ('Tools', None,
-         rose.config_editor.TOP_MENU_TOOLS),
+         metomi.rose.config_editor.TOP_MENU_TOOLS),
         ('Run Suite', Gtk.STOCK_MEDIA_PLAY,
-         rose.config_editor.TOP_MENU_TOOLS_SUITE_RUN),
+         metomi.rose.config_editor.TOP_MENU_TOOLS_SUITE_RUN),
         ('Run Suite default', Gtk.STOCK_MEDIA_PLAY,
-         rose.config_editor.TOP_MENU_TOOLS_SUITE_RUN_DEFAULT,
-         rose.config_editor.ACCEL_SUITE_RUN),
+         metomi.rose.config_editor.TOP_MENU_TOOLS_SUITE_RUN_DEFAULT,
+         metomi.rose.config_editor.ACCEL_SUITE_RUN),
         ('Run Suite custom', Gtk.STOCK_EDIT,
-         rose.config_editor.TOP_MENU_TOOLS_SUITE_RUN_CUSTOM),
+         metomi.rose.config_editor.TOP_MENU_TOOLS_SUITE_RUN_CUSTOM),
         ('Browser', Gtk.STOCK_DIRECTORY,
-         rose.config_editor.TOP_MENU_TOOLS_BROWSER,
-         rose.config_editor.ACCEL_BROWSER),
+         metomi.rose.config_editor.TOP_MENU_TOOLS_BROWSER,
+         metomi.rose.config_editor.ACCEL_BROWSER),
         ('Terminal', Gtk.STOCK_EXECUTE,
-         rose.config_editor.TOP_MENU_TOOLS_TERMINAL,
-         rose.config_editor.ACCEL_TERMINAL),
+         metomi.rose.config_editor.TOP_MENU_TOOLS_TERMINAL,
+         metomi.rose.config_editor.ACCEL_TERMINAL),
         ('View Output', Gtk.STOCK_DIRECTORY,
-         rose.config_editor.TOP_MENU_TOOLS_VIEW_OUTPUT),
-        ('Open Suite GControl', "rose-gtk-scheduler",
-         rose.config_editor.TOP_MENU_TOOLS_OPEN_SUITE_GCONTROL),
+         metomi.rose.config_editor.TOP_MENU_TOOLS_VIEW_OUTPUT),
+        ('Open Suite GControl', "metomi.rose.gtk-scheduler",
+         metomi.rose.config_editor.TOP_MENU_TOOLS_OPEN_SUITE_GCONTROL),
         ('Help', None,
-         rose.config_editor.TOP_MENU_HELP),
+         metomi.rose.config_editor.TOP_MENU_HELP),
         ('Documentation', Gtk.STOCK_HELP,
-         rose.config_editor.TOP_MENU_HELP_GUI,
-         rose.config_editor.ACCEL_HELP_GUI),
+         metomi.rose.config_editor.TOP_MENU_HELP_GUI,
+         metomi.rose.config_editor.ACCEL_HELP_GUI),
         ('About', Gtk.STOCK_DIALOG_INFO,
-         rose.config_editor.TOP_MENU_HELP_ABOUT)]
+         metomi.rose.config_editor.TOP_MENU_HELP_ABOUT)]
 
     toggle_action_details = [
         ('View latent vars', None,
-         rose.config_editor.TOP_MENU_VIEW_LATENT_VARS),
+         metomi.rose.config_editor.TOP_MENU_VIEW_LATENT_VARS),
         ('View fixed vars', None,
-         rose.config_editor.TOP_MENU_VIEW_FIXED_VARS),
+         metomi.rose.config_editor.TOP_MENU_VIEW_FIXED_VARS),
         ('View ignored vars', None,
-         rose.config_editor.TOP_MENU_VIEW_IGNORED_VARS),
+         metomi.rose.config_editor.TOP_MENU_VIEW_IGNORED_VARS),
         ('View user-ignored vars', None,
-         rose.config_editor.TOP_MENU_VIEW_USER_IGNORED_VARS),
+         metomi.rose.config_editor.TOP_MENU_VIEW_USER_IGNORED_VARS),
         ('View without descriptions', None,
-         rose.config_editor.TOP_MENU_VIEW_WITHOUT_DESCRIPTIONS),
+         metomi.rose.config_editor.TOP_MENU_VIEW_WITHOUT_DESCRIPTIONS),
         ('View without help', None,
-         rose.config_editor.TOP_MENU_VIEW_WITHOUT_HELP),
+         metomi.rose.config_editor.TOP_MENU_VIEW_WITHOUT_HELP),
         ('View without titles', None,
-         rose.config_editor.TOP_MENU_VIEW_WITHOUT_TITLES),
+         metomi.rose.config_editor.TOP_MENU_VIEW_WITHOUT_TITLES),
         ('View ignored pages', None,
-         rose.config_editor.TOP_MENU_VIEW_IGNORED_PAGES),
+         metomi.rose.config_editor.TOP_MENU_VIEW_IGNORED_PAGES),
         ('View user-ignored pages', None,
-         rose.config_editor.TOP_MENU_VIEW_USER_IGNORED_PAGES),
+         metomi.rose.config_editor.TOP_MENU_VIEW_USER_IGNORED_PAGES),
         ('View latent pages', None,
-         rose.config_editor.TOP_MENU_VIEW_LATENT_PAGES),
+         metomi.rose.config_editor.TOP_MENU_VIEW_LATENT_PAGES),
         ('Flag opt config vars', None,
-         rose.config_editor.TOP_MENU_VIEW_FLAG_OPT_CONF_VARS),
+         metomi.rose.config_editor.TOP_MENU_VIEW_FLAG_OPT_CONF_VARS),
         ('Flag optional vars', None,
-         rose.config_editor.TOP_MENU_VIEW_FLAG_OPTIONAL_VARS),
+         metomi.rose.config_editor.TOP_MENU_VIEW_FLAG_OPTIONAL_VARS),
         ('Flag no-metadata vars', None,
-         rose.config_editor.TOP_MENU_VIEW_FLAG_NO_METADATA_VARS),
+         metomi.rose.config_editor.TOP_MENU_VIEW_FLAG_NO_METADATA_VARS),
         ('View status bar', None,
-         rose.config_editor.TOP_MENU_VIEW_STATUS_BAR),
+         metomi.rose.config_editor.TOP_MENU_VIEW_STATUS_BAR),
         ('Switch off metadata', None,
-         rose.config_editor.TOP_MENU_METADATA_SWITCH_OFF)]
+         metomi.rose.config_editor.TOP_MENU_METADATA_SWITCH_OFF)]
 
     def __init__(self):
         self.uimanager = Gtk.UIManager()
@@ -295,12 +295,12 @@ class MenuBar(object):
         """Add a macro to the macro menu."""
         macro_address = '/TopMenuBar/Metadata'
         self.uimanager.get_widget(macro_address).get_submenu()
-        if methodname == rose.macro.VALIDATE_METHOD:
+        if methodname == metomi.rose.macro.VALIDATE_METHOD:
             all_v_item = self.uimanager.get_widget(macro_address + "/All V")
             all_v_item.set_sensitive(True)
         config_menu_name = config_name.replace('/', ':').replace('_', '__')
         config_label_name = config_name.split('/')[-1].replace('_', '__')
-        label = rose.config_editor.TOP_MENU_METADATA_MACRO_CONFIG.format(
+        label = metomi.rose.config_editor.TOP_MENU_METADATA_MACRO_CONFIG.format(
             config_label_name)
         config_address = macro_address + '/' + config_menu_name
         config_item = self.uimanager.get_widget(config_address)
@@ -323,7 +323,7 @@ class MenuBar(object):
             config_item.set_submenu(Gtk.Menu())
         macro_fullname = ".".join([modulename, classname, methodname])
         macro_fullname = macro_fullname.replace("_", "__")
-        if methodname == rose.macro.VALIDATE_METHOD:
+        if methodname == metomi.rose.macro.VALIDATE_METHOD:
             stock_id = Gtk.STOCK_DIALOG_QUESTION
         else:
             stock_id = Gtk.STOCK_CONVERT
@@ -336,15 +336,15 @@ class MenuBar(object):
         macro_item.connect("activate",
                            lambda i: run_macro(*i._run_data))
         config_item.get_submenu().append(macro_item)
-        if (methodname == rose.macro.VALIDATE_METHOD):
+        if (methodname == metomi.rose.macro.VALIDATE_METHOD):
             for item in config_item.get_submenu().get_children():
-                if hasattr(item, "_rose_all_validators"):
+                if hasattr(item, "_metomi.rose.all_validators"):
                     return False
             all_item = Gtk.ImageMenuItem(Gtk.STOCK_DIALOG_QUESTION)
-            all_item._rose_all_validators = True
-            all_item.set_label(rose.config_editor.MACRO_MENU_ALL_VALIDATORS)
+            all_item._metomi.rose.all_validators = True
+            all_item.set_label(metomi.rose.config_editor.MACRO_MENU_ALL_VALIDATORS)
             all_item.set_tooltip_text(
-                rose.config_editor.MACRO_MENU_ALL_VALIDATORS_TIP)
+                metomi.rose.config_editor.MACRO_MENU_ALL_VALIDATORS_TIP)
             all_item.show()
             all_item._run_data = [config_name, None, None, methodname]
             all_item.connect("activate",
@@ -376,8 +376,8 @@ class MainMenuHandler(object):
         self.sect_ops = section_ops_inst
         self.var_ops = variable_ops_inst
         self.find_ns_id_func = find_ns_id_func
-        self.bad_colour = rose.gtk.util.color_parse(
-            rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
+        self.bad_colour = metomi.rose.gtk.util.color_parse(
+            metomi.rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
 
     def about_dialog(self, args):
         self.mainwindow.launch_about_dialog()
@@ -413,14 +413,14 @@ class MainMenuHandler(object):
                 self.update_config(config_name)
         num_errors = self.check_fail_rules(configs_updated=True)
         num_errors += self.run_custom_macro(
-            method_name=rose.macro.VALIDATE_METHOD,
+            method_name=metomi.rose.macro.VALIDATE_METHOD,
             configs_updated=True)
         if num_errors:
-            text = rose.config_editor.EVENT_MACRO_VALIDATE_CHECK_ALL.format(
+            text = metomi.rose.config_editor.EVENT_MACRO_VALIDATE_CHECK_ALL.format(
                 num_errors)
             kind = self.reporter.KIND_ERR
         else:
-            text = rose.config_editor.EVENT_MACRO_VALIDATE_CHECK_ALL_OK
+            text = metomi.rose.config_editor.EVENT_MACRO_VALIDATE_CHECK_ALL_OK
             kind = self.reporter.KIND_OUT
         self.reporter.report(text, kind=kind)
 
@@ -430,7 +430,7 @@ class MainMenuHandler(object):
             for config_name in self.data.config:
                 if not self.data.config[config_name].is_preview:
                     self.update_config(config_name)
-        macro = rose.macros.rule.FailureRuleChecker()
+        macro = metomi.rose.macros.rule.FailureRuleChecker()
         macro_fullname = "rule.FailureRuleChecker.validate"
         error_count = 0
         for config_name in sorted(self.data.config.keys()):
@@ -444,13 +444,13 @@ class MainMenuHandler(object):
                 if return_value:
                     error_count += len(return_value)
             except Exception as exc:
-                rose.gtk.dialog.run_dialog(
-                    rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                metomi.rose.gtk.dialog.run_dialog(
+                    metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
                     str(exc),
-                    rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
+                    metomi.rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
                         macro_fullname))
                 continue
-            sorter = rose.config.sort_settings
+            sorter = metomi.rose.config.sort_settings
             to_id = lambda s: self.util.get_id_from_section_option(
                 s.section, s.option)
             return_value.sort(lambda x, y: sorter(to_id(x), to_id(y)))
@@ -458,11 +458,11 @@ class MainMenuHandler(object):
                                          config, return_value,
                                          no_display=(not return_value))
         if error_count > 0:
-            msg = rose.config_editor.EVENT_MACRO_VALIDATE_RULE_PROBLEMS_FOUND
+            msg = metomi.rose.config_editor.EVENT_MACRO_VALIDATE_RULE_PROBLEMS_FOUND
             info_text = msg.format(error_count)
             kind = self.reporter.KIND_ERR
         else:
-            msg = rose.config_editor.EVENT_MACRO_VALIDATE_RULE_NO_PROBLEMS
+            msg = metomi.rose.config_editor.EVENT_MACRO_VALIDATE_RULE_NO_PROBLEMS
             info_text = msg
             kind = self.reporter.KIND_OUT
         self.reporter.report(info_text, kind=kind)
@@ -491,7 +491,7 @@ class MainMenuHandler(object):
         for config_name in config_keys:
             image = self.data.helper.get_icon_path_for_config(config_name)
             macros = self.data.config[config_name].macros
-            macro_tuples = rose.macro.get_macro_class_methods(macros)
+            macro_tuples = metomi.rose.macro.get_macro_class_methods(macros)
             macro_tuples.sort(tuple_sorter)
             for macro_mod, macro_cls, macro_func, help_ in macro_tuples:
                 menubar.add_macro(config_name, macro_mod, macro_cls,
@@ -518,7 +518,7 @@ class MainMenuHandler(object):
         for config_name in self.data.config:
             config_data = self.data.config[config_name]
             config_sect_dict[config_name] = list(config_data.sections.now.keys())
-            config_sect_dict[config_name].sort(rose.config.sort_settings)
+            config_sect_dict[config_name].sort(metomi.rose.config.sort_settings)
         config_name, section = self.mainwindow.launch_graph_dialog(
             config_sect_dict)
         if config_name is None:
@@ -628,8 +628,8 @@ class MainMenuHandler(object):
             if not configs_updated:
                 self.update_config(name)
         if method_name is None:
-            method_names = [rose.macro.VALIDATE_METHOD,
-                            rose.macro.TRANSFORM_METHOD]
+            method_names = [metomi.rose.macro.VALIDATE_METHOD,
+                            metomi.rose.macro.TRANSFORM_METHOD]
         else:
             method_names = [method_name]
         if module_name is not None and config_name is not None:
@@ -648,7 +648,7 @@ class MainMenuHandler(object):
                     for method_name in method_names:
                         if (not hasattr(obj, method_name) or
                                 obj_name.startswith("_") or
-                                not issubclass(obj, rose.macro.MacroBase)):
+                                not issubclass(obj, metomi.rose.macro.MacroBase)):
                             continue
                         if class_name is not None and obj_name != class_name:
                             continue
@@ -656,13 +656,13 @@ class MainMenuHandler(object):
                                                    obj_name,
                                                    method_name])
                         err_text = (
-                            rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
+                            metomi.rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
                                 macro_fullname))
                         try:
                             macro_inst = obj()
                         except Exception as exc:
-                            rose.gtk.dialog.run_dialog(
-                                rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                            metomi.rose.gtk.dialog.run_dialog(
+                                metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                 str(exc), err_text)
                             continue
                         if hasattr(macro_inst, method_name):
@@ -672,7 +672,7 @@ class MainMenuHandler(object):
         os.chdir(old_pwd)
         if not macro_data:
             return 0
-        sorter = rose.config.sort_settings
+        sorter = metomi.rose.config.sort_settings
         to_id = lambda s: self.util.get_id_from_section_option(s.section,
                                                                s.option)
         config_macro_errors = []
@@ -692,22 +692,22 @@ class MainMenuHandler(object):
             try:
                 return_value = macro_method(macro_config, meta_config, **res)
             except Exception:
-                rose.gtk.dialog.run_dialog(
-                    rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                metomi.rose.gtk.dialog.run_dialog(
+                    metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
                     'Error in custom macro:\n\n%s' % (
                         traceback.format_exc()),
-                    rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
+                    metomi.rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
                         macro_fullname))
                 continue
-            if methname == rose.macro.TRANSFORM_METHOD:
+            if methname == metomi.rose.macro.TRANSFORM_METHOD:
                 if (not isinstance(return_value, tuple) or
                         len(return_value) != 2 or
                         not isinstance(
-                            return_value[0], rose.config.ConfigNode) or
+                            return_value[0], metomi.rose.config.ConfigNode) or
                         not isinstance(return_value[1], list)):
                     self._handle_bad_macro_return(macro_fullname, return_value)
                     continue
-                integrity_exception = rose.macro.check_config_integrity(
+                integrity_exception = metomi.rose.macro.check_config_integrity(
                     return_value[0])
                 if integrity_exception is not None:
                     self._handle_bad_macro_return(macro_fullname,
@@ -724,7 +724,7 @@ class MainMenuHandler(object):
                                              macro_fullname,
                                              num_changes))
                 continue
-            elif methname == rose.macro.VALIDATE_METHOD:
+            elif methname == metomi.rose.macro.VALIDATE_METHOD:
                 if not isinstance(return_value, list):
                     self._handle_bad_macro_return(macro_fullname,
                                                   return_value)
@@ -741,14 +741,14 @@ class MainMenuHandler(object):
             # Construct a grouped report.
             config_macro_errors.sort()
             config_macro_changes.sort()
-            if rose.macro.VALIDATE_METHOD in method_names:
-                null_format = rose.config_editor.EVENT_MACRO_VALIDATE_ALL_OK
-                change_format = rose.config_editor.EVENT_MACRO_VALIDATE_ALL
+            if metomi.rose.macro.VALIDATE_METHOD in method_names:
+                null_format = metomi.rose.config_editor.EVENT_MACRO_VALIDATE_ALL_OK
+                change_format = metomi.rose.config_editor.EVENT_MACRO_VALIDATE_ALL
                 num_issues = sum([e[2] for e in config_macro_errors])
                 issue_confs = [e[0] for e in config_macro_errors if e[2]]
             else:
-                null_format = rose.config_editor.EVENT_MACRO_TRANSFORM_ALL_OK
-                change_format = rose.config_editor.EVENT_MACRO_TRANSFORM_ALL
+                null_format = metomi.rose.config_editor.EVENT_MACRO_TRANSFORM_ALL_OK
+                change_format = metomi.rose.config_editor.EVENT_MACRO_TRANSFORM_ALL
                 num_issues = sum([e[2] for e in config_macro_changes])
                 issue_confs = [e[0] for e in config_macro_changes if e[2]]
             issue_confs = sorted(set(issue_confs))
@@ -767,23 +767,23 @@ class MainMenuHandler(object):
 
     def _format_macro_config_names(self, config_names):
         if len(config_names) > 5:
-            return rose.config_editor.EVENT_MACRO_CONFIGS.format(
+            return metomi.rose.config_editor.EVENT_MACRO_CONFIGS.format(
                 len(config_names))
         config_names = [c.lstrip("/") for c in config_names]
         return ", ".join(config_names)
 
     def _handle_bad_macro_return(self, macro_fullname, info):
         if isinstance(info, Exception):
-            text = rose.config_editor.ERROR_BAD_MACRO_EXCEPTION.format(
+            text = metomi.rose.config_editor.ERROR_BAD_MACRO_EXCEPTION.format(
                 type(info).__name__, str(info))
         else:
-            text = rose.config_editor.ERROR_BAD_MACRO_RETURN.format(info)
-        summary = rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
+            text = metomi.rose.config_editor.ERROR_BAD_MACRO_RETURN.format(info)
+        summary = metomi.rose.config_editor.ERROR_RUN_MACRO_TITLE.format(
             macro_fullname)
         self.reporter.report(summary,
                              kind=self.reporter.KIND_ERR)
-        rose.gtk.dialog.run_dialog(
-            rose.gtk.dialog.DIALOG_TYPE_ERROR,
+        metomi.rose.gtk.dialog.run_dialog(
+            metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
             text, summary)
 
     def handle_macro_transforms(self, config_name, macro_name,
@@ -825,16 +825,16 @@ class MainMenuHandler(object):
 
     def _report_macro_transform(self, config_name, macro_name, num_changes):
         name = config_name.lstrip("/")
-        if macro_name.endswith(rose.macro.TRANSFORM_METHOD):
+        if macro_name.endswith(metomi.rose.macro.TRANSFORM_METHOD):
             macro = macro_name.split('.')[-2]
         else:
             macro = macro_name.split('.')[-1]
         kind = self.reporter.KIND_OUT
         if num_changes:
-            info_text = rose.config_editor.EVENT_MACRO_TRANSFORM.format(
+            info_text = metomi.rose.config_editor.EVENT_MACRO_TRANSFORM.format(
                 name, macro, num_changes)
         else:
-            info_text = rose.config_editor.EVENT_MACRO_TRANSFORM_OK.format(
+            info_text = metomi.rose.config_editor.EVENT_MACRO_TRANSFORM_OK.format(
                 name, macro)
         self.reporter.report(info_text, kind=kind)
 
@@ -853,16 +853,16 @@ class MainMenuHandler(object):
 
     def _report_macro_validation(self, config_name, macro_name, num_errors):
         name = config_name.lstrip("/")
-        if macro_name.endswith(rose.macro.VALIDATE_METHOD):
+        if macro_name.endswith(metomi.rose.macro.VALIDATE_METHOD):
             macro = macro_name.split('.')[-2]
         else:
             macro = macro_name.split('.')[-1]
         if num_errors:
-            info_text = rose.config_editor.EVENT_MACRO_VALIDATE.format(
+            info_text = metomi.rose.config_editor.EVENT_MACRO_VALIDATE.format(
                 name, macro, num_errors)
             kind = self.reporter.KIND_ERR
         else:
-            info_text = rose.config_editor.EVENT_MACRO_VALIDATE_OK.format(
+            info_text = metomi.rose.config_editor.EVENT_MACRO_VALIDATE_OK.format(
                 name, macro)
             kind = self.reporter.KIND_OUT
         self.reporter.report(info_text, kind=kind)
@@ -881,7 +881,7 @@ class MainMenuHandler(object):
                     "config": config_data.config,
                     "directory": config_data.directory
                 }
-        rose.config_editor.upgrade_controller.UpgradeController(
+        metomi.rose.config_editor.upgrade_controller.UpgradeController(
             config_dict, self.handle_macro_transforms,
             parent_window=self.mainwindow.window,
             upgrade_inspector=self.override_macro_defaults)
@@ -899,16 +899,16 @@ class MainMenuHandler(object):
         if self.data.top_level_directory is None:
             start_directory = os.getcwd()
         try:
-            rose.external.launch_fs_browser(start_directory)
-        except rose.popen.RosePopenError as exc:
-            rose.gtk.dialog.run_exception_dialog(exc)
+            metomi.rose.external.launch_fs_browser(start_directory)
+        except metomi.rose.popen.RosePopenError as exc:
+            metomi.rose.gtk.dialog.run_exception_dialog(exc)
 
     def launch_graph(self, namespace, allowed_sections=None):
         try:
             import pygraphviz
         except ImportError as exc:
-            title = rose.config_editor.WARNING_CANNOT_GRAPH
-            rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
+            title = metomi.rose.config_editor.WARNING_CANNOT_GRAPH
+            metomi.rose.gtk.dialog.run_dialog(metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
                                        str(exc), title)
             return
         else:
@@ -924,62 +924,62 @@ class MainMenuHandler(object):
             else:
                 allowed_sections = (
                     self.data.helper.get_sections_from_namespace(namespace))
-        cmd = (shlex.split(rose.config_editor.LAUNCH_COMMAND_GRAPH) +
+        cmd = (shlex.split(metomi.rose.config_editor.LAUNCH_COMMAND_GRAPH) +
                [config_data.directory] + allowed_sections)
         try:
-            rose.popen.RosePopener().run_bg(
+            metomi.rose.popen.RosePopener().run_bg(
                 *cmd, stdout=sys.stdout, stderr=sys.stderr)
-        except rose.popen.RosePopenError as exc:
-            rose.gtk.dialog.run_exception_dialog(exc)
+        except metomi.rose.popen.RosePopenError as exc:
+            metomi.rose.gtk.dialog.run_exception_dialog(exc)
 
     def launch_scheduler(self, *args):
         """Run the scheduler for a suite open in config edit."""
         this_id = self.data.top_level_name
-        scontrol = rose.suite_control.SuiteControl()
+        scontrol = metomi.rose.suite_control.SuiteControl()
         if scontrol.suite_engine_proc.is_suite_registered(this_id):
             try:
                 return scontrol.gcontrol(this_id)
-            except rose.suite_control.SuiteNotRunningError as err:
-                msg = rose.config_editor.DIALOG_TEXT_SUITE_NOT_RUNNING.format(
+            except metomi.rose.suite_control.SuiteNotRunningError as err:
+                msg = metomi.rose.config_editor.DIALOG_TEXT_SUITE_NOT_RUNNING.format(
                     str(err))
-                return rose.gtk.dialog.run_dialog(
-                    rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                return metomi.rose.gtk.dialog.run_dialog(
+                    metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
                     msg,
-                    rose.config_editor.DIALOG_TITLE_SUITE_NOT_RUNNING)
+                    metomi.rose.config_editor.DIALOG_TITLE_SUITE_NOT_RUNNING)
         else:
-            msg = rose.config_editor.DIALOG_TEXT_UNREGISTERED_SUITE.format(
+            msg = metomi.rose.config_editor.DIALOG_TEXT_UNREGISTERED_SUITE.format(
                 this_id)
-            return rose.gtk.dialog.run_dialog(
-                rose.gtk.dialog.DIALOG_TYPE_ERROR,
+            return metomi.rose.gtk.dialog.run_dialog(
+                metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
                 msg,
-                rose.config_editor.DIALOG_TITLE_UNREGISTERED_SUITE)
+                metomi.rose.config_editor.DIALOG_TITLE_UNREGISTERED_SUITE)
 
     def launch_terminal(self):
         # Handle a launch terminal request.
         try:
-            rose.external.launch_terminal()
-        except rose.popen.RosePopenError as exc:
-            rose.gtk.dialog.run_exception_dialog(exc)
+            metomi.rose.external.launch_terminal()
+        except metomi.rose.popen.RosePopenError as exc:
+            metomi.rose.gtk.dialog.run_exception_dialog(exc)
 
     def launch_output_viewer(self):
         """View a suite's output, if any."""
-        seproc = rose.suite_engine_proc.SuiteEngineProcessor.get_processor()
+        seproc = metomi.rose.suite_engine_proc.SuiteEngineProcessor.get_processor()
         try:
             seproc.launch_suite_log_browser(None, self.data.top_level_name)
-        except rose.suite_engine_proc.NoSuiteLogError:
-            rose.gtk.dialog.run_dialog(
-                rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                rose.config_editor.ERROR_NO_OUTPUT.format(
+        except metomi.rose.suite_engine_proc.NoSuiteLogError:
+            metomi.rose.gtk.dialog.run_dialog(
+                metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                metomi.rose.config_editor.ERROR_NO_OUTPUT.format(
                     self.data.top_level_name),
-                rose.config_editor.DIALOG_TITLE_ERROR)
+                metomi.rose.config_editor.DIALOG_TITLE_ERROR)
 
     def get_run_suite_args(self, *args):
         """Ask the user for custom arguments to suite run."""
-        help_cmds = shlex.split(rose.config_editor.LAUNCH_SUITE_RUN_HELP)
+        help_cmds = shlex.split(metomi.rose.config_editor.LAUNCH_SUITE_RUN_HELP)
         help_text = subprocess.Popen(help_cmds,
                                      stdout=subprocess.PIPE).communicate()[0]
-        rose.gtk.dialog.run_command_arg_dialog(
-            rose.config_editor.LAUNCH_SUITE_RUN,
+        metomi.rose.gtk.dialog.run_command_arg_dialog(
+            metomi.rose.config_editor.LAUNCH_SUITE_RUN,
             help_text, self.run_suite_check_args)
 
     def run_suite_check_args(self, args):
@@ -993,7 +993,7 @@ class MainMenuHandler(object):
             args = []
         for key, value in list(kwargs.items()):
             args.extend([key, value])
-        rose.gtk.run.run_suite(*args)
+        metomi.rose.gtk.run.run_suite(*args)
         return False
 
     def transform_default(self, only_this_config=None):
@@ -1001,24 +1001,24 @@ class MainMenuHandler(object):
         if (only_this_config is not None and
                 only_this_config in list(self.data.config.keys())):
             config_keys = [only_this_config]
-            text = rose.config_editor.DIALOG_LABEL_AUTOFIX
+            text = metomi.rose.config_editor.DIALOG_LABEL_AUTOFIX
         else:
             config_keys = sorted(self.data.config.keys())
-            text = rose.config_editor.DIALOG_LABEL_AUTOFIX_ALL
-        proceed = rose.gtk.dialog.run_dialog(
-            rose.gtk.dialog.DIALOG_TYPE_WARNING,
+            text = metomi.rose.config_editor.DIALOG_LABEL_AUTOFIX_ALL
+        proceed = metomi.rose.gtk.dialog.run_dialog(
+            metomi.rose.gtk.dialog.DIALOG_TYPE_WARNING,
             text,
-            rose.config_editor.DIALOG_TITLE_AUTOFIX,
+            metomi.rose.config_editor.DIALOG_TITLE_AUTOFIX,
             cancel=True)
         if not proceed:
             return False
-        sorter = rose.config.sort_settings
+        sorter = metomi.rose.config.sort_settings
         to_id = lambda s: self.util.get_id_from_section_option(s.section,
                                                                s.option)
         for config_name in config_keys:
             macro_config = self.data.dump_to_internal_config(config_name)
             meta_config = self.data.config[config_name].meta
-            macro = rose.macros.DefaultTransforms()
+            macro = metomi.rose.macros.DefaultTransforms()
             change_list = macro.transform(macro_config, meta_config)[1]
             change_list.sort(lambda x, y: sorter(to_id(x), to_id(y)))
             self.handle_macro_transforms(
