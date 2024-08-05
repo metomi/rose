@@ -29,7 +29,7 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-import rose
+import metomi.rose
 import metomi.rose.gtk.dialog
 import metomi.rose.gtk.util
 
