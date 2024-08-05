@@ -93,13 +93,13 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
                                         str, str, int, int, int, int,
                                         bool, str, str, str)
         resource_loc = metomi.rose.resource.ResourceLocator(paths=sys.path)
-        image_path = resource_loc.locate('etc/images/rose-config-edit')
+        image_path = str(resource_loc.locate('etc/images/rose-config-edit'))
         self.null_icon = GdkPixbuf.Pixbuf.new_from_file(image_path +
-                                                      '/null_icon.xpm')
+                                                      '/null_icon.png')
         self.changed_icon = GdkPixbuf.Pixbuf.new_from_file(image_path +
-                                                         '/change_icon.xpm')
+                                                         '/change_icon.png')
         self.error_icon = GdkPixbuf.Pixbuf.new_from_file(image_path +
-                                                       '/error_icon.xpm')
+                                                       '/error_icon.png')
         self.tree = metomi.rose.gtk.util.TooltipTreeView(
             get_tooltip_func=self.get_treeview_tooltip)
         self.tree.append_column(self.panel_top)
