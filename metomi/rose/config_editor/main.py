@@ -1848,11 +1848,11 @@ def spawn_window(config_directory_path=None, debug_mode=False,
         opt_meta_paths = []
     if not debug_mode:
         warnings.filterwarnings('ignore')
-    resourcer = metomi.rose.resource.ResourceLocator.default()
+    resourcer = metomi.rose.resource.ResourceLocator(paths=sys.path)
     metomi.rose.gtk.util.rc_setup(
-        resourcer.locate('rose-config-edit/.gtkrc-2.0'))
+        str(resourcer.locate('etc/rose-config-edit/.gtkrc-2.0')))
     metomi.rose.gtk.util.setup_stock_icons()
-    logo = resourcer.locate('images/rose-splash-logo.png')
+    logo = resourcer.locate('etc/images/rose-splash-logo.png')
     if metomi.rose.config_editor.ICON_PATH_SCHEDULER is None:
         gcontrol_icon = None
     else:
