@@ -240,7 +240,7 @@ class CustomMenuButton(Gtk.MenuToolButton):
             if len(item_tuple) == 1:
                 new_item = Gtk.MenuItem(name)
             else:
-                new_item = Gtk.ImageMenuItem(stock_id=item_tuple[1])
+                new_item = Gtk.ImageMenuItem.new_from_stock(item_tuple[1])
                 new_item.set_label(name)
             new_item._func = func
             new_item.connect("activate", lambda m: m._func())
