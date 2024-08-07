@@ -178,11 +178,13 @@ class StatusBar(Gtk.VBox):
             tip_text=metomi.rose.config_editor.STATUS_BAR_CONSOLE_TIP,
             as_tool=True)
         self._console_launcher.connect("clicked", self._launch_console)
-        style = Gtk.RcStyle()
-        style.xthickness = 0
-        style.ythickness = 0
-        setattr(style, "inner-border", [0, 0, 0, 0])
-        self._console_launcher.modify_style(style)
+        # None of this works anymore and needs to be set by CSS
+        # which does not look simple
+        # style = Gtk.RcStyle()
+        # style.xthickness = 0
+        # style.ythickness = 0
+        # setattr(style, "inner-border", [0, 0, 0, 0])
+        # self._console_launcher.modify_style(style)
         message_hbox.pack_start(
             self._message_widget_error_image,
             expand=False, fill=False, padding=0)
