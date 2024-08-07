@@ -103,7 +103,7 @@ class MainWindow(object):
                               metomi.rose.config_editor.LAUNCH_COMMAND)
         self.util = metomi.rose.config_editor.util.Lookup()
         self.window.set_icon(metomi.rose.gtk.util.get_icon())
-        Gtk.window_set_default_icon_list(self.window.get_icon())
+        Gtk.Window.set_default_icon_list([self.window.get_icon()])
         self.window.set_default_size(*metomi.rose.config_editor.SIZE_WINDOW)
         self.window.set_destroy_with_parent(False)
         self.save_func = save_func

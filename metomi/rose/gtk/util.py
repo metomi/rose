@@ -81,14 +81,18 @@ class CustomButton(Gtk.Button):
         if stock_id is not None:
             self.stock_id = stock_id
             self.icon = Gtk.Image()
-            self.icon.set_from_stock(stock_id, size)
+            if stock_id.startswith("gtk") or stock_id.startswith("rose-gtk"):
+                self.icon.set_from_stock(stock_id, size)
+            else:
+                self.icon.set_from_icon_name(stock_id, size)
             self.icon.show()
             if self.icon_at_start:
                 self.hbox.pack_start(self.icon, expand=False, fill=False)
             else:
                 self.hbox.pack_end(self.icon, expand=False, fill=False)
         if has_menu:
-            arrow = Gtk.Arrow(Gtk.ArrowType.DOWN, Gtk.ShadowType.NONE)
+            # not sure if this is correct
+            arrow = Gtk.Image.new_from_icon_name("pan-down-symbolic", size)
             arrow.show()
             self.hbox.pack_end(arrow, expand=False, fill=False)
             self.hbox.reorder_child(arrow, 0)
@@ -228,7 +232,7 @@ class CustomMenuButton(Gtk.MenuToolButton):
             self.icon = Gtk.Image()
             self.icon.set_from_stock(stock_id, size)
             self.icon.show()
-        GObject.GObject.__init__(self, self.icon, label)
+        super().__init__(self, self.icon, label)
         self.set_tooltip_text(tip_text)
         self.show()
         button_menu = Gtk.Menu()
@@ -237,8 +241,13 @@ class CustomMenuButton(Gtk.MenuToolButton):
             if len(item_tuple) == 1:
                 new_item = Gtk.MenuItem(name)
             else:
-                new_item = Gtk.ImageMenuItem(stock_id=item_tuple[1])
-                new_item.set_label(name)
+                new_item_box = Gtk.Box()
+                new_item_icon = Gtk.Image.new_from_icon_name(item_tuple[1], Gtk.IconSize.MENU)
+                new_item_label = Gtk.Label(label=name)
+                new_item = Gtk.MenuItem()
+                new_item_box.pack_start(new_item_icon, False, False, 0)
+                new_item_box.pack_start(new_item_label, False, False, 0)
+                Gtk.Container.add(new_item, new_item_box) 
             new_item._func = func
             new_item.connect("activate", lambda m: m._func())
             new_item.show()

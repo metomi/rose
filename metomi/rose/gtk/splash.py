@@ -64,7 +64,7 @@ class SplashScreen(Gtk.Window):
         self.set_position(Gtk.WindowPosition.CENTER)
         main_vbox = Gtk.VBox()
         main_vbox.show()
-        image = Gtk.image_new_from_file(logo_path)
+        image = Gtk.Image.new_from_file(logo_path)
         image.show()
         image_hbox = Gtk.HBox()
         image_hbox.show()
