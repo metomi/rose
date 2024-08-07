@@ -90,10 +90,10 @@ class StackViewer(Gtk.Window):
         self.main_vbox = Gtk.VPaned()
         accelerators = Gtk.AccelGroup()
         accel_key, accel_mods = Gtk.accelerator_parse("<Ctrl>Z")
-        accelerators.connect_group(accel_key, accel_mods, Gtk.AccelFlags.VISIBLE,
+        accelerators.connect(accel_key, accel_mods, Gtk.AccelFlags.VISIBLE,
                                    lambda a, b, c, d: self.undo_from_log())
         accel_key, accel_mods = Gtk.accelerator_parse("<Ctrl><Shift>Z")
-        accelerators.connect_group(accel_key, accel_mods, Gtk.AccelFlags.VISIBLE,
+        accelerators.connect(accel_key, accel_mods, Gtk.AccelFlags.VISIBLE,
                                    lambda a, b, c, d:
                                    self.undo_from_log(redo_mode_on=True))
         self.add_accel_group(accelerators)

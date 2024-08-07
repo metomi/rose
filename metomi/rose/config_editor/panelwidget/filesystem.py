@@ -98,7 +98,7 @@ class FileSystemPanel(Gtk.ScrolledWindow):
 
     def _handle_click(self, view, event):
         pathinfo = view.get_path_at_pos(int(event.x), int(event.y))
-        if (event.button == 1 and event.type == Gdk._2BUTTON_PRESS and
+        if (event.button == 1 and event.type == Gdk.EventType._2BUTTON_PRESS and
                 pathinfo is None):
             self._handle_activation()
         if event.button == 3:
@@ -110,7 +110,7 @@ class FileSystemPanel(Gtk.ScrolledWindow):
             uimanager = Gtk.UIManager()
             actiongroup = Gtk.ActionGroup('Popup')
             actiongroup.add_actions(actions)
-            uimanager.insert_action_group(actiongroup, pos=0)
+            uimanager.insert_action_group(actiongroup)
             uimanager.add_ui_from_string(ui_string)
             if pathinfo is None:
                 path = None

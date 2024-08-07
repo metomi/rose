@@ -656,7 +656,8 @@ def run_edit_dialog(text, finish_hook=None, title=None):
     dialog.vbox.pack_start(scrolled_window, expand=True, fill=True,
                            padding=0)
     get_text = lambda: text_buffer.get_text(text_buffer.get_start_iter(),
-                                            text_buffer.get_end_iter())
+                                            text_buffer.get_end_iter(),
+                                            False)
 
     max_size = metomi.rose.config_editor.SIZE_MACRO_DIALOG_MAX
     # defines the minimum acceptable size for the edit dialog
@@ -697,7 +698,7 @@ def get_dialog_parent():
     """Find the currently active window, if any, and reparent dialog."""
     ok_windows = []
     max_size = -1
-    for window in Gtk.window_list_toplevels():
+    for window in Gtk.Window.list_toplevels():
         if window.get_title() is not None and window.get_toplevel() == window:
             ok_windows.append(window)
             size_proxy = window.get_size()[0] * window.get_size()[1]
