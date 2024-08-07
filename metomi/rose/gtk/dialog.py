@@ -367,7 +367,7 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     hbox = Gtk.HBox()
 
     if stock_id is not None:
-        image_vbox = Gtk.VBox()
+        image_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         image_vbox.pack_start(dialog.image, expand=False, fill=False,
                               padding=DIALOG_PADDING)
         image_vbox.show()
@@ -377,8 +377,8 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     scrolled_window = Gtk.ScrolledWindow()
     scrolled_window.set_border_width(0)
     scrolled_window.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER)
-    vbox = Gtk.VBox()
-    vbox.pack_start(dialog.label, expand=True, fill=True)
+    vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+    vbox.pack_start(dialog.label, expand=True, fill=True, padding=0)
     vbox.show()
     scrolled_window.add_with_viewport(vbox)
     scrolled_window.get_child().set_shadow_type(Gtk.ShadowType.NONE)
@@ -386,7 +386,7 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     hbox.pack_start(scrolled_window, expand=True, fill=True,
                     padding=metomi.rose.config_editor.SPACING_PAGE)
     hbox.show()
-    dialog.vbox.pack_end(hbox, expand=True, fill=True)
+    dialog.vbox.pack_end(hbox, expand=True, fill=True, padding=0)
 
     if "\n" in text:
         dialog.label.set_line_wrap(False)
