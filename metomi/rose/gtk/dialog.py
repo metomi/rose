@@ -354,7 +354,8 @@ def run_dialog(dialog_type, text, title=None, modal=True,
 
     dialog.label = Gtk.Label(label=text)
     try:
-        Pango.parse_markup(text)
+        # could just keep set_text and set_markup?
+        Pango.parse_markup(text, len(text), "0")
     except GLib.GError:
         try:
             dialog.label.set_markup(metomi.rose.gtk.util.safe_str(text))
@@ -488,7 +489,7 @@ def run_scrolled_dialog(text, title=None):
     scrolled.show()
     label = Gtk.Label()
     try:
-        Pango.parse_markup(text)
+        Pango.parse_markup(text, len(text), "0")
     except GLib.GError:
         label.set_text(text)
     else:
@@ -589,7 +590,7 @@ def run_choices_dialog(text, choices, title=None):
     dialog.set_border_width(DIALOG_SUB_PADDING)
     label = Gtk.Label()
     try:
-        Pango.parse_markup(text)
+        Pango.parse_markup(text, len(text), "0")
     except GLib.GError:
         label.set_text(text)
     else:

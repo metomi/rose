@@ -598,7 +598,7 @@ def get_hyperlink_label(text, search_func=lambda i: False):
     label = Gtk.Label()
     label.show()
     try:
-        Pango.parse_markup(text)
+        Pango.parse_markup(text, len(text), "0")
     except GLib.GError:
         label.set_text(text)
     else:
