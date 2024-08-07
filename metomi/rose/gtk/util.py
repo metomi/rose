@@ -63,7 +63,7 @@ class CustomButton(Gtk.Button):
     def __init__(self, label=None, stock_id=None,
                  size=Gtk.IconSize.SMALL_TOOLBAR, tip_text=None,
                  as_tool=False, icon_at_start=False, has_menu=False):
-        self.hbox = Gtk.HBox()
+        self.hbox = Gtk.Box()
         self.size = size
         self.as_tool = as_tool
         self.icon_at_start = icon_at_start
@@ -84,13 +84,16 @@ class CustomButton(Gtk.Button):
             self.icon.set_from_stock(stock_id, size)
             self.icon.show()
             if self.icon_at_start:
-                self.hbox.pack_start(self.icon, expand=False, fill=False)
+                self.hbox.pack_start(self.icon, expand=False, fill=False,
+                                     padding=0)
             else:
-                self.hbox.pack_end(self.icon, expand=False, fill=False)
+                self.hbox.pack_end(self.icon, expand=False, fill=False,
+                                   padding=0)
         if has_menu:
             arrow = Gtk.Arrow(Gtk.ArrowType.DOWN, Gtk.ShadowType.NONE)
             arrow.show()
-            self.hbox.pack_end(arrow, expand=False, fill=False)
+            self.hbox.pack_end(arrow, expand=False, fill=False,
+                               padding=0)
             self.hbox.reorder_child(arrow, 0)
         self.hbox.show()
         super(CustomButton, self).__init__()
