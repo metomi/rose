@@ -266,7 +266,7 @@ class MenuBar(object):
         self.actiongroup = Gtk.ActionGroup('MenuBar')
         self.actiongroup.add_actions(self.action_details)
         self.actiongroup.add_toggle_actions(self.toggle_action_details)
-        self.uimanager.insert_action_group(self.actiongroup, pos=0)
+        self.uimanager.insert_action_group(self.actiongroup, 0)
         self.uimanager.add_ui_from_string(self.ui_config_string)
         self.macro_ids = []
 
