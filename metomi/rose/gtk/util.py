@@ -621,11 +621,11 @@ def get_icon(system="rose"):
     locator = metomi.rose.resource.ResourceLocator(paths=sys.path)
     icon_path = locator.locate("etc/images/{0}-icon-trim.svg".format(system))
     try:
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(icon_path)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(str(icon_path))
     except Exception:
         icon_path = locator.locate(
             "etc/images/{0}-icon-trim.png".format(system))
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(icon_path)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(str(icon_path))
     return pixbuf
 
 
@@ -665,17 +665,15 @@ def rc_setup(rc_resource):
 
 def setup_scheduler_icon(ipath=None):
     """Setup a 'stock' icon for the scheduler"""
-    new_icon_factory = Gtk.IconFactory()
+    theme = Gtk.IconTheme.get_default()
     locator = metomi.rose.resource.ResourceLocator(paths=sys.path)
-    iname = "rose-gtk-scheduler"
+    # iname = "rose-gtk-scheduler"
     if ipath is None:
-        new_icon_factory.add(
-            iname, Gtk.icon_factory_lookup_default(Gtk.STOCK_MISSING_IMAGE))
+        theme.load_icon("image-missing", 64, 0)
     else:
         path = locator.locate(ipath)
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(path)
-        new_icon_factory.add(iname, Gtk.IconSet(pixbuf))
-    new_icon_factory.add_default()
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(str(path))
+        theme.set_icon(pixbuf) # not sure if this is right!
 
 
 def setup_stock_icons():
@@ -691,7 +689,7 @@ def setup_stock_icons():
         ifile = png_icon_name + ".png"
         istring = png_icon_name.replace("_", "-")
         path = locator.locate("etc/images/rose-config-edit/" + ifile)
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(path)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(str(path))
         new_icon_factory.add("rose-gtk-" + istring,
                              Gtk.IconSet(pixbuf))
     exp_icon_pixbuf = get_icon()
