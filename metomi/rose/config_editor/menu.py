@@ -277,7 +277,7 @@ class MenuBar(object):
         for key_press, accel_func in list(accel_dict.items()):
             key, mod = Gtk.accelerator_parse(key_press)
             self.accelerators.lookup[str(key) + str(mod)] = accel_func
-            self.accelerators.connect_group(
+            self.accelerators.connect(
                 key, mod,
                 Gtk.AccelFlags.VISIBLE,
                 lambda a, c, k, m: self.accelerators.lookup[str(k) + str(m)]())
