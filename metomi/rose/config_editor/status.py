@@ -142,8 +142,8 @@ class StatusBar(Gtk.VBox):
         self._error_widget.show()
         locator = metomi.rose.resource.ResourceLocator(paths=sys.path)
         icon_path = locator.locate(
-            'etc/images/rose-config-edit/error_icon.xpm')
-        image = Gtk.image_new_from_file(icon_path)
+            'etc/images/rose-config-edit/error_icon.png')
+        image = Gtk.Image.new_from_file(str(icon_path))
         image.show()
         self._error_widget.pack_start(image, expand=False, fill=False, padding=0)
         self._error_widget_label = Gtk.Label()
