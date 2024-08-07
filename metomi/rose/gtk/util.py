@@ -265,7 +265,7 @@ class ToolBar(Gtk.Toolbar):
                 separator.show()
                 self.insert(separator, 0)
             if isinstance(stock, str) and stock.startswith("Gtk."):
-                stock = getattr(gtk, stock.replace("Gtk.", "", 1))
+                stock = getattr(Gtk, stock.replace("Gtk.", "", 1))
             if callable(stock):
                 widget = stock()
                 widget.show()
