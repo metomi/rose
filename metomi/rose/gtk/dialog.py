@@ -724,15 +724,19 @@ def _configure_scroll(dialog, scrolled_window):
     """Set scroll window size and scroll policy."""
     # make sure the dialog size doesn't exceed the maximum - if so change it
     max_size = metomi.rose.config_editor.SIZE_MACRO_DIALOG_MAX
-    my_size = dialog.size_request()
+    my_size = dialog.get_size()
     new_size = [-1, -1]
-    for i, scrollbar_cls in [(0, Gtk.VScrollbar), (1, Gtk.HScrollbar)]:
-        new_size[i] = min([my_size[i], max_size[i]])
+    for i, scrollbar_cls in [(0, Gtk.Scrollbar.new(orientation=Gtk.Orientation.VERTICAL)), (1, Gtk.Scrollbar.new(orientation=Gtk.Orientation.HORIZONTAL))]:
+        new_size[i] = min(my_size[i], max_size[i])
         if new_size[i] < max_size[i]:
             # Factor in existence of a scrollbar in the other dimension.
             # For horizontal dimension, add width of vertical scroll bar + 2
             # For vertical dimension, add height of horizontal scroll bar + 2
-            new_size[i] += scrollbar_cls().size_request()[i] + 2
+            # What is the value in rose 2019? - here it is zero on load.
+            new_size[i] += getattr(
+                scrollbar_cls.get_preferred_size().natural_size,
+                ["width", "height"][i]
+            ) + 2
     scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
     dialog.set_default_size(*new_size)
 
