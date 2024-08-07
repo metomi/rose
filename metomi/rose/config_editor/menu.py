@@ -266,7 +266,7 @@ class MenuBar(object):
         self.actiongroup = Gtk.ActionGroup('MenuBar')
         self.actiongroup.add_actions(self.action_details)
         self.actiongroup.add_toggle_actions(self.toggle_action_details)
-        self.uimanager.insert_action_group(self.actiongroup, pos=0)
+        self.uimanager.insert_action_group(self.actiongroup)
         self.uimanager.add_ui_from_string(self.ui_config_string)
         self.macro_ids = []
 
@@ -277,7 +277,7 @@ class MenuBar(object):
         for key_press, accel_func in list(accel_dict.items()):
             key, mod = Gtk.accelerator_parse(key_press)
             self.accelerators.lookup[str(key) + str(mod)] = accel_func
-            self.accelerators.connect_group(
+            self.accelerators.connect(
                 key, mod,
                 Gtk.AccelFlags.VISIBLE,
                 lambda a, c, k, m: self.accelerators.lookup[str(k) + str(m)]())

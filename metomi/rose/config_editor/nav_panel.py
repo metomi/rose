@@ -389,9 +389,10 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
             dest_path = (0,)
         else:
             i = 1
-            while self.tree.row_expanded(path[:i]) and i <= len(path):
+            # removed the path[:i] in here
+            while self.tree.row_expanded(path) and i <= len(path):
                 i += 1
-            dest_path = path[:i]
+            dest_path = path
         cursor_path = self.tree.get_cursor()[0]
         if cursor_path != dest_path:
             self.tree.set_cursor(dest_path)
@@ -595,7 +596,7 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
             iter_stack.append(model.iter_next(iter_))
         return True
 
-    def _get_should_show(self, model, iter_):
+    def _get_should_show(self, model, iter_, _):
         # Determine whether to show a row.
         latent_status = model.get_value(iter_, self.COLUMN_LATENT_STATUS)
         ignored_status = model.get_value(iter_, self.COLUMN_IGNORED_STATUS)
@@ -606,7 +607,7 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
         if is_visible:
             return True
         while child_iter is not None:
-            if self._get_should_show(model, child_iter):
+            if self._get_should_show(model, child_iter, _):
                 return True
             child_iter = model.iter_next(child_iter)
         return False

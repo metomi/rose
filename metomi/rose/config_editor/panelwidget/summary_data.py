@@ -114,7 +114,7 @@ class BaseSummaryDataPanel(Gtk.VBox):
         """
         raise NotImplementedError()
 
-    def set_tree_cell_status(self, column, cell, model, row_iter):
+    def set_tree_cell_status(self, column, cell, model, row_iter, _):
         """Add status markup to the cell - e.g. error notification.
 
         column is the Gtk.TreeColumn where the cell is
@@ -345,7 +345,7 @@ class BaseSummaryDataPanel(Gtk.VBox):
     def _refilter(self, widget=None):
         self._view.get_model().get_model().refilter()
 
-    def _filter_visible(self, model, iter_):
+    def _filter_visible(self, model, iter_, _):
         filt_text = self._filter_widget.get_text()
         if not filt_text:
             return True
@@ -355,7 +355,7 @@ class BaseSummaryDataPanel(Gtk.VBox):
                 return True
         child_iter = model.iter_children(iter_)
         while child_iter is not None:
-            if self._filter_visible(model, child_iter):
+            if self._filter_visible(model, child_iter, _):
                 return True
             child_iter = model.iter_next(child_iter)
         return False
@@ -758,7 +758,7 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
         col.set_cell_data_func(cell_for_value,
                                self._set_tree_cell_value)
 
-    def set_tree_cell_status(self, col, cell, model, row_iter):
+    def set_tree_cell_status(self, col, cell, model, row_iter, _):
         """Set the status text for a cell in this column."""
         col_index = self._view.get_columns().index(col)
         sect_index = self.get_section_column_index()
@@ -806,7 +806,7 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
         column_names += sub_var_names
         return data_rows, column_names
 
-    def _set_tree_cell_value(self, column, cell, treemodel, iter_):
+    def _set_tree_cell_value(self, column, cell, treemodel, iter_, _):
         cell.set_property("visible", True)
         col_index = self._view.get_columns().index(column)
         value = self._view.get_model().get_value(iter_, col_index)

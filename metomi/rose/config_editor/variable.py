@@ -394,8 +394,8 @@ class VariableWidget(object):
                     hasattr(self.valuewidget, 'set_focus_index')):
                 self.valuewidget.set_focus_index(index)
             for child in self.valuewidget.get_children():
-                if (Gtk.SENSITIVE & child.flags() and
-                        Gtk.PARENT_SENSITIVE & child.flags()):
+                if (self.valuewidget.get_sensitive() & child.get_state_flags() and
+                        self.valuewidget.get_parent().get_sensitive() & child.get_state_flags()):
                     break
             else:
                 if hasattr(self, 'menuwidget'):

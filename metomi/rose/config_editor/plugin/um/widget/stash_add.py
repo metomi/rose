@@ -499,7 +499,7 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
         if pathinfo is not None:
             path, col = pathinfo[0:2]
             if event.button != 3:
-                if event.type == Gdk._2BUTTON_PRESS:
+                if event.type == Gdk.EventType._2BUTTON_PRESS:
                     self._handle_activation(treeview, path, col)
             else:
                 self._popup_tree_menu(path, col, event)

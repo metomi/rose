@@ -740,7 +740,7 @@ class MainController(object):
             self.notebook.set_current_page(index)
             if index != -1:
                 self.notebook.remove_page(index + 1)
-        self.notebook.set_tab_label_packing(page)
+        self.notebook.set_tab_label_packing(page, page.labelwidget)
 
     def make_page(self, namespace_name):
         """Look up page data and attributes and call a page constructor."""
