@@ -697,7 +697,8 @@ def get_dialog_parent():
     """Find the currently active window, if any, and reparent dialog."""
     ok_windows = []
     max_size = -1
-    for window in Gtk.window_list_toplevels():
+    # not sure if this window change is correct
+    for window in Gtk.Window.list_toplevels():
         if window.get_title() is not None and window.get_toplevel() == window:
             ok_windows.append(window)
             size_proxy = window.get_size()[0] * window.get_size()[1]
