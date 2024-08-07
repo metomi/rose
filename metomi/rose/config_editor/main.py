@@ -346,7 +346,7 @@ class MainController(object):
                 (metomi.rose.config_editor.TOOLBAR_FIND, 'Gtk.Entry'),
                 (metomi.rose.config_editor.TOOLBAR_FIND_NEXT, 'Gtk.STOCK_FIND'),
                 (metomi.rose.config_editor.TOOLBAR_VALIDATE,
-                 'Gtk.STOCK_DIALOG_QUESTION'),
+                 "dialog-question"),
                 (metomi.rose.config_editor.TOOLBAR_TRANSFORM,
                  'Gtk.STOCK_CONVERT'),
                 (metomi.rose.config_editor.TOOLBAR_VIEW_OUTPUT,

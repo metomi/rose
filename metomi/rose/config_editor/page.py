@@ -1056,9 +1056,14 @@ class ConfigPage(Gtk.VBox):
             if method == metomi.rose.macro.TRANSFORM_METHOD:
                 stock_id = Gtk.STOCK_CONVERT
             else:
-                stock_id = Gtk.STOCK_DIALOG_QUESTION
-            macro_menuitem = Gtk.ImageMenuItem(stock_id=stock_id)
-            macro_menuitem.set_label(macro_name)
+                stock_id = "dialog-question"
+            macro_menuitem_box = Gtk.Box()
+            macro_menuitem_icon = Gtk.Image.new_from_icon_name(stock_id, Gtk.IconSize.MENU)
+            macro_menuitem_label = Gtk.Label(label=macro_name)
+            macro_menuitem = Gtk.MenuItem()
+            macro_menuitem_box.pack_start(macro_menuitem_icon, False, False, 0)
+            macro_menuitem_box.pack_start(macro_menuitem_label, False, False, 0)
+            Gtk.Container.add(macro_menuitem, macro_menuitem_box)
             macro_menuitem.set_tooltip_text(description)
             macro_menuitem.show()
             macro_menuitem._macro = macro_name
