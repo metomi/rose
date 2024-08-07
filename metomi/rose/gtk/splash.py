@@ -200,10 +200,10 @@ class SplashScreenProcess(object):
     def _communicate(self, json_text):
         while True:
             try:
-                self.process.stdin.write(json_text + "\n")
+                self.process.communicate(input=(json_text + "\n").encode())
             except IOError:
                 self.start()
-                self.process.stdin.write(json_text + "\n")
+                self.process.communicate(input=(json_text + "\n").encode())
             else:
                 break
 
