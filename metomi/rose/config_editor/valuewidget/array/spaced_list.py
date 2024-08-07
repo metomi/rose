@@ -76,6 +76,26 @@ class SpacedListValueWidget(Gtk.HBox):
         self.connect('focus-in-event',
                      lambda w, e: self.hook.get_focus(self.get_focus_entry()))
 
+    def force_scroll(self, widget=None):
+        """Adjusts a scrolled window to display the correct widget."""
+        y_coordinate = None
+        if widget is not None:
+            y_coordinate = widget.get_allocation().y
+        scroll_container = widget.get_parent()
+        if scroll_container is None:
+            return False
+        while not isinstance(scroll_container, Gtk.ScrolledWindow):
+            scroll_container = scroll_container.get_parent()
+        vadj = scroll_container.get_vadjustment()
+        if y_coordinate == -1:  # Bad allocation, don't scroll
+            return False
+        if y_coordinate is None:
+            vadj.set_upper(vadj.get_upper() + 0.08 * vadj.get_page_size())
+            vadj.set_value(vadj.get_upper() - vadj.get_page_size())
+            return False
+        vadj.set_value(y_coordinate)
+        return False
+
     def get_focus_entry(self):
         """Get either the last selected entry or the last one."""
         if self.last_selected_src is not None:
@@ -331,6 +351,8 @@ class SpacedListValueWidget(Gtk.HBox):
     def add_entry(self):
         """Add a new entry (with null text) to the variable array."""
         entry = self.get_entry('')
+        entry.connect('focus-in-event', lambda w, e: self.force_scroll(w))
+        self.last_selected_src = entry
         self.entries.append(entry)
         self._adjust_entry_length()
         self.populate_table(focus_widget=entry)

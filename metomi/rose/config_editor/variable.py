@@ -279,7 +279,7 @@ class VariableWidget(object):
         while not isinstance(scroll_container, Gtk.ScrolledWindow):
             scroll_container = scroll_container.get_parent()
         vadj = scroll_container.get_vadjustment()
-        if vadj.upper == 1.0 or y_coordinate == -1:
+        if vadj.get_upper() == 1.0 or y_coordinate == -1:
             if not self.force_signal_ids:
                 self.force_signal_ids.append(vadj.connect_after(
                     'changed',
@@ -290,13 +290,13 @@ class VariableWidget(object):
             self.force_signal_ids = []
             vadj.connect('changed', metomi.rose.config_editor.false_function)
         if y_coordinate is None:
-            vadj.upper = vadj.upper + 0.08 * vadj.page_size
-            vadj.set_value(vadj.upper - vadj.page_size)
+            vadj.set_upper(vadj.get_upper() + 0.08 * vadj.get_page_size())
+            vadj.set_value(vadj.get_upper() - vadj.get_page_size())
             return False
         if y_coordinate == -1:  # Bad allocation, don't scroll
             return False
-        if not vadj.value < y_coordinate < vadj.value + 0.95 * vadj.page_size:
-            vadj.set_value(min(y_coordinate, vadj.upper - vadj.page_size))
+        if not vadj.get_value() < y_coordinate < vadj.get_value() + 0.95 * vadj.get_page_size():
+            vadj.set_value(min(y_coordinate, vadj.get_upper() - vadj.get_page_size()))
         return False
 
     def remove_from(self, container):
