@@ -231,7 +231,7 @@ class CustomMenuButton(Gtk.MenuToolButton):
             self.icon = Gtk.Image()
             self.icon.set_from_stock(stock_id, size)
             self.icon.show()
-        GObject.GObject.__init__(self, self.icon, label)
+        super().__init__(self, self.icon, label)
         self.set_tooltip_text(tip_text)
         self.show()
         button_menu = Gtk.Menu()
