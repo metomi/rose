@@ -138,8 +138,8 @@ class Reporter:
         if isinstance(message, bytes):
             message = message.decode()
         if callable(self.event_handler):
-            return self.event_handler(message, kind, level, prefix, clip)
-
+            ret =  self.event_handler(message, kind, level, prefix, clip)
+            return ret
         if isinstance(message, Event):
             if kind is None:
                 kind = message.kind

@@ -36,8 +36,6 @@ from gi.repository import Pango
 import metomi.rose.gtk.util
 import metomi.rose.popen
 
-GObject.threads_init()
-
 
 class SplashScreen(Gtk.Window):
 
@@ -60,7 +58,7 @@ class SplashScreen(Gtk.Window):
         self.set_icon(metomi.rose.gtk.util.get_icon())
         self.modify_bg(Gtk.StateType.NORMAL,
                        metomi.rose.gtk.util.color_parse(self.BACKGROUND_COLOUR))
-        self.set_gravity(Gdk.GRAVITY_CENTER)
+        self.set_gravity(5) # same as gravity center
         self.set_position(Gtk.WindowPosition.CENTER)
         main_vbox = Gtk.VBox()
         main_vbox.show()
@@ -68,8 +66,8 @@ class SplashScreen(Gtk.Window):
         image.show()
         image_hbox = Gtk.HBox()
         image_hbox.show()
-        image_hbox.pack_start(image, expand=False, fill=True)
-        main_vbox.pack_start(image_hbox, expand=False, fill=True)
+        image_hbox.pack_start(image, expand=False, fill=True, padding=0)
+        main_vbox.pack_start(image_hbox, expand=False, fill=True, padding=0)
         self._is_progress_bar_pulsing = False
         self._progress_fraction = 0.0
         self.progress_bar = Gtk.ProgressBar()
@@ -108,19 +106,15 @@ class SplashScreen(Gtk.Window):
             fraction = min(
                 [1.0, self.event_count / self.total_number_of_events])
         self._stop_pulse()
-
         if not no_progress:
             GObject.idle_add(self.progress_bar.set_fraction, fraction)
             self._progress_fraction = fraction
-
         self.progress_bar.set_text(text)
         self._progress_message = text
         GObject.timeout_add(self.TIME_IDLE_BEFORE_PULSE,
                             self._start_pulse, fraction, text)
-
         if fraction == 1.0 and not no_progress:
             GObject.timeout_add(self.TIME_WAIT_FINISH, self.finish)
-
         while Gtk.events_pending():
             Gtk.main_iteration()
 
@@ -200,10 +194,10 @@ class SplashScreenProcess(object):
     def _communicate(self, json_text):
         while True:
             try:
-                self.process.stdin.write(json_text + "\n")
+                self.process.stdin.write((json_text + "\n").encode())
             except IOError:
                 self.start()
-                self.process.stdin.write(json_text + "\n")
+                self.process.stdin.write((json_text + "\n").encode())
             else:
                 break
 
@@ -225,15 +219,10 @@ class SplashScreenProcess(object):
     __call__ = update
 
     def start(self):
-        file_name = __file__.rsplit(".", 1)[0] + ".py"
-        self.process = Popen([file_name] + list(self.args), stdin=PIPE)
+        self.process = Popen(["rose", "launch-splash-screen"] + list(self.args), stdin=PIPE)
 
     def stop(self):
-        if self.process is not None and not self.process.stdin.closed:
-            try:
-                self.process.communicate(input=json.dumps("stop") + "\n")
-            except IOError:
-                pass
+        self.process.kill()
         self.process = None
 
 
@@ -256,6 +245,8 @@ class SplashScreenUpdaterThread(threading.Thread):
                 return False
             try:
                 stdin_line = self.stdin.readline()
+                if not stdin_line:
+                    continue
             except IOError:
                 continue
             try:
@@ -263,12 +254,11 @@ class SplashScreenUpdaterThread(threading.Thread):
             except ValueError:
                 continue
             if update_input == "stop":
-                self._stop()
+                self.stop_event.set()
                 continue
             GObject.idle_add(self._update_splash_screen, update_input)
-
-    def _stop(self):
-        self.stop_event.set()
+        
+    def stop(self):
         try:
             Gtk.main_quit()
         except RuntimeError:
@@ -288,10 +278,10 @@ class SplashScreenUpdaterThread(threading.Thread):
         return False
 
 
-def main():
+def main(argv=sys.argv):
     """Start splash screen."""
     sys.path.append(os.getenv('ROSE_HOME'))
-    splash_screen = SplashScreen(*sys.argv[1:])
+    splash_screen = SplashScreen(argv[0], argv[1], argv[2])
     stop_event = threading.Event()
     update_thread = SplashScreenUpdaterThread(
         splash_screen, stop_event, sys.stdin)
@@ -301,7 +291,6 @@ def main():
     except KeyboardInterrupt:
         pass
     finally:
-        stop_event.set()
         update_thread.join()
 
 
