@@ -200,6 +200,9 @@ class SplashScreenProcess(object):
     def _communicate(self, json_text):
         while True:
             try:
+                # what to do with this - got a ValueError not IOError
+                # because the file end was reached
+                self.start()
                 self.process.communicate(input=(json_text + "\n").encode())
             except IOError:
                 self.start()
