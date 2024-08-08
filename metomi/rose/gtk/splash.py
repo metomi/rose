@@ -60,7 +60,7 @@ class SplashScreen(Gtk.Window):
         self.set_icon(metomi.rose.gtk.util.get_icon())
         self.modify_bg(Gtk.StateType.NORMAL,
                        metomi.rose.gtk.util.color_parse(self.BACKGROUND_COLOUR))
-        self.set_gravity(Gdk.GRAVITY_CENTER)
+        self.set_gravity(5) # same as gravity center
         self.set_position(Gtk.WindowPosition.CENTER)
         main_vbox = Gtk.VBox()
         main_vbox.show()
