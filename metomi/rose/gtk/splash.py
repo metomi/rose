@@ -228,8 +228,7 @@ class SplashScreenProcess(object):
     __call__ = update
 
     def start(self):
-        file_name = __file__.rsplit(".", 1)[0] + ".py"
-        self.process = Popen([file_name] + list(self.args), stdin=PIPE)
+        self.process = Popen(" ".join(["rose launch-splash-screen"] + list(self.args)), shell=True, stdin=PIPE)
 
     def stop(self):
         if self.process is not None and not self.process.stdin.closed:
@@ -291,10 +290,10 @@ class SplashScreenUpdaterThread(threading.Thread):
         return False
 
 
-def main():
+def main(argv=sys.argv):
     """Start splash screen."""
     sys.path.append(os.getenv('ROSE_HOME'))
-    splash_screen = SplashScreen(*sys.argv[1:])
+    splash_screen = SplashScreen(argv[0], argv[1], argv[2])
     stop_event = threading.Event()
     update_thread = SplashScreenUpdaterThread(
         splash_screen, stop_event, sys.stdin)
