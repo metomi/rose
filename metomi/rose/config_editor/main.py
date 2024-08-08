@@ -24,7 +24,6 @@ Classes:
     MainController - driver for loading and central coordination.
 
 """
-
 import cProfile
 import os
 import pstats
@@ -274,12 +273,10 @@ class MainController(object):
                        config_obj_type_dict=config_obj_types,
                        load_all_apps=load_all_apps,
                        load_no_apps=load_no_apps)
-
         self.reporter.report_load_event(
             metomi.rose.config_editor.EVENT_LOAD_STATUSES.format(
                 self.data.top_level_name)
         )
-
         if not self.is_pluggable:
             self.generate_toolbar()
             self.generate_menubar()
@@ -287,9 +284,7 @@ class MainController(object):
             self.generate_status_bar()
             # Create notebook (tabbed container) and connect signals.
             self.notebook = metomi.rose.gtk.util.Notebook()
-
         self.updater.nav_panel = getattr(self, "nav_panel", None)
-
         # Create the main panel with the menu, toolbar, tree panel, notebook.
         if not self.is_pluggable:
             self.mainwindow.load(name=self.data.top_level_name,

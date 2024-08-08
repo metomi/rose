@@ -63,7 +63,8 @@ class StatusReporter(metomi.rose.reporter.Reporter):
                 level = message.level
             message_kwargs = message.kwargs
         if kind == self.EVENT_KIND_LOAD and not self._no_load:
-            return self._load_updater.update(str(message), **message_kwargs)
+            ret = self._load_updater.update(str(message), **message_kwargs)
+            return ret
         return self._status_bar_update_func(message, kind, level)
 
     def report_load_event(
