@@ -202,7 +202,7 @@ def null_cmp(x_item, y_item):
         return (x_id == '') - (y_id == '')
     if x_sort_key == y_sort_key:
         return metomi.rose.config.sort_settings(x_id, y_id)
-    return cmp(x_sort_key, y_sort_key)
+    return (x_sort_key > y_sort_key) - (x_sort_key < y_sort_key)
 
 
 def _pretty_format_data(data, global_indent=0, indent=4, width=60):
