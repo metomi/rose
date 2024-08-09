@@ -450,7 +450,8 @@ class ConfigDataHelper(object):
         else:
             object_statuses = variable_statuses
         status_counts = list(object_statuses.items())
-        status_counts.sort(lambda x, y: cmp(x[1], y[1]))
+        print(status_counts)
+        status_counts.sort(key = lambda x: x[1])
         if not status_counts:
             cache[namespace] = status
             return metomi.rose.config.ConfigNode.STATE_NORMAL
