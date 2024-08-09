@@ -130,7 +130,7 @@ class ConsoleWindow(Gtk.Window):
         if self._destroy_hook is not None:
             self._destroy_hook()
 
-    def _get_should_show(self, model, iter_):
+    def _get_should_show(self, model, iter_, _):
         # Determine whether to show a row.
         category = model.get_value(iter_, 0)
         if self._filter_category not in [self.CATEGORY_ALL, category]:

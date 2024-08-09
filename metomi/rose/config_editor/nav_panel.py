@@ -597,7 +597,7 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
             iter_stack.append(model.iter_next(iter_))
         return True
 
-    def _get_should_show(self, model, iter_):
+    def _get_should_show(self, model, iter_, _):
         # Determine whether to show a row.
         latent_status = model.get_value(iter_, self.COLUMN_LATENT_STATUS)
         ignored_status = model.get_value(iter_, self.COLUMN_IGNORED_STATUS)
