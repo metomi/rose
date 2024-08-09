@@ -19,6 +19,7 @@
 # -----------------------------------------------------------------------------
 
 import re
+from functools import cmp_to_key
 
 import metomi.rose.config
 
@@ -191,7 +192,7 @@ class ConfigDataHelper(object):
         config_name = self.util.split_full_ns(self.data, ns)[0]
         config_data = self.data.config[config_name]
         sections = self.get_sections_from_namespace(ns)
-        sections.sort(metomi.rose.config.sort_settings)
+        sections.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         for section in sections:
             sect_data = config_data.sections.now.get(section)
             if sect_data is not None and sect_data.comments:
@@ -450,7 +451,6 @@ class ConfigDataHelper(object):
         else:
             object_statuses = variable_statuses
         status_counts = list(object_statuses.items())
-        print(status_counts)
         status_counts.sort(key = lambda x: x[1])
         if not status_counts:
             cache[namespace] = status
