@@ -135,11 +135,21 @@ class Reporter:
         arguments and return its result instead.
 
         """
+        print("reporting 1")
         if isinstance(message, bytes):
             message = message.decode()
+            print("reporting 2")
         if callable(self.event_handler):
-            return self.event_handler(message, kind, level, prefix, clip)
-
+            print("reporting 3")
+            print(message)
+            print(kind)
+            print(level)
+            print(prefix)
+            print(clip)
+            ret =  self.event_handler(message, kind, level, prefix, clip)
+            print("Reporter after ret L150")
+            return ret
+        print("reporting")
         if isinstance(message, Event):
             if kind is None:
                 kind = message.kind

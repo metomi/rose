@@ -26,6 +26,8 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 
+import threading
+
 import metomi.rose.config
 import metomi.rose.config_editor
 import metomi.rose.gtk.console
@@ -55,6 +57,7 @@ class StatusReporter(metomi.rose.reporter.Reporter):
     def event_handler(self, message, kind=None, level=None, prefix=None,
                       clip=None):
         """Handle a message or event."""
+        print(1000)
         message_kwargs = {}
         if isinstance(message, metomi.rose.reporter.Event):
             if kind is None:
@@ -63,7 +66,11 @@ class StatusReporter(metomi.rose.reporter.Reporter):
                 level = message.level
             message_kwargs = message.kwargs
         if kind == self.EVENT_KIND_LOAD and not self._no_load:
-            return self._load_updater.update(str(message), **message_kwargs)
+            print(str(threading.get_ident())+" 1001")
+            ret = self._load_updater.update(str(message), **message_kwargs)
+            print(str(threading.get_ident())+" 1001---")
+            return ret
+        print(1002)
         return self._status_bar_update_func(message, kind, level)
 
     def report_load_event(
@@ -73,7 +80,9 @@ class StatusReporter(metomi.rose.reporter.Reporter):
                                     kind=self.EVENT_KIND_LOAD,
                                     no_progress=no_progress,
                                     new_total_events=new_total_events)
+        print("Status 1")
         self.report(event)
+        print("Status 1-1")
 
     def set_no_load(self):
         self._no_load = True
