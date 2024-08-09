@@ -608,7 +608,7 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
         if is_visible:
             return True
         while child_iter is not None:
-            if self._get_should_show(model, child_iter):
+            if self._get_should_show(model, child_iter, _):
                 return True
             child_iter = model.iter_next(child_iter)
         return False
