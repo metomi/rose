@@ -487,12 +487,11 @@ class MainMenuHandler(object):
         """Refresh the menu dealing with custom macro launches."""
         menubar.clear_macros()
         config_keys = sorted(list(self.data.config.keys()))
-        tuple_sorter = lambda x, y: cmp(x[0], y[0])
         for config_name in config_keys:
             image = self.data.helper.get_icon_path_for_config(config_name)
             macros = self.data.config[config_name].macros
             macro_tuples = metomi.rose.macro.get_macro_class_methods(macros)
-            macro_tuples.sort(tuple_sorter)
+            macro_tuples.sort(key=lambda x: x[0])
             for macro_mod, macro_cls, macro_func, help_ in macro_tuples:
                 menubar.add_macro(config_name, macro_mod, macro_cls,
                                   macro_func, help_, image,
