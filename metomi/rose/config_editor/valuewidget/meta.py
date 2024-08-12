@@ -34,8 +34,8 @@ class MetaValueWidget(Gtk.Box):
         self.set_value = set_value
         self.hook = hook
         self.entry = Gtk.Entry()
-        self.normal_colour = self.entry.style.text[Gtk.StateType.NORMAL]
-        self.insens_colour = self.entry.style.text[Gtk.StateType.INSENSITIVE]
+        # self.normal_colour = self.entry.style.text[Gtk.StateType.NORMAL]
+        # self.insens_colour = self.entry.style.text[Gtk.StateType.INSENSITIVE]
         self.entry.set_text(self.value)
         self.entry.connect("button-release-event",
                            self._handle_middle_click_paste)
@@ -60,10 +60,10 @@ class MetaValueWidget(Gtk.Box):
     def _check_diff(self, *args):
         text = self.entry.get_text()
         if text == self.value:
-            self.entry.modify_text(Gtk.StateType.NORMAL, self.normal_colour)
+            # self.entry.modify_text(Gtk.StateType.NORMAL, self.normal_colour)
             self.button.set_sensitive(False)
         else:
-            self.entry.modify_text(Gtk.StateType.NORMAL, self.insens_colour)
+            # self.entry.modify_text(Gtk.StateType.NORMAL, self.insens_colour)
             self.button.set_sensitive(True)
         if not text:
             self.button.set_sensitive(False)

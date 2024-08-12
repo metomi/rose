@@ -186,11 +186,11 @@ class ConfigPage(Gtk.Box):
                                  padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
         close_button = metomi.rose.gtk.util.CustomButton(
             stock_id=Gtk.STOCK_CLOSE, size=Gtk.IconSize.MENU, as_tool=True)
-        style = Gtk.RcStyle()
-        style.xthickness = 0
-        style.ythickness = 0
-        setattr(style, "inner-border", [0, 0, 0, 0])
-        close_button.modify_style(style)
+        # style = Gtk.RcStyle()
+        # style.xthickness = 0
+        # style.ythickness = 0
+        # setattr(style, "inner-border", [0, 0, 0, 0])
+        # close_button.modify_style(style)
 
         label_box.pack_start(label_event_box, expand=False, fill=False,
                              padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
