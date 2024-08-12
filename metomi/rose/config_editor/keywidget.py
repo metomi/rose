@@ -442,7 +442,7 @@ class KeyWidget(Gtk.Box):
         if att_list is None:
             att_list = Pango.AttrList()
         if underline:
-            att_list.insert(Pango.AttrUnderline(Pango.Underline.SINGLE,
+            att_list.insert(Pango.AttrUnderlineNew(Pango.Underline.SINGLE,
                                                 start_index=0,
                                                 end_index=-1))
         else:
