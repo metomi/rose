@@ -42,9 +42,6 @@ class RawValueWidget(Gtk.Box):
         self.set_value = set_value
         self.hook = hook
         self.entry = Gtk.Entry()
-        insensitive_colour = Gtk.Style().bg[0]
-        self.entry.modify_bg(Gtk.StateType.INSENSITIVE, insensitive_colour)
-        self.normal_colour = Gtk.Style().fg[Gtk.StateType.NORMAL]
         if metomi.rose.env.contains_env_var(self.value):
             self.entry.modify_text(Gtk.StateType.NORMAL, ENV_COLOUR)
             self.entry.set_tooltip_text(metomi.rose.config_editor.VAR_WIDGET_ENV_INFO)
