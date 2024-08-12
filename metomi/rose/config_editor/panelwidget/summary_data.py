@@ -66,7 +66,7 @@ class BaseSummaryDataPanel(Gtk.Box):
         self.group_index = None
         self.util = metomi.rose.config_editor.util.Lookup()
         self.control_widget_hbox = self._get_control_widget_hbox()
-        self.pack_start(self.control_widget_hbox, expand=False, fill=False)
+        self.pack_start(self.control_widget_hbox, expand=False, fill=False, padding=0)
         self._prev_store = None
         self._prev_sort_model = None
         self._view = metomi.rose.gtk.util.TooltipTreeView(
@@ -85,7 +85,7 @@ class BaseSummaryDataPanel(Gtk.Box):
         self.update()
         self._window.add(self._view)
         self._window.show()
-        self.pack_start(self._window, expand=True, fill=True)
+        self.pack_start(self._window, expand=True, fill=True, padding=0)
         self.show()
 
     def add_cell_renderer_for_value(self, column, column_title):
@@ -116,7 +116,7 @@ class BaseSummaryDataPanel(Gtk.Box):
         """
         raise NotImplementedError()
 
-    def set_tree_cell_status(self, column, cell, model, row_iter):
+    def set_tree_cell_status(self, column, cell, model, row_iter, _):
         """Add status markup to the cell - e.g. error notification.
 
         column is the Gtk.TreeColumn where the cell is
@@ -161,7 +161,7 @@ class BaseSummaryDataPanel(Gtk.Box):
         group_label.show()
         self._group_widget = Gtk.ComboBox()
         cell = Gtk.CellRendererText()
-        self._group_widget.pack_start(cell, True, True, 0)
+        self._group_widget.pack_start(cell, True)
         self._group_widget.add_attribute(cell, 'text', 0)
         self._group_widget.connect("changed", self._handle_group_change)
         self._group_widget.show()
@@ -297,7 +297,7 @@ class BaseSummaryDataPanel(Gtk.Box):
             col = Gtk.TreeViewColumn()
             col.set_title(column_name.replace("_", "__"))
             cell_for_status = Gtk.CellRendererText()
-            col.pack_start(cell_for_status, False, True, 0)
+            col.pack_start(cell_for_status, False)
             col.set_cell_data_func(cell_for_status,
                                    self.set_tree_cell_status)
             self.add_cell_renderer_for_value(col, column_name)
@@ -347,7 +347,7 @@ class BaseSummaryDataPanel(Gtk.Box):
     def _refilter(self, widget=None):
         self._view.get_model().get_model().refilter()
 
-    def _filter_visible(self, model, iter_):
+    def _filter_visible(self, model, iter_, _):
         filt_text = self._filter_widget.get_text()
         if not filt_text:
             return True
@@ -357,7 +357,7 @@ class BaseSummaryDataPanel(Gtk.Box):
                 return True
         child_iter = model.iter_children(iter_)
         while child_iter is not None:
-            if self._filter_visible(model, child_iter):
+            if self._filter_visible(model, child_iter, _):
                 return True
             child_iter = model.iter_next(child_iter)
         return False
@@ -760,7 +760,7 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
         col.set_cell_data_func(cell_for_value,
                                self._set_tree_cell_value)
 
-    def set_tree_cell_status(self, col, cell, model, row_iter):
+    def set_tree_cell_status(self, col, cell, model, row_iter, _):
         """Set the status text for a cell in this column."""
         col_index = self._view.get_columns().index(col)
         sect_index = self.get_section_column_index()
@@ -808,7 +808,7 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
         column_names += sub_var_names
         return data_rows, column_names
 
-    def _set_tree_cell_value(self, column, cell, treemodel, iter_):
+    def _set_tree_cell_value(self, column, cell, treemodel, iter_, _):
         cell.set_property("visible", True)
         col_index = self._view.get_columns().index(column)
         value = self._view.get_model().get_value(iter_, col_index)
