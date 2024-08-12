@@ -110,8 +110,10 @@ class ConfigPage(Gtk.Box):
         self.scrolled_vbox.show()
         self.scrolled_main_window.add_with_viewport(self.scrolled_vbox)
         self.scrolled_main_window.get_child().set_shadow_type(Gtk.ShadowType.NONE)
-        self.scrolled_main_window.set_border_width(
-            metomi.rose.config_editor.SPACING_SUB_PAGE)
+        self.scrolled_main_window.set_margin_start(
+            metomi.rose.config_editor.SPACING_SUB_PAGE) # left
+        self.scrolled_main_window.set_margin_end(
+            metomi.rose.config_editor.SPACING_SUB_PAGE) # right
         self.scrolled_vbox.pack_start(self.main_container,
                                       expand=False, fill=True, padding=0)
         self.scrolled_main_window.show()
@@ -184,11 +186,7 @@ class ConfigPage(Gtk.Box):
                                  padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
         close_button = metomi.rose.gtk.util.CustomButton(
             stock_id=Gtk.STOCK_CLOSE, size=Gtk.IconSize.MENU, as_tool=True)
-        style = Gtk.RcStyle()
-        style.xthickness = 0
-        style.ythickness = 0
-        setattr(style, "inner-border", [0, 0, 0, 0])
-        close_button.modify_style(style)
+        Gtk.Widget.set_name(close_button, "page-tab-button")
 
         label_box.pack_start(label_event_box, expand=False, fill=False,
                              padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
