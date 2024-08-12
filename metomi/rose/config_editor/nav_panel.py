@@ -391,9 +391,10 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
             dest_path = (0,)
         else:
             i = 1
-            while self.tree.row_expanded(path[:i]) and i <= len(path):
+            # removed the path[:i] in here
+            while self.tree.row_expanded(path) and i <= len(path):
                 i += 1
-            dest_path = path[:i]
+            dest_path = path
         cursor_path = self.tree.get_cursor()[0]
         if cursor_path != dest_path:
             self.tree.set_cursor(dest_path)
