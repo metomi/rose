@@ -192,7 +192,7 @@ class LogicalArrayValueWidget(Gtk.HBox):
             for col, label in enumerate(self.metadata['element-titles']):
                 if col >= len(table_widgets):
                     break
-                widget = Gtk.HBox()
+                widget = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
                 label = Gtk.Label(label=self.metadata['element-titles'][col])
                 label.show()
                 widget.pack_start(label, expand=True, fill=True)

@@ -360,7 +360,7 @@ class MainWindow(object):
             target_section_entry.show()
             vbox.pack_start(target_section_entry, expand=False, fill=False, padding=0)
         vbox.show()
-        hbox = Gtk.HBox()
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         hbox.pack_start(vbox, expand=True, fill=True,
                         padding=metomi.rose.config_editor.SPACING_PAGE)
         hbox.show()
@@ -434,7 +434,7 @@ class MainWindow(object):
         dialog, container, name_entry = metomi.rose.gtk.dialog.get_naming_dialog(
             label, checker_function, ok_tip_text, err_tip_text)
         dialog.set_title(metomi.rose.config_editor.DIALOG_TITLE_CONFIG_CREATE)
-        meta_hbox = Gtk.HBox()
+        meta_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         meta_label = Gtk.Label(label=
             metomi.rose.config_editor.DIALOG_LABEL_CONFIG_CHOOSE_META)
         meta_label.show()
@@ -644,7 +644,7 @@ class MacroChangesDialog(Gtk.Dialog):
             stock_id = Gtk.STOCK_CONVERT
         image = Gtk.Image.new_from_stock(stock_id, Gtk.IconSize.LARGE_TOOLBAR)
         image.show()
-        hbox = Gtk.HBox()
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         hbox.pack_start(image, expand=False, fill=False,
                         padding=metomi.rose.config_editor.SPACING_PAGE)
         hbox.pack_start(self.label, expand=False, fill=False,

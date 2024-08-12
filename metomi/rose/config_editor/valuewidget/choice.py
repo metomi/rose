@@ -160,7 +160,7 @@ class ChoicesValueWidget(Gtk.HBox):
         return False
 
     def _get_add_widget(self):
-        add_hbox = Gtk.HBox()
+        add_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         add_entry = Gtk.ComboBoxEntry()
         add_entry.connect("changed", self._handle_combo_choice)
         add_entry.get_child().connect(
@@ -169,7 +169,7 @@ class ChoicesValueWidget(Gtk.HBox):
         add_entry.set_tooltip_text(metomi.rose.config_editor.CHOICE_TIP_ENTER_CUSTOM)
         add_entry.show()
         self._set_available_hints(add_entry)
-        add_hbox.pack_end(add_entry, expand=True, fill=True)
+        add_hbox.pack_end(add_entry, expand=True, fill=True, padding=0)
         add_hbox.show()
         return add_hbox
 

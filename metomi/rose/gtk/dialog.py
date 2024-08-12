@@ -114,11 +114,11 @@ class DialogProcess(object):
         image_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         image_vbox.pack_start(self.image, expand=False, fill=False, padding=0)
         image_vbox.show()
-        top_hbox = Gtk.HBox()
+        top_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         top_hbox.pack_start(image_vbox, expand=False, fill=False,
                             padding=DIALOG_PADDING)
         top_hbox.show()
-        hbox = Gtk.HBox()
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         hbox.pack_start(self.label, expand=False, fill=False,
                         padding=DIALOG_PADDING)
         hbox.show()
@@ -136,7 +136,7 @@ class DialogProcess(object):
         self.cmd_label = Gtk.Label()
         self.cmd_label.set_markup("<b>" + cmd_string + "</b>")
         self.cmd_label.show()
-        cmd_hbox = Gtk.HBox()
+        cmd_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         cmd_hbox.pack_start(self.cmd_label, expand=False, fill=False,
                             padding=DIALOG_PADDING)
         cmd_hbox.show()
@@ -146,7 +146,7 @@ class DialogProcess(object):
         self.progress_bar = Gtk.ProgressBar()
         self.progress_bar.set_pulse_step(0.1)
         self.progress_bar.show()
-        hbox = Gtk.HBox()
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         hbox.pack_start(self.progress_bar, expand=True, fill=True,
                         padding=DIALOG_PADDING)
         hbox.show()
@@ -301,8 +301,8 @@ def run_command_arg_dialog(cmd_name, help_text, run_hook):
     help_button.connect(
         "clicked",
         lambda b: run_scrolled_dialog(help_text, title=help_label))
-    help_hbox = Gtk.HBox()
-    help_hbox.pack_start(help_button, expand=False, fill=False)
+    help_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+    help_hbox.pack_start(help_button, expand=False, fill=False, padding=0)
     help_hbox.show()
     container.pack_end(help_hbox, expand=False, fill=False)
     name_entry.grab_focus()
@@ -364,7 +364,7 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     else:
         dialog.label.set_markup(text)
     dialog.label.show()
-    hbox = Gtk.HBox()
+    hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
     if stock_id is not None:
         image_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -451,7 +451,7 @@ def run_hyperlink_dialog(stock_id=None, text="", title=None,
     vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
     vbox.pack_start(scrolled_window, expand=True, fill=True, padding=0)
     vbox.show()
-    main_hbox.pack_start(vbox, expand=True, fill=True)
+    main_hbox.pack_start(vbox, expand=True, fill=True, padding=0)
     top_vbox.pack_start(main_hbox, expand=True, fill=True, padding=0)
     # Insert the button
     button_box = Gtk.HBox(spacing=DIALOG_PADDING)
@@ -512,7 +512,7 @@ def run_scrolled_dialog(text, title=None):
     button.connect("clicked", lambda b: window.destroy())
     button.show()
     button.grab_focus()
-    button_box = Gtk.HBox()
+    button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
     button_box.pack_end(button, expand=False, fill=False)
     button_box.show()
     main_vbox = Gtk.VBox(spacing=DIALOG_SUB_PADDING)
@@ -536,7 +536,7 @@ def get_naming_dialog(label, checker, ok_tip=None,
     dialog.set_modal(True)
     ok_button = dialog.action_area.get_children()[0]
     main_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-    name_hbox = Gtk.HBox()
+    name_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
     name_label = Gtk.Label()
     name_label.set_text(label)
     name_label.show()
@@ -555,7 +555,7 @@ def get_naming_dialog(label, checker, ok_tip=None,
     main_vbox.pack_start(name_hbox, expand=False, fill=True,
                          padding=DIALOG_PADDING)
     main_vbox.show()
-    hbox = Gtk.HBox()
+    hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
     hbox.pack_start(main_vbox, expand=False, fill=True,
                     padding=DIALOG_PADDING)
     hbox.show()

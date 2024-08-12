@@ -437,15 +437,15 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
             has_menu=True)
         self._view_button.connect("button-press-event",
                                   self._popup_view_menu)
-        filter_hbox = Gtk.HBox()
-        filter_hbox.pack_start(group_label, expand=False, fill=False)
-        filter_hbox.pack_start(self._group_widget, expand=False, fill=False)
+        filter_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        filter_hbox.pack_start(group_label, expand=False, fill=False, padding=0)
+        filter_hbox.pack_start(self._group_widget, expand=False, fill=False, padding=0)
         filter_hbox.pack_start(filter_label, expand=False, fill=False,
                                padding=10)
-        filter_hbox.pack_start(self._filter_widget, expand=False, fill=False)
-        filter_hbox.pack_end(self._view_button, expand=False, fill=False)
-        filter_hbox.pack_end(self._refresh_button, expand=False, fill=False)
-        filter_hbox.pack_end(self._add_button, expand=False, fill=False)
+        filter_hbox.pack_start(self._filter_widget, expand=False, fill=False, padding=0)
+        filter_hbox.pack_end(self._view_button, expand=False, fill=False, padding=0)
+        filter_hbox.pack_end(self._refresh_button, expand=False, fill=False, padding=0)
+        filter_hbox.pack_end(self._add_button, expand=False, fill=False, padding=0)
         filter_hbox.show()
         return filter_hbox
 

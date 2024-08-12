@@ -62,10 +62,10 @@ class SourceValueWidget(Gtk.HBox):
         formats_check_button.set_active(not self.formats_ok)
         formats_check_button.connect("toggled", self._toggle_formats)
         formats_check_button.show()
-        formats_check_hbox = Gtk.HBox()
+        formats_check_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         formats_check_hbox.show()
         formats_check_hbox.pack_end(formats_check_button, expand=False,
-                                    fill=False)
+                                    fill=False, padding=0)
         vbox.pack_start(formats_check_hbox, expand=False, fill=False, padding=0)
         treeviews_hbox = Gtk.HPaned()
         treeviews_hbox.show()

@@ -329,20 +329,20 @@ class ConfigPage(Gtk.VBox):
             as_tool=True,
             tip_text=metomi.rose.config_editor.TAB_MENU_WEB_HELP)
         url_button.connect("clicked", self.launch_url)
-        button_hbox.pack_start(add_button, expand=False, fill=False)
-        button_hbox.pack_start(revert_button, expand=False, fill=False)
-        button_hbox.pack_start(sep_vbox, expand=False, fill=False)
-        button_hbox.pack_start(info_button, expand=False, fill=False)
+        button_hbox.pack_start(add_button, expand=False, fill=False, padding=0)
+        button_hbox.pack_start(revert_button, expand=False, fill=False, padding=0)
+        button_hbox.pack_start(sep_vbox, expand=False, fill=False, padding=0)
+        button_hbox.pack_start(info_button, expand=False, fill=False, padding=0)
         if self.help is not None:
-            button_hbox.pack_start(help_button, expand=False, fill=False)
+            button_hbox.pack_start(help_button, expand=False, fill=False, padding=0)
         if self.url is not None:
-            button_hbox.pack_start(url_button, expand=False, fill=False)
+            button_hbox.pack_start(url_button, expand=False, fill=False, padding=0)
         button_hbox.show()
         button_frame = Gtk.Frame()
         button_frame.set_shadow_type(Gtk.ShadowType.NONE)
         button_frame.add(button_hbox)
         button_frame.show()
-        self.tool_hbox.pack_start(button_frame, expand=False, fill=False)
+        self.tool_hbox.pack_start(button_frame, expand=False, fill=False, padding=0)
         label_box = Gtk.HBox(homogeneous=False,
                              spacing=metomi.rose.config_editor.SPACING_PAGE)
         # Had to remove True, True, 0 in below like Ben F
@@ -402,7 +402,7 @@ class ConfigPage(Gtk.VBox):
         self._last_info_labels = [l.get_text() for l in label_list]
         for button, label in zip(button_list, label_list):
             var_hbox = Gtk.HBox(homogeneous=False)
-            var_hbox.pack_start(button, expand=False, fill=False)
+            var_hbox.pack_start(button, expand=False, fill=False, padding=0)
             var_hbox.pack_start(label, expand=False, fill=True,
                                 padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
             var_hbox.show()
@@ -414,8 +414,8 @@ class ConfigPage(Gtk.VBox):
             help_label_window = Gtk.ScrolledWindow()
             help_label_window.set_policy(Gtk.PolicyType.AUTOMATIC,
                                          Gtk.PolicyType.AUTOMATIC)
-            help_label_hbox = Gtk.HBox()
-            help_label_hbox.pack_start(help_label, expand=False, fill=False)
+            help_label_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+            help_label_hbox.pack_start(help_label, expand=False, fill=False, padding=0)
             help_label_hbox.show()
             help_label_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             help_label_vbox.pack_start(
@@ -432,7 +432,7 @@ class ConfigPage(Gtk.VBox):
                 height = min([metomi.rose.config_editor.SIZE_WINDOW[1] / 3,
                               help_label.size_request()[1]])
             help_label_window.set_size_request(width, height)
-            help_hbox = Gtk.HBox()
+            help_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
             help_hbox.pack_start(help_label_window, expand=True, fill=True,
                                  padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
             help_hbox.show()

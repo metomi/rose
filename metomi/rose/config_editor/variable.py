@@ -112,9 +112,9 @@ class VariableWidget(object):
         key_vbox.pack_start(self.keywidget, expand=False, fill=False,
                             padding=max([(menu_offset - key_offset) / 2, 0]))
         key_vbox.show()
-        label_content_hbox = Gtk.HBox()
-        label_content_hbox.pack_start(menu_vbox, expand=False, fill=False)
-        label_content_hbox.pack_start(key_vbox, expand=False, fill=False)
+        label_content_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        label_content_hbox.pack_start(menu_vbox, expand=False, fill=False, padding=0)
+        label_content_hbox.pack_start(key_vbox, expand=False, fill=False, padding=0)
         label_content_hbox.show()
         event_box = Gtk.EventBox()
         event_box.show()

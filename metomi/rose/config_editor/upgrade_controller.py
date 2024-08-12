@@ -114,7 +114,7 @@ class UpgradeController(object):
         label.show()
         self.window.vbox.pack_start(
             label, True, True, metomi.rose.config_editor.SPACING_PAGE)
-        button_hbox = Gtk.HBox()
+        button_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         button_hbox.show()
         all_versions_toggle_button = Gtk.CheckButton(
             label=metomi.rose.config_editor.DIALOG_LABEL_UPGRADE_ALL,

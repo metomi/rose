@@ -110,7 +110,7 @@ class ConsoleWindow(Gtk.Window):
         message_scrolled_window.add(self._message_treeview)
         top_vbox.pack_start(message_scrolled_window, expand=True, fill=True, padding=0)
 
-        category_hbox = Gtk.HBox()
+        category_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         category_hbox.show()
         top_vbox.pack_end(category_hbox, expand=False, fill=False, padding=0)
         for category in categories + [self.CATEGORY_ALL]:
@@ -120,7 +120,7 @@ class ConsoleWindow(Gtk.Window):
                                  lambda b: self._set_new_filter(
                                         b, category_hbox.get_children()))
             togglebutton.show()
-            category_hbox.pack_start(togglebutton, expand=True, fill=True)
+            category_hbox.pack_start(togglebutton, expand=True, fill=True, padding=0)
         togglebutton.set_active(True)
         self.show()
         self._scroll_to_end()

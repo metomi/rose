@@ -66,7 +66,7 @@ class SplashScreen(Gtk.Window):
         main_vbox.show()
         image = Gtk.Image.new_from_file(logo_path)
         image.show()
-        image_hbox = Gtk.HBox()
+        image_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         image_hbox.show()
         image_hbox.pack_start(image, expand=False, fill=True, padding=0)
         main_vbox.pack_start(image_hbox, expand=False, fill=True, padding=0)

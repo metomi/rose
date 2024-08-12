@@ -274,7 +274,7 @@ class MixedArrayValueWidget(Gtk.HBox):
             hook = self.hook
             setter = ArrayElementSetter(self.setter, unwrapped_index)
             if self.has_titles and row_index == 0:
-                widget = Gtk.HBox()
+                widget = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
                 label = Gtk.Label(label=self.metadata['element-titles'][i])
                 label.show()
                 widget.pack_start(label, expand=True, fill=True)

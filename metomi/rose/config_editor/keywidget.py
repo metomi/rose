@@ -53,7 +53,7 @@ class KeyWidget(Gtk.VBox):
                  show_modes):
         super(KeyWidget, self).__init__(homogeneous=False, spacing=0)
         self.my_variable = variable
-        self.hbox = Gtk.HBox()
+        self.hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.hbox.show()
         self.pack_start(self.hbox, expand=False, fill=False)
         self.var_ops = var_ops
@@ -65,7 +65,7 @@ class KeyWidget(Gtk.VBox):
         self._last_var_comments = None
         self.ignored_label = Gtk.Label()
         self.ignored_label.show()
-        self.hbox.pack_start(self.ignored_label, expand=False, fill=False)
+        self.hbox.pack_start(self.ignored_label, expand=False, fill=False, padding=0)
         self.set_ignored()
         if self.my_variable.name != '':
             self.entry = Gtk.Label()
@@ -87,7 +87,7 @@ class KeyWidget(Gtk.VBox):
                           lambda b, w: self._handle_leave(b))
         self.hbox.pack_start(event_box, expand=True, fill=True,
                              padding=0)
-        self.comments_box = Gtk.HBox()
+        self.comments_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.hbox.pack_start(self.comments_box, expand=False, fill=False)
         self.grab_focus = self.entry.grab_focus
         self.set_sensitive(True)
@@ -321,9 +321,9 @@ class KeyWidget(Gtk.VBox):
             mode_text = metomi.rose.config_editor.VAR_FLAG_MARKUP.format(mode_text)
             label = metomi.rose.gtk.util.get_hyperlink_label(mode_text, search_func)
             label.show()
-            hbox = Gtk.HBox()
+            hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
             hbox.show()
-            hbox.pack_start(label, expand=False, fill=False)
+            hbox.pack_start(label, expand=False, fill=False, padding=0)
             hbox.set_sensitive(self.entry.get_property("sensitive"))
             hbox._show_mode = mode
             self.pack_start(hbox, expand=False, fill=False,
@@ -373,9 +373,9 @@ class KeyWidget(Gtk.VBox):
         markup = metomi.rose.config_editor.VAR_FLAG_MARKUP.format(markup)
         label.set_markup(markup)
         label.show()
-        hbox = Gtk.HBox()
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         hbox._flag_type = flag_type
-        hbox.pack_start(label, expand=False, fill=False)
+        hbox.pack_start(label, expand=False, fill=False, padding=0)
         hbox.set_sensitive(self.entry.get_property("sensitive"))
         hbox.show()
         self.pack_start(hbox, expand=False, fill=False)

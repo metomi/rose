@@ -288,7 +288,7 @@ class RowArrayValueWidget(Gtk.HBox):
             value_index = unwrapped_index
             if (not isinstance(self.type, list) and
                     value_index >= len(self.value_array)):
-                widget = Gtk.HBox()
+                widget = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
                 eb0 = Gtk.EventBox()
                 eb0.show()
                 widget.pack_start(eb0, expand=True, fill=True)
