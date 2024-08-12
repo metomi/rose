@@ -145,7 +145,7 @@ class ConfigPage(Gtk.Box):
         self.vpaned.show()
         self.main_vpaned.pack2(self.vpaned)
         self.main_vpaned.show()
-        self.pack_start(self.main_vpaned, expand=True, fill=True)
+        self.pack_start(self.main_vpaned, expand=True, fill=True, padding=0)
         self.show()
         self.scroll_vadj = self.scrolled_main_window.get_vadjustment()
         self.scrolled_main_window.connect(
@@ -353,7 +353,7 @@ class ConfigPage(Gtk.Box):
         self.tool_hbox.pack_start(
             label_box, expand=True, fill=True, padding=10)
         self.tool_hbox.show()
-        self.pack_start(self.tool_hbox, expand=False, fill=False)
+        self.pack_start(self.tool_hbox, expand=False, fill=False, padding=0)
         self.reorder_child(self.tool_hbox, 0)
         if isinstance(parent, Gtk.Window):
             if parent.get_child() is not None:
@@ -408,7 +408,7 @@ class ConfigPage(Gtk.Box):
             var_hbox.pack_start(label, expand=False, fill=True,
                                 padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
             var_hbox.show()
-            info_container.pack_start(var_hbox, expand=False, fill=True)
+            info_container.pack_start(var_hbox, expand=False, fill=True, padding=0)
         # Add page help.
         if self.description:
             help_label = metomi.rose.gtk.util.get_hyperlink_label(
@@ -443,7 +443,7 @@ class ConfigPage(Gtk.Box):
                 padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
         for child in self.info_panel.get_children():
             self.info_panel.remove(child)
-        self.info_panel.pack_start(info_container, expand=True, fill=True)
+        self.info_panel.pack_start(info_container, expand=True, fill=True, padding=0)
 
     def generate_filesystem_panel(self):
         """Generate a widget to view the file hierarchy."""
