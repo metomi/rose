@@ -24,6 +24,8 @@ from gi.repository import Gtk
 
 import metomi.rose.config
 
+from functools import cmp_to_key
+
 
 class FormatsChooserValueWidget(Gtk.HBox):
 
@@ -129,7 +131,7 @@ class FormatsChooserValueWidget(Gtk.HBox):
     def load_data_chooser(self):
         data_model = Gtk.ListStore(str)
         options = self.values_getter()
-        options.sort(metomi.rose.config.sort_settings)
+        options.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         for value in options:
             if value not in [e.get_text() for e in self.entries]:
                 data_model.append([str(value)])

@@ -38,6 +38,8 @@ import metomi.rose.gtk.util
 import metomi.rose.resource
 import metomi.rose.variable
 
+from functools import cmp_to_key
+
 
 class ConfigPage(Gtk.VBox):
 
@@ -534,7 +536,7 @@ class ConfigPage(Gtk.VBox):
         for sect_data in self.sections:
             if not sect_data.ignored_reason:
                 section_choices.append(sect_data.name)
-        section_choices.sort(metomi.rose.config.sort_settings)
+        section_choices.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         if self.ns_is_default and section_choices:
             add_ui_start = add_ui_start.replace(
                 "'Popup'>",
@@ -1041,9 +1043,9 @@ class ConfigPage(Gtk.VBox):
         descending_cmp = lambda x, y: metomi.rose.config_editor.util.null_cmp(
             x[0], y[0])
         if ascending:
-            sorted_data.sort(ascending_cmp)
+            sorted_data.sort(key=cmp_to_key(ascending_cmp))
         else:
-            sorted_data.sort(descending_cmp)
+            sorted_data.sort(key=cmp_to_key(descending_cmp))
         if [x[4] for x in sorted_data] == datavars:
             return False
         for i, datum in enumerate(sorted_data):

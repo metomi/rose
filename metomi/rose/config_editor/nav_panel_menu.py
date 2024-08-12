@@ -30,6 +30,8 @@ import metomi.rose.config
 import metomi.rose.config_editor.util
 import metomi.rose.gtk.dialog
 
+from functools import cmp_to_key
+
 
 class NavPanelHandler(object):
 
@@ -156,10 +158,10 @@ class NavPanelHandler(object):
                                 mode == metomi.rose.META_PROP_VALUE_TRUE):
                             continue
                     config_sect_dict[config_name].append(section)
-            config_sect_dict[config_name].sort(metomi.rose.config.sort_settings)
+            config_sect_dict[config_name].sort(key=cmp_to_key(metomi.rose.config.sort_settings))
             if config_name in prefer_name_sections:
                 prefer_name_sections[config_name].sort(
-                    metomi.rose.config.sort_settings)
+                    key=cmp_to_key(metomi.rose.config.sort_settings))
         config_name, section = self.mainwindow.launch_ignore_dialog(
             config_sect_dict, prefer_name_sections, is_ignored)
         if config_name in self.data.config and section is not None:
@@ -244,10 +246,10 @@ class NavPanelHandler(object):
         for config_name in config_names:
             config_data = self.data.config[config_name]
             config_sect_dict[config_name] = list(config_data.sections.now.keys())
-            config_sect_dict[config_name].sort(metomi.rose.config.sort_settings)
+            config_sect_dict[config_name].sort(key=cmp_to_key(metomi.rose.config.sort_settings))
             if config_name in prefer_name_sections:
                 prefer_name_sections[config_name].sort(
-                    metomi.rose.config.sort_settings)
+                    key=cmp_to_key(metomi.rose.config.sort_settings))
         config_name, section = self.mainwindow.launch_remove_dialog(
             config_sect_dict, prefer_name_sections)
         if config_name in self.data.config and section is not None:
@@ -258,7 +260,7 @@ class NavPanelHandler(object):
             variable_sorter = lambda v, w: metomi.rose.config.sort_settings(
                 v.metadata['id'], w.metadata['id'])
             variables = list(config_data.vars.now.get(section, []))
-            variables.sort(variable_sorter)
+            variables.sort(key=cmp_to_key(variable_sorter))
             variables.reverse()
             for variable in variables:
                 self.var_ops.remove_var(variable)
@@ -279,10 +281,10 @@ class NavPanelHandler(object):
         for config_name in self.data.config:
             config_data = self.data.config[config_name]
             config_sect_dict[config_name] = list(config_data.sections.now.keys())
-            config_sect_dict[config_name].sort(metomi.rose.config.sort_settings)
+            config_sect_dict[config_name].sort(key=cmp_to_key(metomi.rose.config.sort_settings))
             if config_name in prefer_name_sections:
                 prefer_name_sections[config_name].sort(
-                    metomi.rose.config.sort_settings)
+                    key=cmp_to_key(metomi.rose.config.sort_settings))
         config_name, source_section, target_section = (
             self.mainwindow.launch_rename_dialog(
                 config_sect_dict, prefer_name_sections)

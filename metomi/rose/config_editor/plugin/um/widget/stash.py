@@ -37,6 +37,8 @@ import metomi.rose.resource
 import metomi.rose.config_editor.plugin.um.widget.stash_add as stash_add
 import metomi.rose.config_editor.plugin.um.widget.stash_util as stash_util
 
+from functools import cmp_to_key
+
 
 class BaseStashSummaryDataPanelv1(
         metomi.rose.config_editor.panelwidget.summary_data.BaseSummaryDataPanel):
@@ -210,9 +212,8 @@ class BaseStashSummaryDataPanelv1(
             while len(sort_list) < 4:
                 sort_list.append(None)
             sort_list[3] = section
-        sub_sect_names.sort(lambda x, y: cmp(section_sort_keys.get(x),
-                                             section_sort_keys.get(y)))
-        sub_var_names.sort(metomi.rose.config.sort_settings)
+        sub_sect_names.sort(key=lambda x: section_sort_keys.get(x))
+        sub_var_names.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         sub_var_names.sort(lambda x, y: (y != self.STREQ_NL_PACKAGE_OPT) -
                                         (x != self.STREQ_NL_PACKAGE_OPT))
         sub_var_names.sort(lambda x, y: (y == self.STREQ_NL_ITEM_OPT) -

@@ -30,6 +30,8 @@ import metomi.rose.config_editor.variable
 import metomi.rose.formats
 import metomi.rose.variable
 
+from functools import cmp_to_key
+
 
 class PageTable(Gtk.Table):
 
@@ -68,7 +70,7 @@ class PageTable(Gtk.Table):
             variable_widget = child.get_parent()
             if variable_widget not in [x[0] for x in widget_coordinate_list]:
                 widget_coordinate_list.append((variable_widget, top_row))
-        widget_coordinate_list.sort(lambda x, y: cmp(x[1], y[1]))
+        widget_coordinate_list.sort(key=lambda x: x[1])
         old_index = None
         for widget, index in widget_coordinate_list:
             if widget.variable.metadata["id"] == variable.metadata["id"]:
@@ -156,9 +158,8 @@ class PageTable(Gtk.Table):
                 (val.metadata.get("sort-key", "~")), val.metadata["id"])
             is_ghost = val in self.ghost_data
             sort_key_vars.append((sort_key, val, is_ghost))
-        sort_key_vars.sort(metomi.rose.config_editor.util.null_cmp)
-        sort_key_vars.sort(lambda x, y: cmp("=null" in x[1].metadata["id"],
-                                            "=null" in y[1].metadata["id"]))
+        sort_key_vars.sort(key=cmp_to_key(metomi.rose.config_editor.util.null_cmp))
+        sort_key_vars.sort(key=lambda x: "=null" in x[1].metadata["id"])
         return [(x[1], x[2]) for x in sort_key_vars]
 
     def _show_and_hide_variable_widgets(self, just_this_widget=None):
@@ -299,7 +300,7 @@ class PageLatentTable(Gtk.Table):
         v_sort_ids.sort(
             lambda x, y: metomi.rose.config.sort_settings(
                 x[0] + "~" + x[1], y[0] + "~" + y[1]))
-        v_sort_ids.sort(lambda x, y: cmp("=null" in x[1], "=null" in y[1]))
+        v_sort_ids.sort(key=lambda x: "=null" in x[1])
         for _, var_id in v_sort_ids:
             is_ghost = False
             for variable in self.panel_data:

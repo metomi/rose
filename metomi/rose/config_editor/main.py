@@ -35,6 +35,8 @@ import sys
 import tempfile
 import warnings
 
+from functools import cmp_to_key
+
 # Ignore add menu related warnings for now, but remove this later.
 warnings.filterwarnings('ignore',
                         'instance of invalid non-instantiatable type',
@@ -1653,9 +1655,8 @@ class MainController(object):
             current_name = self.util.split_full_ns(self.data, current_ns)[0]
             ns_cmp = lambda x, y: (y == current_ns) - (x == current_ns)
             name_cmp = lambda x, y: (y == current_name) - (x == current_name)
-        id_cmp = lambda v, w: cmp(v.metadata['id'], w.metadata['id'])
         config_keys = sorted(list(self.data.config.keys()))
-        config_keys.sort(name_cmp)
+        config_keys.sort(key=cmp_to_key(name_cmp))
         for config_name in config_keys:
             config_data = self.data.config[config_name]
             search_vars = config_data.vars.get_all(
@@ -1673,10 +1674,10 @@ class MainController(object):
                     found_ns_vars.setdefault(ns, [])
                     found_ns_vars[ns].append(variable)
             ns_list = sorted(list(found_ns_vars.keys()))
-            ns_list.sort(ns_cmp)
+            ns_list.sort(key=cmp_to_key(ns_cmp))
             for ns in ns_list:
                 variables = found_ns_vars[ns]
-                variables.sort(id_cmp)
+                variables.sort(key=lambda x: x.metadata.id)
                 for variable in variables:
                     var_id = variable.metadata['id']
                     if (config_name, var_id) not in self.find_hist['ids']:

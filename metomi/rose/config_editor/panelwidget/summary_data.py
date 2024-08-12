@@ -28,6 +28,8 @@ import metomi.rose.config_editor
 import metomi.rose.config_editor.util
 import metomi.rose.gtk.util
 
+from functools import cmp_to_key
+
 
 class BaseSummaryDataPanel(Gtk.VBox):
 
@@ -785,8 +787,8 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
                 self.var_id_map[variable.metadata["id"]] = variable
                 if variable.name not in sub_var_names:
                     sub_var_names.append(variable.name)
-        sub_sect_names.sort(metomi.rose.config.sort_settings)
-        sub_var_names.sort(metomi.rose.config.sort_settings)
+        sub_sect_names.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
+        sub_var_names.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         data_rows = []
         for section in sub_sect_names:
             row_data = [section]
