@@ -23,7 +23,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 
-class MetaValueWidget(Gtk.HBox):
+class MetaValueWidget(Gtk.Box):
 
     """This class generates an entry and button for a metadata flag value."""
 

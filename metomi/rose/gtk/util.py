@@ -112,9 +112,9 @@ class CustomButton(Gtk.Button):
         self.icon.set_from_stock(stock_id, self.size)
         self.stock_id = stock_id
         if self.icon_at_start:
-            self.hbox.pack_start(self.icon, expand=False, fill=False)
+            self.hbox.pack_start(self.icon, expand=False, fill=False, padding=0)
         else:
-            self.hbox.pack_end(self.icon, expand=False, fill=False)
+            self.hbox.pack_end(self.icon, expand=False, fill=False, padding=0)
         return False
 
     def set_tip_text(self, new_text):
@@ -153,7 +153,7 @@ class CustomExpandButton(Gtk.Button):
         else:
             self.stock_id = self.minimise_id
 
-        self.hbox = Gtk.HBox()
+        self.hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.size = size
         self.as_tool = as_tool
         self.icon_at_start = icon_at_start
@@ -173,9 +173,9 @@ class CustomExpandButton(Gtk.Button):
         self.icon.set_from_stock(self.stock_id, size)
         self.icon.show()
         if self.icon_at_start:
-            self.hbox.pack_start(self.icon, expand=False, fill=False)
+            self.hbox.pack_start(self.icon, expand=False, fill=False, padding=0)
         else:
-            self.hbox.pack_end(self.icon, expand=False, fill=False)
+            self.hbox.pack_end(self.icon, expand=False, fill=False, padding=0)
         self.hbox.show()
         super(CustomExpandButton, self).__init__()
 
@@ -195,9 +195,9 @@ class CustomExpandButton(Gtk.Button):
         self.icon.set_from_stock(stock_id, self.size)
         self.stock_id = stock_id
         if self.icon_at_start:
-            self.hbox.pack_start(self.icon, expand=False, fill=False)
+            self.hbox.pack_start(self.icon, expand=False, fill=False, padding=0)
         else:
-            self.hbox.pack_end(self.icon, expand=False, fill=False)
+            self.hbox.pack_end(self.icon, expand=False, fill=False, padding=0)
         return False
 
     def set_tip_text(self, new_text):

@@ -31,7 +31,7 @@ import metomi.rose.formats
 import metomi.rose.gtk.choice
 
 
-class SourceValueWidget(Gtk.HBox):
+class SourceValueWidget(Gtk.Box):
 
     """This class generates a special widget for the file source variable.
 
@@ -55,18 +55,18 @@ class SourceValueWidget(Gtk.HBox):
         if self.formats_ok is None:
             content_sections = self._get_available_sections()
             self.formats_ok = bool(content_sections)
-        vbox = Gtk.VBox()
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         vbox.show()
         formats_check_button = Gtk.CheckButton(
             metomi.rose.config_editor.FILE_CONTENT_PANEL_FORMAT_LABEL)
         formats_check_button.set_active(not self.formats_ok)
         formats_check_button.connect("toggled", self._toggle_formats)
         formats_check_button.show()
-        formats_check_hbox = Gtk.HBox()
+        formats_check_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         formats_check_hbox.show()
         formats_check_hbox.pack_end(formats_check_button, expand=False,
-                                    fill=False)
-        vbox.pack_start(formats_check_hbox, expand=False, fill=False)
+                                    fill=False, padding=0)
+        vbox.pack_start(formats_check_hbox, expand=False, fill=False, padding=0)
         treeviews_hbox = Gtk.HPaned()
         treeviews_hbox.show()
         self._listview = metomi.rose.gtk.choice.ChoicesListView(
@@ -80,12 +80,12 @@ class SourceValueWidget(Gtk.HBox):
         frame = Gtk.Frame()
         frame.show()
         frame.add(self._listview)
-        value_vbox = Gtk.VBox()
+        value_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         value_vbox.show()
-        value_vbox.pack_start(frame, expand=False, fill=False)
+        value_vbox.pack_start(frame, expand=False, fill=False, padding=0)
         value_eb = Gtk.EventBox()
         value_eb.show()
-        value_vbox.pack_start(value_eb, expand=True, fill=True)
+        value_vbox.pack_start(value_eb, expand=True, fill=True, padding=0)
 
         self._available_frame = Gtk.Frame()
         self._generate_available_treeview()
@@ -102,8 +102,8 @@ class SourceValueWidget(Gtk.HBox):
         self._adder.show()
         treeviews_hbox.add1(value_vbox)
         treeviews_hbox.add2(self._available_frame)
-        vbox.pack_start(treeviews_hbox, expand=True, fill=True)
-        vbox.pack_start(self._adder, expand=True, fill=True)
+        vbox.pack_start(treeviews_hbox, expand=True, fill=True, padding=0)
+        vbox.pack_start(self._adder, expand=True, fill=True, padding=0)
         self.grab_focus = lambda: self.hook.get_focus(self._listview)
         self.pack_start(vbox, True, True, 0)
 
