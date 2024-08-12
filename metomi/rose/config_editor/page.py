@@ -195,7 +195,7 @@ class ConfigPage(Gtk.Box):
         label_box.pack_start(label_event_box, expand=False, fill=False,
                              padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
         if not is_detached:
-            label_box.pack_end(close_button, expand=False, fill=False)
+            label_box.pack_end(close_button, expand=False, fill=False, padding=0)
         label_box.show()
         event_box = Gtk.EventBox()
         event_box.add(label_box)
