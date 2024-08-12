@@ -31,7 +31,7 @@ import metomi.rose.gtk.util
 from functools import cmp_to_key
 
 
-class BaseSummaryDataPanel(Gtk.VBox):
+class BaseSummaryDataPanel(Gtk.Box):
 
     """A base class for summarising data across many namespaces.
 
@@ -165,12 +165,12 @@ class BaseSummaryDataPanel(Gtk.VBox):
         self._group_widget.add_attribute(cell, 'text', 0)
         self._group_widget.connect("changed", self._handle_group_change)
         self._group_widget.show()
-        filter_hbox = Gtk.HBox()
-        filter_hbox.pack_start(group_label, expand=False, fill=False)
-        filter_hbox.pack_start(self._group_widget, expand=False, fill=False)
+        filter_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        filter_hbox.pack_start(group_label, expand=False, fill=False, padding=0)
+        filter_hbox.pack_start(self._group_widget, expand=False, fill=False, padding=0)
         filter_hbox.pack_start(filter_label, expand=False, fill=False,
                                padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
-        filter_hbox.pack_start(self._filter_widget, expand=False, fill=False)
+        filter_hbox.pack_start(self._filter_widget, expand=False, fill=False, padding=0)
         filter_hbox.show()
         return filter_hbox
 

@@ -29,7 +29,7 @@ import metomi.rose.external
 import metomi.rose.gtk.util
 
 
-class FileChooserValueWidget(Gtk.HBox):
+class FileChooserValueWidget(Gtk.Box):
 
     """This class displays a path, with an open dialog to define a new one."""
 
@@ -95,7 +95,7 @@ class FileChooserValueWidget(Gtk.HBox):
         return False
 
 
-class FileEditorValueWidget(Gtk.HBox):
+class FileEditorValueWidget(Gtk.Box):
 
     """This class creates a button that launches an editor for a file path."""
 

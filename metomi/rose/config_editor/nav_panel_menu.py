@@ -96,7 +96,6 @@ class NavPanelHandler(object):
             config_data = self.data.config[config_name]
             return config_data.is_preview
         except KeyError:
-            print(config_name)
             return False
 
     def copy_request(self, base_ns, new_section=None, skip_update=False):

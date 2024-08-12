@@ -515,9 +515,9 @@ class BaseStashSummaryDataPanelv1(
             tip_text=self.PACKAGE_MANAGER_TIP,
             has_menu=True)
         self.control_widget_hbox.pack_end(package_button, expand=False,
-                                          fill=False)
+                                          fill=False, padding=0)
         self.control_widget_hbox.pack_end(self._add_button,
-                                          expand=False, fill=False)
+                                          expand=False, fill=False, padding=0)
         self._add_button.connect("clicked",
                                  self._launch_new_diagnostic_window)
         package_button.connect("button-press-event",

@@ -123,7 +123,7 @@ class StackViewer(Gtk.Window):
         vadj = text_scroller.get_vadjustment()
         vadj.set_value(vadj.upper - 0.9 * vadj.page_size)
         text_scroller.show()
-        vbox = Gtk.VBox()
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         label = Gtk.Label()
         if redo_mode_on:
             label.set_text('REDO STACK')
@@ -135,7 +135,7 @@ class StackViewer(Gtk.Window):
         vbox.set_border_width(metomi.rose.config_editor.SPACING_SUB_PAGE)
         vbox.pack_start(label, expand=False, fill=True,
                         padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
-        vbox.pack_start(text_scroller, expand=True, fill=True)
+        vbox.pack_start(text_scroller, expand=True, fill=True, padding=0)
         vbox.show()
         return vbox
 

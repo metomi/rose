@@ -132,7 +132,7 @@ class MainController(object):
         self.metadata_off = metadata_off
         if opt_meta_paths is None:
             opt_meta_paths = []
-        print(2)
+
         # Set page variable 'verbosity' defaults.
         self.page_var_show_modes = {
             metomi.rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION:
@@ -197,7 +197,7 @@ class MainController(object):
                 self.reporter,
                 self.tree_trigger_update
             ))
-        print(3)
+
         self.mainwindow = metomi.rose.config_editor.window.MainWindow()
 
         self.section_ops = metomi.rose.config_editor.ops.section.SectionOperations(
@@ -231,7 +231,7 @@ class MainController(object):
             self.update_ns_sub_data,
             self.reload_namespace_tree
         )
-        print(4)
+
         # Add in the main menu bar and tool bar handler.
         self.main_handle = metomi.rose.config_editor.menu.MainMenuHandler(
             self.data, self.util, self.reporter,
@@ -276,14 +276,10 @@ class MainController(object):
                        config_obj_type_dict=config_obj_types,
                        load_all_apps=load_all_apps,
                        load_no_apps=load_no_apps)
-        print(str(threading.get_ident())+"5")
-        print(metomi.rose.config_editor.EVENT_LOAD_STATUSES.format(
-                self.data.top_level_name))
         self.reporter.report_load_event(
             metomi.rose.config_editor.EVENT_LOAD_STATUSES.format(
                 self.data.top_level_name)
         )
-        print(5.1)
         if not self.is_pluggable:
             self.generate_toolbar()
             self.generate_menubar()
@@ -291,12 +287,9 @@ class MainController(object):
             self.generate_status_bar()
             # Create notebook (tabbed container) and connect signals.
             self.notebook = metomi.rose.gtk.util.Notebook()
-        print(5.2)
         self.updater.nav_panel = getattr(self, "nav_panel", None)
-        print(6)
         # Create the main panel with the menu, toolbar, tree panel, notebook.
         if not self.is_pluggable:
-            print(7)
             self.mainwindow.load(name=self.data.top_level_name,
                                  menu=self.top_menu,
                                  accelerators=self.menubar.accelerators,
@@ -306,7 +299,6 @@ class MainController(object):
                                  notebook=self.notebook,
                                  page_change_func=self.handle_page_change,
                                  save_func=self.save_to_file)
-            print(8)
             self.mainwindow.window.connect('destroy', self.main_handle.destroy)
             self.mainwindow.window.connect('delete-event',
                                            self.main_handle.destroy)
@@ -1875,7 +1867,6 @@ def spawn_window(config_directory_path=None, debug_mode=False,
         title = config_directory_path.split("/")[-1]
     splash_screen = metomi.rose.gtk.splash.SplashScreenProcess(logo, title,
                                                         number_of_events)
-    print("We are now here.")
     try:
         ctrl = MainController(config_directory_path,
                               load_updater=splash_screen,
@@ -1887,7 +1878,7 @@ def spawn_window(config_directory_path=None, debug_mode=False,
     except BaseException:
         splash_screen.stop()
         raise
-    print("1-------")
+
     # open up any initial_namespaces the user has provided us with
     if initial_namespaces:
         # if the namespace ends with a / remove it
@@ -1926,9 +1917,7 @@ def spawn_window(config_directory_path=None, debug_mode=False,
                                                  True, "main")
     Gtk.Settings.get_default().set_long_property("gtk-menu-images",
                                                  True, "main")
-    print("At the end of spawn window")
     splash_screen.stop()
-    print("After splash stop")
     Gtk.main()
 
 

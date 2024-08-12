@@ -57,7 +57,6 @@ class StatusReporter(metomi.rose.reporter.Reporter):
     def event_handler(self, message, kind=None, level=None, prefix=None,
                       clip=None):
         """Handle a message or event."""
-        print(1000)
         message_kwargs = {}
         if isinstance(message, metomi.rose.reporter.Event):
             if kind is None:
@@ -66,11 +65,8 @@ class StatusReporter(metomi.rose.reporter.Reporter):
                 level = message.level
             message_kwargs = message.kwargs
         if kind == self.EVENT_KIND_LOAD and not self._no_load:
-            print(str(threading.get_ident())+" 1001")
             ret = self._load_updater.update(str(message), **message_kwargs)
-            print(str(threading.get_ident())+" 1001---")
             return ret
-        print(1002)
         return self._status_bar_update_func(message, kind, level)
 
     def report_load_event(
@@ -80,9 +76,7 @@ class StatusReporter(metomi.rose.reporter.Reporter):
                                     kind=self.EVENT_KIND_LOAD,
                                     no_progress=no_progress,
                                     new_total_events=new_total_events)
-        print("Status 1")
         self.report(event)
-        print("Status 1-1")
 
     def set_no_load(self):
         self._no_load = True
@@ -92,7 +86,7 @@ class StatusReporter(metomi.rose.reporter.Reporter):
         self._load_updater.stop()
 
 
-class StatusBar(Gtk.VBox):
+class StatusBar(Gtk.Box):
 
     """Generate the status bar widget."""
 
@@ -101,7 +95,7 @@ class StatusBar(Gtk.VBox):
         self.verbosity = verbosity
         self.num_errors = 0
         self.console = None
-        hbox = Gtk.HBox()
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         hbox.show()
         self.pack_start(hbox, expand=False, fill=False, padding=0)
         self._generate_error_widget()
@@ -147,7 +141,7 @@ class StatusBar(Gtk.VBox):
 
     def _generate_error_widget(self):
         # Generate the error display widget.
-        self._error_widget = Gtk.HBox()
+        self._error_widget = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self._error_widget.show()
         locator = metomi.rose.resource.ResourceLocator(paths=sys.path)
         icon_path = locator.locate(
@@ -166,7 +160,7 @@ class StatusBar(Gtk.VBox):
         # Generate the message display widget.
         self._message_widget = Gtk.EventBox()
         self._message_widget.show()
-        message_hbox = Gtk.HBox()
+        message_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         message_hbox.show()
         self._message_widget.add(message_hbox)
         self._message_widget.connect("enter-notify-event",
