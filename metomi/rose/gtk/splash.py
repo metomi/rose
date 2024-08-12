@@ -36,7 +36,7 @@ from gi.repository import Pango
 import metomi.rose.gtk.util
 import metomi.rose.popen
 
-GObject.threads_init()
+# GObject.threads_init()
 
 
 class SplashScreen(Gtk.Window):
@@ -94,7 +94,6 @@ class SplashScreen(Gtk.Window):
 
     def update(self, event, no_progress=False, new_total_events=None):
         """Show text corresponding to an event."""
-        #print(str(threading.get_ident())+"update")
         text = str(event)
         if new_total_events is not None:
             self.total_number_of_events = new_total_events
@@ -108,24 +107,18 @@ class SplashScreen(Gtk.Window):
         else:
             fraction = min(
                 [1.0, self.event_count / self.total_number_of_events])
-        #print(str(threading.get_ident())+"update 2")
         self._stop_pulse()
-        #print(str(threading.get_ident())+"update 3")
         if not no_progress:
             GObject.idle_add(self.progress_bar.set_fraction, fraction)
             self._progress_fraction = fraction
-        #print(str(threading.get_ident())+"update 4")
         self.progress_bar.set_text(text)
         self._progress_message = text
         GObject.timeout_add(self.TIME_IDLE_BEFORE_PULSE,
                             self._start_pulse, fraction, text)
-        #print(str(threading.get_ident())+"update 5")
         if fraction == 1.0 and not no_progress:
             GObject.timeout_add(self.TIME_WAIT_FINISH, self.finish)
-        #print(str(threading.get_ident())+"update 6")
         while Gtk.events_pending():
             Gtk.main_iteration()
-        #print(str(threading.get_ident())+"update 7")
 
     def _start_pulse(self, idle_fraction, idle_message):
         """Start the progress bar pulsing (moving side-to-side)."""
@@ -198,23 +191,13 @@ class SplashScreenProcess(object):
             return self._update_buffered(*args, **kwargs)
         self._flush_buffer()
         json_text = json.dumps({"args": args, "kwargs": kwargs})
-        #print(str(threading.get_ident())+"splash L201")
-        #print(str(threading.get_ident())+json_text)
         self._communicate(json_text)
 
     def _communicate(self, json_text):
-        # breakpoint()
         while True:
-            #print(str(threading.get_ident())+"COMMUNICATING")
-            #print(str(threading.get_ident())+json_text)
             try:
-                # what to do with this - got a ValueError not IOError
-                # because the file end was reached
-                # self.start()
                 self.process.stdin.write((json_text + "\n").encode())
-                #print(str(threading.get_ident())+"COMMUNICATING AHHHHHHHHHH")
             except IOError:
-                #print(str(threading.get_ident())+"aghhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
                 self.start()
                 self.process.stdin.write((json_text + "\n").encode())
             else:
@@ -238,21 +221,10 @@ class SplashScreenProcess(object):
     __call__ = update
 
     def start(self):
-        #print(str(threading.get_ident())+"STARTING------------------------------------")
         self.process = Popen(["rose", "launch-splash-screen"] + list(self.args), stdin=PIPE)
 
     def stop(self):
-        print("Inside splash stop")
-        if self.process is not None and not self.process.stdin.closed:
-            try:
-                print("Inside splash stop try")
-                #print(str(threading.get_ident())+" STOPPING------------------------------------")
-                print((json.dumps("stop") + "\n"))
-                self.process.stdin.write((json.dumps("stop") + "\n").encode())
-                print("Inside splash stop try - completed FINE")
-            except IOError:
-                pass
-        # self.process.kill()
+        self.process.kill()
         self.process = None
 
 
@@ -268,51 +240,29 @@ class SplashScreenUpdaterThread(threading.Thread):
 
     def run(self):
         """Loop over time and wait for stdin lines."""
-        #print(str(threading.get_ident())+"Update 100")
-        # breakpoint()
         GObject.timeout_add(1000, self._check_splash_screen_alive)
         while not self.stop_event.is_set():
             time.sleep(0.005)
             if self.stop_event.is_set():
-                #print(str(threading.get_ident())+" 123")
                 return False
             try:
-                print(str(threading.get_ident())+" std_line")
                 stdin_line = self.stdin.readline()
-                print(stdin_line)
-                # if not stdin_line:
-                #     continue
-                #print(str(threading.get_ident())+"stdin_line")
+                if not stdin_line:
+                    continue
             except IOError:
                 continue
-            # if len(stdin_line) == 0:
-            #     #print(str(threading.get_ident())+"HIT HIT HTO")
-            #     # update_input = "stop"
-            #     # self._stop()
-            #     continue
             try:
-                # #print(str(threading.get_ident())+12345)
                 update_input = json.loads(stdin_line.strip())
-                print(str(threading.get_ident())+" " +str(update_input))
-                # #print(str(threading.get_ident())+repr(update_input))
-                # #print(str(threading.get_ident())+len(update_input))
             except ValueError:
                 continue
-            # if len(stdin_line) == 0:
-            #     update_input = "stop"
             if update_input == "stop":
-                print(str(threading.get_ident())+" stop message received")
-                self._stop()
+                self.stop_event.set()
                 continue
             GObject.idle_add(self._update_splash_screen, update_input)
-        #print(str(threading.get_ident())+" Update 1001")
         
-    def _stop(self):
-        print(str(threading.get_ident())+" Inside _stop in splash")
-        self.stop_event.set()
+    def stop(self):
         try:
             Gtk.main_quit()
-            print(str(threading.get_ident())+" Inside _stop in splash - splash was quit")
         except RuntimeError:
             # This can result from gtk having already quit.
             pass
@@ -326,7 +276,6 @@ class SplashScreenUpdaterThread(threading.Thread):
 
     def _update_splash_screen(self, update_input):
         """Update the splash screen with info extracted from stdin."""
-        #print(str(threading.get_ident())+" _update_splash_screen")
         self.window.update(*update_input["args"], **update_input["kwargs"])
         return False
 
@@ -344,8 +293,6 @@ def main(argv=sys.argv):
     except KeyboardInterrupt:
         pass
     finally:
-        "FINALLY SPLASH +++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        stop_event.set()
         update_thread.join()
 
 

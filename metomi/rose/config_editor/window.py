@@ -31,6 +31,8 @@ import metomi.rose.gtk.dialog
 import metomi.rose.gtk.util
 import metomi.rose.resource
 
+import threading
+
 
 REC_SPLIT_MACRO_TEXT = re.compile(
     '(.{' + str(metomi.rose.config_editor.DIALOG_BODY_MACRO_CHANGES_MAX_LENGTH) +
