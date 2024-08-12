@@ -101,7 +101,7 @@ class VariableWidget(object):
         self.labelwidget = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.labelwidget.show()
         self.labelwidget.set_ignored = self.keywidget.set_ignored
-        menu_offset = self.menuwidget.size_request()[1] / 2
+        menu_offset = self.menuwidget.get_preferred_size().natural_size.height / 2
         key_offset = self.keywidget.get_centre_height() / 2
         menu_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         menu_vbox.pack_start(self.menuwidget, expand=False, fill=False,
