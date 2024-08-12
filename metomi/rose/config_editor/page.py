@@ -426,13 +426,14 @@ class ConfigPage(Gtk.Box):
             help_label_window.add_with_viewport(help_label_vbox)
             help_label_window.get_child().set_shadow_type(Gtk.ShadowType.NONE)
             help_label_window.show()
-            width, height = help_label_window.size_request()
+            width = help_label_window.get_preferred_size().natural_size.width
+            height = help_label_window.get_preferred_size().natural_size.height
             if info == "Blank page - no data":
                 self.main_vpaned.set_position(
                     metomi.rose.config_editor.SIZE_WINDOW[1] * 100)
             else:
                 height = min([metomi.rose.config_editor.SIZE_WINDOW[1] / 3,
-                              help_label.size_request()[1]])
+                              help_label.get_preferred_size().natural_size.height])
             help_label_window.set_size_request(width, height)
             help_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
             help_hbox.pack_start(help_label_window, expand=True, fill=True,
