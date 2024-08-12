@@ -266,7 +266,7 @@ class ChoicesTreeView(Gtk.TreeView):
         col = Gtk.TreeViewColumn()
         col.set_title(title)
         cell_text = Gtk.CellRendererText()
-        col.pack_start(cell_text, True, True, 0)
+        col.pack_start(cell_text, True)
         col.set_cell_data_func(cell_text, self._set_cell_text)
         self.append_column(col)
         self.set_expander_column(col)

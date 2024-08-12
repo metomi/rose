@@ -756,7 +756,7 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
     def add_cell_renderer_for_value(self, col, col_title):
         """Add a CellRendererText for the column."""
         cell_for_value = Gtk.CellRendererText()
-        col.pack_start(cell_for_value, True, True, 0)
+        col.pack_start(cell_for_value, True)
         col.set_cell_data_func(cell_for_value,
                                self._set_tree_cell_value)
 
