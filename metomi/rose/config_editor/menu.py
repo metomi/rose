@@ -394,7 +394,7 @@ class MainMenuHandler(object):
 
     def get_orphan_container(self, page):
         """Return a container with the page object inside."""
-        box = Gtk.VBox()
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         box.pack_start(page, expand=True, fill=True)
         box.show()
         return box
@@ -601,7 +601,7 @@ class MainMenuHandler(object):
             entries[key] = entry
             labels[key] = label
             table.attach(entry, 1, 2, i, i + 1)
-            hbox = Gtk.HBox()
+            hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
             hbox.pack_start(label, False, True, 0)
             table.attach(hbox, 0, 1, i, i + 1)
         dialog.show_all()

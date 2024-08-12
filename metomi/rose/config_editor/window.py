@@ -107,7 +107,7 @@ class MainWindow(object):
         self.window.set_default_size(*metomi.rose.config_editor.SIZE_WINDOW)
         self.window.set_destroy_with_parent(False)
         self.save_func = save_func
-        self.top_vbox = Gtk.VBox()
+        self.top_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.log_window = None  # The stack viewer.
         self.window.add(self.top_vbox)
         # Load the menu bar
@@ -196,13 +196,13 @@ class MainWindow(object):
         section_box.connect(
             "changed",
             lambda s: ok_button.set_sensitive(bool(s.get_text())))
-        vbox = Gtk.VBox(spacing=10)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         vbox.pack_start(config_label, expand=False, fill=False, padding=5)
         vbox.pack_start(config_name_box, expand=False, fill=False, padding=5)
         vbox.pack_start(label, expand=False, fill=False, padding=5)
         vbox.pack_start(section_box, expand=False, fill=False, padding=5)
         vbox.show()
-        hbox = Gtk.HBox(spacing=10)
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         hbox.pack_start(vbox, expand=True, fill=True, padding=10)
         hbox.show()
         add_dialog.vbox.pack_start(hbox, True, True, 0)
@@ -315,7 +315,7 @@ class MainWindow(object):
         if config_name_box.get_active() == -1:
             config_name_box.set_active(0)
         config_name_box.show()
-        section_box = Gtk.VBox()
+        section_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         section_box.show()
         null_section_checkbutton = Gtk.CheckButton(
             metomi.rose.config_editor.DIALOG_LABEL_NULL_SECTION)
@@ -337,7 +337,7 @@ class MainWindow(object):
                 section_box,
                 name_section_dict[name_keys[c.get_active()]],
                 prefs.get(name_keys[c.get_active()], [])))
-        vbox = Gtk.VBox(spacing=metomi.rose.config_editor.SPACING_PAGE)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=metomi.rose.config_editor.SPACING_PAGE)
         vbox.pack_start(config_label, expand=False, fill=False)
         vbox.pack_start(config_name_box, expand=False, fill=False)
         vbox.pack_start(section_label, expand=False, fill=False)
@@ -360,7 +360,7 @@ class MainWindow(object):
             target_section_entry.show()
             vbox.pack_start(target_section_entry, expand=False, fill=False)
         vbox.show()
-        hbox = Gtk.HBox()
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         hbox.pack_start(vbox, expand=True, fill=True,
                         padding=metomi.rose.config_editor.SPACING_PAGE)
         hbox.show()
@@ -434,7 +434,7 @@ class MainWindow(object):
         dialog, container, name_entry = metomi.rose.gtk.dialog.get_naming_dialog(
             label, checker_function, ok_tip_text, err_tip_text)
         dialog.set_title(metomi.rose.config_editor.DIALOG_TITLE_CONFIG_CREATE)
-        meta_hbox = Gtk.HBox()
+        meta_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         meta_label = Gtk.Label(label=
             metomi.rose.config_editor.DIALOG_LABEL_CONFIG_CHOOSE_META)
         meta_label.show()
@@ -644,7 +644,7 @@ class MacroChangesDialog(Gtk.Dialog):
             stock_id = Gtk.STOCK_CONVERT
         image = Gtk.Image.new_from_stock(stock_id, Gtk.IconSize.LARGE_TOOLBAR)
         image.show()
-        hbox = Gtk.HBox()
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         hbox.pack_start(image, expand=False, fill=False,
                         padding=metomi.rose.config_editor.SPACING_PAGE)
         hbox.pack_start(self.label, expand=False, fill=False,

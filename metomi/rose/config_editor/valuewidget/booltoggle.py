@@ -25,7 +25,7 @@ from gi.repository import Gtk
 import metomi.rose
 
 
-class BoolToggleValueWidget(Gtk.HBox):
+class BoolToggleValueWidget(Gtk.Box):
 
     """Produces a 'true' and 'false' labelled toggle button."""
 

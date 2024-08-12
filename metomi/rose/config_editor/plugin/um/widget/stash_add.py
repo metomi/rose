@@ -30,7 +30,7 @@ import metomi.rose.gtk.util
 import metomi.rose.config_editor.plugin.um.widget.stash_util as stash_util
 
 
-class AddStashDiagnosticsPanelv1(Gtk.VBox):
+class AddStashDiagnosticsPanelv1(Gtk.Box):
 
     """Display a grouped set of stash requests to add."""
 
@@ -82,7 +82,7 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
         info.
 
         """
-        super(AddStashDiagnosticsPanelv1, self).__init__(self)
+        super(AddStashDiagnosticsPanelv1, self).__init__(self, orientation=Gtk.Orientation.VERTICAL)
         self.set_property("homogeneous", False)
         self.stash_lookup = stash_lookup
         self.request_lookup = request_lookup
@@ -437,15 +437,15 @@ class AddStashDiagnosticsPanelv1(Gtk.VBox):
             has_menu=True)
         self._view_button.connect("button-press-event",
                                   self._popup_view_menu)
-        filter_hbox = Gtk.HBox()
-        filter_hbox.pack_start(group_label, expand=False, fill=False)
-        filter_hbox.pack_start(self._group_widget, expand=False, fill=False)
+        filter_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        filter_hbox.pack_start(group_label, expand=False, fill=False, padding=0)
+        filter_hbox.pack_start(self._group_widget, expand=False, fill=False, padding=0)
         filter_hbox.pack_start(filter_label, expand=False, fill=False,
                                padding=10)
-        filter_hbox.pack_start(self._filter_widget, expand=False, fill=False)
-        filter_hbox.pack_end(self._view_button, expand=False, fill=False)
-        filter_hbox.pack_end(self._refresh_button, expand=False, fill=False)
-        filter_hbox.pack_end(self._add_button, expand=False, fill=False)
+        filter_hbox.pack_start(self._filter_widget, expand=False, fill=False, padding=0)
+        filter_hbox.pack_end(self._view_button, expand=False, fill=False, padding=0)
+        filter_hbox.pack_end(self._refresh_button, expand=False, fill=False, padding=0)
+        filter_hbox.pack_end(self._add_button, expand=False, fill=False, padding=0)
         filter_hbox.show()
         return filter_hbox
 

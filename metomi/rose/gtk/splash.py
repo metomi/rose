@@ -60,11 +60,11 @@ class SplashScreen(Gtk.Window):
                        metomi.rose.gtk.util.color_parse(self.BACKGROUND_COLOUR))
         self.set_gravity(5) # same as gravity center
         self.set_position(Gtk.WindowPosition.CENTER)
-        main_vbox = Gtk.VBox()
+        main_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         main_vbox.show()
         image = Gtk.Image.new_from_file(logo_path)
         image.show()
-        image_hbox = Gtk.HBox()
+        image_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         image_hbox.show()
         image_hbox.pack_start(image, expand=False, fill=True, padding=0)
         main_vbox.pack_start(image_hbox, expand=False, fill=True, padding=0)
@@ -78,7 +78,7 @@ class SplashScreen(Gtk.Window):
         self._progress_message = None
         self.event_count = 0.0
         self.total_number_of_events = float(total_number_of_events)
-        progress_hbox = Gtk.HBox(spacing=self.SUB_PADDING)
+        progress_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=self.SUB_PADDING)
         progress_hbox.show()
         progress_hbox.pack_start(self.progress_bar, expand=True, fill=True,
                                  padding=self.SUB_PADDING)

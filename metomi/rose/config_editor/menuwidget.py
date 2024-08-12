@@ -28,7 +28,7 @@ import metomi.rose.gtk.dialog
 import metomi.rose.gtk.util
 
 
-class MenuWidget(Gtk.HBox):
+class MenuWidget(Gtk.Box):
 
     """This class generates a button with a menu for variable actions."""
 
