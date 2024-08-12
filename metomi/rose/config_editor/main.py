@@ -53,7 +53,7 @@ warnings.filterwarnings('ignore',
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 
 import metomi.rose.config
 import metomi.rose.config_editor
@@ -1992,6 +1992,17 @@ def main():
     if opts.new_mode:
         cwd = None
     metomi.rose.gtk.dialog.set_exception_hook_dialog(keep_alive=True)
+
+    screen = Gdk.Screen.get_default()
+    provider = Gtk.CssProvider()
+    style_context = Gtk.StyleContext()
+    style_context.add_provider_for_screen(
+            screen, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
+    locator = metomi.rose.resource.ResourceLocator(paths=sys.path)
+    css_path = locator.locate('etc/rose-config-edit/style.css')
+    provider.load_from_path(str(css_path))
+
     if opts.profile_mode:
         handle = tempfile.NamedTemporaryFile()
         cProfile.runctx("""spawn_window(cwd, debug_mode=opts.debug_mode,

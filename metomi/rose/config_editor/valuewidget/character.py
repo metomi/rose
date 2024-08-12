@@ -58,9 +58,6 @@ class QuotedTextValueWidget(Gtk.Box):
         self.set_value = set_value
         self.hook = hook
         self.entry = Gtk.Entry()
-        insensitive_colour = Gtk.Style().bg[0]
-        self.entry.modify_bg(Gtk.StateType.INSENSITIVE,
-                             insensitive_colour)
         self.in_error = not self.type_checker(self.value)
         self.set_entry_text()
         self.entry.connect("button-release-event",
