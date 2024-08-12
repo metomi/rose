@@ -31,7 +31,7 @@ import metomi.rose.gtk.dialog
 import metomi.rose.gtk.util
 import metomi.rose.resource
 
-import threading
+from functools import cmp_to_key
 
 
 REC_SPLIT_MACRO_TEXT = re.compile(
@@ -399,7 +399,7 @@ class MainWindow(object):
     def _reload_section_choices(self, vbox, sections, prefs):
         for child in vbox.get_children():
             vbox.remove(child)
-        sections.sort(metomi.rose.config.sort_settings)
+        sections.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         section_chooser = Gtk.ComboBoxText()
         for k, section in enumerate(sections):
             section_chooser.append_text(section)
@@ -711,9 +711,9 @@ class MacroChangesDialog(Gtk.Dialog):
             text = (text.rstrip() + " " +
                     extra_text.format(nums_is_warning[True]))
         self.label.set_markup(text)
-        changes.sort(lambda x, y: cmp(x.option, y.option))
-        changes.sort(lambda x, y: cmp(x.section, y.section))
-        changes.sort(lambda x, y: cmp(x.is_warning, y.is_warning))
+        changes.sort(key=lambda x: x.option)
+        changes.sort(key=lambda x: x.section)
+        changes.sort(key=lambda x: x.is_warning)
         last_section = None
         last_section_iter = None
         for item in changes:

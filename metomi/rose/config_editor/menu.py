@@ -42,6 +42,8 @@ import metomi.rose.popen
 # import metomi.rose.suite_control
 # import metomi.rose.suite_engine_proc
 
+from functools import cmp_to_key
+
 
 class MenuBar(object):
 
@@ -517,7 +519,7 @@ class MainMenuHandler(object):
         for config_name in self.data.config:
             config_data = self.data.config[config_name]
             config_sect_dict[config_name] = list(config_data.sections.now.keys())
-            config_sect_dict[config_name].sort(metomi.rose.config.sort_settings)
+            config_sect_dict[config_name].sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         config_name, section = self.mainwindow.launch_graph_dialog(
             config_sect_dict)
         if config_name is None:

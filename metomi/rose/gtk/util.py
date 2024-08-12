@@ -538,9 +538,9 @@ class TreeModelSortUtil(object):
         """Perform a useful form of 'cmp'"""
         if (isinstance(value1, str) and isinstance(value2, str)):
             if value1.isdigit() and value2.isdigit():
-                return cmp(float(value1), float(value2))
+                return (float(value1) > float(value2)) - (float(value1) < float(value2))
             return metomi.rose.config.sort_settings(value1, value2)
-        return cmp(value1, value2)
+        return (value1 > value2) - (value1 < value2)
 
     def handle_sort_column_change(self, model):
         """Store previous sorting information for multi-column sorts."""
