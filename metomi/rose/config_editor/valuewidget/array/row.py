@@ -30,7 +30,7 @@ import metomi.rose.gtk.util
 import metomi.rose.variable
 
 
-class RowArrayValueWidget(Gtk.HBox):
+class RowArrayValueWidget(Gtk.Box):
 
     """This is a class to represent a value as part of a row."""
 
@@ -288,7 +288,7 @@ class RowArrayValueWidget(Gtk.HBox):
             value_index = unwrapped_index
             if (not isinstance(self.type, list) and
                     value_index >= len(self.value_array)):
-                widget = Gtk.HBox()
+                widget = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
                 eb0 = Gtk.EventBox()
                 eb0.show()
                 widget.pack_start(eb0, expand=True, fill=True)
@@ -419,7 +419,7 @@ class RowArrayValueWidget(Gtk.HBox):
                                 lambda b, e: b.set_state(Gtk.StateType.ACTIVE))
         self.add_button.connect('leave-notify-event',
                                 lambda b, e: b.set_state(Gtk.StateType.NORMAL))
-        self.add_del_button_box = Gtk.VBox()
+        self.add_del_button_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.add_del_button_box.pack_start(
             self.add_button, expand=False, fill=False)
         self.add_del_button_box.pack_start(

@@ -31,7 +31,7 @@ ENV_COLOUR = metomi.rose.gtk.util.color_parse(
     metomi.rose.config_editor.COLOUR_VARIABLE_TEXT_VAL_ENV)
 
 
-class RawValueWidget(Gtk.HBox):
+class RawValueWidget(Gtk.Box):
 
     """This class generates a basic entry widget for an unformatted value."""
 
@@ -90,7 +90,7 @@ class RawValueWidget(Gtk.HBox):
         return False
 
 
-class TextMultilineValueWidget(Gtk.HBox):
+class TextMultilineValueWidget(Gtk.Box):
 
     """This class displays text with multiple lines."""
 

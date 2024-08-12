@@ -29,7 +29,7 @@ import metomi.rose.gtk.util
 import metomi.rose.variable
 
 
-class SpacedListValueWidget(Gtk.HBox):
+class SpacedListValueWidget(Gtk.Box):
 
     """This is a class to represent a list separated by spaces."""
 
@@ -168,7 +168,7 @@ class SpacedListValueWidget(Gtk.HBox):
         right_event_box.connect('enter-notify-event', self._handle_arrow_enter)
         right_event_box.connect('leave-notify-event', self._handle_arrow_leave)
         right_event_box.set_tooltip_text(self.TIP_RIGHT)
-        self.arrow_box = Gtk.HBox()
+        self.arrow_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.arrow_box.show()
         self.arrow_box.pack_start(left_event_box, expand=False, fill=False)
         self.arrow_box.pack_end(right_event_box, expand=False, fill=False)
@@ -186,7 +186,7 @@ class SpacedListValueWidget(Gtk.HBox):
                                 lambda b, e: b.set_state(Gtk.StateType.ACTIVE))
         self.del_button.connect('leave-notify-event',
                                 lambda b, e: b.set_state(Gtk.StateType.NORMAL))
-        self.button_box = Gtk.HBox()
+        self.button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.button_box.show()
         self.button_box.pack_start(self.arrow_box, expand=False, fill=True)
         add_image = Gtk.Image.new_from_stock(Gtk.STOCK_ADD, Gtk.IconSize.MENU)
@@ -201,7 +201,7 @@ class SpacedListValueWidget(Gtk.HBox):
                                 lambda b, e: b.set_state(Gtk.StateType.ACTIVE))
         self.add_button.connect('leave-notify-event',
                                 lambda b, e: b.set_state(Gtk.StateType.NORMAL))
-        self.add_del_button_box = Gtk.VBox()
+        self.add_del_button_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.add_del_button_box.pack_start(
             self.add_button, expand=False, fill=False)
         self.add_del_button_box.pack_start(
@@ -304,7 +304,7 @@ class SpacedListValueWidget(Gtk.HBox):
             for col, label in enumerate(self.metadata['element-titles']):
                 if col >= len(table_widgets) - 1:
                     break
-                widget = Gtk.HBox()
+                widget = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
                 label = Gtk.Label(label=self.metadata['element-titles'][col])
                 label.show()
                 widget.pack_start(label, expand=True, fill=True)

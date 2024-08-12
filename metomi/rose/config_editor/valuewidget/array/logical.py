@@ -26,7 +26,7 @@ import metomi.rose.gtk.util
 import metomi.rose.variable
 
 
-class LogicalArrayValueWidget(Gtk.HBox):
+class LogicalArrayValueWidget(Gtk.Box):
 
     """This is a class to represent an array of logical or boolean types."""
 
@@ -124,7 +124,7 @@ class LogicalArrayValueWidget(Gtk.HBox):
                                 lambda b, e: b.set_state(Gtk.StateType.ACTIVE))
         self.del_button.connect('leave-notify-event',
                                 lambda b, e: b.set_state(Gtk.StateType.NORMAL))
-        self.button_box = Gtk.VBox()
+        self.button_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.button_box.show()
         self.button_box.pack_start(self.add_button, expand=False, fill=False)
         self.button_box.pack_start(self.del_button, expand=False, fill=False)
@@ -192,7 +192,7 @@ class LogicalArrayValueWidget(Gtk.HBox):
             for col, label in enumerate(self.metadata['element-titles']):
                 if col >= len(table_widgets):
                     break
-                widget = Gtk.HBox()
+                widget = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
                 label = Gtk.Label(label=self.metadata['element-titles'][col])
                 label.show()
                 widget.pack_start(label, expand=True, fill=True)

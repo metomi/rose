@@ -25,7 +25,7 @@ from gi.repository import Gtk
 import metomi.rose.config_editor
 
 
-class ComboBoxValueWidget(Gtk.HBox):
+class ComboBoxValueWidget(Gtk.Box):
 
     """This is a class to add a combo box for a set of variable values.
 

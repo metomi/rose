@@ -28,7 +28,7 @@ import metomi.rose.gtk.util
 import metomi.rose.variable
 
 
-class HintsValueWidget(Gtk.HBox):
+class HintsValueWidget(Gtk.Box):
     """This class generates a widget for entering value-hints."""
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):

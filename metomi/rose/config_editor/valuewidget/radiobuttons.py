@@ -25,7 +25,7 @@ from gi.repository import Gtk
 import metomi.rose.config_editor
 
 
-class RadioButtonsValueWidget(Gtk.HBox):
+class RadioButtonsValueWidget(Gtk.Box):
 
     """This is a class to represent a value as radio buttons."""
 
@@ -41,7 +41,7 @@ class RadioButtonsValueWidget(Gtk.HBox):
         var_titles = metadata.get(metomi.rose.META_PROP_VALUE_TITLES)
 
         if var_titles:
-            vbox = Gtk.VBox()
+            vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             self.pack_start(vbox, False, True, 0)
             vbox.show()
 

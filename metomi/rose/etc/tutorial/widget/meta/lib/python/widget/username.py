@@ -16,7 +16,7 @@ pygtk.require('2.0')
 import gtk
 
 
-class UsernameValueWidget(gtk.HBox):
+class UsernameValueWidget(Gtk.Box):
 
     """This class generates a widget for entering usernames."""
 

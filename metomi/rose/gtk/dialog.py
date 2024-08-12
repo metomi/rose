@@ -111,18 +111,18 @@ class DialogProcess(object):
         self.image = Gtk.Image.new_from_stock(stock_id,
                                               Gtk.IconSize.DIALOG)
         self.image.show()
-        image_vbox = Gtk.VBox()
-        image_vbox.pack_start(self.image, expand=False, fill=False)
+        image_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        image_vbox.pack_start(self.image, expand=False, fill=False, padding=0)
         image_vbox.show()
-        top_hbox = Gtk.HBox()
+        top_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         top_hbox.pack_start(image_vbox, expand=False, fill=False,
                             padding=DIALOG_PADDING)
         top_hbox.show()
-        hbox = Gtk.HBox()
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         hbox.pack_start(self.label, expand=False, fill=False,
                         padding=DIALOG_PADDING)
         hbox.show()
-        main_vbox = Gtk.VBox()
+        main_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         main_vbox.show()
         main_vbox.pack_start(hbox, expand=False, fill=False,
                              padding=DIALOG_SUB_PADDING)
@@ -136,7 +136,7 @@ class DialogProcess(object):
         self.cmd_label = Gtk.Label()
         self.cmd_label.set_markup("<b>" + cmd_string + "</b>")
         self.cmd_label.show()
-        cmd_hbox = Gtk.HBox()
+        cmd_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         cmd_hbox.pack_start(self.cmd_label, expand=False, fill=False,
                             padding=DIALOG_PADDING)
         cmd_hbox.show()
@@ -146,7 +146,7 @@ class DialogProcess(object):
         self.progress_bar = Gtk.ProgressBar()
         self.progress_bar.set_pulse_step(0.1)
         self.progress_bar.show()
-        hbox = Gtk.HBox()
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         hbox.pack_start(self.progress_bar, expand=True, fill=True,
                         padding=DIALOG_PADDING)
         hbox.show()
@@ -155,7 +155,7 @@ class DialogProcess(object):
         top_hbox.pack_start(main_vbox, expand=True, fill=True,
                             padding=DIALOG_PADDING)
         if self.event_queue is None:
-            self.dialog.vbox.pack_start(top_hbox, expand=True, fill=True)
+            self.dialog.vbox.pack_start(top_hbox, expand=True, fill=True, padding=0)
         else:
             text_view_scroll = Gtk.ScrolledWindow()
             text_view_scroll.set_policy(Gtk.PolicyType.NEVER,
@@ -301,8 +301,8 @@ def run_command_arg_dialog(cmd_name, help_text, run_hook):
     help_button.connect(
         "clicked",
         lambda b: run_scrolled_dialog(help_text, title=help_label))
-    help_hbox = Gtk.HBox()
-    help_hbox.pack_start(help_button, expand=False, fill=False)
+    help_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+    help_hbox.pack_start(help_button, expand=False, fill=False, padding=0)
     help_hbox.show()
     container.pack_end(help_hbox, expand=False, fill=False)
     name_entry.grab_focus()
@@ -364,10 +364,10 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     else:
         dialog.label.set_markup(text)
     dialog.label.show()
-    hbox = Gtk.HBox()
+    hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
     if stock_id is not None:
-        image_vbox = Gtk.VBox()
+        image_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         image_vbox.pack_start(dialog.image, expand=False, fill=False,
                               padding=DIALOG_PADDING)
         image_vbox.show()
@@ -377,8 +377,8 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     scrolled_window = Gtk.ScrolledWindow()
     scrolled_window.set_border_width(0)
     scrolled_window.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER)
-    vbox = Gtk.VBox()
-    vbox.pack_start(dialog.label, expand=True, fill=True)
+    vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+    vbox.pack_start(dialog.label, expand=True, fill=True, padding=0)
     vbox.show()
     scrolled_window.add_with_viewport(vbox)
     scrolled_window.get_child().set_shadow_type(Gtk.ShadowType.NONE)
@@ -386,7 +386,7 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     hbox.pack_start(scrolled_window, expand=True, fill=True,
                     padding=metomi.rose.config_editor.SPACING_PAGE)
     hbox.show()
-    dialog.vbox.pack_end(hbox, expand=True, fill=True)
+    dialog.vbox.pack_end(hbox, expand=True, fill=True, padding=0)
 
     if "\n" in text:
         dialog.label.set_line_wrap(False)
@@ -422,12 +422,12 @@ def run_hyperlink_dialog(stock_id=None, text="", title=None,
     dialog.set_type_hint(Gdk.WindowTypeHint.DIALOG)
     dialog.set_title(title)
     dialog.set_modal(False)
-    top_vbox = Gtk.VBox()
+    top_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
     top_vbox.show()
-    main_hbox = Gtk.HBox(spacing=DIALOG_PADDING)
+    main_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=DIALOG_PADDING)
     main_hbox.show()
     # Insert the image
-    image_vbox = Gtk.VBox()
+    image_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
     image_vbox.show()
     image = Gtk.Image.new_from_stock(stock_id,
                                      size=Gtk.IconSize.DIALOG)
@@ -437,7 +437,7 @@ def run_hyperlink_dialog(stock_id=None, text="", title=None,
     main_hbox.pack_start(image_vbox, expand=False, fill=False,
                          padding=DIALOG_PADDING)
     # Apply the text
-    message_vbox = Gtk.VBox()
+    message_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
     message_vbox.show()
     label = metomi.rose.gtk.util.get_hyperlink_label(text, search_func)
     message_vbox.pack_start(label, expand=True, fill=True,
@@ -448,13 +448,13 @@ def run_hyperlink_dialog(stock_id=None, text="", title=None,
     scrolled_window.add_with_viewport(message_vbox)
     scrolled_window.get_child().set_shadow_type(Gtk.ShadowType.NONE)
     scrolled_window.show()
-    vbox = Gtk.VBox()
-    vbox.pack_start(scrolled_window, expand=True, fill=True)
+    vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+    vbox.pack_start(scrolled_window, expand=True, fill=True, padding=0)
     vbox.show()
-    main_hbox.pack_start(vbox, expand=True, fill=True)
-    top_vbox.pack_start(main_hbox, expand=True, fill=True)
+    main_hbox.pack_start(vbox, expand=True, fill=True, padding=0)
+    top_vbox.pack_start(main_hbox, expand=True, fill=True, padding=0)
     # Insert the button
-    button_box = Gtk.HBox(spacing=DIALOG_PADDING)
+    button_box = Gtk.Box(spacing=DIALOG_PADDING)
     button_box.show()
     button = metomi.rose.gtk.util.CustomButton(label=DIALOG_BUTTON_CLOSE,
                                         size=Gtk.IconSize.LARGE_TOOLBAR,
@@ -497,7 +497,7 @@ def run_scrolled_dialog(text, title=None):
     label.show()
     filler_eb = Gtk.EventBox()
     filler_eb.show()
-    label_box = Gtk.VBox()
+    label_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
     label_box.pack_start(label, expand=False, fill=False)
     label_box.pack_start(filler_eb, expand=True, fill=True)
     label_box.show()
@@ -512,12 +512,12 @@ def run_scrolled_dialog(text, title=None):
     button.connect("clicked", lambda b: window.destroy())
     button.show()
     button.grab_focus()
-    button_box = Gtk.HBox()
+    button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
     button_box.pack_end(button, expand=False, fill=False)
     button_box.show()
-    main_vbox = Gtk.VBox(spacing=DIALOG_SUB_PADDING)
-    main_vbox.pack_start(scrolled, expand=True, fill=True)
-    main_vbox.pack_end(button_box, expand=False, fill=False)
+    main_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=DIALOG_SUB_PADDING)
+    main_vbox.pack_start(scrolled, expand=True, fill=True, padding=0)
+    main_vbox.pack_end(button_box, expand=False, fill=False, padding=0)
     main_vbox.show()
     window.add(main_vbox)
     window.show()
@@ -535,8 +535,8 @@ def get_naming_dialog(label, checker, ok_tip=None,
     dialog.set_transient_for(parent_window)
     dialog.set_modal(True)
     ok_button = dialog.action_area.get_children()[0]
-    main_vbox = Gtk.VBox()
-    name_hbox = Gtk.HBox()
+    main_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+    name_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
     name_label = Gtk.Label()
     name_label.set_text(label)
     name_label.show()
@@ -555,7 +555,7 @@ def get_naming_dialog(label, checker, ok_tip=None,
     main_vbox.pack_start(name_hbox, expand=False, fill=True,
                          padding=DIALOG_PADDING)
     main_vbox.show()
-    hbox = Gtk.HBox()
+    hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
     hbox.pack_start(main_vbox, expand=False, fill=True,
                     padding=DIALOG_PADDING)
     hbox.show()
@@ -596,7 +596,7 @@ def run_choices_dialog(text, choices, title=None):
     else:
         label.set_markup(text)
     dialog.vbox.set_spacing(DIALOG_SUB_PADDING)
-    dialog.vbox.pack_start(label, expand=False, fill=False)
+    dialog.vbox.pack_start(label, expand=False, fill=False, padding=0)
     if len(choices) < 5:
         for i, choice in enumerate(choices):
             group = None
@@ -607,7 +607,7 @@ def run_choices_dialog(text, choices, title=None):
             radio_button = Gtk.RadioButton(group,
                                            label=choice,
                                            use_underline=False)
-            dialog.vbox.pack_start(radio_button, expand=False, fill=False)
+            dialog.vbox.pack_start(radio_button, expand=False, fill=False, padding=0)
         getter = (lambda:
                   [b.get_label() for b in radio_button.get_group()
                    if b.get_active()].pop())
@@ -616,7 +616,7 @@ def run_choices_dialog(text, choices, title=None):
         for choice in choices:
             combo_box.append_text(choice)
         combo_box.set_active(0)
-        dialog.vbox.pack_start(combo_box, expand=False, fill=False)
+        dialog.vbox.pack_start(combo_box, expand=False, fill=False, padding=0)
         getter = lambda: choices[combo_box.get_active()]
     dialog.show_all()
     response = dialog.run()

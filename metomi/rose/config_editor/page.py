@@ -39,7 +39,7 @@ import metomi.rose.resource
 import metomi.rose.variable
 
 
-class ConfigPage(Gtk.VBox):
+class ConfigPage(Gtk.Box):
 
     """Returns a container for a tab."""
 
@@ -48,7 +48,7 @@ class ConfigPage(Gtk.VBox):
                  reporter, directory=None, sub_data=None, sub_ops=None,
                  launch_info_func=None, launch_edit_func=None,
                  launch_macro_func=None):
-        super(ConfigPage, self).__init__(homogeneous=False)
+        super(ConfigPage, self).__init__(homogeneous=False, orientation=Gtk.Orientation.VERTICAL)
         self.namespace = page_metadata.get('namespace')
         self.ns_is_default = page_metadata.get('ns_is_default')
         self.config_name = page_metadata.get('config_name')
@@ -106,17 +106,17 @@ class ConfigPage(Gtk.VBox):
         self.scrolled_main_window = Gtk.ScrolledWindow()
         self.scrolled_main_window.set_policy(Gtk.PolicyType.AUTOMATIC,
                                              Gtk.PolicyType.AUTOMATIC)
-        self.scrolled_vbox = Gtk.VBox()
+        self.scrolled_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.scrolled_vbox.show()
         self.scrolled_main_window.add_with_viewport(self.scrolled_vbox)
         self.scrolled_main_window.get_child().set_shadow_type(Gtk.ShadowType.NONE)
         self.scrolled_main_window.set_border_width(
             metomi.rose.config_editor.SPACING_SUB_PAGE)
         self.scrolled_vbox.pack_start(self.main_container,
-                                      expand=False, fill=True)
+                                      expand=False, fill=True, padding=0)
         self.scrolled_main_window.show()
         self.main_vpaned = Gtk.VPaned()
-        self.info_panel = Gtk.VBox(homogeneous=False)
+        self.info_panel = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, homogeneous=False)
         self.info_panel.show()
         self.update_info()
         second_panel = None
@@ -175,7 +175,7 @@ class ConfigPage(Gtk.VBox):
                                     self._handle_enter_label)
             label_event_box.connect("leave-notify-event",
                                     self._handle_leave_label)
-        label_box = Gtk.HBox(homogeneous=False)
+        label_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, homogeneous=False)
         if self.icon_path is not None:
             self.label_icon = Gtk.Image()
             self.label_icon.set_from_file(self.icon_path)
@@ -304,12 +304,12 @@ class ConfigPage(Gtk.VBox):
     def reshuffle_for_detached(self, add_button, revert_button, parent):
         """Reshuffle widgets for detached view."""
         focus_child = getattr(self, 'focus_child')
-        button_hbox = Gtk.HBox(homogeneous=False, spacing=0)
-        self.tool_hbox = Gtk.HBox(homogeneous=False, spacing=0)
+        button_hbox = Gtk.Box(homogeneous=False, spacing=0)
+        self.tool_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, homogeneous=False, spacing=0)
         sep = Gtk.VSeparator()
         sep.show()
-        sep_vbox = Gtk.VBox()
-        sep_vbox.pack_start(sep, expand=True, fill=True)
+        sep_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        sep_vbox.pack_start(sep, expand=True, fill=True, padding=0)
         sep_vbox.set_border_width(metomi.rose.config_editor.SPACING_SUB_PAGE)
         sep_vbox.show()
         info_button = metomi.rose.gtk.util.CustomButton(
@@ -327,21 +327,21 @@ class ConfigPage(Gtk.VBox):
             as_tool=True,
             tip_text=metomi.rose.config_editor.TAB_MENU_WEB_HELP)
         url_button.connect("clicked", self.launch_url)
-        button_hbox.pack_start(add_button, expand=False, fill=False)
-        button_hbox.pack_start(revert_button, expand=False, fill=False)
-        button_hbox.pack_start(sep_vbox, expand=False, fill=False)
-        button_hbox.pack_start(info_button, expand=False, fill=False)
+        button_hbox.pack_start(add_button, expand=False, fill=False, padding=0)
+        button_hbox.pack_start(revert_button, expand=False, fill=False, padding=0)
+        button_hbox.pack_start(sep_vbox, expand=False, fill=False, padding=0)
+        button_hbox.pack_start(info_button, expand=False, fill=False, padding=0)
         if self.help is not None:
-            button_hbox.pack_start(help_button, expand=False, fill=False)
+            button_hbox.pack_start(help_button, expand=False, fill=False, padding=0)
         if self.url is not None:
-            button_hbox.pack_start(url_button, expand=False, fill=False)
+            button_hbox.pack_start(url_button, expand=False, fill=False, padding=0)
         button_hbox.show()
         button_frame = Gtk.Frame()
         button_frame.set_shadow_type(Gtk.ShadowType.NONE)
         button_frame.add(button_hbox)
         button_frame.show()
-        self.tool_hbox.pack_start(button_frame, expand=False, fill=False)
-        label_box = Gtk.HBox(homogeneous=False,
+        self.tool_hbox.pack_start(button_frame, expand=False, fill=False, padding=0)
+        label_box = Gtk.Box(homogeneous=False,
                              spacing=metomi.rose.config_editor.SPACING_PAGE)
         # Had to remove True, True, 0 in below like Ben F
         label_box.pack_start(self.get_label_widget(is_detached=True))
@@ -393,14 +393,14 @@ class ConfigPage(Gtk.VBox):
 
     def generate_page_info(self, button_list=None, label_list=None, info=None):
         """Generate a widget giving information about sections."""
-        info_container = Gtk.VBox(homogeneous=False)
+        info_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, homogeneous=False)
         info_container.show()
         if button_list is None or label_list is None or info is None:
             button_list, label_list, info = self._get_page_info_widgets()
         self._last_info_labels = [l.get_text() for l in label_list]
         for button, label in zip(button_list, label_list):
-            var_hbox = Gtk.HBox(homogeneous=False)
-            var_hbox.pack_start(button, expand=False, fill=False)
+            var_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, homogeneous=False)
+            var_hbox.pack_start(button, expand=False, fill=False, padding=0)
             var_hbox.pack_start(label, expand=False, fill=True,
                                 padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
             var_hbox.show()
@@ -412,12 +412,12 @@ class ConfigPage(Gtk.VBox):
             help_label_window = Gtk.ScrolledWindow()
             help_label_window.set_policy(Gtk.PolicyType.AUTOMATIC,
                                          Gtk.PolicyType.AUTOMATIC)
-            help_label_hbox = Gtk.HBox()
-            help_label_hbox.pack_start(help_label, expand=False, fill=False)
+            help_label_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+            help_label_hbox.pack_start(help_label, expand=False, fill=False, padding=0)
             help_label_hbox.show()
-            help_label_vbox = Gtk.VBox()
+            help_label_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             help_label_vbox.pack_start(
-                help_label_hbox, expand=False, fill=False)
+                help_label_hbox, expand=False, fill=False, padding=0)
             help_label_vbox.show()
             help_label_window.add_with_viewport(help_label_vbox)
             help_label_window.get_child().set_shadow_type(Gtk.ShadowType.NONE)
@@ -430,7 +430,7 @@ class ConfigPage(Gtk.VBox):
                 height = min([metomi.rose.config_editor.SIZE_WINDOW[1] / 3,
                               help_label.size_request()[1]])
             help_label_window.set_size_request(width, height)
-            help_hbox = Gtk.HBox()
+            help_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
             help_hbox.pack_start(help_label_window, expand=True, fill=True,
                                  padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
             help_hbox.show()
@@ -801,7 +801,7 @@ class ConfigPage(Gtk.VBox):
             self.main_container.destroy()
             self.generate_main_container()
             self.scrolled_vbox.pack_start(self.main_container, expand=False,
-                                          fill=True)
+                                          fill=True, padding=0)
             self.choose_focus(focus_var)
             self.update_ignored(no_refresh=True)
             self.trigger_update_status()
