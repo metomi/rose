@@ -29,7 +29,7 @@ import metomi.rose.gtk.util
 import metomi.rose.variable
 
 
-class SpacedListValueWidget(Gtk.HBox):
+class SpacedListValueWidget(Gtk.Box):
 
     """This is a class to represent a list separated by spaces."""
 

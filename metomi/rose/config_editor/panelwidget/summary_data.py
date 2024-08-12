@@ -29,7 +29,7 @@ import metomi.rose.config_editor.util
 import metomi.rose.gtk.util
 
 
-class BaseSummaryDataPanel(Gtk.VBox):
+class BaseSummaryDataPanel(Gtk.Box):
 
     """A base class for summarising data across many namespaces.
 

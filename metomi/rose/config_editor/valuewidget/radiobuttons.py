@@ -25,7 +25,7 @@ from gi.repository import Gtk
 import metomi.rose.config_editor
 
 
-class RadioButtonsValueWidget(Gtk.HBox):
+class RadioButtonsValueWidget(Gtk.Box):
 
     """This is a class to represent a value as radio buttons."""
 

@@ -32,7 +32,7 @@ import metomi.rose.opt_parse
 import metomi.rose.variable
 
 
-class ChoicesValueWidget(Gtk.HBox):
+class ChoicesValueWidget(Gtk.Box):
 
     """This represents a value as actual/available choices.
 

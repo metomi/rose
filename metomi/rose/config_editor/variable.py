@@ -257,7 +257,7 @@ class VariableWidget(object):
             self.valuewidget.trigger_scroll = (
                 lambda b, e: self.force_scroll(b, container))
             setattr(self, 'get_parent', lambda: container)
-        elif isinstance(container, Gtk.VBox):
+        elif isinstance(container, Gtk.Box(orientation=Gtk.Orientation.VERTICAL)):
             container.pack_start(self.labelwidget, expand=False, fill=True,
                                  padding=5)
             container.pack_start(self.contentwidget, expand=True, fill=True,

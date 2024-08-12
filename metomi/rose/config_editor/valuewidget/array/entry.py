@@ -27,7 +27,7 @@ import metomi.rose.gtk.util
 import metomi.rose.variable
 
 
-class EntryArrayValueWidget(Gtk.HBox):
+class EntryArrayValueWidget(Gtk.Box):
 
     """This is a class to represent multiple array entries."""
 

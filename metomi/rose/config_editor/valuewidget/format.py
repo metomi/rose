@@ -25,7 +25,7 @@ from gi.repository import Gtk
 import metomi.rose.config
 
 
-class FormatsChooserValueWidget(Gtk.HBox):
+class FormatsChooserValueWidget(Gtk.Box):
 
     """This class allows the addition of section names to a variable value."""
 

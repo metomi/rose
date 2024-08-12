@@ -30,7 +30,7 @@ import metomi.rose.gtk.util
 import metomi.rose.variable
 
 
-class MixedArrayValueWidget(Gtk.HBox):
+class MixedArrayValueWidget(Gtk.Box):
 
     """This is a class to represent a derived type variable as a table.
 

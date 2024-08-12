@@ -92,7 +92,7 @@ class StatusReporter(metomi.rose.reporter.Reporter):
         self._load_updater.stop()
 
 
-class StatusBar(Gtk.VBox):
+class StatusBar(Gtk.Box):
 
     """Generate the status bar widget."""
 

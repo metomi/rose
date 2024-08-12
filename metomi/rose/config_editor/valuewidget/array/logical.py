@@ -26,7 +26,7 @@ import metomi.rose.gtk.util
 import metomi.rose.variable
 
 
-class LogicalArrayValueWidget(Gtk.HBox):
+class LogicalArrayValueWidget(Gtk.Box):
 
     """This is a class to represent an array of logical or boolean types."""
 

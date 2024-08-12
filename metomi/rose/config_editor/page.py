@@ -39,7 +39,7 @@ import metomi.rose.resource
 import metomi.rose.variable
 
 
-class ConfigPage(Gtk.VBox):
+class ConfigPage(Gtk.Box):
 
     """Returns a container for a tab."""
 
@@ -116,7 +116,7 @@ class ConfigPage(Gtk.VBox):
                                       expand=False, fill=True, padding=0)
         self.scrolled_main_window.show()
         self.main_vpaned = Gtk.VPaned()
-        self.info_panel = Gtk.VBox(homogeneous=False)
+        self.info_panel = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, homogeneous=False)
         self.info_panel.show()
         self.update_info()
         second_panel = None
@@ -175,7 +175,7 @@ class ConfigPage(Gtk.VBox):
                                     self._handle_enter_label)
             label_event_box.connect("leave-notify-event",
                                     self._handle_leave_label)
-        label_box = Gtk.HBox(homogeneous=False)
+        label_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, homogeneous=False)
         if self.icon_path is not None:
             self.label_icon = Gtk.Image()
             self.label_icon.set_from_file(self.icon_path)
@@ -306,8 +306,8 @@ class ConfigPage(Gtk.VBox):
     def reshuffle_for_detached(self, add_button, revert_button, parent):
         """Reshuffle widgets for detached view."""
         focus_child = getattr(self, 'focus_child')
-        button_hbox = Gtk.HBox(homogeneous=False, spacing=0)
-        self.tool_hbox = Gtk.HBox(homogeneous=False, spacing=0)
+        button_hbox = Gtk.Box(homogeneous=False, spacing=0)
+        self.tool_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, homogeneous=False, spacing=0)
         sep = Gtk.VSeparator()
         sep.show()
         sep_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -343,7 +343,7 @@ class ConfigPage(Gtk.VBox):
         button_frame.add(button_hbox)
         button_frame.show()
         self.tool_hbox.pack_start(button_frame, expand=False, fill=False, padding=0)
-        label_box = Gtk.HBox(homogeneous=False,
+        label_box = Gtk.Box(homogeneous=False,
                              spacing=metomi.rose.config_editor.SPACING_PAGE)
         # Had to remove True, True, 0 in below like Ben F
         label_box.pack_start(self.get_label_widget(is_detached=True))
@@ -395,13 +395,13 @@ class ConfigPage(Gtk.VBox):
 
     def generate_page_info(self, button_list=None, label_list=None, info=None):
         """Generate a widget giving information about sections."""
-        info_container = Gtk.VBox(homogeneous=False)
+        info_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, homogeneous=False)
         info_container.show()
         if button_list is None or label_list is None or info is None:
             button_list, label_list, info = self._get_page_info_widgets()
         self._last_info_labels = [l.get_text() for l in label_list]
         for button, label in zip(button_list, label_list):
-            var_hbox = Gtk.HBox(homogeneous=False)
+            var_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, homogeneous=False)
             var_hbox.pack_start(button, expand=False, fill=False, padding=0)
             var_hbox.pack_start(label, expand=False, fill=True,
                                 padding=metomi.rose.config_editor.SPACING_SUB_PAGE)

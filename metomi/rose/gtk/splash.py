@@ -80,7 +80,7 @@ class SplashScreen(Gtk.Window):
         self._progress_message = None
         self.event_count = 0.0
         self.total_number_of_events = float(total_number_of_events)
-        progress_hbox = Gtk.HBox(spacing=self.SUB_PADDING)
+        progress_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=self.SUB_PADDING)
         progress_hbox.show()
         progress_hbox.pack_start(self.progress_bar, expand=True, fill=True,
                                  padding=self.SUB_PADDING)

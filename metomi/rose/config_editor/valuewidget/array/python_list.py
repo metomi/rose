@@ -30,7 +30,7 @@ import metomi.rose.gtk.util
 import metomi.rose.variable
 
 
-class PythonListValueWidget(Gtk.HBox):
+class PythonListValueWidget(Gtk.Box):
 
     """This is a class to represent a Python-compatible list format."""
 

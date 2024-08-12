@@ -424,7 +424,7 @@ def run_hyperlink_dialog(stock_id=None, text="", title=None,
     dialog.set_modal(False)
     top_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
     top_vbox.show()
-    main_hbox = Gtk.HBox(spacing=DIALOG_PADDING)
+    main_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=DIALOG_PADDING)
     main_hbox.show()
     # Insert the image
     image_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -454,7 +454,7 @@ def run_hyperlink_dialog(stock_id=None, text="", title=None,
     main_hbox.pack_start(vbox, expand=True, fill=True, padding=0)
     top_vbox.pack_start(main_hbox, expand=True, fill=True, padding=0)
     # Insert the button
-    button_box = Gtk.HBox(spacing=DIALOG_PADDING)
+    button_box = Gtk.Box(spacing=DIALOG_PADDING)
     button_box.show()
     button = metomi.rose.gtk.util.CustomButton(label=DIALOG_BUTTON_CLOSE,
                                         size=Gtk.IconSize.LARGE_TOOLBAR,
@@ -515,7 +515,7 @@ def run_scrolled_dialog(text, title=None):
     button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
     button_box.pack_end(button, expand=False, fill=False)
     button_box.show()
-    main_vbox = Gtk.VBox(spacing=DIALOG_SUB_PADDING)
+    main_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=DIALOG_SUB_PADDING)
     main_vbox.pack_start(scrolled, expand=True, fill=True, padding=0)
     main_vbox.pack_end(button_box, expand=False, fill=False, padding=0)
     main_vbox.show()

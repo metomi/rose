@@ -30,7 +30,7 @@ import metomi.rose.gtk.util
 import metomi.rose.variable
 
 
-class RowArrayValueWidget(Gtk.HBox):
+class RowArrayValueWidget(Gtk.Box):
 
     """This is a class to represent a value as part of a row."""
 

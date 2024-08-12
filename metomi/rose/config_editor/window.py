@@ -196,13 +196,13 @@ class MainWindow(object):
         section_box.connect(
             "changed",
             lambda s: ok_button.set_sensitive(bool(s.get_text())))
-        vbox = Gtk.VBox(spacing=10)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         vbox.pack_start(config_label, expand=False, fill=False, padding=5)
         vbox.pack_start(config_name_box, expand=False, fill=False, padding=5)
         vbox.pack_start(label, expand=False, fill=False, padding=5)
         vbox.pack_start(section_box, expand=False, fill=False, padding=5)
         vbox.show()
-        hbox = Gtk.HBox(spacing=10)
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         hbox.pack_start(vbox, expand=True, fill=True, padding=10)
         hbox.show()
         add_dialog.vbox.pack_start(hbox, True, True, 0)
@@ -337,7 +337,7 @@ class MainWindow(object):
                 section_box,
                 name_section_dict[name_keys[c.get_active()]],
                 prefs.get(name_keys[c.get_active()], [])))
-        vbox = Gtk.VBox(spacing=metomi.rose.config_editor.SPACING_PAGE)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=metomi.rose.config_editor.SPACING_PAGE)
         vbox.pack_start(config_label, expand=False, fill=False, padding=0)
         vbox.pack_start(config_name_box, expand=False, fill=False, padding=0)
         vbox.pack_start(section_label, expand=False, fill=False, padding=0)

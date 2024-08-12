@@ -31,7 +31,7 @@ import metomi.rose.formats
 import metomi.rose.gtk.choice
 
 
-class SourceValueWidget(Gtk.HBox):
+class SourceValueWidget(Gtk.Box):
 
     """This class generates a special widget for the file source variable.
 

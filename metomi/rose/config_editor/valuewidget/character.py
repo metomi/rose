@@ -26,7 +26,7 @@ from metomi.rose import META_PROP_TYPE
 import metomi.rose.config_editor.util
 
 
-class QuotedTextValueWidget(Gtk.HBox):
+class QuotedTextValueWidget(Gtk.Box):
 
     """This class represents 'character' and 'quoted' types in an entry."""
 

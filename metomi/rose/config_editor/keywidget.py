@@ -31,7 +31,7 @@ import metomi.rose.gtk.util
 import metomi.rose.variable
 
 
-class KeyWidget(Gtk.VBox):
+class KeyWidget(Gtk.Box):
 
     """This class generates a label or entry box for a variable name."""
 
@@ -341,7 +341,7 @@ class KeyWidget(Gtk.VBox):
                     break
         else:
             for widget in self.get_children():
-                if (isinstance(widget, Gtk.HBox) and
+                if (isinstance(widget, Gtk.Box) and
                         hasattr(widget, "_show_mode") and
                         widget._show_mode == mode):
                     self.remove(widget)
