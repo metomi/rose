@@ -59,7 +59,7 @@ class VariableWidget(object):
         if show_modes is None:
             show_modes = {}
         self.show_modes = show_modes
-        self.insensitive_colour = Gtk.Style().bg[0]
+        self.insensitive_colour = Gtk.Style.bg
         self.bad_colour = metomi.rose.gtk.util.color_parse(
             metomi.rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
         self.hidden_colour = metomi.rose.gtk.util.color_parse(
