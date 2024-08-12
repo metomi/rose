@@ -206,7 +206,8 @@ class VariableWidget(object):
         self.generate_valuewidget(variable, override_custom=True)
 
     def handle_focus_in(self, widget, event):
-        widget._first_colour = widget.style.base[Gtk.StateType.NORMAL]
+        # needs to be the new css way
+        # widget._first_colour = widget.style.base[Gtk.StateType.NORMAL]
         new_colour = metomi.rose.gtk.util.color_parse(
             metomi.rose.config_editor.COLOUR_VALUEWIDGET_BASE_SELECTED)
         widget.modify_base(Gtk.StateType.NORMAL, new_colour)
