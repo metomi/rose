@@ -55,7 +55,7 @@ class KeyWidget(Gtk.Box):
         self.my_variable = variable
         self.hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.hbox.show()
-        self.pack_start(self.hbox, expand=False, fill=False)
+        self.pack_start(self.hbox, expand=False, fill=False, padding=0)
         self.var_ops = var_ops
         self.meta = variable.metadata
         self.launch_help = launch_help_func
@@ -88,7 +88,7 @@ class KeyWidget(Gtk.Box):
         self.hbox.pack_start(event_box, expand=True, fill=True,
                              padding=0)
         self.comments_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        self.hbox.pack_start(self.comments_box, expand=False, fill=False)
+        self.hbox.pack_start(self.comments_box, expand=False, fill=False, padding=0)
         self.grab_focus = self.entry.grab_focus
         self.set_sensitive(True)
         self.set_sensitive = self._set_sensitive
@@ -378,7 +378,7 @@ class KeyWidget(Gtk.Box):
         hbox.pack_start(label, expand=False, fill=False, padding=0)
         hbox.set_sensitive(self.entry.get_property("sensitive"))
         hbox.show()
-        self.pack_start(hbox, expand=False, fill=False)
+        self.pack_start(hbox, expand=False, fill=False, padding=0)
 
     def _edit_finish_hook(self, text):
         self.var_ops.set_var_comments(self.my_variable, text.splitlines())
