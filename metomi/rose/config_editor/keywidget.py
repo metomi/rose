@@ -126,7 +126,7 @@ class KeyWidget(Gtk.Box):
 
     def get_centre_height(self):
         """Return the vertical displacement of the centre of this widget."""
-        return (self.entry.size_request()[1] / 2)
+        return (self.entry.get_preferred_size().natural_size.height / 2)
 
     def handle_launch_help(self, widget, event):
         """Handle launching help."""
