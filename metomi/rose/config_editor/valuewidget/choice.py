@@ -121,7 +121,7 @@ class ChoicesValueWidget(Gtk.HBox):
         self.hints = list(args)
 
         self.should_show_kinship = self._calc_should_show_kinship()
-        list_vbox = Gtk.VBox()
+        list_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         list_vbox.show()
         self._listview = metomi.rose.gtk.choice.ChoicesListView(
             self._set_value_listview,
@@ -131,9 +131,9 @@ class ChoicesValueWidget(Gtk.HBox):
         list_frame = Gtk.Frame()
         list_frame.show()
         list_frame.add(self._listview)
-        list_vbox.pack_start(list_frame, expand=False, fill=False)
+        list_vbox.pack_start(list_frame, expand=False, fill=False, padding=0)
         self.pack_start(list_vbox, expand=True, fill=True)
-        tree_vbox = Gtk.VBox()
+        tree_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         tree_vbox.show()
         self._treeview = metomi.rose.gtk.choice.ChoicesTreeView(
             self._set_value_treeview,
@@ -145,10 +145,10 @@ class ChoicesValueWidget(Gtk.HBox):
         tree_frame = Gtk.Frame()
         tree_frame.show()
         tree_frame.add(self._treeview)
-        tree_vbox.pack_start(tree_frame, expand=True, fill=True)
+        tree_vbox.pack_start(tree_frame, expand=True, fill=True, padding=0)
         if self.should_edit:
             add_widget = self._get_add_widget()
-            tree_vbox.pack_end(add_widget, expand=False, fill=False)
+            tree_vbox.pack_end(add_widget, expand=False, fill=False, padding=0)
         self.pack_start(tree_vbox, expand=True, fill=True)
         self._listview.connect('focus-in-event',
                                self.hook.trigger_scroll)

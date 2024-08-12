@@ -106,14 +106,14 @@ class ConfigPage(Gtk.VBox):
         self.scrolled_main_window = Gtk.ScrolledWindow()
         self.scrolled_main_window.set_policy(Gtk.PolicyType.AUTOMATIC,
                                              Gtk.PolicyType.AUTOMATIC)
-        self.scrolled_vbox = Gtk.VBox()
+        self.scrolled_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.scrolled_vbox.show()
         self.scrolled_main_window.add_with_viewport(self.scrolled_vbox)
         self.scrolled_main_window.get_child().set_shadow_type(Gtk.ShadowType.NONE)
         self.scrolled_main_window.set_border_width(
             metomi.rose.config_editor.SPACING_SUB_PAGE)
         self.scrolled_vbox.pack_start(self.main_container,
-                                      expand=False, fill=True)
+                                      expand=False, fill=True, padding=0)
         self.scrolled_main_window.show()
         self.main_vpaned = Gtk.VPaned()
         self.info_panel = Gtk.VBox(homogeneous=False)
@@ -310,8 +310,8 @@ class ConfigPage(Gtk.VBox):
         self.tool_hbox = Gtk.HBox(homogeneous=False, spacing=0)
         sep = Gtk.VSeparator()
         sep.show()
-        sep_vbox = Gtk.VBox()
-        sep_vbox.pack_start(sep, expand=True, fill=True)
+        sep_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        sep_vbox.pack_start(sep, expand=True, fill=True, padding=0)
         sep_vbox.set_border_width(metomi.rose.config_editor.SPACING_SUB_PAGE)
         sep_vbox.show()
         info_button = metomi.rose.gtk.util.CustomButton(
@@ -417,9 +417,9 @@ class ConfigPage(Gtk.VBox):
             help_label_hbox = Gtk.HBox()
             help_label_hbox.pack_start(help_label, expand=False, fill=False)
             help_label_hbox.show()
-            help_label_vbox = Gtk.VBox()
+            help_label_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             help_label_vbox.pack_start(
-                help_label_hbox, expand=False, fill=False)
+                help_label_hbox, expand=False, fill=False, padding=0)
             help_label_vbox.show()
             help_label_window.add_with_viewport(help_label_vbox)
             help_label_window.get_child().set_shadow_type(Gtk.ShadowType.NONE)
@@ -803,7 +803,7 @@ class ConfigPage(Gtk.VBox):
             self.main_container.destroy()
             self.generate_main_container()
             self.scrolled_vbox.pack_start(self.main_container, expand=False,
-                                          fill=True)
+                                          fill=True, padding=0)
             self.choose_focus(focus_var)
             self.update_ignored(no_refresh=True)
             self.trigger_update_status()

@@ -384,7 +384,7 @@ class MainMenuHandler(object):
 
     def get_orphan_container(self, page):
         """Return a container with the page object inside."""
-        box = Gtk.VBox()
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         box.pack_start(page, expand=True, fill=True)
         box.show()
         return box

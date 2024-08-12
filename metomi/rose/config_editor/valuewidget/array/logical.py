@@ -124,7 +124,7 @@ class LogicalArrayValueWidget(Gtk.HBox):
                                 lambda b, e: b.set_state(Gtk.StateType.ACTIVE))
         self.del_button.connect('leave-notify-event',
                                 lambda b, e: b.set_state(Gtk.StateType.NORMAL))
-        self.button_box = Gtk.VBox()
+        self.button_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.button_box.show()
         self.button_box.pack_start(self.add_button, expand=False, fill=False)
         self.button_box.pack_start(self.del_button, expand=False, fill=False)

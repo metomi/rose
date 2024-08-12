@@ -99,16 +99,16 @@ class VariableWidget(object):
 
     def generate_labelwidget(self):
         """Creates the label widget, a composite of key and menu widgets."""
-        self.labelwidget = Gtk.VBox()
+        self.labelwidget = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.labelwidget.show()
         self.labelwidget.set_ignored = self.keywidget.set_ignored
         menu_offset = self.menuwidget.size_request()[1] / 2
         key_offset = self.keywidget.get_centre_height() / 2
-        menu_vbox = Gtk.VBox()
+        menu_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         menu_vbox.pack_start(self.menuwidget, expand=False, fill=False,
                              padding=max([(key_offset - menu_offset), 0]))
         menu_vbox.show()
-        key_vbox = Gtk.VBox()
+        key_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         key_vbox.pack_start(self.keywidget, expand=False, fill=False,
                             padding=max([(menu_offset - key_offset) / 2, 0]))
         key_vbox.show()
@@ -123,7 +123,7 @@ class VariableWidget(object):
 
     def generate_contentwidget(self):
         """Create the content widget, a vbox-packed valuewidget."""
-        self.contentwidget = Gtk.VBox()
+        self.contentwidget = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.contentwidget.show()
         content_event_box = Gtk.EventBox()
         content_event_box.show()

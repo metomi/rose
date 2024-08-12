@@ -55,7 +55,7 @@ class ConsoleWindow(Gtk.Window):
             self.category_icons.append(
                 self.render_icon(id_, Gtk.IconSize.MENU))
         self._destroy_hook = destroy_hook
-        top_vbox = Gtk.VBox()
+        top_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         top_vbox.show()
         self.add(top_vbox)
 
@@ -108,11 +108,11 @@ class ConsoleWindow(Gtk.Window):
         self._message_treeview.set_model(filter_model)
 
         message_scrolled_window.add(self._message_treeview)
-        top_vbox.pack_start(message_scrolled_window, expand=True, fill=True)
+        top_vbox.pack_start(message_scrolled_window, expand=True, fill=True, padding=0)
 
         category_hbox = Gtk.HBox()
         category_hbox.show()
-        top_vbox.pack_end(category_hbox, expand=False, fill=False)
+        top_vbox.pack_end(category_hbox, expand=False, fill=False, padding=0)
         for category in categories + [self.CATEGORY_ALL]:
             togglebutton = Gtk.ToggleButton(label=category,
                                             use_underline=False)

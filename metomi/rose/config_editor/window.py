@@ -107,7 +107,7 @@ class MainWindow(object):
         self.window.set_default_size(*metomi.rose.config_editor.SIZE_WINDOW)
         self.window.set_destroy_with_parent(False)
         self.save_func = save_func
-        self.top_vbox = Gtk.VBox()
+        self.top_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.log_window = None  # The stack viewer.
         self.window.add(self.top_vbox)
         # Load the menu bar
@@ -315,7 +315,7 @@ class MainWindow(object):
         if config_name_box.get_active() == -1:
             config_name_box.set_active(0)
         config_name_box.show()
-        section_box = Gtk.VBox()
+        section_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         section_box.show()
         null_section_checkbutton = Gtk.CheckButton(
             metomi.rose.config_editor.DIALOG_LABEL_NULL_SECTION)
