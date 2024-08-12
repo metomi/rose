@@ -30,7 +30,7 @@ import metomi.rose.gtk.util
 import metomi.rose.variable
 
 
-class MixedArrayValueWidget(Gtk.HBox):
+class MixedArrayValueWidget(Gtk.Box):
 
     """This is a class to represent a derived type variable as a table.
 
@@ -274,7 +274,7 @@ class MixedArrayValueWidget(Gtk.HBox):
             hook = self.hook
             setter = ArrayElementSetter(self.setter, unwrapped_index)
             if self.has_titles and row_index == 0:
-                widget = Gtk.HBox()
+                widget = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
                 label = Gtk.Label(label=self.metadata['element-titles'][i])
                 label.show()
                 widget.pack_start(label, expand=True, fill=True)
@@ -365,7 +365,7 @@ class MixedArrayValueWidget(Gtk.HBox):
                                 lambda b, e: b.set_state(Gtk.StateType.ACTIVE))
         self.add_button.connect('leave-notify-event',
                                 lambda b, e: b.set_state(Gtk.StateType.NORMAL))
-        self.add_del_button_box = Gtk.VBox()
+        self.add_del_button_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.add_del_button_box.pack_start(
             self.add_button, expand=False, fill=False)
         self.add_del_button_box.pack_start(

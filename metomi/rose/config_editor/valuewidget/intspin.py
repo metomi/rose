@@ -27,7 +27,7 @@ from gi.repository import Gtk
 import metomi.rose.config_editor
 
 
-class IntSpinButtonValueWidget(Gtk.HBox):
+class IntSpinButtonValueWidget(Gtk.Box):
 
     """This is a class to represent an integer with a spin button."""
 
