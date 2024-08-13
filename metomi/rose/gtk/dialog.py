@@ -665,11 +665,13 @@ def run_edit_dialog(text, finish_hook=None, title=None):
 
     # hacky solution to get "true" size for dialog
     dialog.show()
-    start_size = dialog.size_request()
+    start_width = dialog.get_preferred_size().natural_size.width
+    start_height = dialog.get_preferred_size().natural_size.height
     scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-    end_size = dialog.size_request()
-    my_size = (max([start_size[0], end_size[0], min_size[0]]) + 20,
-               max([start_size[1], end_size[1], min_size[1]]) + 20)
+    end_width = dialog.get_preferred_size().natural_size.width
+    end_height = dialog.get_preferred_size().natural_size.height
+    my_size = (max([start_width, end_width, min_size[0]]) + 20,
+               max([start_height, end_height, min_size[1]]) + 20)
     new_size = [-1, -1]
     for i in [0, 1]:
         new_size[i] = min([my_size[i], max_size[i]])
