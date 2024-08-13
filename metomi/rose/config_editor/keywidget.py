@@ -175,19 +175,17 @@ class KeyWidget(Gtk.Box):
                 att_list = self.entry.get_attributes()
                 if att_list is None:
                     att_list = Pango.AttrList()
-                att_list.insert(Pango.AttrForeground(
+                att_list.insert(Pango.attr_foreground_new(
                     self.MODIFIED_COLOUR.red,
                     self.MODIFIED_COLOUR.green,
-                    self.MODIFIED_COLOUR.blue,
-                    start_index=0,
-                    end_index=-1))
+                    self.MODIFIED_COLOUR.blue))
                 self.entry.set_attributes(att_list)
         else:
             if isinstance(self.entry, Gtk.Label):
                 att_list = self.entry.get_attributes()
                 if att_list is not None:
                     att_list = att_list.filter(
-                        lambda a: a.type != Pango.ATTR_FOREGROUND)
+                        lambda a: a.klass.type != Pango.AttrType.FOREGROUND)
 
                 if att_list is None:
                     att_list = Pango.AttrList()
@@ -442,12 +440,10 @@ class KeyWidget(Gtk.Box):
         if att_list is None:
             att_list = Pango.AttrList()
         if underline:
-            att_list.insert(Pango.AttrUnderlineNew(Pango.Underline.SINGLE,
-                                                start_index=0,
-                                                end_index=-1))
+            att_list.insert(Pango.attr_underline_new(Pango.Underline.SINGLE))
         else:
             att_list = att_list.filter(lambda a:
-                                       a.type != Pango.ATTR_UNDERLINE)
+                                       a.klass.type != Pango.AttrType.UNDERLINE)
             if att_list is None:
                 att_list = Pango.AttrList()
         label.set_attributes(att_list)
