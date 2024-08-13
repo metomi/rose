@@ -90,7 +90,8 @@ class CustomButton(Gtk.Button):
                 self.hbox.pack_end(self.icon, expand=False, fill=False,
                                    padding=0)
         if has_menu:
-            arrow = Gtk.Arrow(Gtk.ArrowType.DOWN, Gtk.ShadowType.NONE)
+            # not sure if this is correct
+            arrow = Gtk.Image.new_from_icon_name("pan-down-symbolic", 64)
             arrow.show()
             self.hbox.pack_end(arrow, expand=False, fill=False,
                                padding=0)

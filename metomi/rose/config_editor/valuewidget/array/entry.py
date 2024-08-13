@@ -159,25 +159,21 @@ class EntryArrayValueWidget(Gtk.Box):
 
     def generate_buttons(self):
         """Create the left-right movement arrows and add button."""
-        left_arrow = Gtk.Arrow(Gtk.ArrowType.LEFT, Gtk.ShadowType.IN)
+        left_arrow = Gtk.ToolButton()
+        left_arrow.set_icon_name("pan-start-symbolic")
         left_arrow.show()
+        left_arrow.connect('clicked', lambda x: self.move_element(-1))
         left_event_box = Gtk.EventBox()
         left_event_box.add(left_arrow)
         left_event_box.show()
-        left_event_box.connect('button-press-event',
-                               lambda b, e: self.move_element(-1))
-        left_event_box.connect('enter-notify-event', self._handle_arrow_enter)
-        left_event_box.connect('leave-notify-event', self._handle_arrow_leave)
         left_event_box.set_tooltip_text(self.TIP_LEFT)
-        right_arrow = Gtk.Arrow(Gtk.ArrowType.RIGHT, Gtk.ShadowType.IN)
+        right_arrow = Gtk.ToolButton()
+        right_arrow.set_icon_name("pan-end-symbolic")
         right_arrow.show()
+        right_arrow.connect('clicked', lambda x: self.move_element(1))
         right_event_box = Gtk.EventBox()
-        right_event_box.show()
         right_event_box.add(right_arrow)
-        right_event_box.connect(
-            'button-press-event', lambda b, e: self.move_element(1))
-        right_event_box.connect('enter-notify-event', self._handle_arrow_enter)
-        right_event_box.connect('leave-notify-event', self._handle_arrow_leave)
+        right_event_box.show()
         right_event_box.set_tooltip_text(self.TIP_RIGHT)
         self.arrow_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.arrow_box.show()
@@ -218,14 +214,6 @@ class EntryArrayValueWidget(Gtk.Box):
         self.add_del_button_box.pack_start(
             self.del_button, expand=False, fill=False)
         self.add_del_button_box.show()
-
-    def _handle_arrow_enter(self, arrow_event_box, event):
-        if arrow_event_box.get_child().state != Gtk.StateType.INSENSITIVE:
-            arrow_event_box.set_state(Gtk.StateType.ACTIVE)
-
-    def _handle_arrow_leave(self, arrow_event_box, event):
-        if arrow_event_box.get_child().state != Gtk.StateType.INSENSITIVE:
-            arrow_event_box.set_state(Gtk.StateType.NORMAL)
 
     def set_arrow_sensitive(self, is_left_sensitive, is_right_sensitive):
         """Control the sensitivity of the movement buttons."""
