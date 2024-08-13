@@ -201,7 +201,7 @@ class MenuWidget(Gtk.Box):
         actiongroup.set_translation_domain('')
         actiongroup.add_actions(actions)
         uimanager = Gtk.UIManager()
-        uimanager.insert_action_group(actiongroup, pos=0)
+        uimanager.insert_action_group(actiongroup)
         uimanager.add_ui_from_string(option_ui)
         remove_item = uimanager.get_widget('/Options/Remove')
         remove_item.connect("activate",
