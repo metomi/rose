@@ -188,7 +188,7 @@ def import_object(
     """
     is_builtin = False
     module_name = ".".join(import_string.split(".")[:-1])
-    if module_name.startswith("rose."):
+    if module_name.startswith("metomi.rose."):
         is_builtin = True
     if module_prefix is None:
         as_name = module_name
