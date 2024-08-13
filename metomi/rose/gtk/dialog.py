@@ -656,7 +656,8 @@ def run_edit_dialog(text, finish_hook=None, title=None):
     dialog.vbox.pack_start(scrolled_window, expand=True, fill=True,
                            padding=0)
     get_text = lambda: text_buffer.get_text(text_buffer.get_start_iter(),
-                                            text_buffer.get_end_iter())
+                                            text_buffer.get_end_iter(),
+                                            False)
 
     max_size = metomi.rose.config_editor.SIZE_MACRO_DIALOG_MAX
     # defines the minimum acceptable size for the edit dialog
