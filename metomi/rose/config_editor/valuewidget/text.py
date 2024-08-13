@@ -101,7 +101,7 @@ class TextMultilineValueWidget(Gtk.Box):
 
         self.entrybuffer = Gtk.TextBuffer()
         self.entrybuffer.set_text(self.value)
-        self.entry = Gtk.TextView(self.entrybuffer)
+        self.entry = Gtk.TextView(buffer=self.entrybuffer)
         self.entry.set_wrap_mode(Gtk.WrapMode.WORD)
         self.entry.set_left_margin(metomi.rose.config_editor.SPACING_SUB_PAGE)
         self.entry.set_right_margin(metomi.rose.config_editor.SPACING_SUB_PAGE)
