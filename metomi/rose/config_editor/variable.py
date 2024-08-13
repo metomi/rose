@@ -168,8 +168,8 @@ class VariableWidget(object):
             error_handler = lambda e: self.handle_bad_valuewidget(
                 str(e), variable, set_value)
             widget = metomi.rose.resource.import_object(widget_path,
-                                                 files,
-                                                 error_handler)
+                                                        files,
+                                                        error_handler)
             if widget is None:
                 text = metomi.rose.config_editor.ERROR_IMPORT_CLASS.format(w_val)
                 self.handle_bad_valuewidget(text, variable, set_value)
