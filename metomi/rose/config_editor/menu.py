@@ -455,7 +455,7 @@ class MainMenuHandler(object):
             sorter = metomi.rose.config.sort_settings
             to_id = lambda s: self.util.get_id_from_section_option(
                 s.section, s.option)
-            return_value.sort(lambda x, y: sorter(to_id(x), to_id(y)))
+            return_value.sort(key=cmp_to_key(lambda x, y: sorter(to_id(x), to_id(y))))
             self.handle_macro_validation(config_name, macro_fullname,
                                          config, return_value,
                                          no_display=(not return_value))
