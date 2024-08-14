@@ -19,3 +19,6 @@
 # -----------------------------------------------------------------------------
 
 from . import python_list
+from . import logical
+from . import mixed
+from . import spaced_list
