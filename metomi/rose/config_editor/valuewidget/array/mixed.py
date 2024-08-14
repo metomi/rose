@@ -20,6 +20,7 @@
 
 import re
 import sys
+import math
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -375,7 +376,7 @@ class MixedArrayValueWidget(Gtk.Box):
 
     def setter(self, array_index, element_value):
         """Update the value."""
-        widget_row = self.rows[array_index / self.num_cols]
+        widget_row = self.rows[math.floor(array_index / self.num_cols)]
         widget = widget_row[array_index % self.num_cols]
         self._normalise_width_chars(widget)
         i = array_index - len(self.value_array)
