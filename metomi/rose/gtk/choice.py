@@ -76,7 +76,7 @@ class ChoicesListView(Gtk.TreeView):
         cell_text.set_property('editable', True)
         cell_text.connect('edited', self._handle_edited)
         col.pack_start(cell_text, True)
-        col.set_cell_data_func(cell_text, self._set_cell_text)
+        col.set_cell_data_func(cell_text, self._set_cell_text, None)
         self.append_column(col)
         self._populate()
 
@@ -200,7 +200,7 @@ class ChoicesListView(Gtk.TreeView):
         self._handle_reordering()
         self._populate()
 
-    def _set_cell_text(self, column, cell, model, r_iter):
+    def _set_cell_text(self, column, cell, model, r_iter, _):
         name = model.get_value(r_iter, 0)
         if name == metomi.rose.config_editor.CHOICE_LABEL_EMPTY:
             cell.set_property("markup", "<i>" + name + "</i>")
@@ -261,13 +261,13 @@ class ChoicesTreeView(Gtk.TreeView):
         cell_toggle = Gtk.CellRendererToggle()
         cell_toggle.connect_after("toggled", self._handle_cell_toggle)
         col.pack_start(cell_toggle, False)
-        col.set_cell_data_func(cell_toggle, self._set_cell_state)
+        col.set_cell_data_func(cell_toggle, self._set_cell_state, None)
         self.append_column(col)
         col = Gtk.TreeViewColumn()
         col.set_title(title)
         cell_text = Gtk.CellRendererText()
         col.pack_start(cell_text, True)
-        col.set_cell_data_func(cell_text, self._set_cell_text)
+        col.set_cell_data_func(cell_text, self._set_cell_text, None)
         self.append_column(col)
         self.set_expander_column(col)
         self.show()
@@ -322,7 +322,7 @@ class ChoicesTreeView(Gtk.TreeView):
             if model.get_value(iter_, 2) != is_implicit:
                 model.set_value(iter_, 2, is_implicit)
 
-    def _set_cell_text(self, column, cell, model, r_iter):
+    def _set_cell_text(self, column, cell, model, r_iter, _):
         """Set markup for a section depending on its status."""
         section_name = model.get_value(r_iter, 0)
         is_in_value = model.get_value(r_iter, 1)
@@ -343,7 +343,7 @@ class ChoicesTreeView(Gtk.TreeView):
             cell.set_property("markup", section_name)
             cell.set_property("sensitive", True)
 
-    def _set_cell_state(self, column, cell, model, r_iter):
+    def _set_cell_state(self, column, cell, model, r_iter, _):
         """Set the check box for a section depending on its status."""
         is_in_value = model.get_value(r_iter, 1)
         is_implicit = model.get_value(r_iter, 2)
