@@ -18,6 +18,10 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+
 import re
 
 import metomi.rose
@@ -55,7 +59,11 @@ class ValueWidgetHook(object):
     def get_focus(self, widget):
         """Set up a trigger based on focusing for a widget."""
         if self._focus_func is None:
-            return widget.grab_focus()
+            if isinstance(widget, Gtk.Entry):
+                Gtk.Widget.grab_focus(widget)
+                return
+            Gtk.Widget.grab_focus(widget)
+            return
         return self._focus_func(widget)
 
     def copy(self):
