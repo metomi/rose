@@ -301,7 +301,7 @@ class ConfigPage(Gtk.Box):
 
     def reshuffle_for_detached(self, add_button, revert_button, parent):
         """Reshuffle widgets for detached view."""
-        focus_child = getattr(self, 'focus_child')
+        focus_child = self.get_focus_child()
         button_hbox = Gtk.Box(homogeneous=False, spacing=0)
         self.tool_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, homogeneous=False, spacing=0)
         sep = Gtk.VSeparator()
@@ -792,7 +792,7 @@ class ConfigPage(Gtk.Box):
         """
         if self.sort_data(column_index, ascending) or remake_forced:
             focus_var = None
-            focus_widget = self.get_toplevel().focus_child
+            focus_widget = self.get_toplevel().get_focus_child()
             if (focus_widget is not None and
                     hasattr(focus_widget.get_parent(), 'variable')):
                 focus_var = focus_widget.get_parent().variable
@@ -831,7 +831,7 @@ class ConfigPage(Gtk.Box):
     def get_main_focus(self):
         """Retrieve the focus variable widget id."""
         widget_list = self.get_main_variable_widgets()
-        focus_child = getattr(self.main_container, "focus_child")
+        focus_child = self.main_container.get_focus_child()
         for widget in widget_list:
             if focus_child == widget:
                 if hasattr(widget.get_parent(), 'variable'):
