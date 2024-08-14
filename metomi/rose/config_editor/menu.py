@@ -111,15 +111,8 @@ class MenuBar(object):
         <menuitem action="Autofix"/>
       </menu>
       <menu action="Tools">
-        <menu action="Run Suite">
-          <menuitem action="Run Suite default"/>
-          <menuitem action="Run Suite custom"/>
-        </menu>
-        <separator name="sep_run_action"/>
         <menuitem action="Browser"/>
         <menuitem action="Terminal"/>
-        <menuitem action="View Output"/>
-        <menuitem action="Open Suite GControl"/>
       </menu>
       <menu action="Page">
         <menuitem action="Add variable"/>
@@ -206,23 +199,12 @@ class MenuBar(object):
          metomi.rose.config_editor.TOP_MENU_METADATA_GRAPH),
         ('Tools', None,
          metomi.rose.config_editor.TOP_MENU_TOOLS),
-        ('Run Suite', Gtk.STOCK_MEDIA_PLAY,
-         metomi.rose.config_editor.TOP_MENU_TOOLS_SUITE_RUN),
-        ('Run Suite default', Gtk.STOCK_MEDIA_PLAY,
-         metomi.rose.config_editor.TOP_MENU_TOOLS_SUITE_RUN_DEFAULT,
-         metomi.rose.config_editor.ACCEL_SUITE_RUN),
-        ('Run Suite custom', Gtk.STOCK_EDIT,
-         metomi.rose.config_editor.TOP_MENU_TOOLS_SUITE_RUN_CUSTOM),
         ('Browser', Gtk.STOCK_DIRECTORY,
          metomi.rose.config_editor.TOP_MENU_TOOLS_BROWSER,
          metomi.rose.config_editor.ACCEL_BROWSER),
         ('Terminal', Gtk.STOCK_EXECUTE,
          metomi.rose.config_editor.TOP_MENU_TOOLS_TERMINAL,
          metomi.rose.config_editor.ACCEL_TERMINAL),
-        ('View Output', Gtk.STOCK_DIRECTORY,
-         metomi.rose.config_editor.TOP_MENU_TOOLS_VIEW_OUTPUT),
-        ('Open Suite GControl', "rose-gtk-scheduler",
-         metomi.rose.config_editor.TOP_MENU_TOOLS_OPEN_SUITE_GCONTROL),
         ('Help', None,
          metomi.rose.config_editor.TOP_MENU_HELP),
         ('Documentation', Gtk.STOCK_HELP,
