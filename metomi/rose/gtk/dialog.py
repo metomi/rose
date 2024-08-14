@@ -304,7 +304,7 @@ def run_command_arg_dialog(cmd_name, help_text, run_hook):
     help_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
     help_hbox.pack_start(help_button, expand=False, fill=False, padding=0)
     help_hbox.show()
-    container.pack_end(help_hbox, expand=False, fill=False)
+    container.pack_end(help_hbox, expand=False, fill=False, padding=0)
     name_entry.grab_focus()
     dialog.connect("response", _handle_command_arg_response, run_hook,
                    name_entry)
@@ -513,7 +513,7 @@ def run_scrolled_dialog(text, title=None):
     button.show()
     button.grab_focus()
     button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-    button_box.pack_end(button, expand=False, fill=False)
+    button_box.pack_end(button, expand=False, fill=False, padding=0)
     button_box.show()
     main_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=DIALOG_SUB_PADDING)
     main_vbox.pack_start(scrolled, expand=True, fill=True, padding=0)

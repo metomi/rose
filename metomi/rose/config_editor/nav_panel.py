@@ -74,9 +74,9 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
         self.cell_error_icon = Gtk.CellRendererPixbuf()
         self.cell_changed_icon = Gtk.CellRendererPixbuf()
         self.cell_title = Gtk.CellRendererText()
-        self.panel_top.pack_start(self.cell_error_icon, False, True, 0)
-        self.panel_top.pack_start(self.cell_changed_icon, False, True, 0)
-        self.panel_top.pack_start(self.cell_title, False, True, 0)
+        self.panel_top.pack_start(self.cell_error_icon, False)
+        self.panel_top.pack_start(self.cell_changed_icon, False)
+        self.panel_top.pack_start(self.cell_title, False)
         self.panel_top.add_attribute(self.cell_error_icon,
                                      attribute='pixbuf',
                                      column=self.COLUMN_ERROR_ICON)

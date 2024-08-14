@@ -63,7 +63,7 @@ class FileSystemPanel(Gtk.ScrolledWindow):
         col = Gtk.TreeViewColumn()
         col.set_title(metomi.rose.config_editor.TITLE_FILE_PANEL)
         cell = Gtk.CellRendererText()
-        col.pack_start(cell, True, True, 0)
+        col.pack_start(cell, True)
         col.set_cell_data_func(cell,
                                self._set_path_markup, store)
         view.append_column(col)

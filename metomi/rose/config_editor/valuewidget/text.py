@@ -114,7 +114,7 @@ class TextMultilineValueWidget(Gtk.Box):
 
         self.grab_focus = lambda: self.hook.get_focus(self.entry)
         self.entrybuffer.connect('changed', self.setter)
-        self.pack_start(viewport, expand=True, fill=True)
+        self.pack_start(viewport, expand=True, fill=True, padding=0)
 
     def get_focus_index(self):
         """Return the cursor position within the variable value."""

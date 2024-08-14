@@ -64,7 +64,7 @@ class BaseSummaryDataPanel(Gtk.Box):
         self.group_index = None
         self.util = metomi.rose.config_editor.util.Lookup()
         self.control_widget_hbox = self._get_control_widget_hbox()
-        self.pack_start(self.control_widget_hbox, expand=False, fill=False)
+        self.pack_start(self.control_widget_hbox, expand=False, fill=False, padding=0)
         self._prev_store = None
         self._prev_sort_model = None
         self._view = metomi.rose.gtk.util.TooltipTreeView(
@@ -83,7 +83,7 @@ class BaseSummaryDataPanel(Gtk.Box):
         self.update()
         self._window.add(self._view)
         self._window.show()
-        self.pack_start(self._window, expand=True, fill=True)
+        self.pack_start(self._window, expand=True, fill=True, padding=0)
         self.show()
 
     def add_cell_renderer_for_value(self, column, column_title):
@@ -159,7 +159,7 @@ class BaseSummaryDataPanel(Gtk.Box):
         group_label.show()
         self._group_widget = Gtk.ComboBox()
         cell = Gtk.CellRendererText()
-        self._group_widget.pack_start(cell, True, True, 0)
+        self._group_widget.pack_start(cell, True)
         self._group_widget.add_attribute(cell, 'text', 0)
         self._group_widget.connect("changed", self._handle_group_change)
         self._group_widget.show()
@@ -295,7 +295,7 @@ class BaseSummaryDataPanel(Gtk.Box):
             col = Gtk.TreeViewColumn()
             col.set_title(column_name.replace("_", "__"))
             cell_for_status = Gtk.CellRendererText()
-            col.pack_start(cell_for_status, False, True, 0)
+            col.pack_start(cell_for_status, False)
             col.set_cell_data_func(cell_for_status,
                                    self.set_tree_cell_status)
             self.add_cell_renderer_for_value(col, column_name)
@@ -803,7 +803,7 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
     def add_cell_renderer_for_value(self, col, col_title):
         """Add a CellRendererText for the column."""
         cell_for_value = Gtk.CellRendererText()
-        col.pack_start(cell_for_value, True, True, 0)
+        col.pack_start(cell_for_value, True)
         col.set_cell_data_func(cell_for_value,
                                self._set_tree_cell_value)
 
