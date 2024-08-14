@@ -118,8 +118,10 @@ class StatusBar(Gtk.Box):
                 kind = message.kind
             if level is None:
                 level = message.level
-        if level > self.verbosity:
-            return
+                print(message.level)
+        if level != None:
+            if level > self.verbosity:
+                return
         if isinstance(message, Exception):
             kind = metomi.rose.reporter.Reporter.KIND_ERR
             level = metomi.rose.reporter.Reporter.FAIL
