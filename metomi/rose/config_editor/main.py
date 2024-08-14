@@ -344,10 +344,6 @@ class MainController(object):
                  "dialog-question"),
                 (metomi.rose.config_editor.TOOLBAR_TRANSFORM,
                  'Gtk.STOCK_CONVERT'),
-                (metomi.rose.config_editor.TOOLBAR_VIEW_OUTPUT,
-                 'Gtk.STOCK_DIRECTORY'),
-                (metomi.rose.config_editor.TOOLBAR_SUITE_GCONTROL,
-                 'rose-gtk-scheduler')
             ],
             sep_on_name=[
                 metomi.rose.config_editor.TOOLBAR_CHECK_AND_SAVE,
@@ -374,10 +370,6 @@ class MainController(object):
                self.main_handle.check_all_extra)
         assign(metomi.rose.config_editor.TOOLBAR_TRANSFORM,
                self.main_handle.transform_default)
-        assign(metomi.rose.config_editor.TOOLBAR_VIEW_OUTPUT,
-               self.main_handle.launch_output_viewer)
-        assign(metomi.rose.config_editor.TOOLBAR_SUITE_GCONTROL,
-               self.main_handle.launch_scheduler)
         self.find_entry = self.toolbar.item_dict.get(
             metomi.rose.config_editor.TOOLBAR_FIND)['widget']
         self.find_entry.connect("activate", self._launch_find)
@@ -385,24 +377,6 @@ class MainController(object):
         add_icon = self.toolbar.item_dict.get(
             metomi.rose.config_editor.TOOLBAR_ADD)['widget']
         add_icon.connect('button_press_event', self.add_page_variable)
-        custom_text = metomi.rose.config_editor.TOOLBAR_SUITE_RUN_MENU
-        self._toolbar_run_button = metomi.rose.gtk.util.CustomMenuButton(
-            stock_id=Gtk.STOCK_MEDIA_PLAY,
-            menu_items=[(custom_text, Gtk.STOCK_MEDIA_PLAY)],
-            menu_funcs=[self.main_handle.get_run_suite_args],
-            tip_text=metomi.rose.config_editor.TOOLBAR_SUITE_RUN)
-        self._toolbar_run_button.connect("clicked", self.main_handle.run_suite)
-        self.toolbar.insert(self._toolbar_run_button, -1)
-
-        self.toolbar.set_widget_sensitive(
-            metomi.rose.config_editor.TOOLBAR_SUITE_GCONTROL,
-            any(c.config_type == metomi.rose.TOP_CONFIG_NAME
-                for c in list(self.data.config.values())))
-
-        self.toolbar.set_widget_sensitive(
-            metomi.rose.config_editor.TOOLBAR_VIEW_OUTPUT,
-            any(c.config_type == metomi.rose.TOP_CONFIG_NAME
-                for c in list(self.data.config.values())))
 
     def generate_menubar(self):
         """Link in the menu functionality and accelerators."""
@@ -510,18 +484,10 @@ class MainController(object):
              lambda m: self.refresh_metadata(m.get_active())),
             ('/TopMenuBar/Metadata/Upgrade',
              lambda m: self.main_handle.handle_upgrade()),
-            ('/TopMenuBar/Tools/Run Suite/Run Suite default',
-             self.main_handle.run_suite),
-            ('/TopMenuBar/Tools/Run Suite/Run Suite custom',
-             self.main_handle.get_run_suite_args),
             ('/TopMenuBar/Tools/Browser',
              lambda m: self.main_handle.launch_browser()),
             ('/TopMenuBar/Tools/Terminal',
              lambda m: self.main_handle.launch_terminal()),
-            ('/TopMenuBar/Tools/View Output',
-             lambda m: self.main_handle.launch_output_viewer()),
-            ('/TopMenuBar/Tools/Open Suite GControl',
-             lambda m: self.main_handle.launch_scheduler()),
             ('/TopMenuBar/Page/Revert',
              lambda m: self.revert_to_saved_data()),
             ('/TopMenuBar/Page/Page Info',
@@ -598,10 +564,6 @@ class MainController(object):
                 add_menuitem
             ))
         self.main_handle.load_macro_menu(self.menubar)
-        if not any(c.config_type == metomi.rose.TOP_CONFIG_NAME
-                   for c in list(self.data.config.values())):
-            self.menubar.uimanager.get_widget(
-                "/TopMenuBar/Tools/Run Suite").set_sensitive(False)
         self.update_bar_widgets()
         self.top_menu = self.menubar.uimanager.get_widget('/TopMenuBar')
         # Load the keyboard accelerators.
@@ -624,8 +586,6 @@ class MainController(object):
             self.main_handle.destroy,
             metomi.rose.config_editor.ACCEL_METADATA_REFRESH:
             self._refresh_metadata_if_on,
-            metomi.rose.config_editor.ACCEL_SUITE_RUN:
-            self.main_handle.run_suite,
             metomi.rose.config_editor.ACCEL_BROWSER:
             self.main_handle.launch_browser,
             metomi.rose.config_editor.ACCEL_TERMINAL:
@@ -1416,11 +1376,6 @@ class MainController(object):
         self._get_menu_widget('/Save').set_sensitive(is_changed)
         self._get_menu_widget('/Check and save').set_sensitive(is_changed)
         self._get_menu_widget('/Graph').set_sensitive(not is_changed)
-        self._toolbar_run_button.set_sensitive(not is_changed)
-        self._get_menu_widget('/Run Suite custom').set_sensitive(
-            not is_changed)
-        self._get_menu_widget('/Run Suite default').set_sensitive(
-            not is_changed)
 
     def _refresh_metadata_if_on(self, config_name=None):
         """Reload any metadata, if present - otherwise do nothing."""
