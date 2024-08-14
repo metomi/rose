@@ -69,7 +69,7 @@ class SpacedListValueWidget(Gtk.Box):
 
         self.generate_buttons()
         self.populate_table()
-        self.pack_start(self.add_del_button_box, expand=False, fill=False)
+        self.pack_start(self.add_del_button_box, expand=False, fill=False, padding=0)
         self.pack_start(self.entry_table, expand=True, fill=True)
         self.entry_table.connect_after('size-allocate',
                                        lambda w, e: self.reshape_table())
@@ -92,7 +92,7 @@ class SpacedListValueWidget(Gtk.Box):
             prefix = get_next_delimiter(self.value[len(text):], val)
             if prefix is None:
                 return
-            if my_entry == self.entry_table.focus_child:
+            if my_entry == self.entry_table.get_focus_child():
                 return len(text + prefix) + my_entry.get_position()
             text += prefix + val
         return None

@@ -94,7 +94,7 @@ class PythonListValueWidget(Gtk.Box):
             prefix = entry.get_next_delimiter(self.value[len(text):], val)
             if prefix is None:
                 return
-            if my_entry == self.entry_table.focus_child:
+            if my_entry == self.entry_table.get_focus_child():
                 return len(text + prefix) + my_entry.get_position()
             text += prefix + val
         return None

@@ -133,10 +133,10 @@ class RowArrayValueWidget(Gtk.Box):
         return [self.type] * self.num_cols
 
     def grab_focus(self):
-        if self.entry_table.focus_child is None:
+        if self.entry_table.get_focus_child() is None:
             self.hook.get_focus(self.rows[-1][-1])
         else:
-            self.hook.get_focus(self.entry_table.focus_child)
+            self.hook.get_focus(self.entry_table.get_focus_child())
 
     def add_element(self, *args):
         """Create a new element (non-derived types)."""
@@ -179,7 +179,7 @@ class RowArrayValueWidget(Gtk.Box):
                                                        val)
                 if prefix_text is None:
                     return
-                if widget == self.entry_table.focus_child:
+                if widget == self.entry_table.get_focus_child():
                     if hasattr(widget, "get_focus_index"):
                         position = widget.get_focus_index()
                         return len(text + prefix_text) + position

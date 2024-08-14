@@ -799,7 +799,7 @@ class ConfigPage(Gtk.Box):
         """
         if self.sort_data(column_index, ascending) or remake_forced:
             focus_var = None
-            focus_widget = self.get_toplevel().focus_child
+            focus_widget = self.get_toplevel().get_focus_child()
             if (focus_widget is not None and
                     hasattr(focus_widget.get_parent(), 'variable')):
                 focus_var = focus_widget.get_parent().variable
