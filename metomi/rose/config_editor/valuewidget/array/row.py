@@ -86,7 +86,7 @@ class RowArrayValueWidget(Gtk.Box):
             self.insert_row(i)
         self.normalise_width_widgets()
         self.generate_buttons(is_for_elements=not isinstance(self.type, list))
-        self.pack_start(self.add_del_button_box, expand=False, fill=False)
+        self.pack_start(self.add_del_button_box, expand=False, fill=False, padding=0)
         self.pack_start(self.entry_table, expand=True, fill=True, padding=0)
         self.show()
 

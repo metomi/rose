@@ -91,7 +91,7 @@ class MixedArrayValueWidget(Gtk.Box):
             self.insert_row(i)
         self.normalise_width_widgets()
         self.generate_buttons()
-        self.pack_start(self.add_del_button_box, expand=False, fill=False)
+        self.pack_start(self.add_del_button_box, expand=False, fill=False, padding=0)
         self.pack_start(self.entry_table, expand=True, fill=True, padding=0)
         self.show()
 
