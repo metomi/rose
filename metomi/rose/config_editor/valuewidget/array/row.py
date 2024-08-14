@@ -20,6 +20,7 @@
 
 import re
 import sys
+import math
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -86,7 +87,7 @@ class RowArrayValueWidget(Gtk.Box):
         self.normalise_width_widgets()
         self.generate_buttons(is_for_elements=not isinstance(self.type, list))
         self.pack_start(self.add_del_button_box, expand=False, fill=False)
-        self.pack_start(self.entry_table, expand=True, fill=True)
+        self.pack_start(self.entry_table, expand=True, fill=True, padding=0)
         self.show()
 
     def set_num_rows(self):
@@ -291,7 +292,7 @@ class RowArrayValueWidget(Gtk.Box):
                 widget = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
                 eb0 = Gtk.EventBox()
                 eb0.show()
-                widget.pack_start(eb0, expand=True, fill=True)
+                widget.pack_start(eb0, expand=True, fill=True, padding=0)
                 widget.show()
                 self.entry_table.attach(widget,
                                         i, i + 1,
@@ -421,9 +422,9 @@ class RowArrayValueWidget(Gtk.Box):
                                 lambda b, e: b.set_state(Gtk.StateType.NORMAL))
         self.add_del_button_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.add_del_button_box.pack_start(
-            self.add_button, expand=False, fill=False)
+            self.add_button, expand=False, fill=False, padding=0)
         self.add_del_button_box.pack_start(
-            self.del_button, expand=False, fill=False)
+            self.del_button, expand=False, fill=False, padding=0)
         self.add_del_button_box.show()
         self._decide_show_buttons()
 

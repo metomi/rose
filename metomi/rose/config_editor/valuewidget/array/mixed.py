@@ -92,7 +92,7 @@ class MixedArrayValueWidget(Gtk.Box):
         self.normalise_width_widgets()
         self.generate_buttons()
         self.pack_start(self.add_del_button_box, expand=False, fill=False)
-        self.pack_start(self.entry_table, expand=True, fill=True)
+        self.pack_start(self.entry_table, expand=True, fill=True, padding=0)
         self.show()
 
     def set_num_rows(self):
@@ -277,7 +277,7 @@ class MixedArrayValueWidget(Gtk.Box):
                 widget = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
                 label = Gtk.Label(label=self.metadata['element-titles'][i])
                 label.show()
-                widget.pack_start(label, expand=True, fill=True)
+                widget.pack_start(label, expand=True, fill=True, padding=0)
             else:
                 widget = widget_cls(w_value, w_meta, setter.set_value, hook)
             if hover_text:
@@ -367,9 +367,9 @@ class MixedArrayValueWidget(Gtk.Box):
                                 lambda b, e: b.set_state(Gtk.StateType.NORMAL))
         self.add_del_button_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.add_del_button_box.pack_start(
-            self.add_button, expand=False, fill=False)
+            self.add_button, expand=False, fill=False, padding=0)
         self.add_del_button_box.pack_start(
-            self.del_button, expand=False, fill=False)
+            self.del_button, expand=False, fill=False, padding=0)
         self.add_del_button_box.show()
         self._decide_show_buttons()
 

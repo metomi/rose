@@ -89,8 +89,8 @@ class EntryArrayValueWidget(Gtk.Box):
         self.generate_entries(value_array)
         self.generate_buttons()
         self.populate_table()
-        self.pack_start(self.add_del_button_box, expand=False, fill=False)
-        self.pack_start(self.entry_table, expand=True, fill=True)
+        self.pack_start(self.add_del_button_box, expand=False, fill=False, padding=0)
+        self.pack_start(self.entry_table, expand=True, fill=True, padding=0)
         self.entry_table.connect_after('size-allocate',
                                        lambda w, e: self.reshape_table())
         self.connect('focus-in-event',
@@ -195,7 +195,7 @@ class EntryArrayValueWidget(Gtk.Box):
                                 lambda b, e: b.set_state(Gtk.StateType.NORMAL))
         self.button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.button_box.show()
-        self.button_box.pack_start(self.arrow_box, expand=False, fill=True)
+        self.button_box.pack_start(self.arrow_box, expand=False, fill=True, padding=0)
         add_image = Gtk.Image.new_from_stock(Gtk.STOCK_ADD, Gtk.IconSize.MENU)
         add_image.show()
         self.add_button = Gtk.EventBox()
@@ -210,9 +210,9 @@ class EntryArrayValueWidget(Gtk.Box):
                                 lambda b, e: b.set_state(Gtk.StateType.NORMAL))
         self.add_del_button_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.add_del_button_box.pack_start(
-            self.add_button, expand=False, fill=False)
+            self.add_button, expand=False, fill=False, padding=0)
         self.add_del_button_box.pack_start(
-            self.del_button, expand=False, fill=False)
+            self.del_button, expand=False, fill=False, padding=0)
         self.add_del_button_box.show()
 
     def set_arrow_sensitive(self, is_left_sensitive, is_right_sensitive):
