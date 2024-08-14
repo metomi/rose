@@ -46,7 +46,7 @@ class ComboBoxValueWidget(Gtk.Box):
         liststore = Gtk.ListStore(str)
         cell = Gtk.CellRendererText()
         cell.xalign = self.FRAC_X_ALIGN
-        comboboxentry.pack_start(cell, True, True, 0)
+        comboboxentry.pack_start(cell, True)
         comboboxentry.add_attribute(cell, 'text', 0)
 
         var_values = self.metadata[metomi.rose.META_PROP_VALUES]

@@ -49,7 +49,7 @@ class FileChooserValueWidget(Gtk.Box):
             tip_text="Browse for a filename")
         self.open_button.show()
         self.open_button.connect("clicked", self.run_and_destroy)
-        self.pack_end(self.open_button, expand=False, fill=False)
+        self.pack_end(self.open_button, expand=False, fill=False, padding=0)
         self.edit_button.set_sensitive(os.path.isfile(self.value))
 
     def generate_entry(self):
@@ -86,7 +86,7 @@ class FileChooserValueWidget(Gtk.Box):
         self.edit_button.connect(
             "clicked",
             lambda b: metomi.rose.external.launch_geditor(self.value))
-        self.pack_end(self.edit_button, expand=False, fill=False)
+        self.pack_end(self.edit_button, expand=False, fill=False, padding=0)
 
     def setter(self, widget):
         self.value = widget.get_text()

@@ -95,15 +95,15 @@ class StatusBar(Gtk.Box):
         self.console = None
         hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         hbox.show()
-        self.pack_start(hbox, expand=False, fill=False)
+        self.pack_start(hbox, expand=False, fill=False, padding=0)
         self._generate_error_widget()
-        hbox.pack_start(self._error_widget, expand=False, fill=False)
+        hbox.pack_start(self._error_widget, expand=False, fill=False, padding=0)
         vsep_message = Gtk.VSeparator()
         vsep_message.show()
         vsep_eb = Gtk.EventBox()
         vsep_eb.show()
-        hbox.pack_start(vsep_message, expand=False, fill=False)
-        hbox.pack_start(vsep_eb, expand=True, fill=True)
+        hbox.pack_start(vsep_message, expand=False, fill=False, padding=0)
+        hbox.pack_start(vsep_eb, expand=True, fill=True, padding=0)
         self._generate_message_widget()
         hbox.pack_end(self._message_widget, expand=False, fill=False,
                       padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
@@ -146,7 +146,7 @@ class StatusBar(Gtk.Box):
             'etc/images/rose-config-edit/error_icon.png')
         image = Gtk.Image.new_from_file(str(icon_path))
         image.show()
-        self._error_widget.pack_start(image, expand=False, fill=False)
+        self._error_widget.pack_start(image, expand=False, fill=False, padding=0)
         self._error_widget_label = Gtk.Label()
         self._error_widget_label.show()
         self._error_widget.pack_start(
@@ -181,10 +181,10 @@ class StatusBar(Gtk.Box):
         self._console_launcher.connect("clicked", self._launch_console)
         message_hbox.pack_start(
             self._message_widget_error_image,
-            expand=False, fill=False)
+            expand=False, fill=False, padding=0)
         message_hbox.pack_start(
             self._message_widget_info_image,
-            expand=False, fill=False)
+            expand=False, fill=False, padding=0)
         message_hbox.pack_start(
             self._message_widget_label,
             expand=False, fill=False,
@@ -193,7 +193,7 @@ class StatusBar(Gtk.Box):
             vsep, expand=False, fill=False,
             padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
         message_hbox.pack_start(
-            self._console_launcher, expand=False, fill=False)
+            self._console_launcher, expand=False, fill=False, padding=0)
 
     def _update_error_widget(self):
         # Update the error display widget.

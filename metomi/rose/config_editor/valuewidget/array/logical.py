@@ -87,8 +87,8 @@ class LogicalArrayValueWidget(Gtk.Box):
 
         self.generate_buttons()
         self.populate_table()
-        self.pack_start(self.button_box, expand=False, fill=False)
-        self.pack_start(self.entry_table, expand=True, fill=True)
+        self.pack_start(self.button_box, expand=False, fill=False, padding=0)
+        self.pack_start(self.entry_table, expand=True, fill=True, padding=0)
         self.entry_table.connect_after('size-allocate',
                                        lambda w, e: self.reshape_table())
         self.connect('focus-in-event',
@@ -126,8 +126,8 @@ class LogicalArrayValueWidget(Gtk.Box):
                                 lambda b, e: b.set_state(Gtk.StateType.NORMAL))
         self.button_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.button_box.show()
-        self.button_box.pack_start(self.add_button, expand=False, fill=False)
-        self.button_box.pack_start(self.del_button, expand=False, fill=False)
+        self.button_box.pack_start(self.add_button, expand=False, fill=False, padding=0)
+        self.button_box.pack_start(self.del_button, expand=False, fill=False, padding=0)
 
     def get_entry(self, value_item):
         """Create a widget for this array element."""

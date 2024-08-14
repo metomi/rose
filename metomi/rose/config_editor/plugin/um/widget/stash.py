@@ -153,7 +153,7 @@ class BaseStashSummaryDataPanelv1(
                                    self._set_tree_cell_value_combo)
         elif col_title == self.INCLUDED_TITLE:
             cell_for_value = Gtk.CellRendererToggle()
-            col.pack_start(cell_for_value, False, True, 0)
+            col.pack_start(cell_for_value, False)
             cell_for_value.set_property("activatable", True)
             cell_for_value.connect("toggled",
                                    self._handle_cell_toggle_change)
@@ -161,7 +161,7 @@ class BaseStashSummaryDataPanelv1(
                                    self._set_tree_cell_value_toggle)
         else:
             cell_for_value = Gtk.CellRendererText()
-            col.pack_start(cell_for_value, True, True, 0)
+            col.pack_start(cell_for_value, True)
             if (col_title not in [self.SECTION_INDEX_TITLE,
                                   self.DESCRIPTION_TITLE]):
                 cell_for_value.set_property("editable", True)

@@ -125,7 +125,7 @@ class MainWindow(object):
             notebook.connect_after(signal, page_change_func)
         self.generate_main_hbox(nav_panel, notebook)
         self.top_vbox.pack_start(self.main_hbox, True, True, 0)
-        self.top_vbox.pack_start(status_bar, expand=False, fill=False)
+        self.top_vbox.pack_start(status_bar, expand=False, fill=False, padding=0)
         self.top_vbox.show()
         self.window.show()
         nav_panel.tree.columns_autosize()
@@ -338,11 +338,11 @@ class MainWindow(object):
                 name_section_dict[name_keys[c.get_active()]],
                 prefs.get(name_keys[c.get_active()], [])))
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=metomi.rose.config_editor.SPACING_PAGE)
-        vbox.pack_start(config_label, expand=False, fill=False)
-        vbox.pack_start(config_name_box, expand=False, fill=False)
-        vbox.pack_start(section_label, expand=False, fill=False)
-        vbox.pack_start(null_section_checkbutton, expand=False, fill=False)
-        vbox.pack_start(section_box, expand=False, fill=False)
+        vbox.pack_start(config_label, expand=False, fill=False, padding=0)
+        vbox.pack_start(config_name_box, expand=False, fill=False, padding=0)
+        vbox.pack_start(section_label, expand=False, fill=False, padding=0)
+        vbox.pack_start(null_section_checkbutton, expand=False, fill=False, padding=0)
+        vbox.pack_start(section_box, expand=False, fill=False, padding=0)
         if do_target_section:
             target_section_entry = Gtk.Entry()
             self._reload_target_section_entry(
@@ -358,7 +358,7 @@ class MainWindow(object):
                 )
             )
             target_section_entry.show()
-            vbox.pack_start(target_section_entry, expand=False, fill=False)
+            vbox.pack_start(target_section_entry, expand=False, fill=False, padding=0)
         vbox.show()
         hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         hbox.pack_start(vbox, expand=True, fill=True,
@@ -406,7 +406,7 @@ class MainWindow(object):
         if section_chooser.get_active() == -1 and sections:
             section_chooser.set_active(0)
         section_chooser.show()
-        vbox.pack_start(section_chooser, expand=False, fill=False)
+        vbox.pack_start(section_chooser, expand=False, fill=False, padding=0)
         return section_chooser
 
     def _reload_target_section_entry(self, section_combo_box, target_entry,
@@ -664,9 +664,9 @@ class MacroChangesDialog(Gtk.Dialog):
             column.set_title(title)
             cell = Gtk.CellRendererText()
             if i == len(self.COLUMNS) - 1:
-                column.pack_start(cell, True, True, 0)
+                column.pack_start(cell, True)
             else:
-                column.pack_start(cell, False, True, 0)
+                column.pack_start(cell, False)
             if title == "Type":
                 column.set_cell_data_func(cell, self._set_type_markup, i)
             else:

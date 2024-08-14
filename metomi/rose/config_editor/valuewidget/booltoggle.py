@@ -73,7 +73,7 @@ class BoolToggleValueWidget(Gtk.Box):
             self.button.set_image(bad_img)
         self.button.connect('toggled', self._switch_state_and_set)
         self.button.show()
-        self.pack_start(self.button, expand=False, fill=False)
+        self.pack_start(self.button, expand=False, fill=False, padding=0)
         self.grab_focus = lambda: self.hook.get_focus(self.button)
         self.button.connect('focus-in-event', self.hook.trigger_scroll)
 

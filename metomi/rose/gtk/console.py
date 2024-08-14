@@ -71,7 +71,7 @@ class ConsoleWindow(Gtk.Window):
         category_column = Gtk.TreeViewColumn()
         category_column.set_title(self.COLUMN_TITLE_CATEGORY)
         cell_category = Gtk.CellRendererPixbuf()
-        category_column.pack_start(cell_category, False, True, 0)
+        category_column.pack_start(cell_category, False)
         category_column.set_cell_data_func(cell_category,
                                            self._set_category_cell, 0)
         category_column.set_clickable(True)
@@ -82,7 +82,7 @@ class ConsoleWindow(Gtk.Window):
         message_column = Gtk.TreeViewColumn()
         message_column.set_title(self.COLUMN_TITLE_MESSAGE)
         cell_message = Gtk.CellRendererText()
-        message_column.pack_start(cell_message, False, True, 0)
+        message_column.pack_start(cell_message, False)
         message_column.add_attribute(cell_message, attribute="text",
                                      column=1)
         message_column.set_clickable(True)
@@ -93,7 +93,7 @@ class ConsoleWindow(Gtk.Window):
         time_column = Gtk.TreeViewColumn()
         time_column.set_title(self.COLUMN_TITLE_TIME)
         cell_time = Gtk.CellRendererText()
-        time_column.pack_start(cell_time, False, True, 0)
+        time_column.pack_start(cell_time, False)
         time_column.set_cell_data_func(cell_time, self._set_time_cell, 2)
         time_column.set_clickable(True)
         time_column.set_sort_indicator(True)
