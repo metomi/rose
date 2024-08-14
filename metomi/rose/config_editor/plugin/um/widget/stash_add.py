@@ -365,8 +365,10 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
         k = group_index
         data_rows = [r[k:k + 1] + r[0:k] + r[k + 1:] for r in data_rows]
         column_names.insert(0, column_names.pop(k))
-        data_rows.sort(lambda x, y:
-                       self._sort_row_data(x, y, 0, descending))
+        if descending:
+            data_rows.sort(key=cmp_to_key(self._sort_row_data), reverse=True)
+        else:
+            data_rows.sort(key=cmp_to_key(self._sort_row_data))
         last_entry = None
         rows_are_descendants = []
         for i, row in enumerate(data_rows):
@@ -656,10 +658,9 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
             value = metomi.rose.gtk.util.safe_str(value)
         cell.set_property("markup", value)
 
-    def _sort_row_data(self, row1, row2, sort_index, descending=False):
+    def _sort_row_data(self, row1, row2):
         """Handle column sorting."""
-        fac = (-1 if descending else 1)
-        return fac * self.sort_util.cmp_(row1[sort_index], row2[sort_index])
+        return self.sort_util.cmp_(row1[0], row2[0])
 
     def _toggle_show_column_name(self, column_name):
         """Handle a show/hide of a particular column."""
