@@ -51,7 +51,7 @@ class KeyWidget(Gtk.Box):
 
     def __init__(self, variable, var_ops, launch_help_func, update_func,
                  show_modes):
-        super(KeyWidget, self).__init__(homogeneous=False, spacing=0)
+        super(KeyWidget, self).__init__(homogeneous=False, spacing=0, orientation=Gtk.Orientation.VERTICAL)
         self.my_variable = variable
         self.hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.hbox.show()
@@ -319,11 +319,12 @@ class KeyWidget(Gtk.Box):
             mode_text = metomi.rose.config_editor.VAR_FLAG_MARKUP.format(mode_text)
             label = metomi.rose.gtk.util.get_hyperlink_label(mode_text, search_func)
             label.show()
-            hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+            hbox = Gtk.Box()
             hbox.show()
             hbox.pack_start(label, expand=False, fill=False, padding=0)
             hbox.set_sensitive(self.entry.get_property("sensitive"))
             hbox._show_mode = mode
+            # hbox.set_baseline_position(Gtk.BaselinePosition.BOTTOM)
             self.pack_start(hbox, expand=False, fill=False,
                             padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
             show_mode_widget_indices = []
