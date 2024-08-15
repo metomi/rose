@@ -311,8 +311,13 @@ class MenuBar(object):
             stock_id = Gtk.STOCK_DIALOG_QUESTION
         else:
             stock_id = Gtk.STOCK_CONVERT
-        macro_item = Gtk.ImageMenuItem(stock_id=stock_id)
-        macro_item.set_label(macro_fullname)
+        macro_item_box = Gtk.Box()
+        macro_item_icon = Gtk.Image.new_from_icon_name(stock_id, Gtk.IconSize.MENU)
+        macro_item_label = Gtk.Label(label=macro_fullname)
+        macro_item = Gtk.MenuItem()
+        macro_item_box.pack_start(macro_item_icon, False, False, 0)
+        macro_item_box.pack_start(macro_item_label, False, False, 0)
+        Gtk.Container.add(macro_item, macro_item_box)
         macro_item.set_tooltip_text(help_)
         macro_item.show()
         macro_item._run_data = [config_name, modulename, classname,
@@ -324,9 +329,14 @@ class MenuBar(object):
             for item in config_item.get_submenu().get_children():
                 if hasattr(item, "_rose_all_validators"):
                     return False
-            all_item = Gtk.ImageMenuItem(Gtk.STOCK_DIALOG_QUESTION)
+            all_item_box = Gtk.Box()
+            all_item_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_DIALOG_QUESTION, Gtk.IconSize.MENU)
+            all_item_label = Gtk.Label(label=metomi.rose.config_editor.MACRO_MENU_ALL_VALIDATORS)
+            all_item = Gtk.MenuItem()
+            all_item_box.pack_start(all_item_icon, False, False, 0)
+            all_item_box.pack_start(all_item, False, False, 0)
+            Gtk.Container.add(macro_item, macro_item_box)
             all_item._rose_all_validators = True
-            all_item.set_label(metomi.rose.config_editor.MACRO_MENU_ALL_VALIDATORS)
             all_item.set_tooltip_text(
                 metomi.rose.config_editor.MACRO_MENU_ALL_VALIDATORS_TIP)
             all_item.show()
