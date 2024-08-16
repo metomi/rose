@@ -435,27 +435,39 @@ class BaseSummaryDataPanel(Gtk.Box):
         shortcuts = []
 
         # Ignore all.
-        ign_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_NO)
-        ign_menuitem.set_label(
-            metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE_MULTI)
+        ign_menuitem_box = Gtk.Box()
+        ign_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_NO, Gtk.IconSize.MENU)
+        ign_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE_MULTI)
+        ign_menuitem = Gtk.MenuItem()
+        ign_menuitem_box.pack_start(ign_menuitem_icon, False, False, 0)
+        ign_menuitem_box.pack_start(ign_menuitem_label, False, False, 0)
+        Gtk.Container.add(ign_menuitem, ign_menuitem_box)
         ign_menuitem.connect("activate", self._ignore_selected_sections, True)
         ign_menuitem.show()
         menu.append(ign_menuitem)
         shortcuts.append((metomi.rose.config_editor.ACCEL_IGNORE,
                           ign_menuitem))
         # Enable all.
-        ign_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_YES)
-        ign_menuitem.set_label(
-            metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE_MULTI)
+        ign_menuitem_box = Gtk.Box()
+        ign_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_YES, Gtk.IconSize.MENU)
+        ign_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE_MULTI)
+        ign_menuitem = Gtk.MenuItem()
+        ign_menuitem_box.pack_start(ign_menuitem_icon, False, False, 0)
+        ign_menuitem_box.pack_start(ign_menuitem_label, False, False, 0)
+        Gtk.Container.add(ign_menuitem, ign_menuitem_box)
         ign_menuitem.connect("activate", self._ignore_selected_sections, False)
         ign_menuitem.show()
         menu.append(ign_menuitem)
         shortcuts.append((metomi.rose.config_editor.ACCEL_IGNORE,
                           ign_menuitem))
         # Remove all.
-        rem_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_REMOVE)
-        rem_menuitem.set_label(
-            metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE_MULTI)
+        rem_menuitem_box = Gtk.Box()
+        rem_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_REMOVE, Gtk.IconSize.MENU)
+        rem_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE_MULTI)
+        rem_menuitem = Gtk.MenuItem()
+        rem_menuitem_box.pack_start(rem_menuitem_icon, False, False, 0)
+        rem_menuitem_box.pack_start(rem_menuitem_label, False, False, 0)
+        Gtk.Container.add(rem_menuitem, rem_menuitem_box)
         rem_menuitem.connect("activate", self._remove_selected_sections)
         rem_menuitem.show()
         menu.append(rem_menuitem)
@@ -488,10 +500,15 @@ class BaseSummaryDataPanel(Gtk.Box):
         this_section = model.get_value(row_iter, sect_index)
         if this_section is not None:
             # Jump to section.
-            menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_JUMP_TO)
             label = metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_GO_TO.format(
                 this_section.replace("_", "__"))
-            menuitem.set_label(label)
+            menuitem_box = Gtk.Box()
+            menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_JUMP_TO, Gtk.IconSize.MENU)
+            menuitem_label = Gtk.Label(label=label)
+            menuitem = Gtk.MenuItem()
+            menuitem_box.pack_start(menuitem_icon, False, False, 0)
+            menuitem_box.pack_start(menuitem_label, False, False, 0)
+            Gtk.Container.add(menuitem, menuitem_box)
             menuitem._section = this_section
             menuitem.connect("activate",
                              lambda i: self.search_function(i._section))
@@ -512,17 +529,25 @@ class BaseSummaryDataPanel(Gtk.Box):
             # A section is currently selected
             if this_section is not None:
                 # Add section.
-                add_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_ADD)
-                add_menuitem.set_label(
-                    metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_ADD)
+                add_menuitem_box = Gtk.Box()
+                add_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_ADD, Gtk.IconSize.MENU)
+                add_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_ADD)
+                add_menuitem = Gtk.MenuItem()
+                add_menuitem_box.pack_start(add_menuitem_icon, False, False, 0)
+                add_menuitem_box.pack_start(add_menuitem_label, False, False, 0)
+                Gtk.Container.add(add_menuitem, add_menuitem_box)
                 add_menuitem.connect("activate",
                                      lambda i: self.add_section())
                 add_menuitem.show()
                 menu.append(add_menuitem)
                 # Copy section.
-                copy_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_COPY)
-                copy_menuitem.set_label(
-                    metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_COPY)
+                copy_menuitem_box = Gtk.Box()
+                copy_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_COPY, Gtk.IconSize.MENU)
+                copy_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_COPY)
+                copy_menuitem = Gtk.MenuItem()
+                copy_menuitem_box.pack_start(copy_menuitem_icon, False, False, 0)
+                copy_menuitem_box.pack_start(copy_menuitem_label, False, False, 0)
+                Gtk.Container.add(copy_menuitem, copy_menuitem_box)
                 copy_menuitem.connect(
                     "activate", lambda i: self.copy_section(this_section))
                 copy_menuitem.show()
@@ -530,9 +555,13 @@ class BaseSummaryDataPanel(Gtk.Box):
                 if (metomi.rose.variable.IGNORED_BY_USER in
                         self.sections[this_section].ignored_reason):
                     # Enable section.
-                    enab_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_YES)
-                    enab_menuitem.set_label(
-                        metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE)
+                    enab_menuitem_box = Gtk.Box()
+                    enab_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_YES, Gtk.IconSize.MENU)
+                    enab_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE)
+                    enab_menuitem = Gtk.MenuItem()
+                    enab_menuitem_box.pack_start(enab_menuitem_icon, False, False, 0)
+                    enab_menuitem_box.pack_start(enab_menuitem_label, False, False, 0)
+                    Gtk.Container.add(enab_menuitem, enab_menuitem_box)
                     enab_menuitem.connect(
                         "activate",
                         lambda i: self.sub_ops.ignore_section(this_section,
@@ -543,9 +572,13 @@ class BaseSummaryDataPanel(Gtk.Box):
                                       enab_menuitem))
                 else:
                     # Ignore section.
-                    ign_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_NO)
-                    ign_menuitem.set_label(
-                        metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE)
+                    ign_menuitem_box = Gtk.Box()
+                    ign_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_NO, Gtk.IconSize.MENU)
+                    ign_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE)
+                    ign_menuitem = Gtk.MenuItem()
+                    ign_menuitem_box.pack_start(ign_menuitem_icon, False, False, 0)
+                    ign_menuitem_box.pack_start(ign_menuitem_label, False, False, 0)
+                    Gtk.Container.add(ign_menuitem, ign_menuitem_box)
                     ign_menuitem.connect(
                         "activate",
                         lambda i: self.sub_ops.ignore_section(this_section,
@@ -555,9 +588,13 @@ class BaseSummaryDataPanel(Gtk.Box):
                     shortcuts.append((metomi.rose.config_editor.ACCEL_IGNORE,
                                       ign_menuitem))
                 # Remove section.
-                rem_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_REMOVE)
-                rem_menuitem.set_label(
-                    metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE)
+                rem_menuitem_box = Gtk.Box()
+                rem_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_REMOVE, Gtk.IconSize.MENU)
+                rem_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE)
+                rem_menuitem = Gtk.MenuItem()
+                rem_menuitem_box.pack_start(rem_menuitem_icon, False, False, 0)
+                rem_menuitem_box.pack_start(rem_menuitem_label, False, False, 0)
+                Gtk.Container.add(rem_menuitem, rem_menuitem_box)
                 rem_menuitem.connect(
                     "activate", lambda i: self.remove_section(this_section))
                 rem_menuitem.show()
@@ -566,9 +603,13 @@ class BaseSummaryDataPanel(Gtk.Box):
                                   rem_menuitem))
             else:  # A group is currently selected.
                 # Ignore all
-                ign_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_NO)
-                ign_menuitem.set_label(
-                    metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE)
+                ign_menuitem_box = Gtk.Box()
+                ign_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_NO, Gtk.IconSize.MENU)
+                ign_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE)
+                ign_menuitem = Gtk.MenuItem()
+                ign_menuitem_box.pack_start(ign_menuitem_icon, False, False, 0)
+                ign_menuitem_box.pack_start(ign_menuitem_label, False, False, 0)
+                Gtk.Container.add(ign_menuitem, ign_menuitem_box)
                 ign_menuitem.connect("activate",
                                      self._ignore_selected_sections,
                                      True)
@@ -577,9 +618,13 @@ class BaseSummaryDataPanel(Gtk.Box):
                 shortcuts.append((metomi.rose.config_editor.ACCEL_IGNORE,
                                   ign_menuitem))
                 # Enable all
-                ign_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_YES)
-                ign_menuitem.set_label(
-                    metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE)
+                ign_menuitem_box = Gtk.Box()
+                ign_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_YES, Gtk.IconSize.MENU)
+                ign_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE)
+                ign_menuitem = Gtk.MenuItem()
+                ign_menuitem_box.pack_start(ign_menuitem_icon, False, False, 0)
+                ign_menuitem_box.pack_start(ign_menuitem_label, False, False, 0)
+                Gtk.Container.add(ign_menuitem, ign_menuitem_box)
                 ign_menuitem.connect("activate",
                                      self._ignore_selected_sections,
                                      False)
@@ -588,9 +633,13 @@ class BaseSummaryDataPanel(Gtk.Box):
                 shortcuts.append((metomi.rose.config_editor.ACCEL_IGNORE,
                                   ign_menuitem))
                 # Delete all.
-                rem_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_REMOVE)
-                rem_menuitem.set_label(
-                    metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE)
+                rem_menuitem_box = Gtk.Box()
+                rem_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_REMOVE, Gtk.IconSize.MENU)
+                rem_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE)
+                rem_menuitem = Gtk.MenuItem()
+                rem_menuitem_box.pack_start(rem_menuitem_icon, False, False, 0)
+                rem_menuitem_box.pack_start(rem_menuitem_label, False, False, 0)
+                Gtk.Container.add(rem_menuitem, rem_menuitem_box)
                 rem_menuitem.connect(
                     "activate", self._remove_selected_sections)
                 rem_menuitem.show()

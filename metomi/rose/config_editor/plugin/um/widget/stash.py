@@ -407,9 +407,14 @@ class BaseStashSummaryDataPanelv1(
             meta_key = self.STASH_PARSE_DESC_OPT + "=" + str(value)
             metadata = self._stashmaster_meta_lookup.get(meta_key, {})
             help_ = metadata.get(metomi.rose.META_PROP_HELP)
-            if help_ is not None:
-                menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_HELP)
-                menuitem.set_label(label="Help")
+            if help_ is not None:             
+                menuitem_box = Gtk.Box()
+                menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_HELP, Gtk.IconSize.MENU)
+                menuitem_label = Gtk.Label(label="Help")
+                menuitem = Gtk.MenuItem()
+                menuitem_box.pack_start(menuitem_icon, False, False, 0)
+                menuitem_box.pack_start(menuitem_label, False, False, 0)
+                Gtk.Container.add(menuitem, menuitem_box)
                 menuitem._help_text = help_
                 menuitem._help_title = "Help for %s" % value
                 menuitem.connect("activate", self._launch_record_help)
@@ -419,8 +424,13 @@ class BaseStashSummaryDataPanelv1(
         if value not in self._profile_location_map[col_title]:
             return []
         location = self._profile_location_map[col_title][value]
-        menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_ABOUT)
-        menuitem.set_label(label="View " + value.strip("'"))
+        menuitem_box = Gtk.Box()
+        menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_ABOUT, Gtk.IconSize.MENU)
+        menuitem_label = Gtk.Label(label="View " + value.strip("'"))
+        menuitem = Gtk.MenuItem()
+        menuitem_box.pack_start(menuitem_icon, False, False, 0)
+        menuitem_box.pack_start(menuitem_label, False, False, 0)
+        Gtk.Container.add(menuitem, menuitem_box) 
         menuitem._loc_id = location
         menuitem.connect("activate",
                          lambda i: self.search_function(i._loc_id))
@@ -438,9 +448,13 @@ class BaseStashSummaryDataPanelv1(
         if profiles_menuitems:
             profiles_menu = Gtk.Menu()
             profiles_menu.show()
-            profiles_root_menuitem = Gtk.ImageMenuItem(
-                stock_id=Gtk.STOCK_ABOUT)
-            profiles_root_menuitem.set_label("View...")
+            profiles_root_menuitem_box = Gtk.Box()
+            profiles_root_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_ABOUT, Gtk.IconSize.MENU)
+            profiles_root_menuitem_label = Gtk.Label(label="View...")
+            profiles_root_menuitem = Gtk.MenuItem()
+            profiles_root_menuitem_box.pack_start(profiles_root_menuitem_icon, False, False, 0)
+            profiles_root_menuitem_box.pack_start(profiles_root_menuitem_label, False, False, 0)
+            Gtk.Container.add(profiles_root_menuitem, profiles_root_menuitem_box)
             profiles_root_menuitem.show()
             profiles_root_menuitem.set_submenu(profiles_menu)
             for profiles_menuitem in profiles_menuitems:
@@ -765,8 +779,13 @@ class BaseStashSummaryDataPanelv1(
             package_menuitem = Gtk.MenuItem(package_title)
             package_menuitem.show()
             package_menu = Gtk.Menu()
-            enable_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_YES)
-            enable_menuitem.set_label(label="Enable all")
+            enable_menuitem_box = Gtk.Box()
+            enable_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_YES, Gtk.IconSize.MENU)
+            enable_menuitem_label = Gtk.Label(label="Enable all")
+            enable_menuitem = Gtk.MenuItem()
+            enable_menuitem_box.pack_start(enable_menuitem_icon, False, False, 0)
+            enable_menuitem_box.pack_start(enable_menuitem_label, False, False, 0)
+            Gtk.Container.add(enable_menuitem, enable_menuitem_box)
             enable_menuitem._connect_args = (package, False)
             enable_menuitem.connect(
                 "button-release-event",
@@ -774,17 +793,27 @@ class BaseStashSummaryDataPanelv1(
             enable_menuitem.show()
             enable_menuitem.set_sensitive(any(ignored_list))
             package_menu.append(enable_menuitem)
-            ignore_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_NO)
-            ignore_menuitem.set_label(label="Ignore all")
+            ignore_menuitem_box = Gtk.Box()
+            ignore_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_NO, Gtk.IconSize.MENU)
+            ignore_menuitem_label = Gtk.Label(label="Ignore all")
+            ignore_menuitem = Gtk.MenuItem()
+            ignore_menuitem_box.pack_start(ignore_menuitem_icon, False, False, 0)
+            ignore_menuitem_box.pack_start(ignore_menuitem_label, False, False, 0)
+            Gtk.Container.add(ignore_menuitem, ignore_menuitem_box)
             ignore_menuitem._connect_args = (package, True)
             ignore_menuitem.connect(
                 "button-release-event",
                 lambda m, e: self._packages_enable(*m._connect_args))
             ignore_menuitem.set_sensitive(any(not i for i in ignored_list))
             ignore_menuitem.show()
-            package_menu.append(ignore_menuitem)
-            remove_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_REMOVE)
-            remove_menuitem.set_label(label="Remove all")
+            package_menu.append(ignore_menuitem)          
+            remove_menuitem_box = Gtk.Box()
+            remove_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_REMOVE, Gtk.IconSize.MENU)
+            remove_menuitem_label = Gtk.Label(label="Remove all")
+            remove_menuitem = Gtk.MenuItem()
+            remove_menuitem_box.pack_start(remove_menuitem_icon, False, False, 0)
+            remove_menuitem_box.pack_start(remove_menuitem_label, False, False, 0)
+            Gtk.Container.add(remove_menuitem, remove_menuitem_box)
             remove_menuitem._connect_args = (package,)
             remove_menuitem.connect(
                 "button-release-event",
@@ -792,9 +821,14 @@ class BaseStashSummaryDataPanelv1(
             remove_menuitem.show()
             package_menu.append(remove_menuitem)
             package_menuitem.set_submenu(package_menu)
-            menu.append(package_menuitem)
-        menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_ADD)
-        menuitem.set_label(label="Import")
+            menu.append(package_menuitem)       
+        menuitem_box = Gtk.Box()
+        menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_ADD, Gtk.IconSize.MENU)
+        menuitem_label = Gtk.Label(label="Import")
+        menuitem = Gtk.MenuItem()
+        menuitem_box.pack_start(menuitem_icon, False, False, 0)
+        menuitem_box.pack_start(menuitem_label, False, False, 0)
+        Gtk.Container.add(menuitem, menuitem_box)
         import_menu = Gtk.Menu()
         new_packages = set(self._package_lookup.keys()) - set(packages.keys())
         for new_package in sorted(new_packages):
@@ -810,8 +844,13 @@ class BaseStashSummaryDataPanelv1(
         menuitem.set_submenu(import_menu)
         menuitem.show()
         menu.append(menuitem)
-        menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_NO)
-        menuitem.set_label(label="Disable all packages")
+        menuitem_box = Gtk.Box()
+        menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_NO, Gtk.IconSize.MENU)
+        menuitem_label = Gtk.Label(label="Disable all packages")
+        menuitem = Gtk.MenuItem()
+        menuitem_box.pack_start(menuitem_icon, False, False, 0)
+        menuitem_box.pack_start(menuitem_label, False, False, 0)
+        Gtk.Container.add(menuitem, menuitem_box)
         menuitem.connect("activate",
                          lambda i: self._packages_enable(disable=True))
         menuitem.show()

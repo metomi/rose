@@ -138,11 +138,13 @@ class SourceValueWidget(Gtk.Box):
 
     def _get_custom_menu_items(self):
         """Return some custom menuitems for use in the list view."""
-        menuitem = Gtk.ImageMenuItem(
-            metomi.rose.config_editor.FILE_CONTENT_PANEL_MENU_OPTIONAL)
-        image = Gtk.Image.new_from_stock(
-            Gtk.STOCK_DIALOG_QUESTION, Gtk.IconSize.MENU)
-        menuitem.set_image(image)
+        menuitem_box = Gtk.Box()
+        menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_DIALOG_QUESTION, Gtk.IconSize.MENU)
+        menuitem_label = Gtk.Label(label=metomi.rose.config_editor.FILE_CONTENT_PANEL_MENU_OPTIONAL)
+        menuitem = Gtk.MenuItem()
+        menuitem_box.pack_start(menuitem_icon, False, False, 0)
+        menuitem_box.pack_start(menuitem_label, False, False, 0)
+        Gtk.Container.add(menuitem, menuitem_box)
         menuitem.connect(
             "button-press-event", self._toggle_menu_optional_status)
         menuitem.show()

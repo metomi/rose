@@ -541,8 +541,13 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
         section, item = self._get_section_item_from_iter(row_iter)
         if section is None or item is None:
             return False
-        add_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_ADD)
-        add_menuitem.set_label("Add STASH request")
+        add_menuitem_box = Gtk.Box()
+        add_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_ADD, Gtk.IconSize.MENU)
+        add_menuitem_label = Gtk.Label(label="Add STASH request")
+        add_menuitem = Gtk.MenuItem()
+        add_menuitem_box.pack_start(add_menuitem_icon, False, False, 0)
+        add_menuitem_box.pack_start(add_menuitem_label, False, False, 0)
+        Gtk.Container.add(add_menuitem, add_menuitem_box)
         add_menuitem.connect("activate",
                              lambda i: self.add_stash_request(section, item))
         add_menuitem.show()
@@ -553,8 +558,13 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
             self.STASH_PARSE_DESC_OPT + "=" + str(stash_desc_value), {})
         desc_meta_help = desc_meta.get(metomi.rose.META_PROP_HELP)
         if desc_meta_help is not None:
-            help_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_HELP)
-            help_menuitem.set_label("Help")
+            help_menuitem_box = Gtk.Box()
+            help_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_HELP, Gtk.IconSize.MENU)
+            help_menuitem_label = Gtk.Label(label="Help")
+            help_menuitem = Gtk.MenuItem()
+            help_menuitem_box.pack_start(help_menuitem_icon, False, False, 0)
+            help_menuitem_box.pack_start(help_menuitem_label, False, False, 0)
+            Gtk.Container.add(help_menuitem, help_menuitem_box)
             help_menuitem._help_text = desc_meta_help
             help_menuitem._help_title = "Help for %s" % stash_desc_value
             help_menuitem.connect("activate", self._launch_record_help)
@@ -562,8 +572,13 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
             menu.append(help_menuitem)
         streqs = list(self.request_lookup.get(section, {}).get(item, {}).keys())
         if streqs:
-            view_menuitem = Gtk.ImageMenuItem(stock_id=Gtk.STOCK_FIND)
-            view_menuitem.set_label(label="View...")
+            view_menuitem_box = Gtk.Box()
+            view_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_FIND, Gtk.IconSize.MENU)
+            view_menuitem_label = Gtk.Label(label="View...")
+            view_menuitem = Gtk.MenuItem()
+            view_menuitem_box.pack_start(view_menuitem_icon, False, False, 0)
+            view_menuitem_box.pack_start(view_menuitem_label, False, False, 0)
+            Gtk.Container.add(view_menuitem, view_menuitem_box)
             view_menuitem.show()
             view_menu = Gtk.Menu()
             view_menu.show()
