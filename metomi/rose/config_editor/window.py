@@ -734,8 +734,9 @@ class MacroChangesDialog(Gtk.Dialog):
         max_size = metomi.rose.config_editor.SIZE_MACRO_DIALOG_MAX
         my_size = self.size_request()
         new_size = [-1, -1]
-        for i in [0, 1]:
-            new_size[i] = min([my_size[i], max_size[i]])
+        # this needs checking
+        new_size[0] = min([my_size.width, max_size[0]])
+        new_size[1] = min([my_size.height, max_size[1]])
         self.treewindow.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.set_default_size(*new_size)
         if self.for_transform:
