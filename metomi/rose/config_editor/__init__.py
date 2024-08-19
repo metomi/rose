@@ -701,7 +701,14 @@ META_PROP_WIDGET_SUB_NS = "widget[rose-config-edit:sub-ns]"
 
 # Miscellaneous
 COPYRIGHT = (
-    "Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.")
+    """Copyright (C) 2012-2024 British Crown (Met Office) & Contributors.
+       For full terms of use and licenses visit the Rose link above.""")
+ABOUT_TEXT = "GUI interface to edit rose suites."
+CREDIT = (
+    ["Ben Fitzpatrick", ["Principal Developer"]],
+    ["Dimitrios Theodorakis", ["Migration to Rose 2.0"]],
+    ["Joseph Abram", ["Migration to Rose 2.0"]]
+)
 HELP_FILE = "rose-rug-config-edit.html"
 LAUNCH_COMMAND = "rose config-edit"
 LAUNCH_COMMAND_CONFIG = "rose config-edit -C"

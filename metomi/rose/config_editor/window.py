@@ -152,7 +152,8 @@ class MainWindow(object):
             name=metomi.rose.config_editor.PROGRAM_NAME,
             copyright_=metomi.rose.config_editor.COPYRIGHT,
             logo_path="etc/images/rose-logo.png",
-            website=metomi.rose.config_editor.PROJECT_URL)
+            website=metomi.rose.config_editor.PROJECT_URL,
+            website_label=metomi.rose.config_editor.PROJECT_URL)
 
     def _reload_choices(self, liststore, top_name, add_choices):
         liststore.clear()

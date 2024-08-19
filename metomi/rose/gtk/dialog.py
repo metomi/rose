@@ -268,23 +268,21 @@ def _process(cmd_args, stdout=sys.stdout, stderr=sys.stderr):
 
 
 def run_about_dialog(name=None, copyright_=None,
-                     logo_path=None, website=None):
+                     logo_path=None, website=None, website_label=None):
     parent_window = get_dialog_parent()
     about_dialog = Gtk.AboutDialog()
     about_dialog.set_transient_for(parent_window)
-    about_dialog.set_name(name)
-    licence_path = os.path.join(os.getenv("ROSE_HOME"),
-                                metomi.rose.FILEPATH_README)
-    about_dialog.set_license(open(licence_path, "r").read())
+    about_dialog.set_program_name(name)
     about_dialog.set_copyright(copyright_)
     resource_loc = metomi.rose.resource.ResourceLocator(paths=sys.path)
     logo_path = resource_loc.locate(logo_path)
-    about_dialog.set_logo(GdkPixbuf.Pixbuf.new_from_file(logo_path))
+    about_dialog.set_logo(GdkPixbuf.Pixbuf.new_from_file(str(logo_path)))
     about_dialog.set_website(website)
-    Gtk.about_dialog_set_url_hook(
-        lambda u, v, w: webbrowser.open(w), about_dialog.get_website())
-    about_dialog.run()
-    about_dialog.destroy()
+    about_dialog.set_website_label(website_label)
+    about_dialog.set_comments(metomi.rose.config_editor.ABOUT_TEXT)
+    for credit in metomi.rose.config_editor.CREDIT:
+        about_dialog.add_credit_section(credit[0], credit[1])
+    about_dialog.present()
 
 
 def run_command_arg_dialog(cmd_name, help_text, run_hook):
