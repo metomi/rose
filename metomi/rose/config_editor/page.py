@@ -548,8 +548,8 @@ class ConfigPage(Gtk.Box):
             actions.insert(0, ('Add blank', Gtk.STOCK_NEW, text))
         ghost_list = [v for v in self.ghost_data]
         sorter = metomi.rose.config.sort_settings
-        ghost_list.sort(lambda v, w: sorter(v.metadata['id'],
-                                            w.metadata['id']))
+        ghost_list.sort(key=cmp_to_key(lambda v, w: sorter(v.metadata['id'],
+                                                           w.metadata['id'])))
         for variable in ghost_list:
             label_text = variable.name
             if (not self.show_modes[metomi.rose.config_editor.SHOW_MODE_NO_TITLE] and
