@@ -831,7 +831,7 @@ class ConfigPage(Gtk.Box):
     def get_main_focus(self):
         """Retrieve the focus variable widget id."""
         widget_list = self.get_main_variable_widgets()
-        focus_child = getattr(self.main_container, "focus_child")
+        focus_child = self.main_container.get_focus_child()
         for widget in widget_list:
             if focus_child == widget:
                 if hasattr(widget.get_parent(), 'variable'):
