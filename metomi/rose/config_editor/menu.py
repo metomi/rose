@@ -334,7 +334,7 @@ class MenuBar(object):
             all_item_label = Gtk.Label(label=metomi.rose.config_editor.MACRO_MENU_ALL_VALIDATORS)
             all_item = Gtk.MenuItem()
             all_item_box.pack_start(all_item_icon, False, False, 0)
-            all_item_box.pack_start(all_item, False, False, 0)
+            all_item_box.pack_start(all_item_label, False, False, 0)
             Gtk.Container.add(macro_item, macro_item_box)
             all_item._rose_all_validators = True
             all_item.set_tooltip_text(
