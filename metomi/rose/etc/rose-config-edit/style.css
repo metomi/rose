@@ -1,3 +1,14 @@
 entry {
     background-color: coral;
 }
+
+/* Fix the close button for tab page labels */
+#page-tab-button {
+    border: None;
+    padding-right: 10px;
+}
+    
+#page-tab-button:hover {
+    background-image: None;
+    box-shadow: None;
+}
