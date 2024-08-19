@@ -493,8 +493,8 @@ class MainMenuHandler(object):
 
     def inspect_custom_macro(self, macro_meth):
         """Inspect a custom macro for kwargs and return any"""
-        arglist = inspect.getargspec(macro_meth).args
-        defaultlist = inspect.getargspec(macro_meth).defaults
+        arglist = inspect.getfullargspec(macro_meth).args
+        defaultlist = inspect.getfullargspec(macro_meth).defaults
         optionals = {}
         while defaultlist is not None and len(defaultlist) > 0:
             if arglist[-1] not in ["self", "config", "meta_config"]:
