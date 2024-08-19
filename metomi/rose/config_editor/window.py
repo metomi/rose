@@ -667,9 +667,9 @@ class MacroChangesDialog(Gtk.Dialog):
             column.set_title(title)
             cell = Gtk.CellRendererText()
             if i == len(self.COLUMNS) - 1:
-                column.pack_start(cell, True, True, 0)
+                column.pack_start(cell, True)
             else:
-                column.pack_start(cell, False, True, 0)
+                column.pack_start(cell, False)
             if title == "Type":
                 column.set_cell_data_func(cell, self._set_type_markup, i)
             else:
