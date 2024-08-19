@@ -564,7 +564,7 @@ class ConfigPage(Gtk.Box):
         uimanager = Gtk.UIManager()
         actiongroup = Gtk.ActionGroup('Popup')
         actiongroup.add_actions(actions)
-        uimanager.insert_action_group(actiongroup, pos=0)
+        uimanager.insert_action_group(actiongroup)
         uimanager.add_ui_from_string(add_ui)
         if 'Add blank' in add_ui:
             blank_item = uimanager.get_widget('/Popup/Add blank')
