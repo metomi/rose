@@ -1672,7 +1672,7 @@ class MainController(object):
             ns_list.sort(ns_cmp)
             for ns in ns_list:
                 variables = found_ns_vars[ns]
-                variables.sort(id_cmp)
+                variables.sort(key=lambda x: x.metadata['id'])
                 for variable in variables:
                     var_id = variable.metadata['id']
                     if (config_name, var_id) not in self.find_hist['ids']:
