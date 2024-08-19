@@ -207,9 +207,7 @@ class ConfigPage(Gtk.Box):
         att_list = label.get_attributes()
         if att_list is None:
             att_list = Pango.AttrList()
-        att_list.insert(Pango.AttrUnderline(Pango.Underline.SINGLE,
-                                            start_index=0,
-                                            end_index=-1))
+        att_list.insert(Pango.attr_underline_new(Pango.Underline.SINGLE))
         label.set_attributes(att_list)
 
     def _handle_leave_label(self, label_event_box, event=None):
@@ -218,7 +216,7 @@ class ConfigPage(Gtk.Box):
         if att_list is None:
             att_list = Pango.AttrList()
         att_list = att_list.filter(lambda a:
-                                   a.type != Pango.ATTR_UNDERLINE)
+                                   a.klass.type != Pango.AttrType.UNDERLINE)
         if att_list is None:
             # This is messy but necessary.
             att_list = Pango.AttrList()
