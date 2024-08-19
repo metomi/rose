@@ -723,7 +723,7 @@ class MainMenuHandler(object):
                                                   return_value)
                     continue
                 if return_value:
-                    return_value.sort(lambda x, y: sorter(to_id(x), to_id(y)))
+                    return_value.sort(key=cmp_to_key(lambda x, y: sorter(to_id(x), to_id(y))))
                 config_macro_errors.append((config_name,
                                             macro_fullname,
                                             len(return_value)))
