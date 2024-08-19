@@ -91,7 +91,7 @@ class StatusBar(Gtk.Box):
     """Generate the status bar widget."""
 
     def __init__(self, verbosity=metomi.rose.reporter.Reporter.DEFAULT):
-        super(StatusBar, self).__init__()
+        super(StatusBar, self).__init__(orientation=Gtk.Orientation.VERTICAL)
         self.verbosity = verbosity
         self.num_errors = 0
         self.console = None

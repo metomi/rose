@@ -52,7 +52,7 @@ class BaseSummaryDataPanel(Gtk.Box):
     def __init__(self, sections, variables, sect_ops, var_ops,
                  search_function, sub_ops,
                  is_duplicate, arg_str=None):
-        super(BaseSummaryDataPanel, self).__init__()
+        super(BaseSummaryDataPanel, self).__init__(orientation=Gtk.Orientation.VERTICAL)
         self.sections = sections
         self.variables = variables
         self._section_data_list = None

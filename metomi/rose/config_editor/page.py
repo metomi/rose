@@ -50,7 +50,7 @@ class ConfigPage(Gtk.Box):
                  reporter, directory=None, sub_data=None, sub_ops=None,
                  launch_info_func=None, launch_edit_func=None,
                  launch_macro_func=None):
-        super(ConfigPage, self).__init__(homogeneous=False)
+        super(ConfigPage, self).__init__(homogeneous=False, orientation=Gtk.Orientation.VERTICAL)
         self.namespace = page_metadata.get('namespace')
         self.ns_is_default = page_metadata.get('ns_is_default')
         self.config_name = page_metadata.get('config_name')

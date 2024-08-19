@@ -83,7 +83,7 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
         info.
 
         """
-        super(AddStashDiagnosticsPanelv1, self).__init__(self)
+        super(AddStashDiagnosticsPanelv1, self).__init__(self, orientation=Gtk.Orientation.VERTICAL)
         self.set_property("homogeneous", False)
         self.stash_lookup = stash_lookup
         self.request_lookup = request_lookup
