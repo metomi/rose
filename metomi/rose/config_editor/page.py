@@ -301,7 +301,7 @@ class ConfigPage(Gtk.Box):
 
     def reshuffle_for_detached(self, add_button, revert_button, parent):
         """Reshuffle widgets for detached view."""
-        focus_child = getattr(self, 'focus_child')
+        focus_child = self.get_focus_child()
         button_hbox = Gtk.Box(homogeneous=False, spacing=0)
         self.tool_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, homogeneous=False, spacing=0)
         sep = Gtk.VSeparator()
