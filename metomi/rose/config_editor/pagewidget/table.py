@@ -158,7 +158,7 @@ class PageTable(Gtk.Table):
                 (val.metadata.get("sort-key", "~")), val.metadata["id"])
             is_ghost = val in self.ghost_data
             sort_key_vars.append((sort_key, val, is_ghost))
-        sort_key_vars.sort(key=cmp_to_key(metomi.rose.config_editor.util.null_cmp))
+        sort_key_vars.sort(key=cmp_to_key(lambda x, y: metomi.rose.config_editor.util.null_cmp(x[0], y[0])))
         sort_key_vars.sort(key=lambda x: "=null" in x[1].metadata["id"])
         return [(x[1], x[2]) for x in sort_key_vars]
 

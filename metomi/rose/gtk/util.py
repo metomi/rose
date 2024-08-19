@@ -450,8 +450,8 @@ class Notebook(Gtk.Notebook):
         """Use this only with pages with the attribute 'namespace'."""
         self.remove_page(self.get_page_ids().index(page_id))
 
-    def set_tab_label_packing(self, page):
-        super(Notebook, self).set_tab_label(page) # check
+    def set_tab_label_packing(self, page, tab_labelwidget):
+        super(Notebook, self).set_tab_label(page, tab_labelwidget)
 
 
 class TooltipTreeView(Gtk.TreeView):
@@ -542,6 +542,11 @@ class TreeModelSortUtil(object):
 
     def cmp_(self, value1, value2):
         """Perform a useful form of 'cmp'"""
+        # Hack - some values coming in as None so replace with strings
+        if value1 is None:
+            value1 = "None"
+        if value2 is None:
+            value2 = "None"
         if (isinstance(value1, str) and isinstance(value2, str)):
             if value1.isdigit() and value2.isdigit():
                 return (float(value1) > float(value2)) - (float(value1) < float(value2))
