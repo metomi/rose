@@ -401,7 +401,7 @@ class NavPanelHandler(object):
         uimanager = Gtk.UIManager()
         actiongroup = Gtk.ActionGroup('Popup')
         actiongroup.add_actions(actions)
-        uimanager.insert_action_group(actiongroup, pos=0)
+        uimanager.insert_action_group(actiongroup)
         uimanager.add_ui_from_string(ui_config_string)
         if namespace is None or (is_top or is_empty):
             new_item = uimanager.get_widget('/Popup/New')
