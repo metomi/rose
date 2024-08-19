@@ -155,7 +155,7 @@ class ConfigPage(Gtk.Box):
     def _handle_click_main_window(self, widget, event):
         if event.button != 3:
             return False
-        self.launch_add_menu(event.button, event.time)
+        self.launch_add_menu(event)
         return False
 
     def get_label_widget(self, is_detached=False):
@@ -298,7 +298,7 @@ class ConfigPage(Gtk.Box):
             url_item = uimanager.get_widget('/Popup/Web_Help')
             url_item.connect("activate", lambda b: self.launch_url())
         tab_menu = uimanager.get_widget('/Popup')
-        tab_menu.popup(None, None, None, event.button, event.time)
+        tab_menu.popup_at_pointer(event)
         return False
 
     def trigger_tab_detach(self, widget=None):
@@ -514,12 +514,12 @@ class ConfigPage(Gtk.Box):
                 self.sub_data_panel.update(self.sub_data["sections"],
                                            self.sub_data["variables"])
 
-    def launch_add_menu(self, button, my_time):
+    def launch_add_menu(self, event):
         """Pop up a contextual add variable menu."""
         add_menu = self.get_add_menu()
         if add_menu is None:
             return False
-        add_menu.popup(None, None, None, button, my_time)
+        add_menu.popup_at_pointer(event)
         return False
 
     def get_add_menu(self):
