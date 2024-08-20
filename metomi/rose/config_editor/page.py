@@ -112,8 +112,10 @@ class ConfigPage(Gtk.Box):
         self.scrolled_vbox.show()
         self.scrolled_main_window.add_with_viewport(self.scrolled_vbox)
         self.scrolled_main_window.get_child().set_shadow_type(Gtk.ShadowType.NONE)
-        self.scrolled_main_window.set_border_width(
-            metomi.rose.config_editor.SPACING_SUB_PAGE)
+        self.scrolled_main_window.set_margin_start(
+            metomi.rose.config_editor.SPACING_SUB_PAGE) # left
+        self.scrolled_main_window.set_margin_end(
+            metomi.rose.config_editor.SPACING_SUB_PAGE) # right
         self.scrolled_vbox.pack_start(self.main_container,
                                       expand=False, fill=True, padding=0)
         self.scrolled_main_window.show()
