@@ -1014,7 +1014,7 @@ class MainMenuHandler(object):
             meta_config = self.data.config[config_name].meta
             macro = metomi.rose.macros.DefaultTransforms()
             change_list = macro.transform(macro_config, meta_config)[1]
-            change_list.sort(lambda x, y: sorter(to_id(x), to_id(y)))
+            change_list.sort(key=cmp_to_key(lambda x, y: sorter(to_id(x), to_id(y))))
             self.handle_macro_transforms(
                 config_name, "Autofixer.transform",
                 macro_config, change_list, triggers_ok=True)
