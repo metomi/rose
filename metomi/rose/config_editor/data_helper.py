@@ -19,6 +19,7 @@
 # -----------------------------------------------------------------------------
 
 import re
+from functools import cmp_to_key
 
 import metomi.rose.config
 
@@ -191,7 +192,7 @@ class ConfigDataHelper(object):
         config_name = self.util.split_full_ns(self.data, ns)[0]
         config_data = self.data.config[config_name]
         sections = self.get_sections_from_namespace(ns)
-        sections.sort(metomi.rose.config.sort_settings)
+        sections.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         for section in sections:
             sect_data = config_data.sections.now.get(section)
             if sect_data is not None and sect_data.comments:
@@ -294,7 +295,7 @@ class ConfigDataHelper(object):
                     miss_sections.append(section)
             full_sections += [config_name + ':' + s for s in miss_sections]
         sorter = metomi.rose.config.sort_settings
-        full_sections.sort(sorter)
+        full_sections.sort(key=cmp_to_key(sorter))
         return full_sections
 
     def get_default_section_namespace(self, section, config_name):
@@ -342,7 +343,7 @@ class ConfigDataHelper(object):
             if (section not in format_keys and
                     ':' in section and not section.startswith('file:')):
                 format_keys.append(section)
-        format_keys.sort(metomi.rose.config.sort_settings)
+        format_keys.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         return format_keys
 
     def get_icon_path_for_config(self, config_name):
@@ -382,7 +383,7 @@ class ConfigDataHelper(object):
             elif (metomi.rose.variable.IGNORED_BY_USER in
                   sect_data.ignored_reason):
                 return_sections.append(section)
-        return_sections.sort(metomi.rose.config.sort_settings)
+        return_sections.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         return return_sections
 
     def get_latent_sections(self, namespace):
@@ -397,7 +398,7 @@ class ConfigDataHelper(object):
         for section in sections:
             if section not in config_data.sections.now:
                 return_sections.append(section)
-        return_sections.sort(metomi.rose.config.sort_settings)
+        return_sections.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         return return_sections
 
     def get_ns_ignored_status(self, namespace):
@@ -450,7 +451,7 @@ class ConfigDataHelper(object):
         else:
             object_statuses = variable_statuses
         status_counts = list(object_statuses.items())
-        status_counts.sort(lambda x, y: cmp(x[1], y[1]))
+        status_counts.sort(key = lambda x: x[1])
         if not status_counts:
             cache[namespace] = status
             return metomi.rose.config.ConfigNode.STATE_NORMAL

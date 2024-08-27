@@ -28,6 +28,8 @@ import metomi.rose.config_editor
 import metomi.rose.config_editor.util
 import metomi.rose.gtk.util
 
+from functools import cmp_to_key
+
 
 class BaseSummaryDataPanel(Gtk.Box):
 
@@ -755,9 +757,8 @@ class BaseSummaryDataPanel(Gtk.Box):
             return True
         return False
 
-    def _sort_row_data(self, row1, row2, sort_index, descending=False):
-        fac = (-1 if descending else 1)
-        return fac * self.sort_util.cmp_(row1[sort_index], row2[sort_index])
+    def _sort_row_data(self, row1, row2):
+        return self.sort_util.cmp_(row1[0], row2[0])
 
     def _handle_group_change(self, combobox):
         model = combobox.get_model()
@@ -784,7 +785,10 @@ class BaseSummaryDataPanel(Gtk.Box):
         k = group_index
         data_rows = [r[k:k + 1] + r[0:k] + r[k + 1:] for r in data_rows]
         column_names.insert(0, column_names.pop(k))
-        data_rows.sort(lambda x, y: self._sort_row_data(x, y, 0, descending))
+        if descending:
+            data_rows.sort(key=cmp_to_key(self._sort_row_data), reverse=True)
+        else:
+            data_rows.sort(key=cmp_to_key(self._sort_row_data))
         last_entry = None
         rows_are_descendants = []
         for i, row in enumerate(data_rows):
@@ -834,8 +838,8 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
                 self.var_id_map[variable.metadata["id"]] = variable
                 if variable.name not in sub_var_names:
                     sub_var_names.append(variable.name)
-        sub_sect_names.sort(metomi.rose.config.sort_settings)
-        sub_var_names.sort(metomi.rose.config.sort_settings)
+        sub_sect_names.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
+        sub_var_names.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         data_rows = []
         for section in sub_sect_names:
             row_data = [section]

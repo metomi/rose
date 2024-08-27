@@ -29,6 +29,8 @@ import copy
 import re
 import time
 
+from functools import cmp_to_key
+
 import metomi.rose.config
 import metomi.rose.config_editor
 
@@ -310,7 +312,7 @@ class GroupOperations(object):
             var.process_metadata(metadata)
             var.metadata['full_ns'] = new_namespace
         sorter = metomi.rose.config.sort_settings
-        clone_vars.sort(lambda v, w: sorter(v.name, w.name))
+        clone_vars.sort(key=cmp_to_key(lambda v, w: sorter(v.name, w.name)))
         if skip_update:
             for var in clone_vars:
                 self.var_ops.add_var(var, skip_update=skip_update)

@@ -18,6 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
+from functools import cmp_to_key
 
 import metomi.rose.config_editor
 
@@ -64,12 +65,9 @@ class NavTreeManager(object):
         # Reload the information into the tree.
         if only_this_config is None:
             configs = list(self.data.config.keys())
-            configs.sort(metomi.rose.config.sort_settings)
+            configs.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
             configs.sort(
-                lambda x, y: cmp(
-                    self.data.config[y].config_type == metomi.rose.TOP_CONFIG_NAME,
-                    self.data.config[x].config_type == metomi.rose.TOP_CONFIG_NAME
-                )
+                key=lambda x: self.data.config[x].config_type == metomi.rose.TOP_CONFIG_NAME
             )
         else:
             configs = [only_this_config]
