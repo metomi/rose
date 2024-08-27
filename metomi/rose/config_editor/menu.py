@@ -301,7 +301,7 @@ class MenuBar(object):
             self.macro_ids.append(self.uimanager.add_ui_from_string(new_ui))
             config_item = self.uimanager.get_widget(config_address)
             if image_path is not None:
-                image = Gtk.image_new_from_file(image_path)
+                image = Gtk.Image.new_from_file(image_path)
                 config_item.set_image(image)
         if config_item.get_submenu() is None:
             config_item.set_submenu(Gtk.Menu())
