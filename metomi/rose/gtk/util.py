@@ -81,7 +81,10 @@ class CustomButton(Gtk.Button):
         if stock_id is not None:
             self.stock_id = stock_id
             self.icon = Gtk.Image()
-            self.icon.set_from_stock(stock_id, size)
+            if stock_id.startswith("gtk"):
+                self.icon.set_from_stock(stock_id, size)
+            else:
+                self.icon.set_from_icon_name(stock_id, size)
             self.icon.show()
             if self.icon_at_start:
                 self.hbox.pack_start(self.icon, expand=False, fill=False,
