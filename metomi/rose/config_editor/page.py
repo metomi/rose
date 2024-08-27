@@ -465,8 +465,8 @@ class ConfigPage(Gtk.Box):
             metadata_files = self.section_ops.get_ns_metadata_files(
                 self.namespace)
             widget_dir = metomi.rose.META_DIR_WIDGET
-            metadata_files.sort(
-                lambda x, y: (widget_dir in y) - (widget_dir in x))
+            metadata_files.sort(key=cmp_to_key(
+                lambda x, y: (widget_dir in y) - (widget_dir in x)))
             prefix = re.sub(r"[^\w]", "_", self.config_name.strip("/"))
             prefix += "/" + metomi.rose.META_DIR_WIDGET + "/"
             custom_widget = metomi.rose.resource.import_object(

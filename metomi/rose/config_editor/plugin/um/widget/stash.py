@@ -214,12 +214,12 @@ class BaseStashSummaryDataPanelv1(
             sort_list[3] = section
         sub_sect_names.sort(key=lambda x: section_sort_keys.get(x))
         sub_var_names.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
-        sub_var_names.sort(lambda x, y: (y != self.STREQ_NL_PACKAGE_OPT) -
-                                        (x != self.STREQ_NL_PACKAGE_OPT))
-        sub_var_names.sort(lambda x, y: (y == self.STREQ_NL_ITEM_OPT) -
-                                        (x == self.STREQ_NL_ITEM_OPT))
-        sub_var_names.sort(lambda x, y: (y == self.STREQ_NL_SECT_OPT) -
-                                        (x == self.STREQ_NL_SECT_OPT))
+        sub_var_names.sort(key=cmp_to_key(lambda x, y: (y != self.STREQ_NL_PACKAGE_OPT) -
+                                        (x != self.STREQ_NL_PACKAGE_OPT)))
+        sub_var_names.sort(key=cmp_to_key(lambda x, y: (y == self.STREQ_NL_ITEM_OPT) -
+                                        (x == self.STREQ_NL_ITEM_OPT)))
+        sub_var_names.sort(key=cmp_to_key(lambda x, y: (y == self.STREQ_NL_SECT_OPT) -
+                                        (x == self.STREQ_NL_SECT_OPT)))
         # Load the data.
         data_rows = []
         for section in sub_sect_names:

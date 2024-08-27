@@ -297,9 +297,9 @@ class PageLatentTable(Gtk.Table):
         for val in self.panel_data + self.ghost_data:
             v_sort_ids.append((val.metadata.get("sort-key", ""),
                                val.metadata["id"]))
-        v_sort_ids.sort(
+        v_sort_ids.sort(key=cmp_to_key(
             lambda x, y: metomi.rose.config.sort_settings(
-                x[0] + "~" + x[1], y[0] + "~" + y[1]))
+                x[0] + "~" + x[1], y[0] + "~" + y[1])))
         v_sort_ids.sort(key=lambda x: "=null" in x[1])
         for _, var_id in v_sort_ids:
             is_ghost = False

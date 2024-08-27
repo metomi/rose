@@ -710,7 +710,7 @@ class MainMenuHandler(object):
                 macro_config, change_list = return_value
                 if not change_list:
                     continue
-                change_list.sort(lambda x, y: sorter(to_id(x), to_id(y)))
+                change_list.sort(key=cmp_to_key(lambda x, y: sorter(to_id(x), to_id(y))))
                 num_changes = len(change_list)
                 self.handle_macro_transforms(config_name, macro_fullname,
                                              macro_config, change_list)

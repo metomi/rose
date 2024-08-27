@@ -83,7 +83,7 @@ class NavPanelHandler(object):
 
         config_names = [
             n for n in self.data.config if not self.ask_is_preview(n)]
-        config_names.sort(lambda x, y: (y == config_name) - (x == config_name))
+        config_names.sort(key=cmp_to_key(lambda x, y: (y == config_name) - (x == config_name)))
         config_name, section = self.mainwindow.launch_add_dialog(
             config_names, choices_help, help_str)
         if config_name in self.data.config and section is not None:
