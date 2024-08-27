@@ -712,8 +712,8 @@ class MacroChangesDialog(Gtk.Dialog):
             text = (text.rstrip() + " " +
                     extra_text.format(nums_is_warning[True]))
         self.label.set_markup(text)
-        changes.sort(key=lambda x: x.option)
-        changes.sort(key=lambda x: x.section)
+        changes.sort(key=lambda x: str(x.option))
+        changes.sort(key=lambda x: str(x.section))
         changes.sort(key=lambda x: x.is_warning)
         last_section = None
         last_section_iter = None
