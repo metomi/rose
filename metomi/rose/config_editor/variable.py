@@ -147,8 +147,7 @@ class VariableWidget(object):
             custom_arg = self.var_ops
         set_value = self._valuewidget_set_value
         hook_object = metomi.rose.config_editor.valuewidget.ValueWidgetHook(
-            metomi.rose.config_editor.false_function,
-            self._get_focus)
+            metomi.rose.config_editor.false_function)
         metadata = copy.deepcopy(variable.metadata)
         if use_this_valuewidget is not None:
             self.valuewidget = use_this_valuewidget(variable.value,
@@ -397,7 +396,7 @@ class VariableWidget(object):
                 if (self.valuewidget.get_sensitive() & child.get_state_flags() and
                         self.valuewidget.get_parent().get_sensitive() & child.get_state_flags()):
                     break
-            else:
+            else: # no break
                 if hasattr(self, 'menuwidget'):
                     self.menuwidget.get_children()[0].grab_focus()
             if scroll_bottom and focus_container is not None:
@@ -498,6 +497,7 @@ class VariableWidget(object):
         widget_for_focus.grab_focus()
         self.valuewidget.trigger_scroll(widget_for_focus, None)
         if isinstance(widget_for_focus, Gtk.Entry):
+            widget_for_focus.grab_focus_without_selecting()
             text_length = len(widget_for_focus.get_text())
             if text_length > 0:
                 widget_for_focus.set_position(text_length)
