@@ -45,7 +45,7 @@ class Lookup(object):
     def get_id_from_section_option(self, section, option):
         """Return a variable id from a section and option."""
         if option is None:
-            id_ = section
+            id_ = str(section)
         else:
             id_ = section + metomi.rose.CONFIG_DELIMITER + option
         self.section_option_id_lookup[id_] = (section, option)
