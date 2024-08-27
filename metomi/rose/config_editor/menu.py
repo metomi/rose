@@ -39,8 +39,6 @@ import metomi.rose.gtk.run
 import metomi.rose.macro
 import metomi.rose.macros
 import metomi.rose.popen
-# import metomi.rose.suite_control
-# import metomi.rose.suite_engine_proc
 
 from functools import cmp_to_key
 
