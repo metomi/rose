@@ -340,7 +340,7 @@ def run_dialog(dialog_type, text, title=None, modal=True,
     elif dialog_type == Gtk.MessageType.WARNING:
         stock_id = Gtk.STOCK_DIALOG_WARNING
     elif dialog_type == Gtk.MessageType.QUESTION:
-        stock_id = Gtk.STOCK_DIALOG_QUESTION
+        stock_id = "dialog-question"
     elif dialog_type == Gtk.MessageType.ERROR:
         stock_id = Gtk.STOCK_DIALOG_ERROR
     else:

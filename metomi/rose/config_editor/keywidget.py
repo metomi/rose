@@ -41,7 +41,7 @@ class KeyWidget(Gtk.Box):
         metomi.rose.config_editor.FLAG_TYPE_FIXED: Gtk.STOCK_DIALOG_AUTHENTICATION,
         metomi.rose.config_editor.FLAG_TYPE_OPT_CONF: Gtk.STOCK_INDEX,
         metomi.rose.config_editor.FLAG_TYPE_OPTIONAL: Gtk.STOCK_ABOUT,
-        metomi.rose.config_editor.FLAG_TYPE_NO_META: Gtk.STOCK_DIALOG_QUESTION,
+        metomi.rose.config_editor.FLAG_TYPE_NO_META: "dialog-question",
     }
 
     MODIFIED_COLOUR = metomi.rose.gtk.util.color_parse(

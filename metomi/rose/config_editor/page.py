@@ -1056,7 +1056,7 @@ class ConfigPage(Gtk.Box):
             if method == metomi.rose.macro.TRANSFORM_METHOD:
                 stock_id = Gtk.STOCK_CONVERT
             else:
-                stock_id = Gtk.STOCK_DIALOG_QUESTION
+                stock_id = "dialog-question"
             macro_menuitem_box = Gtk.Box()
             macro_menuitem_icon = Gtk.Image.new_from_icon_name(stock_id, Gtk.IconSize.MENU)
             macro_menuitem_label = Gtk.Label(label=macro_name)
