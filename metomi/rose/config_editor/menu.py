@@ -306,20 +306,22 @@ class MenuBar(object):
         if config_item.get_submenu() is None:
             config_item.set_submenu(Gtk.Menu())
         macro_fullname = ".".join([modulename, classname, methodname])
-        macro_fullname = macro_fullname.replace("_", "__")
+        macro_fullname = macro_fullname.replace("__", "_")
         if methodname == metomi.rose.macro.VALIDATE_METHOD:
-            stock_id = Gtk.STOCK_DIALOG_QUESTION
+            stock_id = "dialog-question"
         else:
             stock_id = Gtk.STOCK_CONVERT
-        macro_item_box = Gtk.Box()
+        macro_item_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         macro_item_icon = Gtk.Image.new_from_icon_name(stock_id, Gtk.IconSize.MENU)
         macro_item_label = Gtk.Label(label=macro_fullname)
         macro_item = Gtk.MenuItem()
-        macro_item_box.pack_start(macro_item_icon, False, False, 0)
-        macro_item_box.pack_start(macro_item_label, False, False, 0)
+        Gtk.Container.add(macro_item_box, macro_item_icon)
+        Gtk.Container.add(macro_item_box, macro_item_label)
         Gtk.Container.add(macro_item, macro_item_box)
         macro_item.set_tooltip_text(help_)
-        macro_item.show()
+        context = Gtk.Widget.get_style_context(macro_item)
+        Gtk.StyleContext.add_class(context, "macro-item")
+        macro_item.show_all()
         macro_item._run_data = [config_name, modulename, classname,
                                 methodname]
         macro_item.connect("activate",
@@ -329,17 +331,17 @@ class MenuBar(object):
             for item in config_item.get_submenu().get_children():
                 if hasattr(item, "_rose_all_validators"):
                     return False
-            all_item_box = Gtk.Box()
-            all_item_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_DIALOG_QUESTION, Gtk.IconSize.MENU)
+            all_item_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+            all_item_icon = Gtk.Image.new_from_icon_name("dialog-question", Gtk.IconSize.MENU)
             all_item_label = Gtk.Label(label=metomi.rose.config_editor.MACRO_MENU_ALL_VALIDATORS)
             all_item = Gtk.MenuItem()
-            all_item_box.pack_start(all_item_icon, False, False, 0)
-            all_item_box.pack_start(all_item_label, False, False, 0)
-            Gtk.Container.add(macro_item, macro_item_box)
+            Gtk.Container.add(all_item_box, all_item_icon)
+            Gtk.Container.add(all_item_box, all_item_label)
+            Gtk.Container.add(all_item, all_item_box)
             all_item._rose_all_validators = True
             all_item.set_tooltip_text(
                 metomi.rose.config_editor.MACRO_MENU_ALL_VALIDATORS_TIP)
-            all_item.show()
+            all_item.show_all()
             all_item._run_data = [config_name, None, None, methodname]
             all_item.connect("activate",
                              lambda i: run_macro(*i._run_data))
@@ -591,7 +593,6 @@ class MainMenuHandler(object):
         response = dialog.run()
         if response == Gtk.ResponseType.CANCEL or response == Gtk.ResponseType.CLOSE:
             res = optionals
-            dialog.destroy()
         else:
             res = {}
             for key, box in list(entries.items()):
