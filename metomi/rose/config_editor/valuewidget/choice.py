@@ -31,6 +31,7 @@ import metomi.rose.gtk.dialog
 import metomi.rose.opt_parse
 import metomi.rose.variable
 
+from functools import cmp_to_key
 
 class ChoicesValueWidget(Gtk.Box):
 
@@ -240,7 +241,7 @@ class ChoicesValueWidget(Gtk.Box):
         if not self.should_guess_groups or not self.should_show_kinship:
             return default_groups
         ok_groups = [n for n in names if set(n).issubset(name) and n != name]
-        ok_groups.sort(lambda x, y: set(x).issubset(y) - set(y).issubset(x))
+        ok_groups.sort(key=cmp_to_key(lambda x, y: set(x).issubset(y) - set(y).issubset(x)))
         for group in default_groups:
             if group in ok_groups:
                 ok_groups.remove(group)

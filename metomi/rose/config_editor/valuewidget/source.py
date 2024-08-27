@@ -30,6 +30,7 @@ import metomi.rose.config_editor
 import metomi.rose.formats
 import metomi.rose.gtk.choice
 
+from functools import cmp_to_key
 
 class SourceValueWidget(Gtk.Box):
 
@@ -180,8 +181,8 @@ class SourceValueWidget(Gtk.Box):
                 if section_all not in ok_content_sections:
                     ok_content_sections.append(section_all)
             ok_content_sections.append(section)
-        ok_content_sections.sort(metomi.rose.config.sort_settings)
-        ok_content_sections.sort(self._sort_settings_duplicate)
+        ok_content_sections.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
+        ok_content_sections.sort(key=cmp_to_key(self._sort_settings_duplicate))
         return ok_content_sections
 
     def _get_groups(self, name, available_names):

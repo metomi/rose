@@ -40,6 +40,8 @@ import metomi.rose.macro
 import metomi.rose.macros
 import metomi.rose.popen
 
+from functools import cmp_to_key
+
 
 class MenuBar(object):
 
@@ -443,7 +445,7 @@ class MainMenuHandler(object):
             sorter = metomi.rose.config.sort_settings
             to_id = lambda s: self.util.get_id_from_section_option(
                 s.section, s.option)
-            return_value.sort(lambda x, y: sorter(to_id(x), to_id(y)))
+            return_value.sort(key=cmp_to_key(lambda x, y: sorter(to_id(x), to_id(y))))
             self.handle_macro_validation(config_name, macro_fullname,
                                          config, return_value,
                                          no_display=(not return_value))
@@ -477,12 +479,11 @@ class MainMenuHandler(object):
         """Refresh the menu dealing with custom macro launches."""
         menubar.clear_macros()
         config_keys = sorted(list(self.data.config.keys()))
-        tuple_sorter = lambda x, y: cmp(x[0], y[0])
         for config_name in config_keys:
             image = self.data.helper.get_icon_path_for_config(config_name)
             macros = self.data.config[config_name].macros
             macro_tuples = metomi.rose.macro.get_macro_class_methods(macros)
-            macro_tuples.sort(tuple_sorter)
+            macro_tuples.sort(key=lambda x: x[0])
             for macro_mod, macro_cls, macro_func, help_ in macro_tuples:
                 menubar.add_macro(config_name, macro_mod, macro_cls,
                                   macro_func, help_, image,
@@ -508,7 +509,7 @@ class MainMenuHandler(object):
         for config_name in self.data.config:
             config_data = self.data.config[config_name]
             config_sect_dict[config_name] = list(config_data.sections.now.keys())
-            config_sect_dict[config_name].sort(metomi.rose.config.sort_settings)
+            config_sect_dict[config_name].sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         config_name, section = self.mainwindow.launch_graph_dialog(
             config_sect_dict)
         if config_name is None:
@@ -706,7 +707,7 @@ class MainMenuHandler(object):
                 macro_config, change_list = return_value
                 if not change_list:
                     continue
-                change_list.sort(lambda x, y: sorter(to_id(x), to_id(y)))
+                change_list.sort(key=cmp_to_key(lambda x, y: sorter(to_id(x), to_id(y))))
                 num_changes = len(change_list)
                 self.handle_macro_transforms(config_name, macro_fullname,
                                              macro_config, change_list)
@@ -720,7 +721,7 @@ class MainMenuHandler(object):
                                                   return_value)
                     continue
                 if return_value:
-                    return_value.sort(lambda x, y: sorter(to_id(x), to_id(y)))
+                    return_value.sort(key=cmp_to_key(lambda x, y: sorter(to_id(x), to_id(y))))
                 config_macro_errors.append((config_name,
                                             macro_fullname,
                                             len(return_value)))
@@ -1010,7 +1011,7 @@ class MainMenuHandler(object):
             meta_config = self.data.config[config_name].meta
             macro = metomi.rose.macros.DefaultTransforms()
             change_list = macro.transform(macro_config, meta_config)[1]
-            change_list.sort(lambda x, y: sorter(to_id(x), to_id(y)))
+            change_list.sort(key=cmp_to_key(lambda x, y: sorter(to_id(x), to_id(y))))
             self.handle_macro_transforms(
                 config_name, "Autofixer.transform",
                 macro_config, change_list, triggers_ok=True)
