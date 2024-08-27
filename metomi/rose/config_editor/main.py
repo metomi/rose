@@ -1905,18 +1905,6 @@ def get_number_of_configs(config_directory_path=None):
 
 def main():
     """Launch from the command line."""
-    # if (Gtk.pygtk_version[0] < metomi.rose.config_editor.MIN_PYGTK_VERSION[0] or
-    #         Gtk.pygtk_version[1] < metomi.rose.config_editor.MIN_PYGTK_VERSION[1]):
-    #     this_version = '{0}.{1}.{2}'.format(*Gtk.pygtk_version)
-    #     required_version = '{0}.{1}.{2}'.format(
-    #         *metomi.rose.config_editor.MIN_PYGTK_VERSION)
-    #     metomi.rose.gtk.dialog.run_dialog(
-    #         metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
-    #         metomi.rose.config_editor.ERROR_MIN_PYGTK_VERSION.format(
-    #             required_version, this_version),
-    #         metomi.rose.config_editor.ERROR_MIN_PYGTK_VERSION_TITLE
-    #     )
-    #     sys.exit(1)
     sys.path.append(os.getenv('ROSE_HOME'))
     opt_parser = metomi.rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("conf_dir", "meta_path", "new_mode",
