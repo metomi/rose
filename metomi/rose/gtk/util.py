@@ -81,7 +81,7 @@ class CustomButton(Gtk.Button):
         if stock_id is not None:
             self.stock_id = stock_id
             self.icon = Gtk.Image()
-            if stock_id.startswith("gtk"):
+            if stock_id.startswith("gtk") or stock_id.startswith("rose-gtk"):
                 self.icon.set_from_stock(stock_id, size)
             else:
                 self.icon.set_from_icon_name(stock_id, size)
