@@ -32,6 +32,8 @@ import metomi.rose.config_editor.util
 import metomi.rose.gtk.util
 import metomi.rose.resource
 
+from functools import cmp_to_key
+
 
 class PageNavigationPanel(Gtk.ScrolledWindow):
 
@@ -186,7 +188,7 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
         if row is None:
             self.data_store.clear()
         initials = list(namespace_subtree.items())
-        initials.sort(self.sort_tree_items)
+        initials.sort(key=cmp_to_key(self.sort_tree_items))
         stack = []
         if row is None:
             start_keylist = []
@@ -217,7 +219,7 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
             name_iter_map["/".join(new_keylist)] = new_row
             if isinstance(value, dict):
                 newer_initials = list(value.items())
-                newer_initials.sort(self.sort_tree_items)
+                newer_initials.sort(key=cmp_to_key(self.sort_tree_items))
                 for vals in newer_initials:
                     stack.append([new_row] + [list(new_keylist)] + list(vals))
             stack.pop(0)

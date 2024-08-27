@@ -38,6 +38,8 @@ import metomi.rose.gtk.util
 import metomi.rose.resource
 import metomi.rose.variable
 
+from functools import cmp_to_key
+
 
 class ConfigPage(Gtk.Box):
 
@@ -463,8 +465,8 @@ class ConfigPage(Gtk.Box):
             metadata_files = self.section_ops.get_ns_metadata_files(
                 self.namespace)
             widget_dir = metomi.rose.META_DIR_WIDGET
-            metadata_files.sort(
-                lambda x, y: (widget_dir in y) - (widget_dir in x))
+            metadata_files.sort(key=cmp_to_key(
+                lambda x, y: (widget_dir in y) - (widget_dir in x)))
             prefix = re.sub(r"[^\w]", "_", self.config_name.strip("/"))
             prefix += "/" + metomi.rose.META_DIR_WIDGET + "/"
             custom_widget = metomi.rose.resource.import_object(
@@ -530,7 +532,7 @@ class ConfigPage(Gtk.Box):
         for sect_data in self.sections:
             if not sect_data.ignored_reason:
                 section_choices.append(sect_data.name)
-        section_choices.sort(metomi.rose.config.sort_settings)
+        section_choices.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         if self.ns_is_default and section_choices:
             add_ui_start = add_ui_start.replace(
                 "'Popup'>",
@@ -541,8 +543,8 @@ class ConfigPage(Gtk.Box):
             actions.insert(0, ('Add blank', Gtk.STOCK_NEW, text))
         ghost_list = [v for v in self.ghost_data]
         sorter = metomi.rose.config.sort_settings
-        ghost_list.sort(lambda v, w: sorter(v.metadata['id'],
-                                            w.metadata['id']))
+        ghost_list.sort(key=cmp_to_key(lambda v, w: sorter(v.metadata['id'],
+                                                           w.metadata['id'])))
         for variable in ghost_list:
             label_text = variable.name
             if (not self.show_modes[metomi.rose.config_editor.SHOW_MODE_NO_TITLE] and
@@ -1037,9 +1039,9 @@ class ConfigPage(Gtk.Box):
         descending_cmp = lambda x, y: metomi.rose.config_editor.util.null_cmp(
             x[0], y[0])
         if ascending:
-            sorted_data.sort(ascending_cmp)
+            sorted_data.sort(key=cmp_to_key(ascending_cmp))
         else:
-            sorted_data.sort(descending_cmp)
+            sorted_data.sort(key=cmp_to_key(descending_cmp))
         if [x[4] for x in sorted_data] == datavars:
             return False
         for i, datum in enumerate(sorted_data):

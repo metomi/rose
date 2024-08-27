@@ -453,8 +453,8 @@ class Notebook(Gtk.Notebook):
         """Use this only with pages with the attribute 'namespace'."""
         self.remove_page(self.get_page_ids().index(page_id))
 
-    def set_tab_label_packing(self, page):
-        super(Notebook, self).set_tab_label(page) # check
+    def set_tab_label_packing(self, page, tab_labelwidget):
+        super(Notebook, self).set_tab_label(page, tab_labelwidget)
 
 
 class TooltipTreeView(Gtk.TreeView):
@@ -545,11 +545,15 @@ class TreeModelSortUtil(object):
 
     def cmp_(self, value1, value2):
         """Perform a useful form of 'cmp'"""
+        if value1 is None:
+            value1 = "None"
+        if value2 is None:
+            value2 = "None"
         if (isinstance(value1, str) and isinstance(value2, str)):
             if value1.isdigit() and value2.isdigit():
-                return cmp(float(value1), float(value2))
+                return (float(value1) > float(value2)) - (float(value1) < float(value2))
             return metomi.rose.config.sort_settings(value1, value2)
-        return cmp(value1, value2)
+        return (value1 > value2) - (value1 < value2)
 
     def handle_sort_column_change(self, model):
         """Store previous sorting information for multi-column sorts."""

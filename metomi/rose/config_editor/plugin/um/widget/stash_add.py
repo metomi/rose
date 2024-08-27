@@ -29,6 +29,7 @@ import metomi.rose.gtk.util
 
 import metomi.rose.config_editor.plugin.um.widget.stash_util as stash_util
 
+from functools import cmp_to_key
 
 class AddStashDiagnosticsPanelv1(Gtk.Box):
 
@@ -173,14 +174,14 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
         data_rows = []
         columns = ["Section", "Item", "Description", "?", "#"]
         sections = list(self.stash_lookup.keys())
-        sections.sort(self.sort_util.cmp_)
+        sections.sort(key=cmp_to_key(self.sort_util.cmp_))
         props_excess = [self.STASH_PARSE_DESC_OPT, self.STASH_PARSE_ITEM_OPT,
                         self.STASH_PARSE_SECT_OPT]
         for section in sections:
             if section == "-1":
                 continue
             items = list(self.stash_lookup[section].keys())
-            items.sort(self.sort_util.cmp_)
+            items.sort(key=cmp_to_key(self.sort_util.cmp_))
             for item in items:
                 data = self.stash_lookup[section][item]
                 this_row = [section, item, data[self.STASH_PARSE_DESC_OPT]]
@@ -260,7 +261,7 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
             if stash_request_num != "None":
                 sect_streqs = self.request_lookup.get(stash_section, {})
                 streqs = list(sect_streqs.get(stash_item, {}).keys())
-                streqs.sort(metomi.rose.config.sort_settings)
+                streqs.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
                 if streqs:
                     value = "\n    " + "\n    ".join(streqs)
                 else:
@@ -364,8 +365,10 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
         k = group_index
         data_rows = [r[k:k + 1] + r[0:k] + r[k + 1:] for r in data_rows]
         column_names.insert(0, column_names.pop(k))
-        data_rows.sort(lambda x, y:
-                       self._sort_row_data(x, y, 0, descending))
+        if descending:
+            data_rows.sort(key=cmp_to_key(self._sort_row_data), reverse=True)
+        else:
+            data_rows.sort(key=cmp_to_key(self._sort_row_data))
         last_entry = None
         rows_are_descendants = []
         for i, row in enumerate(data_rows):
@@ -580,7 +583,7 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
             view_menu = Gtk.Menu()
             view_menu.show()
             view_menuitem.set_submenu(view_menu)
-            streqs.sort(metomi.rose.config.sort_settings)
+            streqs.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
             for streq in streqs:
                 view_streq_menuitem = Gtk.MenuItem(label=streq)
                 view_streq_menuitem._section = streq
@@ -670,10 +673,9 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
             value = metomi.rose.gtk.util.safe_str(value)
         cell.set_property("markup", value)
 
-    def _sort_row_data(self, row1, row2, sort_index, descending=False):
+    def _sort_row_data(self, row1, row2):
         """Handle column sorting."""
-        fac = (-1 if descending else 1)
-        return fac * self.sort_util.cmp_(row1[sort_index], row2[sort_index])
+        return self.sort_util.cmp_(row1[0], row2[0])
 
     def _toggle_show_column_name(self, column_name):
         """Handle a show/hide of a particular column."""
