@@ -24,7 +24,7 @@ import os
 from gi.repository import Pango
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 
 import metomi.rose.config
 import metomi.rose.config_editor.panelwidget.summary_data
@@ -849,8 +849,7 @@ class BaseStashSummaryDataPanelv1(
                          lambda i: self._packages_enable(disable=True))
         menuitem.show()
         menu.append(menuitem)
-        menu.popup(None, None, widget.position_menu, event.button,
-                   event.time, widget)
+        menu.popup_at_widget(widget, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, event)
 
     def _packages_remove(self, only_this_package=None):
         # Remove requests and no-longer-needed profiles for packages.

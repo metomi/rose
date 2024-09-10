@@ -923,7 +923,7 @@ class MainController(object):
         page = self._get_current_page()
         if page is None:
             return False
-        page.launch_add_menu(event.button, event.time)
+        page.launch_add_menu(event)
 
     def revert_to_saved_data(self):
         """Reload the page data from saved configuration information."""

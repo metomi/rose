@@ -470,7 +470,7 @@ class NavPanelHandler(object):
             rename_section_item.connect(
                 "activate", lambda b: self.rename_dialog(namespace))
         menu = uimanager.get_widget('/Popup')
-        menu.popup(None, None, None, event.button, event.time)
+        menu.popup_at_pointer(event)
         return False
 
     def is_ns_duplicate(self, namespace):
