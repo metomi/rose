@@ -486,7 +486,7 @@ class BaseSummaryDataPanel(Gtk.Box):
                 Gtk.AccelFlags.VISIBLE
             )
 
-        menu.popup(None, None, None, event.button, event.time)
+        menu.gtk_menu_popup_at_widget(event.button, None, None, event)
         return False
 
     def _popup_tree_menu(self, path, col, event):
@@ -660,7 +660,7 @@ class BaseSummaryDataPanel(Gtk.Box):
                     Gtk.AccelFlags.VISIBLE
                 )
 
-        menu.popup(None, None, None, event.button, event.time)
+        menu.gtk_menu_popup_at_widget(event.button, None, None, event)
         return False
 
     def add_section(self, section=None, opt_map=None):

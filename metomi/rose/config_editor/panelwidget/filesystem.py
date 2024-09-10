@@ -122,4 +122,4 @@ class FileSystemPanel(Gtk.ScrolledWindow):
                 "activate",
                 lambda m: self._handle_activation(view, path, col))
             this_menu = uimanager.get_widget('/Popup')
-            this_menu.popup(None, None, None, event.button, event.time)
+            this_menu.gtk_menu_popup_at_widget(event.button, None, None, event)
