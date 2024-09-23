@@ -383,7 +383,7 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
         # Hook function that reacts to a change in filter status.
         self._view.get_model().get_model().refilter()
 
-    def _filter_visible(self, model, iter_):
+    def _filter_visible(self, model, iter_, _):
         # This returns whether a row should be visible.
         filt_text = self._filter_widget.get_text()
         if not filt_text:
@@ -644,7 +644,7 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
             show_column_menu.append(col_menuitem)
         menu.popup_at_widget(widget, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, event)
 
-    def _set_tree_cell_value(self, column, cell, treemodel, iter_):
+    def _set_tree_cell_value(self, column, cell, treemodel, iter_, _):
         # Extract an appropriate value for this cell from the model.
         cell.set_property("visible", True)
         col_index = self._view.get_columns().index(column)
