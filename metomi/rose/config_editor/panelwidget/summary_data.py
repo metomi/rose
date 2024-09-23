@@ -493,7 +493,6 @@ class BaseSummaryDataPanel(Gtk.Box):
         """Launch a menu for this main treeview row (single selection)."""
         shortcuts = []
         menu = Gtk.Menu()
-        # menu.show()
         model = self._view.get_model()
         row_iter = model.get_iter(path)
         sect_index = self.get_section_column_index()
