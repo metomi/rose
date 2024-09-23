@@ -106,7 +106,7 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
 
         self._should_show_meta_column_titles = False
         self.control_widget_hbox = self._get_control_widget_hbox()
-        self.pack_start(self.control_widget_hbox, expand=False, fill=False)
+        self.pack_start(self.control_widget_hbox, expand=False, fill=False, padding=0)
         self._view = metomi.rose.gtk.util.TooltipTreeView(
             get_tooltip_func=self.set_tree_tip)
         self._view.set_rules_hint(True)
@@ -121,14 +121,14 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
         self.generate_tree_view(is_startup=True)
         self._window.add(self._view)
         self._window.show()
-        self.pack_start(self._window, expand=True, fill=True)
+        self.pack_start(self._window, expand=True, fill=True, padding=0)
         self._update_control_sensitivity()
         self.show()
 
     def add_cell_renderer_for_value(self, column):
         """Add a cell renderer to represent the model value."""
         cell_for_value = Gtk.CellRendererText()
-        column.pack_start(cell_for_value, True, True, 0)
+        column.pack_start(cell_for_value, True)
         column.set_cell_data_func(cell_for_value,
                                   self._set_tree_cell_value)
 
@@ -415,7 +415,7 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
         group_label.show()
         self._group_widget = Gtk.ComboBox()
         cell = Gtk.CellRendererText()
-        self._group_widget.pack_start(cell, True, True, 0)
+        self._group_widget.pack_start(cell, True)
         self._group_widget.add_attribute(cell, 'text', 0)
         self._group_widget.show()
         self._add_button = metomi.rose.gtk.util.CustomButton(
