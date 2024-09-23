@@ -303,7 +303,7 @@ class BaseStashSummaryDataPanelv1(
                 stash_meta_dict[address][prop] = node.value
         return stash_meta_dict
 
-    def set_tree_cell_status(self, col, cell, model, row_iter):
+    def set_tree_cell_status(self, col, cell, model, row_iter, _):
         """(Override) Set the status-related markup for a cell."""
         col_index = self._view.get_columns().index(col)
         sect_index = self.get_section_column_index()
@@ -673,7 +673,7 @@ class BaseStashSummaryDataPanelv1(
             self._diag_panel.update_request_info(request_lookup,
                                                  request_changes)
 
-    def _set_tree_cell_value_combo(self, column, cell, treemodel, iter_):
+    def _set_tree_cell_value_combo(self, column, cell, treemodel, iter_, _):
         # Extract a value for a combo box cell renderer.
         cell.set_property("visible", True)
         cell.set_property("editable", True)
@@ -687,7 +687,7 @@ class BaseStashSummaryDataPanelv1(
             cell.set_property("visible", False)
         cell.set_property("text", value)
 
-    def _set_tree_cell_value_toggle(self, column, cell, treemodel, iter_):
+    def _set_tree_cell_value_toggle(self, column, cell, treemodel, iter_, _):
         # Extract a value for a toggle cell renderer.
         cell.set_property("visible", True)
         col_index = self._view.get_columns().index(column)
@@ -702,7 +702,7 @@ class BaseStashSummaryDataPanelv1(
             return False
         cell.set_property("active", value)
 
-    def _set_tree_cell_value(self, column, cell, treemodel, iter_):
+    def _set_tree_cell_value(self, column, cell, treemodel, iter_, _):
         # Extract a value for a conventional text cell renderer.
         cell.set_property("visible", True)
         col_index = self._view.get_columns().index(column)
