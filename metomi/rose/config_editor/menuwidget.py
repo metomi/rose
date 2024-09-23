@@ -292,7 +292,7 @@ class MenuWidget(Gtk.Box):
         option_menu.attach_to_widget(self.button,
                                      lambda m, w: False)
         option_menu.show()
-        option_menu.gtk_menu_popup_at_widget(button, None, None, event)
+        option_menu.popup_at_widget(button, None, None, event)
         return False
 
     def _launch_info_dialog(self, *args):
