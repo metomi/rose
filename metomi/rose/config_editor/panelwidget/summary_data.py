@@ -486,14 +486,14 @@ class BaseSummaryDataPanel(Gtk.Box):
                 Gtk.AccelFlags.VISIBLE
             )
 
-        menu.popup_at_widget(event.button, None, None, event)
+        menu.popup_at_widget(event.button, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, event)
         return False
 
     def _popup_tree_menu(self, path, col, event):
         """Launch a menu for this main treeview row (single selection)."""
         shortcuts = []
         menu = Gtk.Menu()
-        menu.show()
+        # menu.show()
         model = self._view.get_model()
         row_iter = model.get_iter(path)
         sect_index = self.get_section_column_index()
@@ -659,8 +659,8 @@ class BaseSummaryDataPanel(Gtk.Box):
                     mod,
                     Gtk.AccelFlags.VISIBLE
                 )
-
-        menu.popup_at_widget(event.button, None, None, event)
+        menu.popup_at_pointer(event)
+        menu.show_all()
         return False
 
     def add_section(self, section=None, opt_map=None):

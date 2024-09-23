@@ -642,7 +642,7 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
                 "toggled",
                 lambda c: self._toggle_show_column_name(*c._connect_args))
             show_column_menu.append(col_menuitem)
-        menu.popup_at_widget(widget, None, None, event)
+        menu.popup_at_widget(widget, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, event)
 
     def _set_tree_cell_value(self, column, cell, treemodel, iter_):
         # Extract an appropriate value for this cell from the model.

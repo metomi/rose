@@ -147,14 +147,13 @@ class MenuWidget(Gtk.Box):
         self.button.connect(
             "button-press-event",
             lambda b, e: self._popup_option_menu(
-                self.option_ui, self.actions, e.button, e))
+                self.option_ui, self.actions, e))
         # # FIXME: Try to popup the menu at the button, instead of the cursor.
         # self.button.connect(
         #     "activate",
         #     lambda b: self._popup_option_menu(
         #         self.option_ui,
         #         self.actions,
-        #         1,
         #         Gdk.Event(Gdk.KEY_PRESS)))
         self.button.connect(
             "enter-notify-event",
@@ -196,7 +195,7 @@ class MenuWidget(Gtk.Box):
     def _perform_add(self):
         self.var_ops.add_var(self.my_variable)
 
-    def _popup_option_menu(self, option_ui, actions, button, event):
+    def _popup_option_menu(self, option_ui, actions, event):
         actiongroup = Gtk.ActionGroup('Popup')
         actiongroup.set_translation_domain('')
         actiongroup.add_actions(actions)
@@ -292,7 +291,7 @@ class MenuWidget(Gtk.Box):
         option_menu.attach_to_widget(self.button,
                                      lambda m, w: False)
         option_menu.show()
-        option_menu.popup_at_widget(button, None, None, event)
+        option_menu.popup_at_widget(self.button, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, event)
         return False
 
     def _launch_info_dialog(self, *args):

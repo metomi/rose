@@ -855,7 +855,7 @@ class BaseStashSummaryDataPanelv1(
                          lambda i: self._packages_enable(disable=True))
         menuitem.show()
         menu.append(menuitem)
-        menu.popup_at_widget(widget, None, None, event)
+        menu.popup_at_widget(widget, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, event)
 
     def _packages_remove(self, only_this_package=None):
         # Remove requests and no-longer-needed profiles for packages.
