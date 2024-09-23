@@ -593,7 +593,7 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
                 view_streq_menuitem.show()
                 view_menu.append(view_streq_menuitem)
             menu.append(view_menuitem)
-        menu.popup_at_widget(event.button, None, None, event)
+        menu.popup_at_widget(event.button, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, event)
         return False
 
     def _popup_view_menu(self, widget, event):
