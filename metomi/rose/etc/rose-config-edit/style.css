@@ -1,7 +1,3 @@
-entry {
-    background-color: coral;
-}
-
 /* Add padding in-between env cogs and the variable title on pages */
 button > widget > box > image {
     padding-right: 10px;
