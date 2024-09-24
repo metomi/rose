@@ -340,7 +340,7 @@ class MainController(object):
                 (metomi.rose.config_editor.TOOLBAR_ADD, 'Gtk.STOCK_ADD'),
                 (metomi.rose.config_editor.TOOLBAR_REVERT,
                  'Gtk.STOCK_REVERT_TO_SAVED'),
-                (metomi.rose.config_editor.TOOLBAR_FIND, 'Gtk.Entry'),
+                (metomi.rose.config_editor.TOOLBAR_FIND, 'Gtk.SearchEntry'),
                 (metomi.rose.config_editor.TOOLBAR_FIND_NEXT, 'Gtk.STOCK_FIND'),
                 (metomi.rose.config_editor.TOOLBAR_VALIDATE,
                  "dialog-question"),
@@ -376,6 +376,7 @@ class MainController(object):
             metomi.rose.config_editor.TOOLBAR_FIND)['widget']
         self.find_entry.connect("activate", self._launch_find)
         self.find_entry.connect("changed", self._clear_find)
+        Gtk.Entry.set_placeholder_text(self.find_entry, "Search")
         add_icon = self.toolbar.item_dict.get(
             metomi.rose.config_editor.TOOLBAR_ADD)['widget']
         add_icon.connect('button_press_event', self.add_page_variable)
