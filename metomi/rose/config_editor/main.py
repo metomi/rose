@@ -1527,16 +1527,9 @@ class MainController(object):
             page, var_id = self.perform_find(expression, start_page)
             if page is None:
                 text = metomi.rose.config_editor.WARNING_NOT_FOUND
-                try:  # Needs PyGTK >= 2.16
-                    self.find_entry.set_icon_from_stock(
-                        0, Gtk.STOCK_DIALOG_WARNING)
-                    self.find_entry.set_icon_tooltip_text(0, text)
-                except AttributeError:
-                    metomi.rose.gtk.dialog.run_dialog(
-                        metomi.rose.gtk.dialog.DIALOG_TYPE_INFO,
-                        text,
-                        metomi.rose.config_editor.WARNING_NOT_FOUND_TITLE
-                    )
+                self.find_entry.set_icon_from_stock(
+                    0, Gtk.STOCK_DIALOG_WARNING)
+                self.find_entry.set_icon_tooltip_text(0, text)
             else:
                 if var_id is not None:
                     self.reporter.report(
@@ -1545,10 +1538,7 @@ class MainController(object):
 
     def _clear_find(self, *args):
         """Clear any warning icons from the find entry."""
-        try:  # Needs PyGTK >= 2.16
-            self.find_entry.set_icon_from_stock(0, None)
-        except AttributeError:
-            pass
+        self.find_entry.set_icon_from_stock(0, None)
 
     def perform_find(self, expression, start_page=None):
         """Drive the finding of the regex 'expression' within the data."""
@@ -1904,18 +1894,6 @@ def get_number_of_configs(config_directory_path=None):
 
 def main():
     """Launch from the command line."""
-    # if (Gtk.pygtk_version[0] < metomi.rose.config_editor.MIN_PYGTK_VERSION[0] or
-    #         Gtk.pygtk_version[1] < metomi.rose.config_editor.MIN_PYGTK_VERSION[1]):
-    #     this_version = '{0}.{1}.{2}'.format(*Gtk.pygtk_version)
-    #     required_version = '{0}.{1}.{2}'.format(
-    #         *metomi.rose.config_editor.MIN_PYGTK_VERSION)
-    #     metomi.rose.gtk.dialog.run_dialog(
-    #         metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
-    #         metomi.rose.config_editor.ERROR_MIN_PYGTK_VERSION.format(
-    #             required_version, this_version),
-    #         metomi.rose.config_editor.ERROR_MIN_PYGTK_VERSION_TITLE
-    #     )
-    #     sys.exit(1)
     sys.path.append(os.getenv('ROSE_HOME'))
     opt_parser = metomi.rose.opt_parse.RoseOptionParser()
     opt_parser.add_my_options("conf_dir", "meta_path", "new_mode",
