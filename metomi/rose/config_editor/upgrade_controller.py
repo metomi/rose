@@ -89,13 +89,8 @@ class UpgradeController(object):
                 self._combo_cell = Gtk.CellRendererCombo()
                 self._combo_cell.set_property("has-entry", False)
                 self._combo_cell.set_property("editable", True)
-                try:
-                    self._combo_cell.connect("changed",
-                                             self._handle_change_version, 2)
-                except TypeError:
-                    # PyGTK 2.14 - changed signal.
-                    self._combo_cell.connect("edited",
-                                             self._handle_change_version, 2)
+                self._combo_cell.connect("changed",
+                                         self._handle_change_version, 2)
                 cell = self._combo_cell
             else:
                 cell = Gtk.CellRendererText()

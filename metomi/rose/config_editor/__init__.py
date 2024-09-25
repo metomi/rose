@@ -268,8 +268,6 @@ ERROR_METADATA_CHECKER_TEXT = (
     "{0} problem(s) found in metadata at {1}.\n" +
     "Some functionality has been switched off.\n\n" +
     "Run rose metadata-check for more info.")
-ERROR_MIN_PYGTK_VERSION = "Requires PyGTK version {0}, found {1}."
-ERROR_MIN_PYGTK_VERSION_TITLE = "Need later PyGTK version to run"
 ERROR_NO_OUTPUT = "No output found for {0}"
 ERROR_NOT_FOUND = "Could not find path: {0}"
 ERROR_NOT_REGEX = "Could not compile expression: {0}\nError info: {1}"
@@ -716,7 +714,6 @@ LAUNCH_COMMAND_GRAPH = "rose metadata-graph -C"
 LAUNCH_SUITE_RUN = "rose suite-run"
 LAUNCH_SUITE_RUN_HELP = "rose help suite-run"
 MAX_APPS_THRESHOLD = 10
-MIN_PYGTK_VERSION = (2, 12, 0)
 PROGRAM_NAME = "rose edit"
 PROJECT_URL = "http://github.com/metomi/rose/"
 UNTITLED_NAME = "Untitled"
