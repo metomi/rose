@@ -98,12 +98,17 @@ rosa = []
 #     Tornado 6.
 #     tornado
 # ]
+rose-edit = [
+    "pygobject>=3.48.2",
+    "pycairo>=1.27.0"
+]
 all = [
     "metomi-rose[lint]",
     "metomi-rose[docs]",
     "metomi-rose[graph]",
     "metomi-rose[tests]",
-    "metomi-rose[rosa]"
+    "metomi-rose[rosa]",
+    "metomi-rose[edit]"
 ]
 
 [project.scripts]
