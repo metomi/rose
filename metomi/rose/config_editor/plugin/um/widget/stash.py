@@ -141,15 +141,9 @@ class BaseStashSummaryDataPanelv1(
             cell_for_value.set_property("editable", True)
             cell_for_value.set_property("model", listmodel)
             cell_for_value.set_property("text-column", 0)
-            try:
-                cell_for_value.connect("changed",
-                                       self._handle_cell_combo_change,
-                                       col_title)
-            except TypeError:
-                # PyGTK 2.14 - changed signal.
-                cell_for_value.connect("edited",
-                                       self._handle_cell_combo_change,
-                                       col_title)
+            cell_for_value.connect("changed",
+                                   self._handle_cell_combo_change,
+                                   col_title)
             col.pack_start(cell_for_value, True)
             col.set_cell_data_func(cell_for_value,
                                    self._set_tree_cell_value_combo)

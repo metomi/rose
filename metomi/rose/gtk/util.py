@@ -619,17 +619,10 @@ def get_hyperlink_label(text, search_func=lambda i: False):
     except GLib.GError:
         label.set_text(text)
     else:
-        try:
-            label.connect("activate-link",
-                          lambda l, u: handle_link(u, search_func))
-        except TypeError:  # No such signal before PyGTK 2.18
-            label.connect("button-release-event",
-                          lambda l, e: extract_link(l, search_func))
-            text = REC_HYPERLINK_ID_OR_URL.sub(MARKUP_URL_UNDERLINE, text)
-            label.set_markup(text)
-        else:
-            text = REC_HYPERLINK_ID_OR_URL.sub(MARKUP_URL_HTML, text)
-            label.set_markup(text)
+        label.connect("activate-link",
+                      lambda l, u: handle_link(u, search_func))
+        text = REC_HYPERLINK_ID_OR_URL.sub(MARKUP_URL_HTML, text)
+        label.set_markup(text)
     return label
 
 

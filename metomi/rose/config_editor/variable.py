@@ -231,10 +231,10 @@ class VariableWidget(object):
                     no_menuwidget=False):
         """Inserts the child widgets of an instance into the 'container'.
 
-        As PyGTK is not that introspective, we need arguments specifying where
-        the correct area within the widget is - in the case of Gtk.Table
-        instances, we need the number of columns and the row index.
-        These arguments are generically named x_info and y_info.
+        We need arguments specifying where the correct area within the 
+        widget is - in the case of Gtk.Table instances, we need the 
+        number of columns and the row index. These arguments are 
+        generically named x_info and y_info.
 
         """
         if not hasattr(container, 'num_removes'):

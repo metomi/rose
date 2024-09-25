@@ -1529,16 +1529,9 @@ class MainController(object):
             page, var_id = self.perform_find(expression, start_page)
             if page is None:
                 text = metomi.rose.config_editor.WARNING_NOT_FOUND
-                try:  # Needs PyGTK >= 2.16
-                    self.find_entry.set_icon_from_stock(
-                        0, Gtk.STOCK_DIALOG_WARNING)
-                    self.find_entry.set_icon_tooltip_text(0, text)
-                except AttributeError:
-                    metomi.rose.gtk.dialog.run_dialog(
-                        metomi.rose.gtk.dialog.DIALOG_TYPE_INFO,
-                        text,
-                        metomi.rose.config_editor.WARNING_NOT_FOUND_TITLE
-                    )
+                self.find_entry.set_icon_from_stock(
+                    0, Gtk.STOCK_DIALOG_WARNING)
+                self.find_entry.set_icon_tooltip_text(0, text)
             else:
                 if var_id is not None:
                     self.reporter.report(
@@ -1547,10 +1540,7 @@ class MainController(object):
 
     def _clear_find(self, *args):
         """Clear any warning icons from the find entry."""
-        try:  # Needs PyGTK >= 2.16
-            self.find_entry.set_icon_from_stock(0, None)
-        except AttributeError:
-            pass
+        self.find_entry.set_icon_from_stock(0, None)
 
     def perform_find(self, expression, start_page=None):
         """Drive the finding of the regex 'expression' within the data."""
