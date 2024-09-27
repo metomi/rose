@@ -30,7 +30,8 @@ notebook button:focus {
     margin-left: 10px;
 }
 
-notebook box > paned > paned > scrolledwindow > viewport > box > widget > box{ 
+/* Underline key and variable widgets so rows of widgets are distinct astroDimitrios/rose/issues/33 */
+notebook box > paned > paned > scrolledwindow > viewport > box > widget > box { 
     border-bottom: solid;
     border-width: 1px;
     border-color: lightgray;
