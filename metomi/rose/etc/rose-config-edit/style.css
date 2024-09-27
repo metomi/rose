@@ -29,3 +29,11 @@ notebook button:focus {
     margin-top: 10px;
     margin-left: 10px;
 }
+
+notebook box > paned > paned > scrolledwindow > viewport > box > widget > box{ 
+    border-bottom: solid;
+    border-width: 1px;
+    border-color: lightgray;
+    padding: .4em;
+    margin: 0 -.3em;
+  }
