@@ -76,8 +76,8 @@ Configuring Rose
 
 Rose configuration files can be located in the following places:
 
-* ``/etc/.metomi/rose.conf``
-* ``$ROSE_SITE_CONF_PATH/.metomi/rose.conf``
+* ``/etc/rose.conf``
+* ``$ROSE_SITE_CONF_PATH/rose.conf``
 * ``$HOME/.metomi/rose.conf``
 
 See :rose:file:`rose.conf` in the API reference for more information.
