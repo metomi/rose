@@ -9,11 +9,11 @@ Classes:
 
 from functools import partial
 
-import pygtk
+import gi
 
-pygtk.require('2.0')
+gi.require_version('Gtk', '3.0')
 # flake8: noqa: E402
-import gtk
+from gi.repository import Gtk
 
 
 class UsernameValueWidget(Gtk.Box):
@@ -26,7 +26,7 @@ class UsernameValueWidget(Gtk.Box):
         self.metadata = metadata
         self.set_value = set_value
         self.hook = hook
-        self.entry = gtk.Entry()
+        self.entry = Gtk.Entry()
         self.entry.set_text(self.value)
         self.entry.connect_after("paste-clipboard", self._setter)
         self.entry.connect_after("key-release-event", self._setter)
