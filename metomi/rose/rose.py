@@ -95,8 +95,6 @@ DEAD_ENDS = {
     # (ns, sub_cmd): message
     ('rosa', 'rpmbuild'):
         'Rosa RPM Builder has been removed.',
-    ('rose', 'metadata-graph'):
-        'This command has been removed pending re-implementation',
     ('rose', 'suite-clean'):
         'This command has been replaced by: "cylc clean".',
     ('rose', 'suite-cmp-vc'):
