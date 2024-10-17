@@ -401,7 +401,24 @@ class EntryArrayValueWidget(Gtk.Box):
 
     def setter(self, widget):
         """Reconstruct the new variable value from the entry array."""
-        val_array = [e.get_text() for e in self.entries]
+        val_array = []
+        # Prevent str without "" breaking the underlying Python syntax
+        for e in self.entries:
+            v = e.get_text()
+            if v in ("False", "True"): # Boolean
+                val_array.append(v)
+            elif (len(v) == 0) or (v[:1].isdigit()): # Empty or numeric
+                val_array.append(v)
+            elif not v.startswith('"'): # Str - add in leading and trailing "
+                val_array.append('"' + v + '"')
+                e.set_text('"' + v + '"')
+                e.set_position(len(v)+1)
+            elif (not v.endswith('"')) or (len(v) == 1): # Str - add in trailing "
+                val_array.append(v + '"')
+                e.set_text(v + '"')
+                e.set_position(len(v))
+            else:
+                val_array.append(v)
         max_length = max([len(v) for v in val_array] + [1])
         if max_length + 1 != self.chars_width:
             self.chars_width = max_length + 1
