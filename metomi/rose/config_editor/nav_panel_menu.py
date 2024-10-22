@@ -23,7 +23,8 @@ import time
 import webbrowser
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 import metomi.rose.config
@@ -34,14 +35,25 @@ from functools import cmp_to_key
 
 
 class NavPanelHandler(object):
-
     """Handles the navigation panel menu."""
 
-    def __init__(self, data, util, reporter, mainwindow,
-                 undo_stack, redo_stack, add_config_func,
-                 group_ops_inst, section_ops_inst, variable_ops_inst,
-                 kill_page_func, reload_ns_tree_func, transform_default_func,
-                 graph_ns_func):
+    def __init__(
+        self,
+        data,
+        util,
+        reporter,
+        mainwindow,
+        undo_stack,
+        redo_stack,
+        add_config_func,
+        group_ops_inst,
+        section_ops_inst,
+        variable_ops_inst,
+        kill_page_func,
+        reload_ns_tree_func,
+        transform_default_func,
+        graph_ns_func,
+    ):
         self.data = data
         self.util = util
         self.reporter = reporter
@@ -59,21 +71,23 @@ class NavPanelHandler(object):
 
     def add_dialog(self, base_ns):
         """Handle an add section dialog and request."""
-        if base_ns is not None and '/' in base_ns:
+        if base_ns is not None and "/" in base_ns:
             config_name, subsp = self.util.split_full_ns(self.data, base_ns)
             config_data = self.data.config[config_name]
             if config_name == base_ns:
-                help_str = ''
+                help_str = ""
             else:
                 sections = self.data.helper.get_sections_from_namespace(
-                    base_ns)
+                    base_ns
+                )
                 if sections == []:
-                    help_str = subsp.replace('/', ':')
+                    help_str = subsp.replace("/", ":")
                 else:
                     help_str = sections[0]
-                help_str = help_str.split(':', 1)[0]
-                for config_section in (list(config_data.sections.now.keys()) +
-                                       list(config_data.sections.latent.keys())):
+                help_str = help_str.split(":", 1)[0]
+                for config_section in list(
+                    config_data.sections.now.keys()
+                ) + list(config_data.sections.latent.keys()):
                     if config_section.startswith(help_str + ":"):
                         help_str = help_str + ":"
         else:
@@ -82,10 +96,16 @@ class NavPanelHandler(object):
         choices_help = self.data.helper.get_missing_sections(config_name)
 
         config_names = [
-            n for n in self.data.config if not self.ask_is_preview(n)]
-        config_names.sort(key=cmp_to_key(lambda x, y: (y == config_name) - (x == config_name)))
+            n for n in self.data.config if not self.ask_is_preview(n)
+        ]
+        config_names.sort(
+            key=cmp_to_key(
+                lambda x, y: (y == config_name) - (x == config_name)
+            )
+        )
         config_name, section = self.mainwindow.launch_add_dialog(
-            config_names, choices_help, help_str)
+            config_names, choices_help, help_str
+        )
         if config_name in self.data.config and section is not None:
             self.sect_ops.add_section(config_name, section, page_launch=True)
 
@@ -106,21 +126,26 @@ class NavPanelHandler(object):
             return False
         section = sections.pop()
         config_name = self.util.split_full_ns(self.data, namespace)[0]
-        return self.group_ops.copy_section(config_name, section,
-                                           skip_update=skip_update)
+        return self.group_ops.copy_section(
+            config_name, section, skip_update=skip_update
+        )
 
     def create_request(self):
         """Handle a create configuration request."""
-        if not any(v.config_type == metomi.rose.TOP_CONFIG_NAME
-                   for v in list(self.data.config.values())):
+        if not any(
+            v.config_type == metomi.rose.TOP_CONFIG_NAME
+            for v in list(self.data.config.values())
+        ):
             text = metomi.rose.config_editor.WARNING_APP_CONFIG_CREATE
             title = metomi.rose.config_editor.WARNING_APP_CONFIG_CREATE_TITLE
-            metomi.rose.gtk.dialog.run_dialog(metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                                       text, title)
+            metomi.rose.gtk.dialog.run_dialog(
+                metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR, text, title
+            )
             return False
         # Need an application configuration to be created.
-        root = os.path.join(self.data.top_level_directory,
-                            metomi.rose.SUB_CONFIGS_DIR)
+        root = os.path.join(
+            self.data.top_level_directory, metomi.rose.SUB_CONFIGS_DIR
+        )
         name, meta = self.mainwindow.launch_new_config_dialog(root)
         if name is None:
             return False
@@ -130,11 +155,13 @@ class NavPanelHandler(object):
     def ignore_request(self, base_ns, is_ignored):
         """Handle an ignore or enable section request."""
         config_names = list(self.data.config.keys())
-        if base_ns is not None and '/' in base_ns:
+        if base_ns is not None and "/" in base_ns:
             config_name = self.util.split_full_ns(self.data, base_ns)[0]
             prefer_name_sections = {
-                config_name:
-                self.data.helper.get_sections_from_namespace(base_ns)}
+                config_name: self.data.helper.get_sections_from_namespace(
+                    base_ns
+                )
+            }
         else:
             prefer_name_sections = {}
         config_sect_dict = {}
@@ -152,17 +179,24 @@ class NavPanelHandler(object):
                             continue
                     if not is_ignored:
                         mode = sect_data.metadata.get(
-                            metomi.rose.META_PROP_COMPULSORY)
-                        if (not sect_data.ignored_reason or
-                                mode == metomi.rose.META_PROP_VALUE_TRUE):
+                            metomi.rose.META_PROP_COMPULSORY
+                        )
+                        if (
+                            not sect_data.ignored_reason
+                            or mode == metomi.rose.META_PROP_VALUE_TRUE
+                        ):
                             continue
                     config_sect_dict[config_name].append(section)
-            config_sect_dict[config_name].sort(key=cmp_to_key(metomi.rose.config.sort_settings))
+            config_sect_dict[config_name].sort(
+                key=cmp_to_key(metomi.rose.config.sort_settings)
+            )
             if config_name in prefer_name_sections:
                 prefer_name_sections[config_name].sort(
-                    key=cmp_to_key(metomi.rose.config.sort_settings))
+                    key=cmp_to_key(metomi.rose.config.sort_settings)
+                )
         config_name, section = self.mainwindow.launch_ignore_dialog(
-            config_sect_dict, prefer_name_sections, is_ignored)
+            config_sect_dict, prefer_name_sections, is_ignored
+        )
         if config_name in self.data.config and section is not None:
             self.sect_ops.ignore_section(config_name, section, is_ignored)
 
@@ -183,16 +217,22 @@ class NavPanelHandler(object):
             section = metomi.rose.gtk.dialog.run_choices_dialog(
                 metomi.rose.config_editor.DIALOG_LABEL_CHOOSE_SECTION_EDIT,
                 sections,
-                metomi.rose.config_editor.DIALOG_TITLE_CHOOSE_SECTION)
+                metomi.rose.config_editor.DIALOG_TITLE_CHOOSE_SECTION,
+            )
         else:
             section = sections[0]
         if section is None:
             return False
-        title = metomi.rose.config_editor.DIALOG_TITLE_EDIT_COMMENTS.format(section)
+        title = metomi.rose.config_editor.DIALOG_TITLE_EDIT_COMMENTS.format(
+            section
+        )
         text = "\n".join(config_data.sections.now[section].comments)
         finish = lambda t: self.sect_ops.set_section_comments(
-            config_name, section, t.splitlines())
-        metomi.rose.gtk.dialog.run_edit_dialog(text, finish_hook=finish, title=title)
+            config_name, section, t.splitlines()
+        )
+        metomi.rose.gtk.dialog.run_edit_dialog(
+            text, finish_hook=finish, title=title
+        )
 
     def fix_request(self, base_ns):
         """Handle a request to auto-fix a configuration."""
@@ -225,7 +265,8 @@ class NavPanelHandler(object):
             sect_data = config_data.sections.now.get(section)
             if sect_data is not None:
                 metomi.rose.config_editor.util.launch_node_info_dialog(
-                    sect_data, "", search_function)
+                    sect_data, "", search_function
+                )
 
     def graph_request(self, namespace):
         """Handle a graph request for namespace info."""
@@ -234,30 +275,42 @@ class NavPanelHandler(object):
     def remove_request(self, base_ns):
         """Handle a delete section request."""
         config_names = list(self.data.config.keys())
-        if base_ns is not None and '/' in base_ns:
+        if base_ns is not None and "/" in base_ns:
             config_name = self.util.split_full_ns(self.data, base_ns)[0]
             prefer_name_sections = {
-                config_name:
-                self.data.helper.get_sections_from_namespace(base_ns)}
+                config_name: self.data.helper.get_sections_from_namespace(
+                    base_ns
+                )
+            }
         else:
             prefer_name_sections = {}
         config_sect_dict = {}
         for config_name in config_names:
             config_data = self.data.config[config_name]
-            config_sect_dict[config_name] = list(config_data.sections.now.keys())
-            config_sect_dict[config_name].sort(key=cmp_to_key(metomi.rose.config.sort_settings))
+            config_sect_dict[config_name] = list(
+                config_data.sections.now.keys()
+            )
+            config_sect_dict[config_name].sort(
+                key=cmp_to_key(metomi.rose.config.sort_settings)
+            )
             if config_name in prefer_name_sections:
                 prefer_name_sections[config_name].sort(
-                    key=cmp_to_key(metomi.rose.config.sort_settings))
+                    key=cmp_to_key(metomi.rose.config.sort_settings)
+                )
         config_name, section = self.mainwindow.launch_remove_dialog(
-            config_sect_dict, prefer_name_sections)
+            config_sect_dict, prefer_name_sections
+        )
         if config_name in self.data.config and section is not None:
             start_stack_index = len(self.undo_stack)
             group = (
-                metomi.rose.config_editor.STACK_GROUP_DELETE + "-" + str(time.time()))
+                metomi.rose.config_editor.STACK_GROUP_DELETE
+                + "-"
+                + str(time.time())
+            )
             config_data = self.data.config[config_name]
             variable_sorter = lambda v, w: metomi.rose.config.sort_settings(
-                v.metadata['id'], w.metadata['id'])
+                v.metadata["id"], w.metadata["id"]
+            )
             variables = list(config_data.vars.now.get(section, []))
             variables.sort(key=cmp_to_key(variable_sorter))
             variables.reverse()
@@ -269,29 +322,41 @@ class NavPanelHandler(object):
 
     def rename_dialog(self, base_ns):
         """Handle a rename section dialog and request."""
-        if base_ns is not None and '/' in base_ns:
+        if base_ns is not None and "/" in base_ns:
             config_name = self.util.split_full_ns(self.data, base_ns)[0]
             prefer_name_sections = {
-                config_name:
-                self.data.helper.get_sections_from_namespace(base_ns)}
+                config_name: self.data.helper.get_sections_from_namespace(
+                    base_ns
+                )
+            }
         else:
             prefer_name_sections = {}
         config_sect_dict = {}
         for config_name in self.data.config:
             config_data = self.data.config[config_name]
-            config_sect_dict[config_name] = list(config_data.sections.now.keys())
-            config_sect_dict[config_name].sort(key=cmp_to_key(metomi.rose.config.sort_settings))
+            config_sect_dict[config_name] = list(
+                config_data.sections.now.keys()
+            )
+            config_sect_dict[config_name].sort(
+                key=cmp_to_key(metomi.rose.config.sort_settings)
+            )
             if config_name in prefer_name_sections:
                 prefer_name_sections[config_name].sort(
-                    key=cmp_to_key(metomi.rose.config.sort_settings))
+                    key=cmp_to_key(metomi.rose.config.sort_settings)
+                )
         config_name, source_section, target_section = (
             self.mainwindow.launch_rename_dialog(
-                config_sect_dict, prefer_name_sections)
+                config_sect_dict, prefer_name_sections
+            )
         )
-        if (config_name in self.data.config and
-                source_section is not None and target_section):
+        if (
+            config_name in self.data.config
+            and source_section is not None
+            and target_section
+        ):
             self.group_ops.rename_section(
-                config_name, source_section, target_section)
+                config_name, source_section, target_section
+            )
 
     def search_request(self, namespace, setting_id):
         """Handle a search for an id (hyperlink)."""
@@ -306,45 +371,87 @@ class NavPanelHandler(object):
             namespace = "/" + base_ns.lstrip("/")
 
         ui_config_string = """<ui> <popup name='Popup'>"""
-        actions = [('New', Gtk.STOCK_NEW,
-                    metomi.rose.config_editor.TREE_PANEL_NEW_CONFIG),
-                   ('Add', Gtk.STOCK_ADD,
-                    metomi.rose.config_editor.TREE_PANEL_ADD_GENERIC),
-                   ('Autofix', Gtk.STOCK_CONVERT,
-                    metomi.rose.config_editor.TREE_PANEL_AUTOFIX_CONFIG),
-                   ('Clone', Gtk.STOCK_COPY,
-                    metomi.rose.config_editor.TREE_PANEL_CLONE_SECTION),
-                   ('Edit', Gtk.STOCK_EDIT,
-                    metomi.rose.config_editor.TREE_PANEL_EDIT_SECTION),
-                   ('Enable', Gtk.STOCK_YES,
-                    metomi.rose.config_editor.TREE_PANEL_ENABLE_GENERIC),
-                   ('Graph', Gtk.STOCK_SORT_ASCENDING,
-                    metomi.rose.config_editor.TREE_PANEL_GRAPH_SECTION),
-                   ('Ignore', Gtk.STOCK_NO,
-                    metomi.rose.config_editor.TREE_PANEL_IGNORE_GENERIC),
-                   ('Info', Gtk.STOCK_INFO,
-                    metomi.rose.config_editor.TREE_PANEL_INFO_SECTION),
-                   ('Help', Gtk.STOCK_HELP,
-                    metomi.rose.config_editor.TREE_PANEL_HELP_SECTION),
-                   ('URL', Gtk.STOCK_HOME,
-                    metomi.rose.config_editor.TREE_PANEL_URL_SECTION),
-                   ('Remove', Gtk.STOCK_DELETE,
-                    metomi.rose.config_editor.TREE_PANEL_REMOVE_GENERIC),
-                   ('Rename', Gtk.STOCK_COPY,
-                    metomi.rose.config_editor.TREE_PANEL_RENAME_GENERIC)]
+        actions = [
+            (
+                "New",
+                Gtk.STOCK_NEW,
+                metomi.rose.config_editor.TREE_PANEL_NEW_CONFIG,
+            ),
+            (
+                "Add",
+                Gtk.STOCK_ADD,
+                metomi.rose.config_editor.TREE_PANEL_ADD_GENERIC,
+            ),
+            (
+                "Autofix",
+                Gtk.STOCK_CONVERT,
+                metomi.rose.config_editor.TREE_PANEL_AUTOFIX_CONFIG,
+            ),
+            (
+                "Clone",
+                Gtk.STOCK_COPY,
+                metomi.rose.config_editor.TREE_PANEL_CLONE_SECTION,
+            ),
+            (
+                "Edit",
+                Gtk.STOCK_EDIT,
+                metomi.rose.config_editor.TREE_PANEL_EDIT_SECTION,
+            ),
+            (
+                "Enable",
+                Gtk.STOCK_YES,
+                metomi.rose.config_editor.TREE_PANEL_ENABLE_GENERIC,
+            ),
+            (
+                "Graph",
+                Gtk.STOCK_SORT_ASCENDING,
+                metomi.rose.config_editor.TREE_PANEL_GRAPH_SECTION,
+            ),
+            (
+                "Ignore",
+                Gtk.STOCK_NO,
+                metomi.rose.config_editor.TREE_PANEL_IGNORE_GENERIC,
+            ),
+            (
+                "Info",
+                Gtk.STOCK_INFO,
+                metomi.rose.config_editor.TREE_PANEL_INFO_SECTION,
+            ),
+            (
+                "Help",
+                Gtk.STOCK_HELP,
+                metomi.rose.config_editor.TREE_PANEL_HELP_SECTION,
+            ),
+            (
+                "URL",
+                Gtk.STOCK_HOME,
+                metomi.rose.config_editor.TREE_PANEL_URL_SECTION,
+            ),
+            (
+                "Remove",
+                Gtk.STOCK_DELETE,
+                metomi.rose.config_editor.TREE_PANEL_REMOVE_GENERIC,
+            ),
+            (
+                "Rename",
+                Gtk.STOCK_COPY,
+                metomi.rose.config_editor.TREE_PANEL_RENAME_GENERIC,
+            ),
+        ]
         url = None
         help_ = None
-        is_empty = (not self.data.config)
+        is_empty = not self.data.config
         if namespace is not None:
             config_name = self.util.split_full_ns(self.data, namespace)[0]
             if self.data.config[config_name].is_preview:
                 return False
             cloneable = self.is_ns_duplicate(namespace)
-            is_top = (namespace in list(self.data.config.keys()))
+            is_top = namespace in list(self.data.config.keys())
             is_fixable = bool(self.get_ns_errors(namespace))
             has_content = self.data.helper.is_ns_content(namespace)
             is_unsaved = self.data.helper.get_config_has_unsaved_changes(
-                config_name)
+                config_name
+            )
             is_latent = self.data.helper.get_ns_latent_status(namespace)
             latent_sections = self.data.helper.get_latent_sections(namespace)
             metadata = self.get_ns_metadata_and_comments(namespace)[0]
@@ -352,11 +459,17 @@ class NavPanelHandler(object):
                 for i, section in enumerate(latent_sections):
                     action_name = "Add {0}".format(i)
                     ui_config_string += '<menuitem action="{0}"/>'.format(
-                        action_name)
+                        action_name
+                    )
                     actions.append(
-                        (action_name, Gtk.STOCK_ADD,
-                         metomi.rose.config_editor.TREE_PANEL_ADD_SECTION.format(
-                             section.replace("_", "__")))
+                        (
+                            action_name,
+                            Gtk.STOCK_ADD,
+                            metomi.rose.config_editor
+                            .TREE_PANEL_ADD_SECTION.format(
+                                section.replace("_", "__")
+                            ),
+                        )
                     )
                 ui_config_string += '<separator name="addlatentsep"/>'
             ui_config_string += '<menuitem action="Add"/>'
@@ -399,24 +512,26 @@ class NavPanelHandler(object):
                                    <menuitem action="New"/>"""
         ui_config_string += """</popup> </ui>"""
         uimanager = Gtk.UIManager()
-        actiongroup = Gtk.ActionGroup('Popup')
+        actiongroup = Gtk.ActionGroup("Popup")
         actiongroup.add_actions(actions)
         uimanager.insert_action_group(actiongroup)
         uimanager.add_ui_from_string(ui_config_string)
         if namespace is None or (is_top or is_empty):
-            new_item = uimanager.get_widget('/Popup/New')
+            new_item = uimanager.get_widget("/Popup/New")
             new_item.connect("activate", lambda b: self.create_request())
             new_item.set_sensitive(not is_empty)
-        add_item = uimanager.get_widget('/Popup/Add')
+        add_item = uimanager.get_widget("/Popup/Add")
         add_item.connect("activate", lambda b: self.add_dialog(namespace))
         add_item.set_sensitive(not is_empty)
-        enable_item = uimanager.get_widget('/Popup/Enable')
+        enable_item = uimanager.get_widget("/Popup/Enable")
         enable_item.connect(
-            "activate", lambda b: self.ignore_request(namespace, False))
+            "activate", lambda b: self.ignore_request(namespace, False)
+        )
         enable_item.set_sensitive(not is_empty)
-        ignore_item = uimanager.get_widget('/Popup/Ignore')
+        ignore_item = uimanager.get_widget("/Popup/Ignore")
         ignore_item.connect(
-            "activate", lambda b: self.ignore_request(namespace, True))
+            "activate", lambda b: self.ignore_request(namespace, True)
+        )
         ignore_item.set_sensitive(not is_empty)
         if namespace is not None:
             if is_latent:
@@ -427,49 +542,64 @@ class NavPanelHandler(object):
                     add_item.connect(
                         "activate",
                         lambda b: self.sect_ops.add_section(
-                            config_name, b._section))
+                            config_name, b._section
+                        ),
+                    )
             if cloneable:
-                clone_item = uimanager.get_widget('/Popup/Clone')
-                clone_item.connect("activate",
-                                   lambda b: self.copy_request(namespace))
+                clone_item = uimanager.get_widget("/Popup/Clone")
+                clone_item.connect(
+                    "activate", lambda b: self.copy_request(namespace)
+                )
             if has_content:
-                edit_item = uimanager.get_widget('/Popup/Edit')
-                edit_item.connect("activate",
-                                  lambda b: self.edit_request(namespace))
-                info_item = uimanager.get_widget('/Popup/Info')
-                info_item.connect("activate",
-                                  lambda b: self.info_request(namespace))
+                edit_item = uimanager.get_widget("/Popup/Edit")
+                edit_item.connect(
+                    "activate", lambda b: self.edit_request(namespace)
+                )
+                info_item = uimanager.get_widget("/Popup/Info")
+                info_item.connect(
+                    "activate", lambda b: self.info_request(namespace)
+                )
                 graph_item = uimanager.get_widget("/Popup/Graph")
-                graph_item.connect("activate",
-                                   lambda b: self.graph_request(namespace))
+                graph_item.connect(
+                    "activate", lambda b: self.graph_request(namespace)
+                )
                 if is_unsaved:
                     graph_item.set_sensitive(False)
             if help_ is not None:
-                help_item = uimanager.get_widget('/Popup/Help')
-                help_title = namespace.split('/')[1:]
-                help_title = metomi.rose.config_editor.DIALOG_HELP_TITLE.format(
-                    help_title)
+                help_item = uimanager.get_widget("/Popup/Help")
+                help_title = namespace.split("/")[1:]
+                help_title = (
+                    metomi.rose.config_editor.DIALOG_HELP_TITLE.format(
+                        help_title
+                    )
+                )
                 search_function = lambda i: self.search_request(namespace, i)
                 help_item.connect(
                     "activate",
                     lambda b: metomi.rose.gtk.dialog.run_hyperlink_dialog(
-                        Gtk.STOCK_DIALOG_INFO, help_, help_title,
-                        search_function))
+                        Gtk.STOCK_DIALOG_INFO,
+                        help_,
+                        help_title,
+                        search_function,
+                    ),
+                )
             if url is not None:
-                url_item = uimanager.get_widget('/Popup/URL')
-                url_item.connect(
-                    "activate", lambda b: webbrowser.open(url))
+                url_item = uimanager.get_widget("/Popup/URL")
+                url_item.connect("activate", lambda b: webbrowser.open(url))
             if is_fixable:
-                autofix_item = uimanager.get_widget('/Popup/Autofix')
-                autofix_item.connect("activate",
-                                     lambda b: self.fix_request(namespace))
-            remove_section_item = uimanager.get_widget('/Popup/Remove')
+                autofix_item = uimanager.get_widget("/Popup/Autofix")
+                autofix_item.connect(
+                    "activate", lambda b: self.fix_request(namespace)
+                )
+            remove_section_item = uimanager.get_widget("/Popup/Remove")
             remove_section_item.connect(
-                "activate", lambda b: self.remove_request(namespace))
-            rename_section_item = uimanager.get_widget('/Popup/Rename')
+                "activate", lambda b: self.remove_request(namespace)
+            )
+            rename_section_item = uimanager.get_widget("/Popup/Rename")
             rename_section_item.connect(
-                "activate", lambda b: self.rename_dialog(namespace))
-        menu = uimanager.get_widget('/Popup')
+                "activate", lambda b: self.rename_dialog(namespace)
+            )
+        menu = uimanager.get_widget("/Popup")
         menu.popup_at_pointer(event)
         return False
 
@@ -483,8 +613,10 @@ class NavPanelHandler(object):
         sect_data = self.data.config[config_name].sections.now.get(section)
         if sect_data is None:
             return False
-        return (sect_data.metadata.get(metomi.rose.META_PROP_DUPLICATE) ==
-                metomi.rose.META_PROP_VALUE_TRUE)
+        return (
+            sect_data.metadata.get(metomi.rose.META_PROP_DUPLICATE)
+            == metomi.rose.META_PROP_VALUE_TRUE
+        )
 
     def get_ns_errors(self, namespace):
         """Count the number of errors in a namespace."""
@@ -495,7 +627,8 @@ class NavPanelHandler(object):
         for section in sections:
             errors += len(config_data.sections.get_sect(section).error)
         real_data, latent_data = self.data.helper.get_data_for_namespace(
-            namespace)
+            namespace
+        )
         errors += sum([len(v.error) for v in real_data + latent_data])
         return errors
 
@@ -510,18 +643,24 @@ class NavPanelHandler(object):
             # Always show this.
             return True
         show_ignored = self.data.page_ns_show_modes[
-            metomi.rose.config_editor.SHOW_MODE_IGNORED]
+            metomi.rose.config_editor.SHOW_MODE_IGNORED
+        ]
         show_user_ignored = self.data.page_ns_show_modes[
-            metomi.rose.config_editor.SHOW_MODE_USER_IGNORED]
+            metomi.rose.config_editor.SHOW_MODE_USER_IGNORED
+        ]
         show_latent = self.data.page_ns_show_modes[
-            metomi.rose.config_editor.SHOW_MODE_LATENT]
+            metomi.rose.config_editor.SHOW_MODE_LATENT
+        ]
         if latent_status:
             if not show_latent:
                 # Latent page, no latent pages allowed.
                 return False
             # Latent page, latent pages allowed (but may be ignored...).
         if ignored_status:
-            if ignored_status == metomi.rose.config.ConfigNode.STATE_USER_IGNORED:
+            if (
+                ignored_status
+                == metomi.rose.config.ConfigNode.STATE_USER_IGNORED
+            ):
                 if show_ignored or show_user_ignored:
                     # This is an allowed user-ignored page.
                     return True

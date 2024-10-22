@@ -19,7 +19,8 @@
 # -----------------------------------------------------------------------------
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 import metomi.rose.config_editor
@@ -27,12 +28,10 @@ from . import radiobuttons
 
 
 class BoolValueWidget(radiobuttons.RadioButtonsValueWidget):
-
     """Produces 'true' and 'false' labelled radio buttons."""
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
-        super(BoolValueWidget, self).__init__(homogeneous=False,
-                                              spacing=0)
+        super(BoolValueWidget, self).__init__(homogeneous=False, spacing=0)
         self.value = value
         self.metadata = metadata
         self.set_value = set_value
@@ -40,16 +39,23 @@ class BoolValueWidget(radiobuttons.RadioButtonsValueWidget):
         self.allowed_values = []
         self.label_dict = {}
         if metadata.get(metomi.rose.META_PROP_TYPE) == "boolean":
-            self.allowed_values = [metomi.rose.TYPE_BOOLEAN_VALUE_TRUE,
-                                   metomi.rose.TYPE_BOOLEAN_VALUE_FALSE]
+            self.allowed_values = [
+                metomi.rose.TYPE_BOOLEAN_VALUE_TRUE,
+                metomi.rose.TYPE_BOOLEAN_VALUE_FALSE,
+            ]
         else:
-            self.allowed_values = [metomi.rose.TYPE_LOGICAL_VALUE_TRUE,
-                                   metomi.rose.TYPE_LOGICAL_VALUE_FALSE]
+            self.allowed_values = [
+                metomi.rose.TYPE_LOGICAL_VALUE_TRUE,
+                metomi.rose.TYPE_LOGICAL_VALUE_FALSE,
+            ]
             self.label_dict = {
-                metomi.rose.TYPE_LOGICAL_VALUE_TRUE:
-                metomi.rose.TYPE_LOGICAL_TRUE_TITLE,
-                metomi.rose.TYPE_LOGICAL_VALUE_FALSE:
-                metomi.rose.TYPE_LOGICAL_FALSE_TITLE}
+                metomi.rose.TYPE_LOGICAL_VALUE_TRUE: (
+                    metomi.rose.TYPE_LOGICAL_TRUE_TITLE
+                ),
+                metomi.rose.TYPE_LOGICAL_VALUE_FALSE: (
+                    metomi.rose.TYPE_LOGICAL_FALSE_TITLE
+                ),
+            }
 
         for k, item in enumerate(self.allowed_values):
             if item in self.label_dict:
@@ -58,22 +64,22 @@ class BoolValueWidget(radiobuttons.RadioButtonsValueWidget):
                 button_label = str(item)
                 self.label_dict.update({item: button_label})
             if k == 0:
-                radio_button = Gtk.RadioButton(group=None,
-                                               label=button_label,
-                                               use_underline=False)
+                radio_button = Gtk.RadioButton(
+                    group=None, label=button_label, use_underline=False
+                )
                 radio_button.real_value = item
             else:
-                radio_button = Gtk.RadioButton(group=radio_button,
-                                               label=button_label,
-                                               use_underline=False)
+                radio_button = Gtk.RadioButton(
+                    group=radio_button, label=button_label, use_underline=False
+                )
                 radio_button.real_value = item
             radio_button.set_active(False)
             if item == str(value):
                 radio_button.set_active(True)
-            radio_button.connect('toggled', self.setter)
+            radio_button.connect("toggled", self.setter)
             self.pack_start(radio_button, False, False, 10)
             radio_button.show()
-            radio_button.connect('focus-in-event', self.hook.trigger_scroll)
+            radio_button.connect("focus-in-event", self.hook.trigger_scroll)
         self.grab_focus = lambda: self.hook.get_focus(radio_button)
 
     def setter(self, widget, variable):

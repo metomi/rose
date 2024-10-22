@@ -21,7 +21,8 @@
 import os
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk
 
 import metomi.rose.config_editor
@@ -31,7 +32,6 @@ import metomi.rose.gtk.util
 
 
 class FileSystemPanel(Gtk.ScrolledWindow):
-
     """A class to show underlying files and directories in a Gtk.TreeView."""
 
     def __init__(self, directory):
@@ -43,9 +43,10 @@ class FileSystemPanel(Gtk.ScrolledWindow):
         for dirpath, dirnames, filenames in os.walk(self.directory):
             if dirpath not in dirpath_iters:
                 known_path = os.path.dirname(dirpath)
-                new_iter = store.append(dirpath_iters[known_path],
-                                        [os.path.basename(dirpath),
-                                         os.path.abspath(dirpath)])
+                new_iter = store.append(
+                    dirpath_iters[known_path],
+                    [os.path.basename(dirpath), os.path.abspath(dirpath)],
+                )
                 dirpath_iters.update({dirpath: new_iter})
             this_iter = dirpath_iters[dirpath]
             filenames.sort()
@@ -55,8 +56,10 @@ class FileSystemPanel(Gtk.ScrolledWindow):
                 filepath = os.path.join(dirpath, name)
                 store.append(this_iter, [name, os.path.abspath(filepath)])
             for dirname in list(dirnames):
-                if (dirname.startswith(".") or dirname in [
-                        metomi.rose.SUB_CONFIGS_DIR, metomi.rose.CONFIG_META_DIR]):
+                if dirname.startswith(".") or dirname in [
+                    metomi.rose.SUB_CONFIGS_DIR,
+                    metomi.rose.CONFIG_META_DIR,
+                ]:
                     dirnames.remove(dirname)
             dirnames.sort()
         view.set_model(store)
@@ -64,8 +67,7 @@ class FileSystemPanel(Gtk.ScrolledWindow):
         col.set_title(metomi.rose.config_editor.TITLE_FILE_PANEL)
         cell = Gtk.CellRendererText()
         col.pack_start(cell, True)
-        col.set_cell_data_func(cell,
-                               self._set_path_markup, store)
+        col.set_cell_data_func(cell, self._set_path_markup, store)
         view.append_column(col)
         view.expand_all()
         view.show()
@@ -98,17 +100,25 @@ class FileSystemPanel(Gtk.ScrolledWindow):
 
     def _handle_click(self, view, event):
         pathinfo = view.get_path_at_pos(int(event.x), int(event.y))
-        if (event.button == 1 and event.type == Gdk.EventType._2BUTTON_PRESS and
-                pathinfo is None):
+        if (
+            event.button == 1
+            and event.type == Gdk.EventType._2BUTTON_PRESS
+            and pathinfo is None
+        ):
             self._handle_activation()
         if event.button == 3:
             ui_string = """<ui><popup name='Popup'>
                            <menuitem action='Open'/>
                            </popup> </ui>"""
-            actions = [('Open', Gtk.STOCK_OPEN,
-                        metomi.rose.config_editor.FILE_PANEL_MENU_OPEN)]
+            actions = [
+                (
+                    "Open",
+                    Gtk.STOCK_OPEN,
+                    metomi.rose.config_editor.FILE_PANEL_MENU_OPEN,
+                )
+            ]
             uimanager = Gtk.UIManager()
-            actiongroup = Gtk.ActionGroup('Popup')
+            actiongroup = Gtk.ActionGroup("Popup")
             actiongroup.add_actions(actions)
             uimanager.insert_action_group(actiongroup)
             uimanager.add_ui_from_string(ui_string)
@@ -117,9 +127,14 @@ class FileSystemPanel(Gtk.ScrolledWindow):
                 col = None
             else:
                 path, col = pathinfo[:2]
-            open_item = uimanager.get_widget('/Popup/Open')
+            open_item = uimanager.get_widget("/Popup/Open")
             open_item.connect(
-                "activate",
-                lambda m: self._handle_activation(view, path, col))
-            this_menu = uimanager.get_widget('/Popup')
-            this_menu.popup_at_widget(event.button, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, event)
+                "activate", lambda m: self._handle_activation(view, path, col)
+            )
+            this_menu = uimanager.get_widget("/Popup")
+            this_menu.popup_at_widget(
+                event.button,
+                Gdk.Gravity.SOUTH_WEST,
+                Gdk.Gravity.NORTH_WEST,
+                event,
+            )

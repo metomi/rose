@@ -53,7 +53,6 @@ text, remembering to add the [rose-config-edit] section.
 """
 
 import ast
-import os
 import sys
 
 from metomi.rose.resource import ResourceLocator
@@ -215,15 +214,18 @@ EVENT_MACRO_VALIDATE = "{1}: {0}: {2} errors"
 EVENT_MACRO_VALIDATE_ALL = "Custom Validators: {0}: {1} errors"
 EVENT_MACRO_VALIDATE_ALL_OK = "Custom Validators: {0}: all OK"
 EVENT_MACRO_VALIDATE_CHECK_ALL = (
-    "Custom Validators, FailureRuleChecker: {0} total problems found")
+    "Custom Validators, FailureRuleChecker: {0} total problems found"
+)
 EVENT_MACRO_VALIDATE_CHECK_ALL_OK = (
-    "Custom Validators, FailureRuleChecker: No problems found")
+    "Custom Validators, FailureRuleChecker: No problems found"
+)
 EVENT_MACRO_VALIDATE_OK = "{1}: {0} is OK"
 EVENT_MACRO_VALIDATE_NO_PROBLEMS = "Custom Validators: No problems found"
 EVENT_MACRO_VALIDATE_PROBLEMS_FOUND = "Custom Validators: {0} problems found"
 EVENT_MACRO_VALIDATE_RULE_NO_PROBLEMS = "FailureRuleChecker: No problems found"
 EVENT_MACRO_VALIDATE_RULE_PROBLEMS_FOUND = (
-    "FailureRuleChecker: {0} problems found")
+    "FailureRuleChecker: {0} problems found"
+)
 EVENT_REDO = "{0}"
 EVENT_REVERT = "Reverted {0}"
 EVENT_TIME = "%H:%M:%S"
@@ -245,14 +247,18 @@ ERROR_BAD_FIND = "Bad search expression"
 ERROR_BAD_NAME = "{0}: invalid name"
 ERROR_BAD_MACRO_EXCEPTION = "Could not apply macro: error: {0}: {1}"
 ERROR_BAD_MACRO_RETURN = "Bad return value for macro: {0}"
-ERROR_BAD_TRIGGER = ("{0}\nfor <b>{1}</b>\n"
-                     "from the configuration <b>{2}</b>. "
-                     "\nDisabling triggers for this configuration.")
-ERROR_CONFIG_CREATE = ("Error creating application config at {0}:" +
-                       "\n  {1}, {2}")
+ERROR_BAD_TRIGGER = (
+    "{0}\nfor <b>{1}</b>\n"
+    "from the configuration <b>{2}</b>. "
+    "\nDisabling triggers for this configuration."
+)
+ERROR_CONFIG_CREATE = (
+    "Error creating application config at {0}:" + "\n  {1}, {2}"
+)
 ERROR_CONFIG_CREATE_TITLE = "Error in creating configuration"
-ERROR_CONFIG_DELETE = ("Error deleting application config at {0}:" +
-                       "\n  {1}, {2}")
+ERROR_CONFIG_DELETE = (
+    "Error deleting application config at {0}:" + "\n  {1}, {2}"
+)
 ERROR_CONFIG_DELETE_TITLE = "Error in deleting configuration"
 ERROR_ID_NOT_FOUND = "Could not find resource: {0}"
 ERROR_FILE_DELETE_FAILED = "Delete failed. {0}"
@@ -265,9 +271,10 @@ ERROR_LOAD_OPT_CONFS_TITLE = "Error loading opt configs"
 ERROR_LOAD_SYNTAX = "Could not load path: {0}\n\nSyntax error:\n{0}\n{1}"
 ERROR_METADATA_CHECKER_TITLE = "Flawed metadata warning"
 ERROR_METADATA_CHECKER_TEXT = (
-    "{0} problem(s) found in metadata at {1}.\n" +
-    "Some functionality has been switched off.\n\n" +
-    "Run rose metadata-check for more info.")
+    "{0} problem(s) found in metadata at {1}.\n"
+    + "Some functionality has been switched off.\n\n"
+    + "Run rose metadata-check for more info."
+)
 ERROR_NO_OUTPUT = "No output found for {0}"
 ERROR_NOT_FOUND = "Could not find path: {0}"
 ERROR_NOT_REGEX = "Could not compile expression: {0}\nError info: {1}"
@@ -290,17 +297,22 @@ PAGE_WARNING_IGNORED_SECTION = "Ignored section: {0}"
 PAGE_WARNING_IGNORED_SECTION_TIP = "Ignored section"
 PAGE_WARNING_LATENT = "Latent page - no data"
 PAGE_WARNING_NO_CONTENT = "Blank page - no data"
-PAGE_WARNING_NO_CONTENT_TIP = ("No associated configuration or summary data " +
-                               "for this page.")
+PAGE_WARNING_NO_CONTENT_TIP = (
+    "No associated configuration or summary data " + "for this page."
+)
 WARNING_APP_CONFIG_CREATE = "Cannot create another configuration here."
 WARNING_APP_CONFIG_CREATE_TITLE = "Warning - application configuration."
-WARNING_CONFIG_DELETE = ("Cannot remove a whole configuration:\n{0}\n" +
-                         "This must be done externally.")
+WARNING_CONFIG_DELETE = (
+    "Cannot remove a whole configuration:\n{0}\n"
+    + "This must be done externally."
+)
 WARNING_CONFIG_DELETE_TITLE = "Can't remove configuration"
 WARNING_ERRORS_FOUND_ON_SAVE = "Errors found in {0}. Save anyway?"
-WARNING_FILE_DELETE = ("Not a configuration file entry!\n" +
-                       "This file must be manually removed" +
-                       " in the filesystem:\n {0}.")
+WARNING_FILE_DELETE = (
+    "Not a configuration file entry!\n"
+    + "This file must be manually removed"
+    + " in the filesystem:\n {0}."
+)
 WARNING_FILE_DELETE_TITLE = "Can't remove filesystem file"
 WARNING_CANNOT_ENABLE = "Warning - cannot override a trigger setting: {0}"
 WARNING_CANNOT_ENABLE_TITLE = "Warning - can't enable"
@@ -314,14 +326,19 @@ WARNING_NOT_FOUND_TITLE = "Couldn't find it"
 WARNING_NOT_IGNORED = "Should be ignored "
 WARNING_NOT_TRIGGER = "Not part of the trigger mechanism"
 WARNING_USER_NOT_TRIGGER_IGNORED = (
-    "User-ignored, but should be trigger-ignored")
+    "User-ignored, but should be trigger-ignored"
+)
 WARNING_NOT_USER_IGNORABLE = "User-ignored, but is compulsory"
 WARNING_TYPE_ENABLED = "enabled"
 WARNING_TYPE_TRIGGER_IGNORED = "trigger-ignored"
 WARNING_TYPE_USER_IGNORED = "user-ignored"
 WARNING_TYPE_NOT_TRIGGER = "trigger"
-WARNING_TYPES_IGNORE = [WARNING_TYPE_ENABLED, WARNING_TYPE_TRIGGER_IGNORED,
-                        WARNING_TYPE_USER_IGNORED, WARNING_TYPE_NOT_TRIGGER]
+WARNING_TYPES_IGNORE = [
+    WARNING_TYPE_ENABLED,
+    WARNING_TYPE_TRIGGER_IGNORED,
+    WARNING_TYPE_USER_IGNORED,
+    WARNING_TYPE_NOT_TRIGGER,
+]
 WARNING_INTEGER_OUT_OF_BOUNDS = "Warning: integer out of bounds"
 
 # Special metadata "type" values
@@ -494,8 +511,9 @@ DIALOG_BODY_GRAPH_SECTION = "Choose a particular section to graph"
 DIALOG_BODY_MACRO_CHANGES = "<b>{0} {1}</b>\n    {2}\n"
 DIALOG_BODY_MACRO_CHANGES_MAX_LENGTH = 150  # Must > raw CHANGES text above
 DIALOG_BODY_MACRO_CHANGES_NUM_HEIGHT = 3  # > Number, needs more height.
-DIALOG_BODY_NL_CASE_CHANGE = ("Mixed-case names cause trouble in namelists." +
-                              "\nSuggested: {0}")
+DIALOG_BODY_NL_CASE_CHANGE = (
+    "Mixed-case names cause trouble in namelists." + "\nSuggested: {0}"
+)
 DIALOG_BODY_REMOVE_CONFIG = "Choose configuration"
 DIALOG_BODY_RENAME_CONFIG = "Choose configuration"
 DIALOG_BODY_REMOVE_SECTION = "Choose the section to remove"
@@ -504,32 +522,33 @@ DIALOG_COLUMNS_UPGRADE = ["Name", "Version", "Upgrade Version", "Upgrade?"]
 DIALOG_HELP_TITLE = "Help for {0}"
 DIALOG_LABEL_AUTOFIX = "Run built-in transform (fixer) macros?"
 DIALOG_LABEL_AUTOFIX_ALL = (
-    "Run built-in transform (fixer) macros for all configurations?")
+    "Run built-in transform (fixer) macros for all configurations?"
+)
 DIALOG_LABEL_CHOOSE_SECTION_ADD_VAR = "Choose a section for the new variable:"
 DIALOG_LABEL_CHOOSE_SECTION_EDIT = "Choose a section to edit:"
 DIALOG_LABEL_CONFIG_CHOOSE_META = "Metadata id:"
 DIALOG_LABEL_CONFIG_CHOOSE_NAME = "New config name:"
-DIALOG_LABEL_MACRO_TRANSFORM_CHANGES = ("<b>{0}:</b> <i>{1}</i>\n" +
-                                        "changes: {2}")
-DIALOG_LABEL_MACRO_TRANSFORM_NONE = (
-    "No configuration changes from this macro.")
-DIALOG_LABEL_MACRO_VALIDATE_ISSUES = ("<b>{0}</b> <i>{1}</i>\n" +
-                                      "errors: {2}")
+DIALOG_LABEL_MACRO_TRANSFORM_CHANGES = (
+    "<b>{0}:</b> <i>{1}</i>\n" + "changes: {2}"
+)
+DIALOG_LABEL_MACRO_TRANSFORM_NONE = "No configuration changes from this macro."
+DIALOG_LABEL_MACRO_VALIDATE_ISSUES = "<b>{0}</b> <i>{1}</i>\n" + "errors: {2}"
 DIALOG_LABEL_MACRO_VALIDATE_NONE = "Configuration OK for this macro."
-DIALOG_LABEL_MACRO_WARN_ISSUES = ("warnings: {0}")
+DIALOG_LABEL_MACRO_WARN_ISSUES = "warnings: {0}"
 DIALOG_LABEL_NULL_SECTION = "None"
-DIALOG_LABEL_PREFERENCES = ("Please edit your site and user " +
-                            "configurations to make changes.")
-DIALOG_LABEL_UPGRADE = (
-    "Click Upgrade Version cells to change target versions.")
+DIALOG_LABEL_PREFERENCES = (
+    "Please edit your site and user " + "configurations to make changes."
+)
+DIALOG_LABEL_UPGRADE = "Click Upgrade Version cells to change target versions."
 DIALOG_LABEL_UPGRADE_ALL = "Populate all possible versions"
 DIALOG_TIP_SUITE_RUN_HELP = "Read the help for rose suite-run"
 DIALOG_TEXT_MACRO_CHANGED = "changed"
 DIALOG_TEXT_MACRO_ERROR = "error"
 DIALOG_TEXT_MACRO_WARNING = "warning"
-DIALOG_TEXT_SUITE_NOT_RUNNING = ("Cannot launch gcontrol: {0}")
-DIALOG_TEXT_UNREGISTERED_SUITE = ("Cannot launch gcontrol: " +
-                                  "suite {0} is not registered.")
+DIALOG_TEXT_SUITE_NOT_RUNNING = "Cannot launch gcontrol: {0}"
+DIALOG_TEXT_UNREGISTERED_SUITE = (
+    "Cannot launch gcontrol: " + "suite {0} is not registered."
+)
 DIALOG_TITLE_MACRO_TRANSFORM = "{0} - Changes for {1}"
 DIALOG_TITLE_MACRO_TRANSFORM_NONE = "{0}"
 DIALOG_TITLE_MACRO_VALIDATE = "{0} - Issues for {1}"
@@ -565,7 +584,7 @@ DIALOG_NODE_INFO_ATTRIBUTE = "<b>{0}</b>"
 DIALOG_NODE_INFO_CHANGES = "<span foreground='blue'>{0}</span>\n"
 DIALOG_NODE_INFO_DATA = "<span foreground='blue'>Data</span>\n"
 DIALOG_NODE_INFO_DELIMITER = "  "
-DIALOG_NODE_INFO_METADATA = ("<span foreground='blue'>Metadata</span>\n")
+DIALOG_NODE_INFO_METADATA = "<span foreground='blue'>Metadata</span>\n"
 DIALOG_NODE_INFO_MAX_LEN = 80
 DIALOG_NODE_INFO_SUB_ATTRIBUTE = "<i>{0}:</i>"
 STACK_VIEW_TITLE = "Undo and Redo Stack Viewer"
@@ -579,12 +598,18 @@ TITLE_PAGE_INFO = "suite info"
 # Configure the colour used to indicate a latent page in the page tree.
 TITLE_PAGE_LATENT_COLOUR = "grey"
 
-TITLE_PAGE_LATENT_MARKUP = ("<span foreground='" +
-                            TITLE_PAGE_LATENT_COLOUR +
-                            "'><i>{0}</i>" + "</span>")
-TITLE_PAGE_PREVIEW_MARKUP = ("<span foreground='" +
-                             TITLE_PAGE_LATENT_COLOUR +
-                             "'><u>{0}</u>" + "</span>")
+TITLE_PAGE_LATENT_MARKUP = (
+    "<span foreground='"
+    + TITLE_PAGE_LATENT_COLOUR
+    + "'><i>{0}</i>"
+    + "</span>"
+)
+TITLE_PAGE_PREVIEW_MARKUP = (
+    "<span foreground='"
+    + TITLE_PAGE_LATENT_COLOUR
+    + "'><u>{0}</u>"
+    + "</span>"
+)
 TITLE_PAGE_ROOT_MARKUP = "<b>{0}</b>"
 TITLE_PAGE_SUITE = "suite conf"
 
@@ -698,14 +723,13 @@ META_PROP_WIDGET = "widget[rose-config-edit]"
 META_PROP_WIDGET_SUB_NS = "widget[rose-config-edit:sub-ns]"
 
 # Miscellaneous
-COPYRIGHT = (
-    """Copyright (C) British Crown (Met Office) & Contributors.
-       For full terms of use and licenses visit the Rose link above.""")
+COPYRIGHT = """Copyright (C) British Crown (Met Office) & Contributors.
+       For full terms of use and licenses visit the Rose link above."""
 ABOUT_TEXT = "GUI interface to edit rose suites."
 CREDIT = (
     ["Ben Fitzpatrick", ["Principal Developer"]],
     ["Dimitrios Theodorakis", ["Migration to Rose 2.0"]],
-    ["Joseph Abram", ["Migration to Rose 2.0"]]
+    ["Joseph Abram", ["Migration to Rose 2.0"]],
 )
 HELP_FILE = "rose-rug-config-edit.html"
 LAUNCH_COMMAND = "rose config-edit"
@@ -720,10 +744,10 @@ UNTITLED_NAME = "Untitled"
 VAR_ID_IN_CONFIG = "Variable id {0} from the configuration {1}"
 
 
-_OVERRIDE_WARNING_PRIVATE = (
-    "Cannot override: {0}={1} ({2}): not permitted.\n")
+_OVERRIDE_WARNING_PRIVATE = "Cannot override: {0}={1} ({2}): not permitted.\n"
 _OVERRIDE_WARNING_TYPE = (
-    "Cannot override: {0}={1}={2}: site/user conf: was {3}, supplied {4}\n")
+    "Cannot override: {0}={1}={2}: site/user conf: was {3}, supplied {4}\n"
+)
 
 
 def false_function(*args, **kwargs):
@@ -747,16 +771,23 @@ def load_override_config(sections, my_globals=None):
                 cast_value = node.value
             name = key.replace("-", "_").upper()
             orig_value = my_globals[name]
-            if (not isinstance(orig_value, type(cast_value)) and
-                    orig_value is not None):
-                sys.stderr.write(_OVERRIDE_WARNING_TYPE.format(
-                    section, key, cast_value,
-                    type(orig_value), type(cast_value))
+            if (
+                not isinstance(orig_value, type(cast_value))
+                and orig_value is not None
+            ):
+                sys.stderr.write(
+                    _OVERRIDE_WARNING_TYPE.format(
+                        section,
+                        key,
+                        cast_value,
+                        type(orig_value),
+                        type(cast_value),
+                    )
                 )
                 continue
             if name.startswith("_"):
-                sys.stderr.write(_OVERRIDE_WARNING_PRIVATE.format(
-                    section, key, name)
+                sys.stderr.write(
+                    _OVERRIDE_WARNING_PRIVATE.format(section, key, name)
                 )
                 continue
             my_globals[name] = cast_value

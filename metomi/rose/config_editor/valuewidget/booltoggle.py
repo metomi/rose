@@ -19,19 +19,20 @@
 # -----------------------------------------------------------------------------
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 import metomi.rose
 
 
 class BoolToggleValueWidget(Gtk.Box):
-
     """Produces a 'true' and 'false' labelled toggle button."""
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
-        super(BoolToggleValueWidget, self).__init__(homogeneous=False,
-                                                    spacing=0)
+        super(BoolToggleValueWidget, self).__init__(
+            homogeneous=False, spacing=0
+        )
         self.value = value
         self.metadata = metadata
         self.set_value = set_value
@@ -39,30 +40,43 @@ class BoolToggleValueWidget(Gtk.Box):
         self.allowed_values = []
         self.label_dict = {}
         if metadata.get(metomi.rose.META_PROP_TYPE) == "boolean":
-            self.allowed_values = [metomi.rose.TYPE_BOOLEAN_VALUE_FALSE,
-                                   metomi.rose.TYPE_BOOLEAN_VALUE_TRUE]
-            self.label_dict = dict(list(zip(self.allowed_values,
-                                       self.allowed_values)))
+            self.allowed_values = [
+                metomi.rose.TYPE_BOOLEAN_VALUE_FALSE,
+                metomi.rose.TYPE_BOOLEAN_VALUE_TRUE,
+            ]
+            self.label_dict = dict(
+                list(zip(self.allowed_values, self.allowed_values))
+            )
         elif metadata.get(metomi.rose.META_PROP_TYPE) == "python_boolean":
-            self.allowed_values = [metomi.rose.TYPE_PYTHON_BOOLEAN_VALUE_FALSE,
-                                   metomi.rose.TYPE_PYTHON_BOOLEAN_VALUE_TRUE]
-            self.label_dict = dict(list(zip(self.allowed_values,
-                                       self.allowed_values)))
+            self.allowed_values = [
+                metomi.rose.TYPE_PYTHON_BOOLEAN_VALUE_FALSE,
+                metomi.rose.TYPE_PYTHON_BOOLEAN_VALUE_TRUE,
+            ]
+            self.label_dict = dict(
+                list(zip(self.allowed_values, self.allowed_values))
+            )
         else:
-            self.allowed_values = [metomi.rose.TYPE_LOGICAL_VALUE_FALSE,
-                                   metomi.rose.TYPE_LOGICAL_VALUE_TRUE]
+            self.allowed_values = [
+                metomi.rose.TYPE_LOGICAL_VALUE_FALSE,
+                metomi.rose.TYPE_LOGICAL_VALUE_TRUE,
+            ]
             self.label_dict = {
-                metomi.rose.TYPE_LOGICAL_VALUE_FALSE:
-                metomi.rose.TYPE_LOGICAL_FALSE_TITLE,
-                metomi.rose.TYPE_LOGICAL_VALUE_TRUE:
-                metomi.rose.TYPE_LOGICAL_TRUE_TITLE}
+                metomi.rose.TYPE_LOGICAL_VALUE_FALSE: (
+                    metomi.rose.TYPE_LOGICAL_FALSE_TITLE
+                ),
+                metomi.rose.TYPE_LOGICAL_VALUE_TRUE: (
+                    metomi.rose.TYPE_LOGICAL_TRUE_TITLE
+                ),
+            }
 
-        imgs = [Gtk.Image.new_from_stock(Gtk.STOCK_MEDIA_STOP,
-                                         Gtk.IconSize.MENU),
-                Gtk.Image.new_from_stock(Gtk.STOCK_APPLY, Gtk.IconSize.MENU)]
+        imgs = [
+            Gtk.Image.new_from_stock(Gtk.STOCK_MEDIA_STOP, Gtk.IconSize.MENU),
+            Gtk.Image.new_from_stock(Gtk.STOCK_APPLY, Gtk.IconSize.MENU),
+        ]
         self.image_dict = dict(list(zip(self.allowed_values, imgs)))
-        bad_img = Gtk.Image.new_from_stock(Gtk.STOCK_DIALOG_WARNING,
-                                           Gtk.IconSize.MENU)
+        bad_img = Gtk.Image.new_from_stock(
+            Gtk.STOCK_DIALOG_WARNING, Gtk.IconSize.MENU
+        )
         self.button = Gtk.ToggleButton(label=self.value)
         if self.value in self.allowed_values:
             self.button.set_active(self.allowed_values.index(self.value))
@@ -71,11 +85,11 @@ class BoolToggleValueWidget(Gtk.Box):
         else:
             self.button.set_inconsistent(True)
             self.button.set_image(bad_img)
-        self.button.connect('toggled', self._switch_state_and_set)
+        self.button.connect("toggled", self._switch_state_and_set)
         self.button.show()
         self.pack_start(self.button, expand=False, fill=False, padding=0)
         self.grab_focus = lambda: self.hook.get_focus(self.button)
-        self.button.connect('focus-in-event', self.hook.trigger_scroll)
+        self.button.connect("focus-in-event", self.hook.trigger_scroll)
 
     def _switch_state_and_set(self, widget):
         state = self.allowed_values[int(widget.get_active())]

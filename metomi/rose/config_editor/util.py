@@ -26,6 +26,7 @@ one to import custom plugins.
 """
 
 import gi
+
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
@@ -35,7 +36,6 @@ import metomi.rose.gtk.util
 
 
 class Lookup(object):
-
     """Collection of data lookup functions used by multiple modules."""
 
     def __init__(self):
@@ -62,7 +62,7 @@ class Lookup(object):
             return self.section_option_id_lookup[var_id]
         split_char = metomi.rose.CONFIG_DELIMITER
         option_name = var_id.split(split_char)[-1]
-        section = var_id.replace(split_char + option_name, '', 1)
+        section = var_id.replace(split_char + option_name, "", 1)
         if option_name == section:
             option_name = None
         self.section_option_id_lookup[var_id] = (section, option_name)
@@ -72,30 +72,36 @@ class Lookup(object):
         """Return the config name and the internal namespace from full ns."""
         if full_namespace not in self.full_ns_split_lookup:
             for config_name in list(data.config.keys()):
-                if config_name == '/' + data.top_level_name:
+                if config_name == "/" + data.top_level_name:
                     continue
-                if full_namespace.startswith(config_name + '/'):
-                    sub_space = full_namespace.replace(config_name + '/',
-                                                       '', 1)
-                    self.full_ns_split_lookup[full_namespace] = (config_name,
-                                                                 sub_space)
+                if full_namespace.startswith(config_name + "/"):
+                    sub_space = full_namespace.replace(
+                        config_name + "/", "", 1
+                    )
+                    self.full_ns_split_lookup[full_namespace] = (
+                        config_name,
+                        sub_space,
+                    )
                     break
                 elif full_namespace == config_name:
-                    sub_space = ''
-                    self.full_ns_split_lookup[full_namespace] = (config_name,
-                                                                 sub_space)
+                    sub_space = ""
+                    self.full_ns_split_lookup[full_namespace] = (
+                        config_name,
+                        sub_space,
+                    )
                     break
             else:
                 # A top level based namespace
                 config_name = "/" + data.top_level_name
-                sub_space = full_namespace.replace(config_name + '/', '', 1)
-                self.full_ns_split_lookup[full_namespace] = (config_name,
-                                                             sub_space)
+                sub_space = full_namespace.replace(config_name + "/", "", 1)
+                self.full_ns_split_lookup[full_namespace] = (
+                    config_name,
+                    sub_space,
+                )
         return self.full_ns_split_lookup.get(full_namespace, (None, None))
 
 
 class ImportWidgetError(Exception):
-
     """An exception raised when an imported widget cannot be used."""
 
     def __str__(self):
@@ -104,11 +110,13 @@ class ImportWidgetError(Exception):
 
 def launch_node_info_dialog(node, changes, search_function):
     """Launch a dialog displaying attributes of a variable or section."""
-    title = node.__class__.__name__ + " " + node.metadata['id']
-    text = ''
+    title = node.__class__.__name__ + " " + node.metadata["id"]
+    text = ""
     if changes:
-        text += (metomi.rose.config_editor.DIALOG_NODE_INFO_CHANGES.format(changes) +
-                 "\n")
+        text += (
+            metomi.rose.config_editor.DIALOG_NODE_INFO_CHANGES.format(changes)
+            + "\n"
+        )
     text += metomi.rose.config_editor.DIALOG_NODE_INFO_DATA
     try:
         att_list = list(vars(node).items())
@@ -116,7 +124,7 @@ def launch_node_info_dialog(node, changes, search_function):
         # vars will fail when __slots__ are used.
         att_list = node.getattrs()
     att_list.sort()
-    att_list.sort(key=lambda x: (x[0] in ['name', 'value']))
+    att_list.sort(key=lambda x: (x[0] in ["name", "value"]))
     metadata_start_index = len(att_list)
     for key, value in sorted(node.metadata.items()):
         att_list.append([key, value])
@@ -124,8 +132,12 @@ def launch_node_info_dialog(node, changes, search_function):
     name = metomi.rose.config_editor.DIALOG_NODE_INFO_ATTRIBUTE
     maxlen = metomi.rose.config_editor.DIALOG_NODE_INFO_MAX_LEN
     for i, (att_name, att_val) in enumerate(att_list):
-        if (att_name == 'metadata' or att_name.startswith("_") or
-                callable(att_val) or att_name == 'old_value'):
+        if (
+            att_name == "metadata"
+            or att_name.startswith("_")
+            or callable(att_val)
+            or att_name == "old_value"
+        ):
             continue
         if i == metadata_start_index:
             text += "\n" + metomi.rose.config_editor.DIALOG_NODE_INFO_METADATA
@@ -133,11 +145,13 @@ def launch_node_info_dialog(node, changes, search_function):
         indent0 = len(prefix)
         text += prefix
         lenval = maxlen - indent0
-        text += _pretty_format_data(att_val, global_indent=indent0,
-                                    width=lenval)
+        text += _pretty_format_data(
+            att_val, global_indent=indent0, width=lenval
+        )
         text += "\n"
-    metomi.rose.gtk.dialog.run_hyperlink_dialog(Gtk.STOCK_DIALOG_INFO, text, title,
-                                         search_function)
+    metomi.rose.gtk.dialog.run_hyperlink_dialog(
+        Gtk.STOCK_DIALOG_INFO, text, title, search_function
+    )
 
 
 def launch_error_dialog(exception=None, text=""):
@@ -146,9 +160,12 @@ def launch_error_dialog(exception=None, text=""):
         text += "\n"
     if exception is not None:
         text += type(exception).__name__ + ": " + str(exception)
-    metomi.rose.gtk.dialog.run_dialog(metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                               text, metomi.rose.config_editor.DIALOG_TITLE_ERROR,
-                               modal=False)
+    metomi.rose.gtk.dialog.run_dialog(
+        metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
+        text,
+        metomi.rose.config_editor.DIALOG_TITLE_ERROR,
+        modal=False,
+    )
 
 
 def text_for_character_widget(text):
@@ -187,7 +204,7 @@ def wrap_string(text, maxlen=72, indent0=0, maxlines=4, sep=","):
             lines.append("")
             linelen = maxlen
         lines[-1] += dtext
-    lines[-1] = lines[-1][:-len(sep)]
+    lines[-1] = lines[-1][: -len(sep)]
     if len(lines) > maxlines:
         lines = lines[:4] + ["..."]
     return "\n".join(lines)
@@ -197,8 +214,8 @@ def null_cmp(x_item, y_item):
     """Compares sort_key and then id of the tuples x_item/y_item."""
     x_sort_key, x_id = x_item[0:2]
     y_sort_key, y_id = y_item[0:2]
-    if x_id == '' or y_id == '':
-        return (x_id == '') - (y_id == '')
+    if x_id == "" or y_id == "":
+        return (x_id == "") - (y_id == "")
     if x_sort_key == y_sort_key:
         return metomi.rose.config.sort_settings(x_id, y_id)
     return (x_sort_key > y_sort_key) - (x_sort_key < y_sort_key)
@@ -214,8 +231,7 @@ def _pretty_format_data(data, global_indent=0, indent=4, width=60):
             text += "\n" + " " * global_indent
             sub_prefix = sub_name.format(safe_str(key)) + delim
             indent_next = global_indent + indent
-            str_val = _pretty_format_data(val,
-                                          global_indent=indent_next)
+            str_val = _pretty_format_data(val, global_indent=indent_next)
             text += sub_prefix + str_val
         return text
     if isinstance(data, list) and data:
