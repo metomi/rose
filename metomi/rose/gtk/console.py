@@ -21,6 +21,7 @@
 import datetime
 
 import gi
+
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
@@ -28,7 +29,6 @@ import metomi.rose.resource
 
 
 class ConsoleWindow(Gtk.Window):
-
     """Create an error console window."""
 
     CATEGORY_ALL = "All"
@@ -38,9 +38,15 @@ class ConsoleWindow(Gtk.Window):
     DEFAULT_SIZE = (600, 300)
     TITLE = "Error Console"
 
-    def __init__(self, categories, category_message_time_tuples,
-                 category_stock_ids, default_size=None, parent=None,
-                 destroy_hook=None):
+    def __init__(
+        self,
+        categories,
+        category_message_time_tuples,
+        category_stock_ids,
+        default_size=None,
+        parent=None,
+        destroy_hook=None,
+    ):
         super(ConsoleWindow, self).__init__()
         if parent is not None:
             self.set_transient_for(parent)
@@ -53,15 +59,17 @@ class ConsoleWindow(Gtk.Window):
         self.category_icons = []
         for id_ in category_stock_ids:
             self.category_icons.append(
-                self.render_icon(id_, Gtk.IconSize.MENU))
+                self.render_icon(id_, Gtk.IconSize.MENU)
+            )
         self._destroy_hook = destroy_hook
         top_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         top_vbox.show()
         self.add(top_vbox)
 
         message_scrolled_window = Gtk.ScrolledWindow()
-        message_scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC,
-                                           Gtk.PolicyType.AUTOMATIC)
+        message_scrolled_window.set_policy(
+            Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC
+        )
         message_scrolled_window.show()
         self._message_treeview = Gtk.TreeView()
         self._message_treeview.show()
@@ -72,8 +80,9 @@ class ConsoleWindow(Gtk.Window):
         category_column.set_title(self.COLUMN_TITLE_CATEGORY)
         cell_category = Gtk.CellRendererPixbuf()
         category_column.pack_start(cell_category, False)
-        category_column.set_cell_data_func(cell_category,
-                                           self._set_category_cell, 0)
+        category_column.set_cell_data_func(
+            cell_category, self._set_category_cell, 0
+        )
         category_column.set_clickable(True)
         category_column.connect("clicked", self._sort_column, 0)
         self._message_treeview.append_column(category_column)
@@ -83,8 +92,7 @@ class ConsoleWindow(Gtk.Window):
         message_column.set_title(self.COLUMN_TITLE_MESSAGE)
         cell_message = Gtk.CellRendererText()
         message_column.pack_start(cell_message, False)
-        message_column.add_attribute(cell_message, attribute="text",
-                                     column=1)
+        message_column.add_attribute(cell_message, attribute="text", column=1)
         message_column.set_clickable(True)
         message_column.connect("clicked", self._sort_column, 1)
         self._message_treeview.append_column(message_column)
@@ -108,19 +116,27 @@ class ConsoleWindow(Gtk.Window):
         self._message_treeview.set_model(filter_model)
 
         message_scrolled_window.add(self._message_treeview)
-        top_vbox.pack_start(message_scrolled_window, expand=True, fill=True, padding=0)
+        top_vbox.pack_start(
+            message_scrolled_window, expand=True, fill=True, padding=0
+        )
 
         category_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         category_hbox.show()
         top_vbox.pack_end(category_hbox, expand=False, fill=False, padding=0)
         for category in categories + [self.CATEGORY_ALL]:
-            togglebutton = Gtk.ToggleButton(label=category,
-                                            use_underline=False)
-            togglebutton.connect("toggled",
-                                 lambda b: self._set_new_filter(
-                                        b, category_hbox.get_children()))
+            togglebutton = Gtk.ToggleButton(
+                label=category, use_underline=False
+            )
+            togglebutton.connect(
+                "toggled",
+                lambda b: self._set_new_filter(
+                    b, category_hbox.get_children()
+                ),
+            )
             togglebutton.show()
-            category_hbox.pack_start(togglebutton, expand=True, fill=True, padding=0)
+            category_hbox.pack_start(
+                togglebutton, expand=True, fill=True, padding=0
+            )
         togglebutton.set_active(True)
         self.show()
         self._scroll_to_end()
@@ -171,7 +187,8 @@ class ConsoleWindow(Gtk.Window):
     def _set_time_cell(self, column, cell, model, r_iter, index):
         message_time = model.get_value(r_iter, index)
         text = datetime.datetime.fromtimestamp(message_time).strftime(
-            metomi.rose.config_editor.EVENT_TIME_LONG)
+            metomi.rose.config_editor.EVENT_TIME_LONG
+        )
         cell.set_property("text", text)
 
     def _sort_column(self, column, index):

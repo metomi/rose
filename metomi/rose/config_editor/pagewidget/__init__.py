@@ -18,4 +18,5 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
+# flake8: noqa: F401
 from . import table

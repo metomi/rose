@@ -19,17 +19,15 @@
 # -----------------------------------------------------------------------------
 
 import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
 
-import re
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gtk
 
 import metomi.rose
 from . import array
 from . import booltoggle
 from . import character
 from . import combobox
-from . import files
 from . import intspin
 from . import meta
 from . import radiobuttons
@@ -37,12 +35,18 @@ from . import text
 from . import valuehints
 
 
-NON_TEXT_TYPES = ('boolean', 'integer', 'logical', 'python_boolean',
-                  'python_list', 'real', 'spaced_list')
+NON_TEXT_TYPES = (
+    "boolean",
+    "integer",
+    "logical",
+    "python_boolean",
+    "python_list",
+    "real",
+    "spaced_list",
+)
 
 
 class ValueWidgetHook(object):
-
     """Provides hook functions for valuewidgets."""
 
     def __init__(self, scroll_func=None, focus_func=None):
@@ -87,7 +91,7 @@ def chooser(value, metadata, error):
     # determine widget by presence of environment variables
     if contains_env and (not m_type or m_type in NON_TEXT_TYPES or is_list):
         # it is not safe to display the widget as intended due to an env var
-        if '\n' in value:
+        if "\n" in value:
             return text.TextMultilineValueWidget
         else:
             return text.RawValueWidget
@@ -97,7 +101,7 @@ def chooser(value, metadata, error):
         if isinstance(m_type, list):
             # irregular array
             return array.mixed.MixedArrayValueWidget
-        elif m_type in ['logical', 'boolean', 'python_boolean']:
+        elif m_type in ["logical", "boolean", "python_boolean"]:
             # regular array (boolean)
             return array.logical.LogicalArrayValueWidget
         else:
@@ -114,11 +118,11 @@ def chooser(value, metadata, error):
             return combobox.ComboBoxValueWidget
 
     # determine widget by metadata type
-    if m_type == 'integer':
+    if m_type == "integer":
         return intspin.IntSpinButtonValueWidget
-    if m_type == 'meta':
+    if m_type == "meta":
         return meta.MetaValueWidget
-    if m_type == 'str_multi':
+    if m_type == "str_multi":
         return text.TextMultilineValueWidget
     if m_type in ["character", "quoted"]:
         return character.QuotedTextValueWidget
@@ -126,7 +130,7 @@ def chooser(value, metadata, error):
         return array.python_list.PythonListValueWidget
     if m_type == "spaced_list" and not error:
         return array.spaced_list.SpacedListValueWidget
-    if m_type in ['logical', 'boolean', 'python_boolean']:
+    if m_type in ["logical", "boolean", "python_boolean"]:
         return booltoggle.BoolToggleValueWidget
 
     # determine widget by metadata hint
@@ -134,7 +138,7 @@ def chooser(value, metadata, error):
         return valuehints.HintsValueWidget
 
     # fall back to a text widget
-    if '\n' in value:
+    if "\n" in value:
         return text.TextMultilineValueWidget
     else:
         return text.RawValueWidget

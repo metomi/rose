@@ -19,14 +19,14 @@
 # -----------------------------------------------------------------------------
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 import metomi.rose.config_editor
 
 
 class ComboBoxValueWidget(Gtk.Box):
-
     """This is a class to add a combo box for a set of variable values.
 
     It needs to have some allowed values set in the variable metadata.
@@ -36,8 +36,7 @@ class ComboBoxValueWidget(Gtk.Box):
     FRAC_X_ALIGN = 0.9
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
-        super(ComboBoxValueWidget, self).__init__(homogeneous=False,
-                                                  spacing=0)
+        super(ComboBoxValueWidget, self).__init__(homogeneous=False, spacing=0)
         self.value = value
         self.metadata = metadata
         self.set_value = set_value
@@ -47,7 +46,7 @@ class ComboBoxValueWidget(Gtk.Box):
         cell = Gtk.CellRendererText()
         cell.xalign = self.FRAC_X_ALIGN
         comboboxentry.pack_start(cell, True)
-        comboboxentry.add_attribute(cell, 'text', 0)
+        comboboxentry.add_attribute(cell, "text", 0)
 
         var_values = self.metadata[metomi.rose.META_PROP_VALUES]
         var_titles = self.metadata.get(metomi.rose.META_PROP_VALUE_TITLES)
@@ -58,17 +57,18 @@ class ComboBoxValueWidget(Gtk.Box):
                 liststore.append([entry])
         comboboxentry.set_model(liststore)
         if self.value in var_values:
-            index = self.metadata['values'].index(self.value)
+            index = self.metadata["values"].index(self.value)
             comboboxentry.set_active(index)
-        comboboxentry.connect('changed', self.setter)
-        comboboxentry.connect('button-press-event',
-                              lambda b: comboboxentry.grab_focus())
+        comboboxentry.connect("changed", self.setter)
+        comboboxentry.connect(
+            "button-press-event", lambda b: comboboxentry.grab_focus()
+        )
         comboboxentry.show()
         self.pack_start(comboboxentry, False, False, 0)
         self.grab_focus = lambda: self.hook.get_focus(comboboxentry)
-        self.set_contains_error = (lambda e:
-                                   comboboxentry.modify_bg(Gtk.StateType.NORMAL,
-                                                           self.bad_colour))
+        self.set_contains_error = lambda e: comboboxentry.modify_bg(
+            Gtk.StateType.NORMAL, self.bad_colour
+        )
 
     def setter(self, widget):
         index = widget.get_active()

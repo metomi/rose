@@ -23,7 +23,8 @@ import difflib
 import re
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 import metomi.rose.config_editor.keywidget
@@ -39,7 +40,6 @@ import metomi.rose.resource
 
 
 class VariableWidget(object):
-
     """This class generates a set of widgets representing the variable.
 
     The set of widgets generated depends on the variable metadata, if any.
@@ -48,8 +48,14 @@ class VariableWidget(object):
 
     """
 
-    def __init__(self, variable, var_ops, is_ghost=False, show_modes=None,
-                 hide_keywidget_subtext=False):
+    def __init__(
+        self,
+        variable,
+        var_ops,
+        is_ghost=False,
+        show_modes=None,
+        hide_keywidget_subtext=False,
+    ):
         self.variable = variable
         self.key = variable.name
         self.value = variable.value
@@ -60,13 +66,15 @@ class VariableWidget(object):
             show_modes = {}
         self.show_modes = show_modes
         self.bad_colour = metomi.rose.gtk.util.color_parse(
-            metomi.rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR)
+            metomi.rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR
+        )
         self.hidden_colour = metomi.rose.gtk.util.color_parse(
-            metomi.rose.config_editor.COLOUR_VARIABLE_TEXT_IRRELEVANT)
+            metomi.rose.config_editor.COLOUR_VARIABLE_TEXT_IRRELEVANT
+        )
         self.keywidget = self.get_keywidget(variable, show_modes)
         self.generate_valuewidget(variable)
         self.is_inconsistent = False
-        if 'type' in variable.error:
+        if "type" in variable.error:
             self._set_inconsistent(self.valuewidget, variable)
         self.errors = list(variable.error.keys())
         self.menuwidget = self.get_menuwidget(variable)
@@ -76,7 +84,7 @@ class VariableWidget(object):
         self.force_signal_ids = []
         self.is_modified = False
         for child_widget in self.get_children():
-            setattr(child_widget, 'get_parent', lambda: self)
+            setattr(child_widget, "get_parent", lambda: self)
         self.trigger_ignored = lambda v, b: b
         self.get_parent = lambda: None
         self.is_ignored = False
@@ -90,8 +98,11 @@ class VariableWidget(object):
 
         """
         widget = metomi.rose.config_editor.keywidget.KeyWidget(
-            variable, self.var_ops, self.launch_help, self.update_status,
-            show_modes
+            variable,
+            self.var_ops,
+            self.launch_help,
+            self.update_status,
+            show_modes,
         )
         widget.show()
         return widget
@@ -101,24 +112,42 @@ class VariableWidget(object):
         self.labelwidget = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.labelwidget.show()
         self.labelwidget.set_ignored = self.keywidget.set_ignored
-        menu_offset = self.menuwidget.get_preferred_size().natural_size.height / 2
+        menu_offset = (
+            self.menuwidget.get_preferred_size().natural_size.height / 2
+        )
         key_offset = self.keywidget.get_centre_height() / 2
         menu_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        menu_vbox.pack_start(self.menuwidget, expand=False, fill=False,
-                             padding=max([(key_offset - menu_offset), 0]))
+        menu_vbox.pack_start(
+            self.menuwidget,
+            expand=False,
+            fill=False,
+            padding=max([(key_offset - menu_offset), 0]),
+        )
         menu_vbox.show()
         key_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        key_vbox.pack_start(self.keywidget, expand=False, fill=False,
-                            padding=max([(menu_offset - key_offset) / 2, 0]))
+        key_vbox.pack_start(
+            self.keywidget,
+            expand=False,
+            fill=False,
+            padding=max([(menu_offset - key_offset) / 2, 0]),
+        )
         key_vbox.show()
         label_content_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        label_content_hbox.pack_start(menu_vbox, expand=False, fill=False, padding=0)
-        label_content_hbox.pack_start(key_vbox, expand=False, fill=False, padding=0)
+        label_content_hbox.pack_start(
+            menu_vbox, expand=False, fill=False, padding=0
+        )
+        label_content_hbox.pack_start(
+            key_vbox, expand=False, fill=False, padding=0
+        )
         label_content_hbox.show()
         event_box = Gtk.EventBox()
         event_box.show()
-        self.labelwidget.pack_start(label_content_hbox, expand=True, fill=True, padding=0)
-        self.labelwidget.pack_start(event_box, expand=True, fill=True, padding=0)
+        self.labelwidget.pack_start(
+            label_content_hbox, expand=True, fill=True, padding=0
+        )
+        self.labelwidget.pack_start(
+            event_box, expand=True, fill=True, padding=0
+        )
 
     def generate_contentwidget(self):
         """Create the content widget, a vbox-packed valuewidget."""
@@ -127,36 +156,47 @@ class VariableWidget(object):
         content_event_box = Gtk.EventBox()
         content_event_box.show()
         self.contentwidget.pack_start(
-            self.valuewidget, expand=False, fill=False, padding=0)
+            self.valuewidget, expand=False, fill=False, padding=0
+        )
         self.contentwidget.pack_start(
-            content_event_box, expand=True, fill=True, padding=0)
+            content_event_box, expand=True, fill=True, padding=0
+        )
 
     def _valuewidget_set_value(self, value):
         # This is called by a valuewidget to change the variable value.
         self.var_ops.set_var_value(self.variable, value)
         self.update_status()
 
-    def generate_valuewidget(self, variable, override_custom=False,
-                             use_this_valuewidget=None):
+    def generate_valuewidget(
+        self, variable, override_custom=False, use_this_valuewidget=None
+    ):
         """Creates the valuewidget attribute, based on value and metadata."""
         custom_arg = None
-        if (variable.metadata.get("type") ==
-                metomi.rose.config_editor.FILE_TYPE_NORMAL):
-            use_this_valuewidget = (metomi.rose.config_editor.
-                                    valuewidget.source.SourceValueWidget)
+        if (
+            variable.metadata.get("type")
+            == metomi.rose.config_editor.FILE_TYPE_NORMAL
+        ):
+            use_this_valuewidget = (
+                metomi.rose.config_editor.valuewidget.source.SourceValueWidget
+            )
             custom_arg = self.var_ops
         set_value = self._valuewidget_set_value
         hook_object = metomi.rose.config_editor.valuewidget.ValueWidgetHook(
-            metomi.rose.config_editor.false_function)
+            metomi.rose.config_editor.false_function
+        )
         metadata = copy.deepcopy(variable.metadata)
         if use_this_valuewidget is not None:
-            self.valuewidget = use_this_valuewidget(variable.value,
-                                                    metadata,
-                                                    set_value,
-                                                    hook_object,
-                                                    arg_str=custom_arg)
-        elif (metomi.rose.config_editor.META_PROP_WIDGET in self.meta and
-                not override_custom):
+            self.valuewidget = use_this_valuewidget(
+                variable.value,
+                metadata,
+                set_value,
+                hook_object,
+                arg_str=custom_arg,
+            )
+        elif (
+            metomi.rose.config_editor.META_PROP_WIDGET in self.meta
+            and not override_custom
+        ):
             w_val = self.meta[metomi.rose.config_editor.META_PROP_WIDGET]
             info = w_val.split(None, 1)
             if len(info) > 1:
@@ -165,48 +205,56 @@ class VariableWidget(object):
                 widget_path, custom_arg = info[0], None
             files = self.var_ops.get_ns_metadata_files(metadata["full_ns"])
             error_handler = lambda e: self.handle_bad_valuewidget(
-                str(e), variable, set_value)
-            widget = metomi.rose.resource.import_object(widget_path,
-                                                 files,
-                                                 error_handler)
+                str(e), variable, set_value
+            )
+            widget = metomi.rose.resource.import_object(
+                widget_path, files, error_handler
+            )
             if widget is None:
-                text = metomi.rose.config_editor.ERROR_IMPORT_CLASS.format(w_val)
+                text = metomi.rose.config_editor.ERROR_IMPORT_CLASS.format(
+                    w_val
+                )
                 self.handle_bad_valuewidget(text, variable, set_value)
             try:
-                self.valuewidget = widget(variable.value,
-                                          metadata,
-                                          set_value,
-                                          hook_object,
-                                          custom_arg)
+                self.valuewidget = widget(
+                    variable.value,
+                    metadata,
+                    set_value,
+                    hook_object,
+                    custom_arg,
+                )
             except Exception as exc:
                 self.handle_bad_valuewidget(str(exc), variable, set_value)
         else:
             widget_maker = metomi.rose.config_editor.valuewidget.chooser(
-                variable.value, variable.metadata,
-                variable.error)
-            self.valuewidget = widget_maker(variable.value,
-                                            metadata, set_value,
-                                            hook_object, custom_arg)
+                variable.value, variable.metadata, variable.error
+            )
+            self.valuewidget = widget_maker(
+                variable.value, metadata, set_value, hook_object, custom_arg
+            )
         for child in self.valuewidget.get_children():
-            child.connect('focus-in-event', self.handle_focus_in)
-            child.connect('focus-out-event', self.handle_focus_out)
-            if hasattr(child, 'get_children'):
+            child.connect("focus-in-event", self.handle_focus_in)
+            child.connect("focus-out-event", self.handle_focus_out)
+            if hasattr(child, "get_children"):
                 for grandchild in child.get_children():
-                    grandchild.connect('focus-in-event', self.handle_focus_in)
-                    grandchild.connect('focus-out-event',
-                                       self.handle_focus_out)
+                    grandchild.connect("focus-in-event", self.handle_focus_in)
+                    grandchild.connect(
+                        "focus-out-event", self.handle_focus_out
+                    )
         self.valuewidget.show()
 
     def handle_bad_valuewidget(self, error_info, variable, set_value):
         """Handle a bad custom valuewidget import."""
         text = metomi.rose.config_editor.ERROR_IMPORT_WIDGET.format(error_info)
         metomi.rose.reporter.Reporter()(
-            metomi.rose.config_editor.util.ImportWidgetError(text))
+            metomi.rose.config_editor.util.ImportWidgetError(text)
+        )
         self.generate_valuewidget(variable, override_custom=True)
 
     def handle_focus_in(self, widget, event):
         new_colour = metomi.rose.gtk.util.color_parse(
-            metomi.rose.config_editor.COLOUR_VALUEWIDGET_BASE_SELECTED)
+            metomi.rose.config_editor.COLOUR_VALUEWIDGET_BASE_SELECTED
+        )
         widget.modify_base(Gtk.StateType.NORMAL, new_colour)
 
     def handle_focus_out(self, widget, event):
@@ -217,51 +265,68 @@ class VariableWidget(object):
         """Create the menuwidget attribute, an option menu button."""
         if menuclass is None:
             menuclass = metomi.rose.config_editor.menuwidget.MenuWidget
-        menuwidget = menuclass(variable,
-                               self.var_ops,
-                               lambda: self.remove_from(self.get_parent()),
-                               self.update_status,
-                               self.launch_help)
+        menuwidget = menuclass(
+            variable,
+            self.var_ops,
+            lambda: self.remove_from(self.get_parent()),
+            self.update_status,
+            self.launch_help,
+        )
         menuwidget.show()
         return menuwidget
 
-    def insert_into(self, container, x_info=None, y_info=None,
-                    no_menuwidget=False):
+    def insert_into(
+        self, container, x_info=None, y_info=None, no_menuwidget=False
+    ):
         """Inserts the child widgets of an instance into the 'container'.
 
-        We need arguments specifying where the correct area within the 
-        widget is - in the case of Gtk.Table instances, we need the 
-        number of columns and the row index. These arguments are 
+        We need arguments specifying where the correct area within the
+        widget is - in the case of Gtk.Table instances, we need the
+        number of columns and the row index. These arguments are
         generically named x_info and y_info.
 
         """
-        if not hasattr(container, 'num_removes'):
-            setattr(container, 'num_removes', 0)
+        if not hasattr(container, "num_removes"):
+            setattr(container, "num_removes", 0)
         if isinstance(container, Gtk.Table):
             row_index = y_info
             key_col = 0
-            container.attach(self.labelwidget,
-                             key_col, key_col + 1,
-                             row_index, row_index + 1,
-                             xoptions=Gtk.AttachOptions.FILL,
-                             yoptions=Gtk.AttachOptions.FILL)
-            container.attach(self.contentwidget,
-                             key_col + 1, key_col + 2,
-                             row_index, row_index + 1,
-                             xpadding=5,
-                             xoptions=Gtk.AttachOptions.EXPAND | Gtk.AttachOptions.FILL,
-                             yoptions=self.yoptions)
-            self.valuewidget.trigger_scroll = (
-                lambda b, e: self.force_scroll(b, container))
-            setattr(self, 'get_parent', lambda: container)
-        elif isinstance(container, Gtk.Box(orientation=Gtk.Orientation.VERTICAL)):
-            container.pack_start(self.labelwidget, expand=False, fill=True,
-                                 padding=5)
-            container.pack_start(self.contentwidget, expand=True, fill=True,
-                                 padding=10)
-            self.valuewidget.trigger_scroll = (
-                lambda b, e: self.force_scroll(b, container))
-            setattr(self, 'get_parent', lambda: container)
+            container.attach(
+                self.labelwidget,
+                key_col,
+                key_col + 1,
+                row_index,
+                row_index + 1,
+                xoptions=Gtk.AttachOptions.FILL,
+                yoptions=Gtk.AttachOptions.FILL,
+            )
+            container.attach(
+                self.contentwidget,
+                key_col + 1,
+                key_col + 2,
+                row_index,
+                row_index + 1,
+                xpadding=5,
+                xoptions=Gtk.AttachOptions.EXPAND | Gtk.AttachOptions.FILL,
+                yoptions=self.yoptions,
+            )
+            self.valuewidget.trigger_scroll = lambda b, e: self.force_scroll(
+                b, container
+            )
+            setattr(self, "get_parent", lambda: container)
+        elif isinstance(
+            container, Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        ):
+            container.pack_start(
+                self.labelwidget, expand=False, fill=True, padding=5
+            )
+            container.pack_start(
+                self.contentwidget, expand=True, fill=True, padding=10
+            )
+            self.valuewidget.trigger_scroll = lambda b, e: self.force_scroll(
+                b, container
+            )
+            setattr(self, "get_parent", lambda: container)
 
         return container
 
@@ -278,22 +343,31 @@ class VariableWidget(object):
         vadj = scroll_container.get_vadjustment()
         if vadj.get_upper() == 1.0 or y_coordinate == -1:
             if not self.force_signal_ids:
-                self.force_signal_ids.append(vadj.connect_after(
-                    'changed',
-                    lambda a: self.force_scroll(widget, container)))
+                self.force_signal_ids.append(
+                    vadj.connect_after(
+                        "changed",
+                        lambda a: self.force_scroll(widget, container),
+                    )
+                )
         else:
             for handler_id in self.force_signal_ids:
                 vadj.handler_block(handler_id)
             self.force_signal_ids = []
-            vadj.connect('changed', metomi.rose.config_editor.false_function)
+            vadj.connect("changed", metomi.rose.config_editor.false_function)
         if y_coordinate is None:
             vadj.set_upper(vadj.get_upper() + 0.08 * vadj.get_page_size())
             vadj.set_value(vadj.get_upper() - vadj.get_page_size())
             return False
         if y_coordinate == -1:  # Bad allocation, don't scroll
             return False
-        if not vadj.get_value() < y_coordinate < vadj.get_value() + 0.95 * vadj.get_page_size():
-            vadj.set_value(min(y_coordinate, vadj.get_upper() - vadj.get_page_size()))
+        if (
+            not vadj.get_value()
+            < y_coordinate
+            < vadj.get_value() + 0.95 * vadj.get_page_size()
+        ):
+            vadj.set_value(
+                min(y_coordinate, vadj.get_upper() - vadj.get_page_size())
+            )
         return False
 
     def remove_from(self, container):
@@ -334,19 +408,23 @@ class VariableWidget(object):
             if "'Ignore'" not in self.menuwidget.option_ui:
                 self.menuwidget.old_option_ui = self.menuwidget.option_ui
                 self.menuwidget.old_actions = self.menuwidget.actions
-            if list(ign_map.keys()) == [metomi.rose.variable.IGNORED_BY_SECTION]:
+            if list(ign_map.keys()) == [
+                metomi.rose.variable.IGNORED_BY_SECTION
+            ]:
                 # Not ignored in itself, so give Ignore option.
                 if "'Enable'" in self.menuwidget.option_ui:
                     self.menuwidget.option_ui = re.sub(
                         "<menuitem action='Enable'/>",
                         r"<menuitem action='Ignore'/>",
-                        self.menuwidget.option_ui)
+                        self.menuwidget.option_ui,
+                    )
             else:
                 # Ignored in itself, so needs Enable option.
                 self.menuwidget.option_ui = re.sub(
                     "<menuitem action='Ignore'/>",
                     r"<menuitem action='Enable'/>",
-                    self.menuwidget.option_ui)
+                    self.menuwidget.option_ui,
+                )
             self.update_status()
             self.set_sensitive(False)
         else:
@@ -356,7 +434,8 @@ class VariableWidget(object):
                 self.menuwidget.option_ui = re.sub(
                     "<menuitem action='Enable'/>",
                     r"<menuitem action='Ignore'/>",
-                    self.menuwidget.option_ui)
+                    self.menuwidget.option_ui,
+                )
             self.update_status()
             if not self.is_ghost:
                 self.set_sensitive(True)
@@ -374,7 +453,7 @@ class VariableWidget(object):
         self.keywidget.set_modified(is_modified)
         if not is_modified and isinstance(self.keywidget.entry, Gtk.Entry):
             # This variable should now be displayed as a normal variable.
-            self.valuewidget.trigger_refresh(self.variable.metadata['id'])
+            self.valuewidget.trigger_refresh(self.variable.metadata["id"])
 
     def set_sensitive(self, is_sensitive=True):
         """Sets whether the widgets are grayed-out or 'insensitive'."""
@@ -382,37 +461,43 @@ class VariableWidget(object):
             widget.set_sensitive(is_sensitive)
         return False
 
-    def grab_focus(self, focus_container=None, scroll_bottom=False,
-                   index=None):
+    def grab_focus(
+        self, focus_container=None, scroll_bottom=False, index=None
+    ):
         """Method similar to Gtk.Widget - get the keyboard focus."""
-        if hasattr(self, 'valuewidget'):
+        if hasattr(self, "valuewidget"):
             self.valuewidget.grab_focus()
-            if (index is not None and
-                    hasattr(self.valuewidget, 'set_focus_index')):
+            if index is not None and hasattr(
+                self.valuewidget, "set_focus_index"
+            ):
                 self.valuewidget.set_focus_index(index)
             for child in self.valuewidget.get_children():
-                if (self.valuewidget.get_sensitive() & child.get_state_flags() and
-                        self.valuewidget.get_parent().get_sensitive() & child.get_state_flags()):
+                if (
+                    self.valuewidget.get_sensitive() & child.get_state_flags()
+                    and self.valuewidget.get_parent().get_sensitive()
+                    & child.get_state_flags()
+                ):
                     break
-            else: # no break
-                if hasattr(self, 'menuwidget'):
+            else:  # no break
+                if hasattr(self, "menuwidget"):
                     self.menuwidget.get_children()[0].grab_focus()
             if scroll_bottom and focus_container is not None:
                 self.force_scroll(None, container=focus_container)
-        if hasattr(self, 'keywidget') and self.key == '':
+        if hasattr(self, "keywidget") and self.key == "":
             self.keywidget.grab_focus()
         return False
 
     def get_focus_index(self):
         """Get the current cursor position in the variable value string."""
-        if (hasattr(self, "valuewidget") and
-                hasattr(self.valuewidget, "get_focus_index")):
+        if hasattr(self, "valuewidget") and hasattr(
+            self.valuewidget, "get_focus_index"
+        ):
             return self.valuewidget.get_focus_index()
-        diff = difflib.SequenceMatcher(None,
-                                       self.variable.old_value,
-                                       self.variable.value)
+        diff = difflib.SequenceMatcher(
+            None, self.variable.old_value, self.variable.value
+        )
         # Return all end-of-block indicies for changed blocks
-        indicies = [x[4] for x in diff.get_opcodes() if x[0] != 'equal']
+        indicies = [x[4] for x in diff.get_opcodes() if x[0] != "equal"]
         if not indicies:
             return None
         return indicies[-1]
@@ -425,10 +510,12 @@ class VariableWidget(object):
             return
         help_text = None
         if self.show_modes.get(
-                metomi.rose.config_editor.SHOW_MODE_CUSTOM_HELP):
+            metomi.rose.config_editor.SHOW_MODE_CUSTOM_HELP
+        ):
             format_string = metomi.rose.config_editor.CUSTOM_FORMAT_HELP
             help_text = metomi.rose.variable.expand_format_string(
-                format_string, self.variable)
+                format_string, self.variable
+            )
         if help_text is None:
             help_text = self.meta[metomi.rose.META_PROP_HELP]
         self._launch_help_dialog(help_text)
@@ -436,11 +523,13 @@ class VariableWidget(object):
     def _launch_help_dialog(self, help_text):
         """Launch a scrollable dialog for this variable's help text."""
         title = metomi.rose.config_editor.DIALOG_HELP_TITLE.format(
-            self.variable.metadata["id"])
+            self.variable.metadata["id"]
+        )
         ns = self.variable.metadata["full_ns"]
         search_function = lambda i: self.var_ops.search_for_var(ns, i)
         metomi.rose.gtk.dialog.run_hyperlink_dialog(
-            Gtk.STOCK_DIALOG_INFO, help_text, title, search_function)
+            Gtk.STOCK_DIALOG_INFO, help_text, title, search_function
+        )
         return False
 
     def _set_inconsistent(self, valuewidget, variable):
@@ -450,12 +539,13 @@ class VariableWidget(object):
         while widget_list:
             widget = widget_list.pop()
             widget.modify_text(Gtk.StateType.NORMAL, self.bad_colour)
-            if hasattr(widget, 'set_inconsistent'):
+            if hasattr(widget, "set_inconsistent"):
                 widget.set_inconsistent(True)
             if isinstance(widget, Gtk.RadioButton):
                 widget.set_active(False)
-            if (hasattr(widget, 'get_group') and
-                    hasattr(widget.get_group(), 'set_inconsistent')):
+            if hasattr(widget, "get_group") and hasattr(
+                widget.get_group(), "set_inconsistent"
+            ):
                 widget.get_group().set_inconsistent(True)
             if isinstance(widget, Gtk.Entry):
                 widget.modify_fg(Gtk.StateType.NORMAL, self.bad_colour)
@@ -464,14 +554,17 @@ class VariableWidget(object):
                     v_value = float(variable.value)
                     w_value = float(widget.get_value())
                 except (TypeError, ValueError):
-                    widget.modify_text(Gtk.StateType.NORMAL, self.hidden_colour)
+                    widget.modify_text(
+                        Gtk.StateType.NORMAL, self.hidden_colour
+                    )
                 else:
                     if w_value != v_value:
-                        widget.modify_text(Gtk.StateType.NORMAL,
-                                           self.hidden_colour)
-            if hasattr(widget, 'get_children'):
+                        widget.modify_text(
+                            Gtk.StateType.NORMAL, self.hidden_colour
+                        )
+            if hasattr(widget, "get_children"):
                 widget_list.extend(widget.get_children())
-            elif hasattr(widget, 'get_child'):
+            elif hasattr(widget, "get_child"):
                 widget_list.append(widget.get_child())
 
     def _set_consistent(self, valuewidget, variable):
@@ -483,12 +576,13 @@ class VariableWidget(object):
         self.is_inconsistent = True
         for widget in valuewidget.get_children():
             widget.modify_text(Gtk.StateType.NORMAL, normal_text)
-            if hasattr(widget, 'set_inconsistent'):
+            if hasattr(widget, "set_inconsistent"):
                 widget.set_inconsistent(False)
             if isinstance(widget, Gtk.Entry):
                 widget.modify_fg(Gtk.StateType.NORMAL, normal_fg)
-            if (hasattr(widget, 'get_group') and
-                    hasattr(widget.get_group(), 'set_inconsistent')):
+            if hasattr(widget, "get_group") and hasattr(
+                widget.get_group(), "set_inconsistent"
+            ):
                 widget.get_group().set_inconsistent(False)
 
     def _get_focus(self, widget_for_focus):
@@ -499,8 +593,7 @@ class VariableWidget(object):
             text_length = len(widget_for_focus.get_text())
             if text_length > 0:
                 widget_for_focus.set_position(text_length)
-            widget_for_focus.select_region(text_length,
-                                           text_length)
+            widget_for_focus.select_region(text_length, text_length)
         return False
 
     def needs_type_error_refresh(self):
@@ -517,13 +610,14 @@ class VariableWidget(object):
             self._set_consistent(self.valuewidget, variable)
         self.variable = variable
         self.errors = list(variable.error.keys())
-        self.valuewidget.handle_type_error(metomi.rose.META_PROP_TYPE in self.errors)
+        self.valuewidget.handle_type_error(
+            metomi.rose.META_PROP_TYPE in self.errors
+        )
         self.menuwidget.refresh(variable)
         self.keywidget.refresh(variable)
 
 
 class RowVariableWidget(VariableWidget):
-
     """This class generates a set of widgets for use as a row in a table."""
 
     def __init__(self, *args, **kwargs):
@@ -532,14 +626,17 @@ class RowVariableWidget(VariableWidget):
 
     def generate_valuewidget(self, variable, override_custom=False):
         """Creates the valuewidget attribute, based on value and metadata."""
-        if (metomi.rose.META_PROP_LENGTH in variable.metadata or
-                isinstance(variable.metadata.get(metomi.rose.META_PROP_TYPE), list)):
+        if metomi.rose.META_PROP_LENGTH in variable.metadata or isinstance(
+            variable.metadata.get(metomi.rose.META_PROP_TYPE), list
+        ):
             use_this_valuewidget = self.make_row_valuewidget
         else:
             use_this_valuewidget = None
         super(RowVariableWidget, self).generate_valuewidget(
-            variable, override_custom=override_custom,
-            use_this_valuewidget=use_this_valuewidget)
+            variable,
+            override_custom=override_custom,
+            use_this_valuewidget=use_this_valuewidget,
+        )
 
     def make_row_valuewidget(self, *args, **kwargs):
         kwargs.update({"arg_str": str(self.length)})

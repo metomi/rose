@@ -46,12 +46,12 @@ import metomi.rose.macros.trigger
 import metomi.rose.variable
 
 
-REC_NS_SECTION = re.compile(r"^(" + metomi.rose.META_PROP_NS + metomi.rose.CONFIG_DELIMITER +
-                            r")(.*)$")
+REC_NS_SECTION = re.compile(
+    r"^(" + metomi.rose.META_PROP_NS + metomi.rose.CONFIG_DELIMITER + r")(.*)$"
+)
 
 
 class VarData(object):
-
     """Stores past, present, and missing variables."""
 
     def __init__(self, v_map, latent_v_map, save_v_map, latent_save_v_map):
@@ -100,17 +100,17 @@ class VarData(object):
             nodes.pop()
         for node in nodes:
             for var in node.get(section, []):
-                if var.metadata['id'] == var_id:
+                if var.metadata["id"] == var_id:
                     return var
         return None
 
 
 class SectData(object):
-
     """Stores past, present, and missing sections."""
 
-    def __init__(self, sections, latent_sections, save_sections,
-                 latent_save_sections):
+    def __init__(
+        self, sections, latent_sections, save_sections, latent_save_sections
+    ):
         self.now = sections
         self.latent = latent_sections
         self.save = save_sections
@@ -146,12 +146,23 @@ class SectData(object):
 
 
 class ConfigData(object):
-
     """Stores information about a configuration."""
 
-    def __init__(self, config, s_config, directory, opt_conf_lookup, meta,
-                 meta_id, meta_files, macros, config_type,
-                 var_data=None, sect_data=None, is_preview=False):
+    def __init__(
+        self,
+        config,
+        s_config,
+        directory,
+        opt_conf_lookup,
+        meta,
+        meta_id,
+        meta_files,
+        macros,
+        config_type,
+        var_data=None,
+        sect_data=None,
+        is_preview=False,
+    ):
         self.config = config
         self.save_config = s_config
         self.directory = directory
@@ -167,21 +178,29 @@ class ConfigData(object):
 
 
 class ConfigDataManager(object):
-
     """Loads the information from the various configurations."""
 
-    def __init__(self, util, reporter, page_ns_show_modes,
-                 reload_ns_tree_func, opt_meta_paths=None,
-                 no_warn=None):
+    def __init__(
+        self,
+        util,
+        reporter,
+        page_ns_show_modes,
+        reload_ns_tree_func,
+        opt_meta_paths=None,
+        no_warn=None,
+    ):
         """Load the root configuration and all its sub-configurations."""
         self.util = util
         self.helper = metomi.rose.config_editor.data_helper.ConfigDataHelper(
-            self, util)
+            self, util
+        )
         self.reporter = reporter
         self.page_ns_show_modes = page_ns_show_modes
         self.reload_ns_tree_func = reload_ns_tree_func
         self.config = {}  # Stores configuration name: object
-        self._builtin_value_macro = metomi.rose.macros.value.ValueChecker()  # value
+        self._builtin_value_macro = (
+            metomi.rose.macros.value.ValueChecker()
+        )  # value
         self.builtin_macros = {}  # Stores other Rose built-in macro instances
         self._bad_meta_dir_paths = []  # Stores flawed metadata directories.
         self.trigger = {}  # Stores trigger macro instances per configuration
@@ -189,7 +208,9 @@ class ConfigDataManager(object):
         self.trigger_id_value_lookup = {}  # Stores old values of trigger vars
         self.namespace_meta_lookup = {}  # Stores titles etc of namespaces
         self.namespace_cached_statuses = {
-            'latent': {}, 'ignored': {}}  # Caches ns statuses
+            "latent": {},
+            "ignored": {},
+        }  # Caches ns statuses
         self._config_section_namespace_map = {}  # Store section namespaces
         self.locator = metomi.rose.resource.ResourceLocator(paths=sys.path)
         if opt_meta_paths is None:
@@ -202,19 +223,30 @@ class ConfigDataManager(object):
         self.saved_config_names = None
         self.top_level_name = None
 
-    def load(self, top_level_directory, config_obj_dict,
-             config_obj_type_dict=None, load_all_apps=False,
-             load_no_apps=False, metadata_off=False):
+    def load(
+        self,
+        top_level_directory,
+        config_obj_dict,
+        config_obj_type_dict=None,
+        load_all_apps=False,
+        load_no_apps=False,
+        metadata_off=False,
+    ):
         """Load configurations and their metadata."""
         if config_obj_type_dict is None:
             config_obj_type_dict = {}
         if top_level_directory is not None:
             for filename in os.listdir(top_level_directory):
-                if filename in [metomi.rose.TOP_CONFIG_NAME, metomi.rose.SUB_CONFIG_NAME]:
-                    self.load_top_config(top_level_directory,
-                                         load_all_apps=load_all_apps,
-                                         load_no_apps=load_no_apps,
-                                         metadata_off=metadata_off)
+                if filename in [
+                    metomi.rose.TOP_CONFIG_NAME,
+                    metomi.rose.SUB_CONFIG_NAME,
+                ]:
+                    self.load_top_config(
+                        top_level_directory,
+                        load_all_apps=load_all_apps,
+                        load_no_apps=load_no_apps,
+                        metadata_off=metadata_off,
+                    )
                     break
             else:
                 self.load_top_config(None)
@@ -225,13 +257,19 @@ class ConfigDataManager(object):
             self.top_level_directory = None
         for name, obj in list(config_obj_dict.items()):
             config_type = config_obj_type_dict.get(name)
-            self.load_config(config_name=name, config=obj,
-                             config_type=config_type)
+            self.load_config(
+                config_name=name, config=obj, config_type=config_type
+            )
         self.saved_config_names = set(self.config.keys())
 
-    def load_top_config(self, top_level_directory, preview=False,
-                        load_all_apps=False, load_no_apps=False,
-                        metadata_off=False):
+    def load_top_config(
+        self,
+        top_level_directory,
+        preview=False,
+        load_all_apps=False,
+        load_no_apps=False,
+        metadata_off=False,
+    ):
         """Load the config at the top level and any sub configs."""
         self.top_level_directory = top_level_directory
 
@@ -240,8 +278,9 @@ class ConfigDataManager(object):
             self.top_level_name = metomi.rose.config_editor.UNTITLED_NAME
         else:
             self.top_level_name = os.path.basename(top_level_directory)
-            config_container_dir = os.path.join(top_level_directory,
-                                                metomi.rose.SUB_CONFIGS_DIR)
+            config_container_dir = os.path.join(
+                top_level_directory, metomi.rose.SUB_CONFIGS_DIR
+            )
             if os.path.isdir(config_container_dir):
                 sub_contents = sorted(os.listdir(config_container_dir))
 
@@ -250,40 +289,57 @@ class ConfigDataManager(object):
                         preview = True
                     else:
                         for config_dir in sub_contents:
-                            conf_path = os.path.join(config_container_dir,
-                                                     config_dir)
-                            if (os.path.isdir(conf_path) and
-                                    not config_dir.startswith('.')):
+                            conf_path = os.path.join(
+                                config_container_dir, config_dir
+                            )
+                            if os.path.isdir(
+                                conf_path
+                            ) and not config_dir.startswith("."):
                                 self.app_count += 1
 
-                        if (self.app_count >
-                                metomi.rose.config_editor.MAX_APPS_THRESHOLD):
+                        if (
+                            self.app_count
+                            > metomi.rose.config_editor.MAX_APPS_THRESHOLD
+                        ):
                             preview = True
 
                 for config_dir in sub_contents:
                     conf_path = os.path.join(config_container_dir, config_dir)
-                    if (os.path.isdir(conf_path) and
-                            not config_dir.startswith('.')):
-                        self.load_config(conf_path, preview=preview,
-                                         metadata_off=metadata_off)
+                    if os.path.isdir(conf_path) and not config_dir.startswith(
+                        "."
+                    ):
+                        self.load_config(
+                            conf_path,
+                            preview=preview,
+                            metadata_off=metadata_off,
+                        )
             self.load_config(top_level_directory)
             self.reload_ns_tree_func()
 
     def load_info_config(self, config_directory):
         """Load any information (discovery) config."""
-        disc_path = os.path.join(config_directory,
-                                 metomi.rose.INFO_CONFIG_NAME)
+        disc_path = os.path.join(
+            config_directory, metomi.rose.INFO_CONFIG_NAME
+        )
         if os.path.isfile(disc_path):
             config_obj = self.load_config_file(disc_path)[0]
-            self.load_config(config_name="/" + self.top_level_name + "-info",
-                             config=config_obj,
-                             config_type=metomi.rose.INFO_CONFIG_NAME)
+            self.load_config(
+                config_name="/" + self.top_level_name + "-info",
+                config=config_obj,
+                config_type=metomi.rose.INFO_CONFIG_NAME,
+            )
 
-    def load_config(self, config_directory=None,
-                    config_name=None, config=None,
-                    config_type=None, reload_tree_on=False,
-                    skip_load_event=False, preview=False,
-                    metadata_off=False):
+    def load_config(
+        self,
+        config_directory=None,
+        config_name=None,
+        config=None,
+        config_type=None,
+        reload_tree_on=False,
+        skip_load_event=False,
+        preview=False,
+        metadata_off=False,
+    ):
         """Load the configuration and metadata."""
         if config_directory is None:
             name = "/" + config_name.lstrip("/")
@@ -292,19 +348,23 @@ class ConfigDataManager(object):
             if not skip_load_event:
                 self.reporter.report_load_event(
                     metomi.rose.config_editor.EVENT_LOAD_CONFIG.format(
-                        name.lstrip("/")))
+                        name.lstrip("/")
+                    )
+                )
         else:
             config_directory = config_directory.rstrip("/")
             if config_directory != self.top_level_directory:
                 # One of the sub configurations
                 head, tail = os.path.split(config_directory)
-                name = ''
+                name = ""
                 while tail != metomi.rose.SUB_CONFIGS_DIR:
-                    name = "/" + os.path.join(tail, name).rstrip('/')
+                    name = "/" + os.path.join(tail, name).rstrip("/")
                     head, tail = os.path.split(head)
                 name = "/" + name.lstrip("/")
                 config_type = metomi.rose.SUB_CONFIG_NAME
-            elif metomi.rose.TOP_CONFIG_NAME not in os.listdir(config_directory):
+            elif metomi.rose.TOP_CONFIG_NAME not in os.listdir(
+                config_directory
+            ):
                 # Just editing a single sub configuration, not a suite
                 name = "/" + self.top_level_name
                 config_type = metomi.rose.SUB_CONFIG_NAME
@@ -317,21 +377,30 @@ class ConfigDataManager(object):
             if not skip_load_event:
                 self.reporter.report_load_event(
                     metomi.rose.config_editor.EVENT_LOAD_CONFIG.format(
-                        name.lstrip("/")))
-            config_path = os.path.join(config_directory, metomi.rose.SUB_CONFIG_NAME)
+                        name.lstrip("/")
+                    )
+                )
+            config_path = os.path.join(
+                config_directory, metomi.rose.SUB_CONFIG_NAME
+            )
             if not os.path.isfile(config_path):
-                if (os.path.abspath(config_directory) ==
-                        os.path.abspath(self.top_level_directory)):
-                    config_path = os.path.join(config_directory,
-                                               metomi.rose.TOP_CONFIG_NAME)
+                if os.path.abspath(config_directory) == os.path.abspath(
+                    self.top_level_directory
+                ):
+                    config_path = os.path.join(
+                        config_directory, metomi.rose.TOP_CONFIG_NAME
+                    )
                     config_type = metomi.rose.TOP_CONFIG_NAME
                 else:
                     text = metomi.rose.config_editor.ERROR_NOT_FOUND.format(
-                        config_path)
-                    title = metomi.rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR
+                        config_path
+                    )
+                    title = (
+                        metomi.rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR
+                    )
                     metomi.rose.gtk.dialog.run_dialog(
-                        metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                        text, title)
+                        metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR, text, title
+                    )
                     sys.exit(2)
 
             if config_directory != self.top_level_directory and preview:
@@ -345,14 +414,15 @@ class ConfigDataManager(object):
             meta_config_tree = metomi.rose.config_tree.ConfigTree()
         elif metadata_off:
             meta_config_tree = self.load_meta_config_tree(
-                config_type=config_type,
-                opt_meta_paths=self.opt_meta_paths)
+                config_type=config_type, opt_meta_paths=self.opt_meta_paths
+            )
         else:
             try:
                 meta_config_tree = self.load_meta_config_tree(
-                    config, config_directory,
+                    config,
+                    config_directory,
                     config_type=config_type,
-                    opt_meta_paths=self.opt_meta_paths
+                    opt_meta_paths=self.opt_meta_paths,
                 )
             except IOError as exc:
                 metomi.rose.gtk.dialog.run_exception_dialog(exc)
@@ -364,14 +434,24 @@ class ConfigDataManager(object):
         macro_module_prefix = self.helper.get_macro_module_prefix(name)
         meta_files = self.load_meta_files(meta_config_tree)
         macros = metomi.rose.macro.load_meta_macro_modules(
-            meta_files, module_prefix=macro_module_prefix)
+            meta_files, module_prefix=macro_module_prefix
+        )
         meta_id = self.helper.get_config_meta_flag(
-            name, from_this_config_obj=config)
+            name, from_this_config_obj=config
+        )
         # Initialise configuration data object.
-        self.config[name] = ConfigData(config, s_config, config_directory,
-                                       opt_conf_lookup, meta_config,
-                                       meta_id, meta_files, macros,
-                                       config_type, is_preview=preview)
+        self.config[name] = ConfigData(
+            config,
+            s_config,
+            config_directory,
+            opt_conf_lookup,
+            meta_config,
+            meta_id,
+            meta_files,
+            macros,
+            config_type,
+            is_preview=preview,
+        )
 
         self.load_builtin_macros(name)
         self.load_file_metadata(name)
@@ -380,16 +460,20 @@ class ConfigDataManager(object):
         # Load section and variable data into the object.
         sects, l_sects = self.load_sections_from_config(name)
         s_sects, s_l_sects = self.load_sections_from_config(name)
-        self.config[name].sections = SectData(sects, l_sects, s_sects,
-                                              s_l_sects)
+        self.config[name].sections = SectData(
+            sects, l_sects, s_sects, s_l_sects
+        )
         var, l_var, s_var, s_l_var = self.load_vars_from_config(
-            name, return_copies=True)
+            name, return_copies=True
+        )
         self.config[name].vars = VarData(var, l_var, s_var, s_l_var)
 
         if not skip_load_event:
             self.reporter.report_load_event(
                 metomi.rose.config_editor.EVENT_LOAD_METADATA.format(
-                    name.lstrip("/")))
+                    name.lstrip("/")
+                )
+            )
         # Process namespaces and ignored statuses.
         self.load_node_namespaces(name)
         self.load_node_namespaces(name, from_saved=True)
@@ -399,16 +483,21 @@ class ConfigDataManager(object):
             self.reload_ns_tree_func()
 
     def load_config_file(self, config_path):
-        """Return two copies of the metomi.rose.config.ConfigNode at config_path."""
+        """Return two copies of the
+        metomi.rose.config.ConfigNode at config_path.
+
+        """
+
         try:
             config = metomi.rose.config.load(config_path)
         except metomi.rose.config.ConfigSyntaxError as exc:
             text = metomi.rose.config_editor.ERROR_LOAD_SYNTAX.format(
-                config_path, exc)
+                config_path, exc
+            )
             title = metomi.rose.config_editor.DIALOG_TITLE_CRITICAL_ERROR
             metomi.rose.gtk.dialog.run_dialog(
-                metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                text, title)
+                metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR, text, title
+            )
             sys.exit(2)
         else:
             master_config = metomi.rose.config.load(config_path)
@@ -421,7 +510,9 @@ class ConfigDataManager(object):
         opt_conf_lookup = {}
         if config_directory is None:
             return opt_conf_lookup
-        opt_dir = os.path.join(config_directory, metomi.rose.config.OPT_CONFIG_DIR)
+        opt_dir = os.path.join(
+            config_directory, metomi.rose.config.OPT_CONFIG_DIR
+        )
         if not os.path.isdir(opt_dir):
             return opt_conf_lookup
         opt_exceptions = {}
@@ -446,19 +537,26 @@ class ConfigDataManager(object):
             for path, exc in sorted(opt_exceptions.items()):
                 err_text += err_format.format(path, type(exc).__name__, exc)
             err_text = err_text.rstrip()
-            text = metomi.rose.config_editor.ERROR_LOAD_OPT_CONFS.format(err_text)
+            text = metomi.rose.config_editor.ERROR_LOAD_OPT_CONFS.format(
+                err_text
+            )
             title = metomi.rose.config_editor.ERROR_LOAD_OPT_CONFS_TITLE
-            metomi.rose.gtk.dialog.run_dialog(metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                                       text, title=title, modal=False)
+            metomi.rose.gtk.dialog.run_dialog(
+                metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                text,
+                title=title,
+                modal=False,
+            )
         return opt_conf_lookup
 
     def load_builtin_macros(self, config_name):
         """Load Rose builtin macros."""
         self.builtin_macros[config_name] = {
-            metomi.rose.META_PROP_COMPULSORY:
-            metomi.rose.macros.compulsory.CompulsoryChecker(),
-            metomi.rose.META_PROP_TYPE:
-            self._builtin_value_macro}
+            metomi.rose.META_PROP_COMPULSORY: (
+                metomi.rose.macros.compulsory.CompulsoryChecker()
+            ),
+            metomi.rose.META_PROP_TYPE: self._builtin_value_macro,
+        }
 
     def load_sections_from_config(self, config_name, save=False):
         """Return maps of section objects from the configuration."""
@@ -477,44 +575,69 @@ class ConfigDataManager(object):
                     sect_map[""].options.append(section)
                     continue
                 meta_data = self.helper.get_metadata_for_config_id(
-                    "", config_name)
-                sect_map.update({"": metomi.rose.section.Section("", [section],
-                                                          meta_data)})
+                    "", config_name
+                )
+                sect_map.update(
+                    {"": metomi.rose.section.Section("", [section], meta_data)}
+                )
                 real_sect_ids.append("")
                 continue
-            meta_data = self.helper.get_metadata_for_config_id(section,
-                                                               config_name)
+            meta_data = self.helper.get_metadata_for_config_id(
+                section, config_name
+            )
             options = list(node.value.keys())
-            sect_map.update({section: metomi.rose.section.Section(section, options,
-                                                           meta_data)})
+            sect_map.update(
+                {
+                    section: metomi.rose.section.Section(
+                        section, options, meta_data
+                    )
+                }
+            )
             sect_map[section].comments = list(node.comments)
             real_sect_ids.append(section)
             real_sect_basic_ids.extend(
-                [metomi.rose.macro.REC_ID_STRIP_DUPL.sub("", section),
-                 metomi.rose.macro.REC_ID_STRIP.sub("", section)]
+                [
+                    metomi.rose.macro.REC_ID_STRIP_DUPL.sub("", section),
+                    metomi.rose.macro.REC_ID_STRIP.sub("", section),
+                ]
             )
             if node.is_ignored():
                 reason = {}
-                if node.state == metomi.rose.config.ConfigNode.STATE_SYST_IGNORED:
-                    reason = {metomi.rose.variable.IGNORED_BY_SYSTEM:
-                              metomi.rose.config_editor.IGNORED_STATUS_CONFIG}
-                elif (node.state ==
-                      metomi.rose.config.ConfigNode.STATE_USER_IGNORED):
-                    reason = {metomi.rose.variable.IGNORED_BY_USER:
-                              metomi.rose.config_editor.IGNORED_STATUS_CONFIG}
+                if (
+                    node.state
+                    == metomi.rose.config.ConfigNode.STATE_SYST_IGNORED
+                ):
+                    reason = {
+                        metomi.rose.variable.IGNORED_BY_SYSTEM: (
+                            metomi.rose.config_editor.IGNORED_STATUS_CONFIG
+                        )
+                    }
+                elif (
+                    node.state
+                    == metomi.rose.config.ConfigNode.STATE_USER_IGNORED
+                ):
+                    reason = {
+                        metomi.rose.variable.IGNORED_BY_USER: (
+                            metomi.rose.config_editor.IGNORED_STATUS_CONFIG
+                        )
+                    }
                 sect_map[section].ignored_reason.update(reason)
         if "" not in sect_map:
             # This always exists for a configuration.
-            meta_data = self.helper.get_metadata_for_config_id("",
-                                                               config_name)
-            sect_map.update({"": metomi.rose.section.Section("", [], meta_data)})
+            meta_data = self.helper.get_metadata_for_config_id("", config_name)
+            sect_map.update(
+                {"": metomi.rose.section.Section("", [], meta_data)}
+            )
             real_sect_ids.append("")
         for setting_id, sect_node in list(meta_config.value.items()):
             if sect_node.is_ignored() or isinstance(sect_node.value, str):
                 continue
             section, option = self.util.get_section_option_from_id(setting_id)
-            if (option is not None or section in real_sect_ids or
-                    section in real_sect_basic_ids):
+            if (
+                option is not None
+                or section in real_sect_ids
+                or section in real_sect_basic_ids
+            ):
                 continue
             meta_data = {}
             for prop_opt, opt_node in list(sect_node.value.items()):
@@ -522,18 +645,30 @@ class ConfigDataManager(object):
                     continue
                 meta_data.update({prop_opt: opt_node.value})
             latent_section_name = section
-            if (meta_data.get(metomi.rose.META_PROP_DUPLICATE) ==
-                    metomi.rose.META_PROP_VALUE_TRUE):
+            if (
+                meta_data.get(metomi.rose.META_PROP_DUPLICATE)
+                == metomi.rose.META_PROP_VALUE_TRUE
+            ):
                 latent_section_name = section + "({0})".format(
-                    metomi.rose.CONFIG_SETTING_INDEX_DEFAULT)
-            meta_data.update({'id': latent_section_name})
-            if section not in ['ns', 'file:*']:
-                latent_sect_map[latent_section_name] = metomi.rose.section.Section(
-                    latent_section_name, [], meta_data)
+                    metomi.rose.CONFIG_SETTING_INDEX_DEFAULT
+                )
+            meta_data.update({"id": latent_section_name})
+            if section not in ["ns", "file:*"]:
+                latent_sect_map[latent_section_name] = (
+                    metomi.rose.section.Section(
+                        latent_section_name, [], meta_data
+                    )
+                )
         return sect_map, latent_sect_map
 
-    def load_vars_from_config(self, config_name, only_this_section=None,
-                              save=False, update=False, return_copies=False):
+    def load_vars_from_config(
+        self,
+        config_name,
+        only_this_section=None,
+        save=False,
+        update=False,
+        return_copies=False,
+    ):
         """Return maps of variables from the configuration"""
         config_data = self.config[config_name]
         if save:
@@ -573,31 +708,45 @@ class ConfigDataManager(object):
             flags = self.load_option_flags(config_name, section, option)
             ignored_reason = {}
             if section_map[section].ignored_reason:
-                ignored_reason.update({
-                    metomi.rose.variable.IGNORED_BY_SECTION:
-                    metomi.rose.config_editor.IGNORED_STATUS_CONFIG})
+                ignored_reason.update(
+                    {
+                        metomi.rose.variable.IGNORED_BY_SECTION: (
+                            metomi.rose.config_editor.IGNORED_STATUS_CONFIG
+                        )
+                    }
+                )
             if node.state == metomi.rose.config.ConfigNode.STATE_SYST_IGNORED:
-                ignored_reason.update({
-                    metomi.rose.variable.IGNORED_BY_SYSTEM:
-                    metomi.rose.config_editor.IGNORED_STATUS_CONFIG})
-            elif (node.state ==
-                  metomi.rose.config.ConfigNode.STATE_USER_IGNORED):
-                ignored_reason.update({
-                    metomi.rose.variable.IGNORED_BY_USER:
-                    metomi.rose.config_editor.IGNORED_STATUS_CONFIG})
+                ignored_reason.update(
+                    {
+                        metomi.rose.variable.IGNORED_BY_SYSTEM: (
+                            metomi.rose.config_editor.IGNORED_STATUS_CONFIG
+                        )
+                    }
+                )
+            elif (
+                node.state == metomi.rose.config.ConfigNode.STATE_USER_IGNORED
+            ):
+                ignored_reason.update(
+                    {
+                        metomi.rose.variable.IGNORED_BY_USER: (
+                            metomi.rose.config_editor.IGNORED_STATUS_CONFIG
+                        )
+                    }
+                )
             cfg_comments = node.comments
             var_id = self.util.get_id_from_section_option(section, option)
             real_var_ids.append(var_id)
-            meta_data = self.helper.get_metadata_for_config_id(var_id,
-                                                               config_name)
+            meta_data = self.helper.get_metadata_for_config_id(
+                var_id, config_name
+            )
             var_map.setdefault(section, [])
             if return_copies:
                 var_map_copy.setdefault(section, [])
             if update:
-                id_list = [v.metadata['id'] for v in var_map[section]]
+                id_list = [v.metadata["id"] for v in var_map[section]]
                 if var_id in id_list:
                     for i, var in enumerate(var_map[section]):
-                        if var.metadata['id'] == var_id:
+                        if var.metadata["id"] == var_id:
                             var_map[section].pop(i)
                             break
             var_map[section].append(
@@ -608,7 +757,7 @@ class ConfigDataManager(object):
                     ignored_reason,
                     error={},
                     flags=flags,
-                    comments=cfg_comments
+                    comments=cfg_comments,
                 )
             )
             if return_copies:
@@ -620,7 +769,7 @@ class ConfigDataManager(object):
                         ignored_reason,
                         error={},
                         flags=flags,
-                        comments=cfg_comments
+                        comments=cfg_comments,
                     )
                 )
         id_node_stack = list(meta_config.value.items())
@@ -629,13 +778,14 @@ class ConfigDataManager(object):
             if sect_node.is_ignored() or isinstance(sect_node.value, str):
                 continue
             section, option = self.util.get_section_option_from_id(setting_id)
-            if section in ['ns', 'file:*']:
+            if section in ["ns", "file:*"]:
                 continue
             if section in basic_dupl_map:
                 # There is a matching duplicate e.g. foo(3) or foo{bar}(1)
                 for dupl_section in basic_dupl_map[section]:
                     dupl_id = self.util.get_id_from_section_option(
-                        dupl_section, option)
+                        dupl_section, option
+                    )
                     id_node_stack.insert(0, (dupl_id, sect_node))
                 continue
             if only_this_section is not None and section != only_this_section:
@@ -646,14 +796,20 @@ class ConfigDataManager(object):
             if setting_id in real_var_ids:
                 # This variable isn't missing, so skip.
                 continue
-            if (meta_config.get_value([section, metomi.rose.META_PROP_DUPLICATE]) ==
-                    metomi.rose.META_PROP_VALUE_TRUE and
-                    section not in basic_dupl_map and
-                    config.get([section]) is None):
+            if (
+                meta_config.get_value(
+                    [section, metomi.rose.META_PROP_DUPLICATE]
+                )
+                == metomi.rose.META_PROP_VALUE_TRUE
+                and section not in basic_dupl_map
+                and config.get([section]) is None
+            ):
                 section = section + "({0})".format(
-                    metomi.rose.CONFIG_SETTING_INDEX_DEFAULT)
+                    metomi.rose.CONFIG_SETTING_INDEX_DEFAULT
+                )
                 setting_id = self.util.get_id_from_section_option(
-                    section, option)
+                    section, option
+                )
             flags = self.load_option_flags(config_name, section, option)
             ignored_reason = {}
             sect_data = section_map.get(section)
@@ -661,23 +817,25 @@ class ConfigDataManager(object):
                 sect_data = latent_section_map.get(section)
             if sect_data is not None and sect_data.ignored_reason:
                 ignored_reason = {
-                    metomi.rose.variable.IGNORED_BY_SECTION:
-                    metomi.rose.config_editor.IGNORED_STATUS_CONFIG}
+                    metomi.rose.variable.IGNORED_BY_SECTION: (
+                        metomi.rose.config_editor.IGNORED_STATUS_CONFIG
+                    )
+                }
             meta_data = {}
             for prop_opt, opt_node in list(sect_node.value.items()):
                 if opt_node.is_ignored():
                     continue
                 meta_data.update({prop_opt: opt_node.value})
-            meta_data.update({'id': setting_id})
+            meta_data.update({"id": setting_id})
             value = metomi.rose.variable.get_value_from_metadata(meta_data)
             latent_var_map.setdefault(section, [])
             if return_copies:
                 latent_var_map_copy.setdefault(section, [])
             if update:
-                id_list = [v.metadata['id'] for v in latent_var_map[section]]
+                id_list = [v.metadata["id"] for v in latent_var_map[section]]
                 if setting_id in id_list:
                     for var in latent_var_map[section]:
-                        if var.metadata['id'] == setting_id:
+                        if var.metadata["id"] == setting_id:
                             latent_var_map[section].remove(var)
             latent_var_map[section].append(
                 metomi.rose.variable.Variable(
@@ -686,7 +844,7 @@ class ConfigDataManager(object):
                     meta_data,
                     ignored_reason,
                     error={},
-                    flags=flags
+                    flags=flags,
                 )
             )
             if return_copies:
@@ -697,7 +855,7 @@ class ConfigDataManager(object):
                         meta_data,
                         ignored_reason,
                         error={},
-                        flags=flags
+                        flags=flags,
                     )
                 )
         if return_copies:
@@ -717,27 +875,33 @@ class ConfigDataManager(object):
     def load_option_flags(self, config_name, section, option):
         """Load flags for an option."""
         flags = {}
-        opt_conf_flags = self._load_opt_conf_flags(config_name,
-                                                   section, option)
+        opt_conf_flags = self._load_opt_conf_flags(
+            config_name, section, option
+        )
         if opt_conf_flags:
-            flags.update({metomi.rose.config_editor.FLAG_TYPE_OPT_CONF:
-                          opt_conf_flags})
+            flags.update(
+                {metomi.rose.config_editor.FLAG_TYPE_OPT_CONF: opt_conf_flags}
+            )
         return flags
 
     def _load_opt_conf_flags(self, config_name, section, option):
         opt_config_map = self.config[config_name].opt_configs
-        opt_conf_diff_format = metomi.rose.config_editor.VAR_FLAG_TIP_OPT_CONF_STATE
+        opt_conf_diff_format = (
+            metomi.rose.config_editor.VAR_FLAG_TIP_OPT_CONF_STATE
+        )
         opt_flags = {}
         for opt_name in sorted(opt_config_map):
             opt_config = opt_config_map[opt_name]
             opt_node = opt_config.get([section, option])
             if opt_node is not None:
                 opt_sect_node = opt_config.get([section])
-                text = opt_conf_diff_format.format(opt_sect_node.state,
-                                                   section,
-                                                   opt_node.state,
-                                                   option,
-                                                   opt_node.value)
+                text = opt_conf_diff_format.format(
+                    opt_sect_node.state,
+                    section,
+                    opt_node.state,
+                    option,
+                    opt_node.value,
+                )
                 opt_flags[opt_name] = text
         return opt_flags
 
@@ -755,10 +919,13 @@ class ConfigDataManager(object):
         enabled_state = metomi.rose.config.ConfigNode.STATE_NORMAL
         sections_to_be_dumped = []
         if only_this_ns is None:
-            allowed_sections = set(list(sect_map.keys()) + list(var_map.keys()))
+            allowed_sections = set(
+                list(sect_map.keys()) + list(var_map.keys())
+            )
         else:
             allowed_sections = self.helper.get_sections_from_namespace(
-                only_this_ns)
+                only_this_ns
+            )
         for section in sect_map:
             if only_this_ns is not None and section not in allowed_sections:
                 continue
@@ -767,7 +934,7 @@ class ConfigDataManager(object):
             variables = var_map.get(section, [])
             for variable in variables:
                 if only_this_ns is not None:
-                    if variable.metadata['full_ns'] != only_this_ns:
+                    if variable.metadata["full_ns"] != only_this_ns:
                         continue
                 option = variable.name
                 if not variable.name:
@@ -776,15 +943,23 @@ class ConfigDataManager(object):
                 value = variable.value
                 var_state = enabled_state
                 if variable.ignored_reason:
-                    if (metomi.rose.variable.IGNORED_BY_USER in
-                            variable.ignored_reason):
+                    if (
+                        metomi.rose.variable.IGNORED_BY_USER
+                        in variable.ignored_reason
+                    ):
                         var_state = user_ignored_state
-                    elif (metomi.rose.variable.IGNORED_BY_SYSTEM in
-                          variable.ignored_reason):
+                    elif (
+                        metomi.rose.variable.IGNORED_BY_SYSTEM
+                        in variable.ignored_reason
+                    ):
                         var_state = syst_ignored_state
                 var_comments = variable.comments
-                config.set([section, option], value, state=var_state,
-                           comments=var_comments)
+                config.set(
+                    [section, option],
+                    value,
+                    state=var_state,
+                    comments=var_comments,
+                )
         for section_id in sections_to_be_dumped:
             comments = sect_map[section_id].comments
             if not section_id:
@@ -792,11 +967,15 @@ class ConfigDataManager(object):
                 continue
             section_state = enabled_state
             if sect_map[section_id].ignored_reason:
-                if (metomi.rose.variable.IGNORED_BY_USER in
-                        sect_map[section_id].ignored_reason):
+                if (
+                    metomi.rose.variable.IGNORED_BY_USER
+                    in sect_map[section_id].ignored_reason
+                ):
                     section_state = user_ignored_state
-                elif (metomi.rose.variable.IGNORED_BY_SYSTEM in
-                      sect_map[section_id].ignored_reason):
+                elif (
+                    metomi.rose.variable.IGNORED_BY_SYSTEM
+                    in sect_map[section_id].ignored_reason
+                ):
                     section_state = syst_ignored_state
             node = config.get([section_id])
             if node is None:
@@ -813,14 +992,21 @@ class ConfigDataManager(object):
 
     def clear_meta_lookups(self, config_name):
         for ns in list(self.namespace_meta_lookup.keys()):
-            if (ns.startswith(config_name) and
-                    self.util.split_full_ns(self, ns)[0] == config_name):
+            if (
+                ns.startswith(config_name)
+                and self.util.split_full_ns(self, ns)[0] == config_name
+            ):
                 self.namespace_meta_lookup.pop(ns)
         if config_name in self._config_section_namespace_map:
             self._config_section_namespace_map.pop(config_name)
 
-    def load_meta_config_tree(self, config=None, directory=None,
-                              config_type=None, opt_meta_paths=None):
+    def load_meta_config_tree(
+        self,
+        config=None,
+        directory=None,
+        config_type=None,
+        opt_meta_paths=None,
+    ):
         """Load the main metadata, and any specified in 'config'."""
         if config is None:
             config = metomi.rose.config.ConfigNode()
@@ -831,7 +1017,7 @@ class ConfigDataManager(object):
             config_type=config_type,
             error_handler=error_handler,
             opt_meta_paths=opt_meta_paths,
-            no_warn=self.no_warn
+            no_warn=self.no_warn,
         )
 
     def load_meta_files(self, config_tree):
@@ -848,21 +1034,33 @@ class ConfigDataManager(object):
         meta_config = config_data.meta
         directory = config_data.directory
         meta_dir_path = self.load_meta_path(config, directory)[0]
-        reports = metomi.rose.metadata_check.metadata_check(meta_config,
-                                                     directory)
+        reports = metomi.rose.metadata_check.metadata_check(
+            meta_config, directory
+        )
         if reports and meta_dir_path not in self._bad_meta_dir_paths:
             # There are problems with some metadata.
-            title = metomi.rose.config_editor.ERROR_METADATA_CHECKER_TITLE.format(
-                meta_dir_path)
-            text = metomi.rose.config_editor.ERROR_METADATA_CHECKER_TEXT.format(
-                len(reports), meta_dir_path)
+            title = (
+                metomi.rose.config_editor.ERROR_METADATA_CHECKER_TITLE.format(
+                    meta_dir_path
+                )
+            )
+            text = (
+                metomi.rose.config_editor.ERROR_METADATA_CHECKER_TEXT.format(
+                    len(reports), meta_dir_path
+                )
+            )
             self._bad_meta_dir_paths.append(meta_dir_path)
             reports_map = {None: reports}
             reports_text = metomi.rose.macro.get_reports_as_text(
-                reports_map, "metomi.rose.metadata_check.MetadataChecker")
-            metomi.rose.gtk.dialog.run_dialog(metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                                       text, title, modal=False,
-                                       extra_text=reports_text)
+                reports_map, "metomi.rose.metadata_check.MetadataChecker"
+            )
+            metomi.rose.gtk.dialog.run_dialog(
+                metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
+                text,
+                title,
+                modal=False,
+                extra_text=reports_text,
+            )
         for report in reports:
             if report.option != metomi.rose.META_PROP_TRIGGER:
                 meta_config.unset([report.section, report.option])
@@ -894,24 +1092,27 @@ class ConfigDataManager(object):
             config_for_macro.set(keylist, copy.deepcopy(node.value))
         meta_config = self.config[config_name].meta
         bad_list = self.trigger[config_name].validate_dependencies(
-            config_for_macro, meta_config)
+            config_for_macro, meta_config
+        )
         if bad_list:
             self.trigger[config_name].trigger_family_lookup.clear()
             event = metomi.rose.config_editor.EVENT_INVALID_TRIGGERS.format(
-                config_name.strip("/"))
+                config_name.strip("/")
+            )
             self.reporter.report(event, self.reporter.KIND_ERR)
             return
         trig_config = self.trigger[config_name].transform(
-            config_for_macro, meta_config)[0]
+            config_for_macro, meta_config
+        )[0]
         self.trigger_id_value_lookup.setdefault(config_name, {})
         var_id_map = {}
         for variables in list(var_map.values()):
             for variable in variables:
-                var_id_map.update({variable.metadata['id']: variable})
+                var_id_map.update({variable.metadata["id"]: variable})
         latent_var_id_map = {}
         for variables in list(latent_var_map.values()):
             for variable in variables:
-                latent_var_id_map.update({variable.metadata['id']: variable})
+                latent_var_id_map.update({variable.metadata["id"]: variable})
         trig_ids = list(self.trigger[config_name].trigger_family_lookup.keys())
         while trig_ids:
             var_id = trig_ids.pop()
@@ -925,12 +1126,16 @@ class ConfigDataManager(object):
             if sect.endswith(")"):
                 continue
             node = meta_config.get([sect, metomi.rose.META_PROP_DUPLICATE])
-            if node is not None and node.value == metomi.rose.META_PROP_VALUE_TRUE:
+            if (
+                node is not None
+                and node.value == metomi.rose.META_PROP_VALUE_TRUE
+            ):
                 search_string = sect + "("
                 for section in sect_map:
                     if section.startswith(search_string):
                         new_id = self.util.get_id_from_section_option(
-                            section, opt)
+                            section, opt
+                        )
                         trig_ids.append(new_id)
         id_node_map = {}
         id_node_map.update(sect_map)
@@ -942,7 +1147,7 @@ class ConfigDataManager(object):
         for setting_id, node_inst in list(id_node_map.items()):
             is_latent = False
             section, option = self.util.get_section_option_from_id(setting_id)
-            is_section = (option is None)
+            is_section = option is None
             if is_section:
                 if section not in sect_map:
                     is_latent = True
@@ -952,15 +1157,19 @@ class ConfigDataManager(object):
             trig_cfg_node = trig_config.get([section, option])
             if trig_cfg_node is None:
                 # Latent variable or sections cannot be user-ignored.
-                if (setting_id in ignored_dict and
-                        setting_id not in enabled_dict):
+                if (
+                    setting_id in ignored_dict
+                    and setting_id not in enabled_dict
+                ):
                     trig_cfg_state = syst_ignored_state
                 else:
                     trig_cfg_state = enabled_state
             else:
                 trig_cfg_state = trig_cfg_node.state
-            if (trig_cfg_state == enabled_state and
-                    not node_inst.ignored_reason):
+            if (
+                trig_cfg_state == enabled_state
+                and not node_inst.ignored_reason
+            ):
                 # For speed, skip the rest of the checking.
                 # Doc table: E -> E
                 continue
@@ -971,16 +1180,24 @@ class ConfigDataManager(object):
                 # It should be trigger-ignored.
                 # Doc table: * -> I_t
                 info = ignored_dict.get(setting_id)
-                if metomi.rose.variable.IGNORED_BY_SYSTEM not in ignored_reasons:
+                if (
+                    metomi.rose.variable.IGNORED_BY_SYSTEM
+                    not in ignored_reasons
+                ):
                     help_str = ", ".join(list(info.values()))
                     if metomi.rose.variable.IGNORED_BY_USER in ignored_reasons:
                         # It is user-ignored but should be trigger-ignored.
                         # Doc table: I_u -> I_t
                         if node_is_compulsory:
                             # Doc table: I_u -> I_t -> compulsory
-                            key = metomi.rose.config_editor.WARNING_TYPE_USER_IGNORED
-                            val = getattr(metomi.rose.config_editor,
-                                          "WARNING_USER_NOT_TRIGGER_IGNORED")
+                            key = (
+                                metomi.rose.config_editor
+                                .WARNING_TYPE_USER_IGNORED
+                            )
+                            val = getattr(
+                                metomi.rose.config_editor,
+                                "WARNING_USER_NOT_TRIGGER_IGNORED",
+                            )
                             node_inst.warning.update({key: val})
                         else:
                             # Doc table: I_u -> I_t -> optional
@@ -990,15 +1207,26 @@ class ConfigDataManager(object):
                         # Doc table: E -> I_t
                         if is_latent:
                             # Fix this for latent settings.
-                            node_inst.ignored_reason.update({
-                                metomi.rose.variable.IGNORED_BY_SYSTEM:
-                                metomi.rose.config_editor.IGNORED_STATUS_CONFIG})
+                            node_inst.ignored_reason.update(
+                                {
+                                    metomi.rose.variable.IGNORED_BY_SYSTEM: (
+                                        metomi.rose.config_editor
+                                        .IGNORED_STATUS_CONFIG
+                                    )
+                                }
+                            )
                         else:
                             # Flag an error for real settings.
-                            node_inst.error.update({
-                                metomi.rose.config_editor.WARNING_TYPE_ENABLED:
-                                (metomi.rose.config_editor.WARNING_NOT_IGNORED +
-                                 help_str)})
+                            node_inst.error.update(
+                                {
+                                    metomi.rose.config_editor
+                                    .WARNING_TYPE_ENABLED: (
+                                        metomi.rose.config_editor
+                                        .WARNING_NOT_IGNORED
+                                        + help_str
+                                    )
+                                }
+                            )
                 else:
                     # Otherwise, they both agree about trigger-ignored.
                     # Doc table: I_t -> I_t
@@ -1006,25 +1234,38 @@ class ConfigDataManager(object):
             elif metomi.rose.variable.IGNORED_BY_SYSTEM in ignored_reasons:
                 # It should be enabled, but is trigger-ignored.
                 # Doc table: I_t
-                if (setting_id in enabled_dict and
-                        setting_id not in ignored_dict):
+                if (
+                    setting_id in enabled_dict
+                    and setting_id not in ignored_dict
+                ):
                     # It is a valid trigger.
                     # Doc table: I_t -> E
                     parents = self.trigger[config_name].enabled_dict.get(
-                        setting_id)
-                    help_str = (metomi.rose.config_editor.WARNING_NOT_ENABLED +
-                                ', '.join(parents))
-                    err_type = metomi.rose.config_editor.WARNING_TYPE_TRIGGER_IGNORED
+                        setting_id
+                    )
+                    help_str = (
+                        metomi.rose.config_editor.WARNING_NOT_ENABLED
+                        + ", ".join(parents)
+                    )
+                    err_type = (
+                        metomi.rose.config_editor.WARNING_TYPE_TRIGGER_IGNORED
+                    )
                     node_inst.error.update({err_type: help_str})
-                elif (setting_id not in enabled_dict and
-                      setting_id not in ignored_dict):
+                elif (
+                    setting_id not in enabled_dict
+                    and setting_id not in ignored_dict
+                ):
                     # It is not a valid trigger.
                     # Doc table: I_t -> not trigger
                     if node_is_compulsory:
                         # This is an error for compulsory variables.
                         # Doc table: I_t -> not trigger -> compulsory
-                        help_str = metomi.rose.config_editor.WARNING_NOT_TRIGGER
-                        err_type = metomi.rose.config_editor.WARNING_TYPE_NOT_TRIGGER
+                        help_str = (
+                            metomi.rose.config_editor.WARNING_NOT_TRIGGER
+                        )
+                        err_type = (
+                            metomi.rose.config_editor.WARNING_TYPE_NOT_TRIGGER
+                        )
                         node_inst.error.update({err_type: help_str})
                     else:
                         # Overlook for optional variables.
@@ -1038,8 +1279,12 @@ class ConfigDataManager(object):
                     # Compulsory settings should not be user-ignored.
                     # Doc table: I_u -> E -> compulsory
                     # Doc table: I_u -> not trigger -> compulsory
-                    help_str = metomi.rose.config_editor.WARNING_NOT_USER_IGNORABLE
-                    err_type = metomi.rose.config_editor.WARNING_TYPE_USER_IGNORED
+                    help_str = (
+                        metomi.rose.config_editor.WARNING_NOT_USER_IGNORABLE
+                    )
+                    err_type = (
+                        metomi.rose.config_editor.WARNING_TYPE_USER_IGNORED
+                    )
                     node_inst.error.update({err_type: help_str})
             # Remaining possibilities are not a problem:
             # Doc table: E -> E, E -> not trigger
@@ -1064,8 +1309,10 @@ class ConfigDataManager(object):
                     continue
                 if not sect_node.is_ignored() and section.startswith("file:"):
                     file_sections.append(section)
-                    if (sect_node.get_value([metomi.rose.META_PROP_DUPLICATE]) ==
-                            metomi.rose.META_PROP_VALUE_TRUE):
+                    if (
+                        sect_node.get_value([metomi.rose.META_PROP_DUPLICATE])
+                        == metomi.rose.META_PROP_VALUE_TRUE
+                    ):
                         duplicate_file_sections.append(section)
         # Remove metadata for individual duplicate sections - no need.
         for section in list(file_sections):
@@ -1081,23 +1328,29 @@ class ConfigDataManager(object):
             if not sect_node.is_ignored() and setting_id.startswith("file:*="):
                 file_ids.append(setting_id)
         for section in file_sections:
-            title = meta_config.get_value([section, metomi.rose.META_PROP_TITLE])
+            title = meta_config.get_value(
+                [section, metomi.rose.META_PROP_TITLE]
+            )
             if title is None:
-                meta_config.set([section, metomi.rose.META_PROP_TITLE],
-                                section.replace("file:", "", 1))
+                meta_config.set(
+                    [section, metomi.rose.META_PROP_TITLE],
+                    section.replace("file:", "", 1),
+                )
             for file_entry in file_ids:
                 sect_node = meta_config.get([file_entry])
                 for meta_prop, opt_node in list(sect_node.value.items()):
                     if opt_node.is_ignored():
                         continue
                     prop_val = opt_node.value
-                    new_id = section + '=' + file_entry.replace(
-                        'file:*=', '', 1)
+                    new_id = (
+                        section + "=" + file_entry.replace("file:*=", "", 1)
+                    )
                     if meta_config.get([new_id, meta_prop]) is None:
                         meta_config.set([new_id, meta_prop], prop_val)
 
-    def load_node_namespaces(self, config_name, only_this_section=None,
-                             from_saved=False):
+    def load_node_namespaces(
+        self, config_name, only_this_section=None, from_saved=False
+    ):
         """Load namespaces for variables and sections."""
         config_sections = self.config[config_name].sections
         config_vars = self.config[config_name].vars
@@ -1119,17 +1372,18 @@ class ConfigDataManager(object):
 
     def load_ns_for_node(self, node, config_name):
         """Load a namespace for a variable or section."""
-        node_id = node.metadata.get('id')
+        node_id = node.metadata.get("id")
         section, option = self.util.get_section_option_from_id(node_id)
         subspace = node.metadata.get(metomi.rose.META_PROP_NS)
         if subspace is None or option is None:
             new_namespace = self.helper.get_default_section_namespace(
-                section, config_name)
+                section, config_name
+            )
         else:
-            new_namespace = config_name + '/' + subspace
-        if new_namespace == config_name + '/':
+            new_namespace = config_name + "/" + subspace
+        if new_namespace == config_name + "/":
             new_namespace = config_name
-        node.metadata['full_ns'] = new_namespace
+        node.metadata["full_ns"] = new_namespace
         return new_namespace
 
     def load_metadata_for_namespaces(self, config_name):
@@ -1139,13 +1393,12 @@ class ConfigDataManager(object):
         for setting_id, sect_node in list(meta_config.value.items()):
             if sect_node.is_ignored():
                 continue
-            section, option = self.util.get_section_option_from_id(
-                setting_id)
-            is_ns = (section == "ns")
+            section, option = self.util.get_section_option_from_id(setting_id)
+            is_ns = section == "ns"
             is_duplicate_section = (
-                self.util.get_section_option_from_id(section)[1] is None and
-                sect_node.get_value([metomi.rose.META_PROP_DUPLICATE]) ==
-                metomi.rose.META_PROP_VALUE_TRUE
+                self.util.get_section_option_from_id(section)[1] is None
+                and sect_node.get_value([metomi.rose.META_PROP_DUPLICATE])
+                == metomi.rose.META_PROP_VALUE_TRUE
             )
             if is_ns or is_duplicate_section:
                 if is_ns:
@@ -1157,9 +1410,9 @@ class ConfigDataManager(object):
                 else:
                     subspace = sect_node.get_value([metomi.rose.META_PROP_NS])
                     if subspace is None:
-                        namespace = (
-                            self.helper.get_default_section_namespace(
-                                section, config_name))
+                        namespace = self.helper.get_default_section_namespace(
+                            section, config_name
+                        )
                     else:
                         if subspace:
                             namespace = config_name + "/" + subspace
@@ -1180,8 +1433,8 @@ class ConfigDataManager(object):
                         ns_metadata.update({option: value})
         ns_sections = {}  # Namespace-sections key value pairs.
         for variable in config_data.vars.get_all():
-            ns = variable.metadata['full_ns']
-            var_id = variable.metadata['id']
+            ns = variable.metadata["full_ns"]
+            var_id = variable.metadata["id"]
             sect = self.util.get_section_option_from_id(var_id)[0]
             ns_sections.setdefault(ns, [])
             if sect not in ns_sections[ns]:
@@ -1191,7 +1444,9 @@ class ConfigDataManager(object):
                 self.namespace_meta_lookup.setdefault(ns, {})
                 ns_metadata = self.namespace_meta_lookup[ns]
                 if metomi.rose.META_PROP_MACRO in ns_metadata:
-                    ns_metadata[metomi.rose.META_PROP_MACRO] += ", " + macro_info
+                    ns_metadata[metomi.rose.META_PROP_MACRO] += (
+                        ", " + macro_info
+                    )
                 else:
                     ns_metadata[metomi.rose.META_PROP_MACRO] = macro_info
         default_ns_sections = {}
@@ -1207,25 +1462,33 @@ class ConfigDataManager(object):
         for ns in ns_sections:
             self.namespace_meta_lookup.setdefault(ns, {})
             ns_metadata = self.namespace_meta_lookup[ns]
-            ns_metadata['sections'] = ns_sections[ns]
+            ns_metadata["sections"] = ns_sections[ns]
             for ns_section in ns_sections[ns]:
                 # Loop over metadata from contributing sections.
                 # Note: rogue-variable section metadata can be overridden.
-                metadata = self.helper.get_metadata_for_config_id(ns_section,
-                                                                  config_name)
+                metadata = self.helper.get_metadata_for_config_id(
+                    ns_section, config_name
+                )
                 for key, value in list(metadata.items()):
-                    if (ns_section not in default_ns_sections.get(ns, []) and
-                        key in [metomi.rose.META_PROP_TITLE, metomi.rose.META_PROP_SORT_KEY,
-                                metomi.rose.META_PROP_DESCRIPTION]):
+                    if ns_section not in default_ns_sections.get(
+                        ns, []
+                    ) and key in [
+                        metomi.rose.META_PROP_TITLE,
+                        metomi.rose.META_PROP_SORT_KEY,
+                        metomi.rose.META_PROP_DESCRIPTION,
+                    ]:
                         # ns created from variables, not a section - no title.
                         continue
                     if key == metomi.rose.META_PROP_MACRO:
                         macro_info = value
                         if key in ns_metadata:
                             ns_metadata[metomi.rose.META_PROP_MACRO] += (
-                                ", " + macro_info)
+                                ", " + macro_info
+                            )
                         else:
-                            ns_metadata[metomi.rose.META_PROP_MACRO] = macro_info
+                            ns_metadata[metomi.rose.META_PROP_MACRO] = (
+                                macro_info
+                            )
                     else:
                         ns_metadata.setdefault(key, value)
         self.load_namespace_has_sub_data(config_name)
@@ -1233,19 +1496,30 @@ class ConfigDataManager(object):
             icon_path = self.helper.get_icon_path_for_config(config_name)
             self.namespace_meta_lookup.setdefault(config_name, {})
             self.namespace_meta_lookup[config_name].setdefault(
-                "icon", icon_path)
-            if self.config[config_name].config_type == metomi.rose.TOP_CONFIG_NAME:
+                "icon", icon_path
+            )
+            if (
+                self.config[config_name].config_type
+                == metomi.rose.TOP_CONFIG_NAME
+            ):
                 self.namespace_meta_lookup[config_name].setdefault(
                     metomi.rose.META_PROP_TITLE,
-                    metomi.rose.config_editor.TITLE_PAGE_SUITE)
+                    metomi.rose.config_editor.TITLE_PAGE_SUITE,
+                )
                 self.namespace_meta_lookup[config_name].setdefault(
-                    metomi.rose.META_PROP_SORT_KEY, " 1")
-            elif self.config[config_name].config_type == metomi.rose.INFO_CONFIG_NAME:
+                    metomi.rose.META_PROP_SORT_KEY, " 1"
+                )
+            elif (
+                self.config[config_name].config_type
+                == metomi.rose.INFO_CONFIG_NAME
+            ):
                 self.namespace_meta_lookup[config_name].setdefault(
                     metomi.rose.META_PROP_TITLE,
-                    metomi.rose.config_editor.TITLE_PAGE_INFO)
+                    metomi.rose.config_editor.TITLE_PAGE_INFO,
+                )
                 self.namespace_meta_lookup[config_name].setdefault(
-                    metomi.rose.META_PROP_SORT_KEY, " 0")
+                    metomi.rose.META_PROP_SORT_KEY, " 0"
+                )
 
     def load_namespace_has_sub_data(self, config_name=None):
         """Load namespace sub-data status."""
@@ -1265,11 +1539,14 @@ class ConfigDataManager(object):
             file_root_ns = alt_config_name + file_ns
             self.namespace_meta_lookup.setdefault(file_root_ns, {})
             self.namespace_meta_lookup[file_root_ns].setdefault(
-                "has_sub_data", True)
+                "has_sub_data", True
+            )
         # Duplicate root pages have summary data for their members.
         for ns, prop_map in list(self.namespace_meta_lookup.items()):
             if config_name is not None and not ns.startswith(config_name):
                 continue
-            if (metomi.rose.META_PROP_DUPLICATE in prop_map and
-                    ns_hierarchy.get(ns, [])):
+            if (
+                metomi.rose.META_PROP_DUPLICATE in prop_map
+                and ns_hierarchy.get(ns, [])
+            ):
                 prop_map.setdefault("has_sub_data", True)

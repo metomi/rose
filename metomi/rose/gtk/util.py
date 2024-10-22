@@ -26,6 +26,7 @@ import threading
 import webbrowser
 
 import gi
+
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk, GdkPixbuf
 from gi.repository import GObject
@@ -39,17 +40,20 @@ import metomi.rose.resource
 REC_HYPERLINK_ID_OR_URL = re.compile(
     r"""(?P<start_break>\b)
         (?P<url>[\w:-]+=\w+|https?://[^\s<]+)
-        (?P<end_break>\b)""", re.X)
-MARKUP_URL_HTML = (r"""\g<start_break>""" +
-                   r"""<a href='\g<url>'>\g<url></a>""" +
-                   r"""\g<end_break>""")
-MARKUP_URL_UNDERLINE = (r"""\g<start_break>""" +
-                        r"""<u>\g<url></u>""" +
-                        r"""\g<end_break>""")
+        (?P<end_break>\b)""",
+    re.X,
+)
+MARKUP_URL_HTML = (
+    r"""\g<start_break>"""
+    + r"""<a href='\g<url>'>\g<url></a>"""
+    + r"""\g<end_break>"""
+)
+MARKUP_URL_UNDERLINE = (
+    r"""\g<start_break>""" + r"""<u>\g<url></u>""" + r"""\g<end_break>"""
+)
 
 
 class ColourParseError(ValueError):
-
     """An exception raised when gtk colour parsing fails."""
 
     def __str__(self):
@@ -57,12 +61,18 @@ class ColourParseError(ValueError):
 
 
 class CustomButton(Gtk.Button):
-
     """Returns a custom Gtk.Button."""
 
-    def __init__(self, label=None, stock_id=None,
-                 size=Gtk.IconSize.SMALL_TOOLBAR, tip_text=None,
-                 as_tool=False, icon_at_start=False, has_menu=False):
+    def __init__(
+        self,
+        label=None,
+        stock_id=None,
+        size=Gtk.IconSize.SMALL_TOOLBAR,
+        tip_text=None,
+        as_tool=False,
+        icon_at_start=False,
+        has_menu=False,
+    ):
         self.hbox = Gtk.Box()
         self.size = size
         self.as_tool = as_tool
@@ -73,11 +83,13 @@ class CustomButton(Gtk.Button):
             self.label.show()
 
             if self.icon_at_start:
-                self.hbox.pack_end(self.label, expand=False, fill=False,
-                                   padding=5)
+                self.hbox.pack_end(
+                    self.label, expand=False, fill=False, padding=5
+                )
             else:
-                self.hbox.pack_start(self.label, expand=False, fill=False,
-                                     padding=5)
+                self.hbox.pack_start(
+                    self.label, expand=False, fill=False, padding=5
+                )
         if stock_id is not None:
             self.stock_id = stock_id
             self.icon = Gtk.Image()
@@ -87,17 +99,18 @@ class CustomButton(Gtk.Button):
                 self.icon.set_from_icon_name(stock_id, size)
             self.icon.show()
             if self.icon_at_start:
-                self.hbox.pack_start(self.icon, expand=False, fill=False,
-                                     padding=0)
+                self.hbox.pack_start(
+                    self.icon, expand=False, fill=False, padding=0
+                )
             else:
-                self.hbox.pack_end(self.icon, expand=False, fill=False,
-                                   padding=0)
+                self.hbox.pack_end(
+                    self.icon, expand=False, fill=False, padding=0
+                )
         if has_menu:
             # not sure if this is correct
             arrow = Gtk.Image.new_from_icon_name("pan-down-symbolic", size)
             arrow.show()
-            self.hbox.pack_end(arrow, expand=False, fill=False,
-                               padding=0)
+            self.hbox.pack_end(arrow, expand=False, fill=False, padding=0)
             self.hbox.reorder_child(arrow, 0)
         self.hbox.show()
         super(CustomButton, self).__init__()
@@ -116,7 +129,9 @@ class CustomButton(Gtk.Button):
         self.icon.set_from_stock(stock_id, self.size)
         self.stock_id = stock_id
         if self.icon_at_start:
-            self.hbox.pack_start(self.icon, expand=False, fill=False, padding=0)
+            self.hbox.pack_start(
+                self.icon, expand=False, fill=False, padding=0
+            )
         else:
             self.hbox.pack_end(self.icon, expand=False, fill=False, padding=0)
         return False
@@ -135,16 +150,18 @@ class CustomButton(Gtk.Button):
 
 
 class CustomExpandButton(Gtk.Button):
-
     """Custom button for expanding/hiding something"""
 
-    def __init__(self, expander_function=None,
-                 label=None,
-                 size=Gtk.IconSize.SMALL_TOOLBAR,
-                 tip_text=None,
-                 as_tool=False,
-                 icon_at_start=False,
-                 minimised=True):
+    def __init__(
+        self,
+        expander_function=None,
+        label=None,
+        size=Gtk.IconSize.SMALL_TOOLBAR,
+        tip_text=None,
+        as_tool=False,
+        icon_at_start=False,
+        minimised=True,
+    ):
 
         self.expander_function = expander_function
         self.minimised = minimised
@@ -168,16 +185,20 @@ class CustomExpandButton(Gtk.Button):
             self.label.show()
 
             if self.icon_at_start:
-                self.hbox.pack_end(self.label, expand=False, fill=False,
-                                   padding=5)
+                self.hbox.pack_end(
+                    self.label, expand=False, fill=False, padding=5
+                )
             else:
-                self.hbox.pack_start(self.label, expand=False, fill=False,
-                                     padding=5)
+                self.hbox.pack_start(
+                    self.label, expand=False, fill=False, padding=5
+                )
         self.icon = Gtk.Image()
         self.icon.set_from_stock(self.stock_id, size)
         self.icon.show()
         if self.icon_at_start:
-            self.hbox.pack_start(self.icon, expand=False, fill=False, padding=0)
+            self.hbox.pack_start(
+                self.icon, expand=False, fill=False, padding=0
+            )
         else:
             self.hbox.pack_end(self.icon, expand=False, fill=False, padding=0)
         self.hbox.show()
@@ -199,7 +220,9 @@ class CustomExpandButton(Gtk.Button):
         self.icon.set_from_stock(stock_id, self.size)
         self.stock_id = stock_id
         if self.icon_at_start:
-            self.hbox.pack_start(self.icon, expand=False, fill=False, padding=0)
+            self.hbox.pack_start(
+                self.icon, expand=False, fill=False, padding=0
+            )
         else:
             self.hbox.pack_end(self.icon, expand=False, fill=False, padding=0)
         return False
@@ -224,12 +247,17 @@ class CustomExpandButton(Gtk.Button):
 
 
 class CustomMenuButton(Gtk.MenuToolButton):
-
     """Custom wrapper for the gtk Menu Tool Button."""
 
-    def __init__(self, label=None, stock_id=None,
-                 size=Gtk.IconSize.SMALL_TOOLBAR, tip_text=None,
-                 menu_items=[], menu_funcs=[]):
+    def __init__(
+        self,
+        label=None,
+        stock_id=None,
+        size=Gtk.IconSize.SMALL_TOOLBAR,
+        tip_text=None,
+        menu_items=[],
+        menu_funcs=[],
+    ):
         if stock_id is not None:
             self.stock_id = stock_id
             self.icon = Gtk.Image()
@@ -245,12 +273,14 @@ class CustomMenuButton(Gtk.MenuToolButton):
                 new_item = Gtk.MenuItem(name)
             else:
                 new_item_box = Gtk.Box()
-                new_item_icon = Gtk.Image.new_from_icon_name(item_tuple[1], Gtk.IconSize.MENU)
+                new_item_icon = Gtk.Image.new_from_icon_name(
+                    item_tuple[1], Gtk.IconSize.MENU
+                )
                 new_item_label = Gtk.Label(label=name)
                 new_item = Gtk.MenuItem()
                 new_item_box.pack_start(new_item_icon, False, False, 0)
                 new_item_box.pack_start(new_item_label, False, False, 0)
-                Gtk.Container.add(new_item, new_item_box) 
+                Gtk.Container.add(new_item, new_item_box)
             new_item._func = func
             new_item.connect("activate", lambda m: m._func())
             new_item.show()
@@ -260,7 +290,6 @@ class CustomMenuButton(Gtk.MenuToolButton):
 
 
 class ToolBar(Gtk.Toolbar):
-
     """An easier-to-use Gtk.Toolbar."""
 
     def __init__(self, widgets=[], sep_on_name=[]):
@@ -280,30 +309,35 @@ class ToolBar(Gtk.Toolbar):
                 widget.show()
                 widget.set_tooltip_text(name)
             else:
-                widget = CustomButton(stock_id=stock, tip_text=name,
-                                      as_tool=True)
+                widget = CustomButton(
+                    stock_id=stock, tip_text=name, as_tool=True
+                )
             icon_tool_item = Gtk.ToolItem()
             icon_tool_item.add(widget)
             icon_tool_item.show()
-            self.item_dict[name] = {"tip": name, "widget": widget,
-                                    "func": None}
+            self.item_dict[name] = {
+                "tip": name,
+                "widget": widget,
+                "func": None,
+            }
             self.insert(icon_tool_item, 0)
 
     def set_widget_function(self, name, function, args=[]):
         self.item_dict[name]["widget"].args = args
         if len(args) > 0:
-            self.item_dict[name]["widget"].connect("clicked",
-                                                   lambda b: function(*b.args))
+            self.item_dict[name]["widget"].connect(
+                "clicked", lambda b: function(*b.args)
+            )
         else:
-            self.item_dict[name]["widget"].connect("clicked",
-                                                   lambda b: function())
+            self.item_dict[name]["widget"].connect(
+                "clicked", lambda b: function()
+            )
 
     def set_widget_sensitive(self, name, is_sensitive):
         self.item_dict[name]["widget"].set_sensitive(is_sensitive)
 
 
 class AsyncStatusbar(Gtk.Statusbar):
-
     """Wrapper class to add polling a file to statusbar API."""
 
     def __init__(self, *args):
@@ -339,7 +373,6 @@ class AsyncStatusbar(Gtk.Statusbar):
 
 
 class AsyncLabel(Gtk.Label):
-
     """Wrapper class to add polling a file to label API."""
 
     def __init__(self, *args):
@@ -374,7 +407,6 @@ class AsyncLabel(Gtk.Label):
 
 
 class ThreadedProgressBar(Gtk.ProgressBar):
-
     """Wrapper class to allow threaded progress bar pulsing."""
 
     def __init__(self, *args, **kwargs):
@@ -406,7 +438,6 @@ class ThreadedProgressBar(Gtk.ProgressBar):
 
 
 class Notebook(Gtk.Notebook):
-
     """Wrapper class to improve the Gtk.Notebook API."""
 
     def __init__(self, *args):
@@ -458,7 +489,6 @@ class Notebook(Gtk.Notebook):
 
 
 class TooltipTreeView(Gtk.TreeView):
-
     """Wrapper class for Gtk.TreeView with a better tooltip API.
 
     It takes two keyword arguments, model as in Gtk.TreeView and
@@ -473,14 +503,15 @@ class TooltipTreeView(Gtk.TreeView):
 
     """
 
-    def __init__(self, model=None, get_tooltip_func=None,
-                 multiple_selection=False):
+    def __init__(
+        self, model=None, get_tooltip_func=None, multiple_selection=False
+    ):
         super(TooltipTreeView, self).__init__(model)
         self.get_tooltip = get_tooltip_func
         self.set_has_tooltip(True)
         self._last_tooltip_path = None
         self._last_tooltip_column = None
-        self.connect('query-tooltip', self._handle_tooltip)
+        self.connect("query-tooltip", self._handle_tooltip)
         if multiple_selection:
             self.set_rubber_banding(True)
             self.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
@@ -494,8 +525,10 @@ class TooltipTreeView(Gtk.TreeView):
         path, column = pathinfo[:2]
         if path is None:
             return False
-        if (path != self._last_tooltip_path or
-                column != self._last_tooltip_column):
+        if (
+            path != self._last_tooltip_path
+            or column != self._last_tooltip_column
+        ):
             self._last_tooltip_path = path
             self._last_tooltip_column = column
             return False
@@ -507,7 +540,6 @@ class TooltipTreeView(Gtk.TreeView):
 
 
 class TreeModelSortUtil(object):
-
     """This class contains useful sorting methods for TreeModelSort.
 
     Arguments:
@@ -549,9 +581,11 @@ class TreeModelSortUtil(object):
             value1 = "None"
         if value2 is None:
             value2 = "None"
-        if (isinstance(value1, str) and isinstance(value2, str)):
+        if isinstance(value1, str) and isinstance(value2, str):
             if value1.isdigit() and value2.isdigit():
-                return (float(value1) > float(value2)) - (float(value1) < float(value2))
+                return (float(value1) > float(value2)) - (
+                    float(value1) < float(value2)
+                )
             return metomi.rose.config.sort_settings(value1, value2)
         return (value1 > value2) - (value1 < value2)
 
@@ -560,8 +594,10 @@ class TreeModelSortUtil(object):
         id_, order = model.get_sort_column_id()
         if id_ is None and order is None:
             return False
-        if (self._sort_columns_stored and
-                self._sort_columns_stored[0][0] == id_):
+        if (
+            self._sort_columns_stored
+            and self._sort_columns_stored[0][0] == id_
+        ):
             self._sort_columns_stored.pop(0)
         self._sort_columns_stored.insert(0, (id_, order))
         if len(self._sort_columns_stored) > 2:
@@ -604,7 +640,9 @@ def color_parse(color_specification):
     try:
         return Gdk.color_parse(color_specification)
     except ValueError:
-        metomi.rose.reporter.Reporter().report(ColourParseError(color_specification))
+        metomi.rose.reporter.Reporter().report(
+            ColourParseError(color_specification)
+        )
         # Return a noticeable colour.
         return Gdk.color_parse("#0000FF")  # Blue
 
@@ -618,8 +656,9 @@ def get_hyperlink_label(text, search_func=lambda i: False):
     except GLib.GError:
         label.set_text(text)
     else:
-        label.connect("activate-link",
-                      lambda l, u: handle_link(u, search_func))
+        label.connect(
+            "activate-link", lambda _, u: handle_link(u, search_func)
+        )
         text = REC_HYPERLINK_ID_OR_URL.sub(MARKUP_URL_HTML, text)
         label.set_markup(text)
     return label
@@ -633,7 +672,8 @@ def get_icon(system="rose"):
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(str(icon_path))
     except Exception:
         icon_path = locator.locate(
-            "etc/images/{0}-icon-trim.png".format(system))
+            "etc/images/{0}-icon-trim.png".format(system)
+        )
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(str(icon_path))
     return pixbuf
 
@@ -661,7 +701,7 @@ def extract_link(label, search_function):
         if text[upper_bound].isspace():
             break
         upper_bound += 1
-    link = text[lower_bound: upper_bound]
+    link = text[lower_bound:upper_bound]
     if any(c.isspace() for c in link):
         return None
     handle_link(link, search_function, handle_web=True)
@@ -688,18 +728,19 @@ def setup_stock_icons():
     """Setup any additional 'stock' icons."""
     new_icon_factory = Gtk.IconFactory()
     locator = metomi.rose.resource.ResourceLocator(paths=sys.path)
-    for png_icon_name in ["gnome_add",
-                          "gnome_add_errors",
-                          "gnome_add_warnings",
-                          "gnome_package_system",
-                          "gnome_package_system_errors",
-                          "gnome_package_system_warnings"]:
+    for png_icon_name in [
+        "gnome_add",
+        "gnome_add_errors",
+        "gnome_add_warnings",
+        "gnome_package_system",
+        "gnome_package_system_errors",
+        "gnome_package_system_warnings",
+    ]:
         ifile = png_icon_name + ".png"
         istring = png_icon_name.replace("_", "-")
         path = locator.locate("etc/images/rose-config-edit/" + ifile)
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(str(path))
-        new_icon_factory.add("rose-gtk-" + istring,
-                             Gtk.IconSet(pixbuf))
+        new_icon_factory.add("rose-gtk-" + istring, Gtk.IconSet(pixbuf))
     exp_icon_pixbuf = get_icon()
     new_icon_factory.add("rose-exp-logo", Gtk.IconSet(exp_icon_pixbuf))
     new_icon_factory.add_default()

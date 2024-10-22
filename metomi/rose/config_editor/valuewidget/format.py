@@ -19,7 +19,8 @@
 # -----------------------------------------------------------------------------
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 import metomi.rose.config
@@ -28,23 +29,23 @@ from functools import cmp_to_key
 
 
 class FormatsChooserValueWidget(Gtk.Box):
-
     """This class allows the addition of section names to a variable value."""
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
-        super(FormatsChooserValueWidget, self).__init__(homogeneous=False,
-                                                        spacing=0)
+        super(FormatsChooserValueWidget, self).__init__(
+            homogeneous=False, spacing=0
+        )
         self.value = value
         self.metadata = metadata
         self.set_value = set_value
         self.hook = hook
 
-        if 'values_getter' in self.metadata:
+        if "values_getter" in self.metadata:
             meta = self.metadata
-            self.values_getter = meta['values_getter']
+            self.values_getter = meta["values_getter"]
         else:
-            self.values_getter = lambda: meta.get('values', [])
-        num_entries = len(value.split(' '))
+            self.values_getter = lambda: meta.get("values", [])
+        num_entries = len(value.split(" "))
         self.entry_table = Gtk.Table(rows=num_entries + 1, columns=1)
         self.entry_table.show()
         self.entries = []
@@ -60,17 +61,23 @@ class FormatsChooserValueWidget(Gtk.Box):
         image_event.add(image)
         image_event.show()
         self.add_box.pack_start(
-            image_event, expand=False, fill=False, padding=5)
+            image_event, expand=False, fill=False, padding=5
+        )
         self.data_chooser = Gtk.ComboBoxText()
-        self.data_chooser.connect('focus-in-event',
-                                  lambda d, e: self.load_data_chooser())
-        self.data_chooser.connect('changed', lambda d: self.add_new_section())
+        self.data_chooser.connect(
+            "focus-in-event", lambda d, e: self.load_data_chooser()
+        )
+        self.data_chooser.connect("changed", lambda d: self.add_new_section())
         self.data_chooser.show()
-        image_event.connect('button-press-event',
-                            lambda i, w: (self.load_data_chooser() and
-                                          self.data_chooser.popup()))
-        self.add_box.pack_start(self.data_chooser, expand=False, fill=False,
-                                padding=0)
+        image_event.connect(
+            "button-press-event",
+            lambda i, w: (
+                self.load_data_chooser() and self.data_chooser.popup()
+            ),
+        )
+        self.add_box.pack_start(
+            self.data_chooser, expand=False, fill=False, padding=0
+        )
 
         self.load_data_chooser()
         self.populate_table()
@@ -80,8 +87,8 @@ class FormatsChooserValueWidget(Gtk.Box):
         """Create an entry box for a format name."""
         entry = Gtk.Entry()
         entry.set_text(format_name)
-        entry.connect('focus-in-event', self.hook.trigger_scroll)
-        entry.connect('changed', self.entry_change_handler)
+        entry.connect("focus-in-event", self.hook.trigger_scroll)
+        entry.connect("changed", self.entry_change_handler)
         entry.show()
         return entry
 
@@ -93,7 +100,8 @@ class FormatsChooserValueWidget(Gtk.Box):
         self.entry_table.resize(rows=len(self.entries) + 1, columns=1)
         for i, widget in enumerate(self.entries + [self.add_box]):
             self.entry_table.attach(
-                widget, 0, 1, i, i + 1, xoptions=Gtk.AttachOptions.FILL)
+                widget, 0, 1, i, i + 1, xoptions=Gtk.AttachOptions.FILL
+            )
         self.grab_focus = lambda: self.hook.get_focus(self.entries[-1])
 
     def add_new_section(self):
@@ -114,9 +122,9 @@ class FormatsChooserValueWidget(Gtk.Box):
 
     def entry_change_handler(self, entry):
         position = entry.get_position()
-        if entry.get_text() == '' and len(self.entries) > 1:
+        if entry.get_text() == "" and len(self.entries) > 1:
             self.entries.remove(entry)
-        new_value = ' '.join([e.get_text() for e in self.entries])
+        new_value = " ".join([e.get_text() for e in self.entries])
         self.value = new_value
         self.set_value(new_value)
         self.populate_table()

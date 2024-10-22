@@ -39,24 +39,29 @@ class ConfigDataHelper(object):
         variables = config_data.vars.get_all(skip_latent=True)
         save_vars = config_data.vars.get_all(save=True, skip_latent=True)
         sections = config_data.sections.get_all(skip_latent=True)
-        save_sections = config_data.sections.get_all(save=True,
-                                                     skip_latent=True)
+        save_sections = config_data.sections.get_all(
+            save=True, skip_latent=True
+        )
         now_set = set([v.to_hashable() for v in variables])
         save_set = set([v.to_hashable() for v in save_vars])
         now_sect_set = set([s.to_hashable() for s in sections])
         save_sect_set = set([s.to_hashable() for s in save_sections])
-        return (config_name not in self.data.saved_config_names or
-                now_set ^ save_set or
-                now_sect_set ^ save_sect_set)
+        return (
+            config_name not in self.data.saved_config_names
+            or now_set ^ save_set
+            or now_sect_set ^ save_sect_set
+        )
 
     def get_config_meta_flag(self, config_name, from_this_config_obj=None):
         """Return the metadata id flag."""
         for section, option in [
-                [metomi.rose.CONFIG_SECT_TOP, metomi.rose.CONFIG_OPT_META_TYPE],
-                [metomi.rose.CONFIG_SECT_TOP, metomi.rose.CONFIG_OPT_PROJECT]]:
+            [metomi.rose.CONFIG_SECT_TOP, metomi.rose.CONFIG_OPT_META_TYPE],
+            [metomi.rose.CONFIG_SECT_TOP, metomi.rose.CONFIG_OPT_PROJECT],
+        ]:
             if from_this_config_obj is not None:
                 type_node = from_this_config_obj.get(
-                    [section, option], no_ignore=True)
+                    [section, option], no_ignore=True
+                )
                 if type_node is not None and type_node.value:
                     return type_node.value
                 continue
@@ -84,17 +89,21 @@ class ConfigDataHelper(object):
         config_data = self.data.config[config_name]
         meta_config = config_data.meta
         if not node_id:
-            return {'id': node_id}
-        return metomi.rose.macro.get_metadata_for_config_id(node_id, meta_config)
+            return {"id": node_id}
+        return metomi.rose.macro.get_metadata_for_config_id(
+            node_id, meta_config
+        )
 
-    def get_variable_by_id(self, var_id, config_name, save=False,
-                           latent=False):
+    def get_variable_by_id(
+        self, var_id, config_name, save=False, latent=False
+    ):
         """Return the matching variable or None."""
         sect, opt = self.util.get_section_option_from_id(var_id)
         return self.data.config[config_name].vars.get_var(
-            sect, opt, save, skip_latent=not latent)
+            sect, opt, save, skip_latent=not latent
+        )
 
-# ----------------- Data model helper functions ------------------------------
+    # ----------------- Data model helper functions ---------------------------
 
     def get_data_for_namespace(self, ns, from_saved=False):
         """Return a list of vars and a list of latent vars for this ns."""
@@ -112,8 +121,8 @@ class ConfigDataHelper(object):
         for section in allowed_sections:
             variables.extend(var_map.get(section, []))
             latents.extend(latent_var_map.get(section, []))
-        ns_vars = [v for v in variables if v.metadata.get('full_ns') == ns]
-        ns_latents = [v for v in latents if v.metadata.get('full_ns') == ns]
+        ns_vars = [v for v in variables if v.metadata.get("full_ns") == ns]
+        ns_latents = [v for v in latents if v.metadata.get("full_ns") == ns]
         return ns_vars, ns_latents
 
     def get_macro_info_for_namespace(self, ns):
@@ -121,16 +130,20 @@ class ConfigDataHelper(object):
         config_name = self.util.split_full_ns(self, ns)[0]
         config_data = self.data.config[config_name]
         ns_macros_text = self.data.namespace_meta_lookup.get(ns, {}).get(
-            metomi.rose.META_PROP_MACRO, "")
+            metomi.rose.META_PROP_MACRO, ""
+        )
         if not ns_macros_text:
             return {}
-        ns_macros = metomi.rose.variable.array_split(ns_macros_text,
-                                              only_this_delim=",")
+        ns_macros = metomi.rose.variable.array_split(
+            ns_macros_text, only_this_delim=","
+        )
         module_prefix = self.get_macro_module_prefix(config_name)
         for i, ns_macro in enumerate(ns_macros):
             ns_macros[i] = module_prefix + ns_macro
         ns_macro_info = {}
-        macro_tuples = metomi.rose.macro.get_macro_class_methods(config_data.macros)
+        macro_tuples = metomi.rose.macro.get_macro_class_methods(
+            config_data.macros
+        )
         for module_name, class_name, method_name, docstring in macro_tuples:
             this_macro_name = ".".join([module_name, class_name])
             this_macro_method_name = ".".join([this_macro_name, method_name])
@@ -145,8 +158,7 @@ class ConfigDataHelper(object):
 
     def get_section_data_for_namespace(self, ns):
         """Return real and latent lists of Section objects for this ns."""
-        allowed_sections = (
-            self.data.helper.get_sections_from_namespace(ns))
+        allowed_sections = self.data.helper.get_sections_from_namespace(ns)
         config_name = self.util.split_full_ns(self.data, ns)[0]
         config_data = self.data.config[config_name]
         real_sections = []
@@ -214,16 +226,20 @@ class ConfigDataHelper(object):
     def get_ns_url_for_variable(self, variable):
         """Return the parent (ns or section) URL property, if any."""
         config_name = self.util.split_full_ns(
-            self.data, variable.metadata["full_ns"])[0]
+            self.data, variable.metadata["full_ns"]
+        )[0]
         ns_metadata = self.data.namespace_meta_lookup.get(
-            variable.metadata["full_ns"], {})
+            variable.metadata["full_ns"], {}
+        )
         ns_url = ns_metadata.get(metomi.rose.META_PROP_URL)
         if ns_url:
             return ns_url
         section = self.util.get_section_option_from_id(
-            variable.metadata["id"])[0]
+            variable.metadata["id"]
+        )[0]
         section_object = self.data.config[config_name].sections.get_sect(
-            section)
+            section
+        )
         section_url = section_object.metadata.get(metomi.rose.META_PROP_URL)
         return section_url
 
@@ -231,11 +247,11 @@ class ConfigDataHelper(object):
         """Return all sections contributing to a namespace."""
         # FIXME: What about files?
         ns_metadata = self.data.namespace_meta_lookup.get(namespace, {})
-        sections = ns_metadata.get('sections', [])
+        sections = ns_metadata.get("sections", [])
         if sections:
             return [s for s in sections]
         base, subsp = self.util.split_full_ns(self.data, namespace)
-        ns_section = subsp.replace('/', ':')
+        ns_section = subsp.replace("/", ":")
         if ns_section in self.data.config[base].sections.now:
             sect_data = self.data.config[base].sections.now[ns_section]
             if sect_data.metadata["full_ns"] == namespace:
@@ -254,12 +270,12 @@ class ConfigDataHelper(object):
         empty = True
         for section in allowed_sections:
             for variable in config_data.vars.now.get(section, []):
-                if variable.metadata['full_ns'] == namespace:
+                if variable.metadata["full_ns"] == namespace:
                     empty = False
                     if metomi.rose.META_PROP_NS not in variable.metadata:
                         return True
             for variable in config_data.vars.latent.get(section, []):
-                if variable.metadata['full_ns'] == namespace:
+                if variable.metadata["full_ns"] == namespace:
                     empty = False
                     if metomi.rose.META_PROP_NS not in variable.metadata:
                         return True
@@ -290,10 +306,12 @@ class ConfigDataHelper(object):
                 if section not in real_sections:
                     miss_sections.append(section)
             for section in self.data.config[config_name].vars.latent:
-                if (section not in real_sections and
-                        section not in miss_sections):
+                if (
+                    section not in real_sections
+                    and section not in miss_sections
+                ):
                     miss_sections.append(section)
-            full_sections += [config_name + ':' + s for s in miss_sections]
+            full_sections += [config_name + ":" + s for s in miss_sections]
         sorter = metomi.rose.config.sort_settings
         full_sections.sort(key=cmp_to_key(sorter))
         return full_sections
@@ -301,47 +319,52 @@ class ConfigDataHelper(object):
     def get_default_section_namespace(self, section, config_name):
         """Return the default namespace for the section."""
         if config_name not in self.data._config_section_namespace_map:
-            self.data._config_section_namespace_map.setdefault(
-                config_name, {})
-        section_ns = (
-            self.data._config_section_namespace_map[config_name].get(
-                section))
+            self.data._config_section_namespace_map.setdefault(config_name, {})
+        section_ns = self.data._config_section_namespace_map[config_name].get(
+            section
+        )
         if section_ns is None:
             config_data = self.data.config[config_name]
             meta_config = config_data.meta
             node = meta_config.get(
-                [section, metomi.rose.META_PROP_NS], no_ignore=True)
+                [section, metomi.rose.META_PROP_NS], no_ignore=True
+            )
             if node is not None:
                 subspace = node.value
             else:
                 match = REC_ELEMENT_SECTION.match(section)
                 if match:
                     node = meta_config.get(
-                        [match.groups()[0], metomi.rose.META_PROP_NS])
+                        [match.groups()[0], metomi.rose.META_PROP_NS]
+                    )
                     if node is None or node.is_ignored():
-                        subspace = section.replace('(', '/')
-                        subspace = subspace.replace(')', '')
-                        subspace = subspace.replace(':', '/')
+                        subspace = section.replace("(", "/")
+                        subspace = subspace.replace(")", "")
+                        subspace = subspace.replace(":", "/")
                     else:
-                        subspace = node.value + '/' + str(match.groups()[1])
+                        subspace = node.value + "/" + str(match.groups()[1])
                 elif section.startswith(metomi.rose.SUB_CONFIG_FILE_DIR + ":"):
-                    subspace = section.rstrip('/').replace('/', ':')
-                    subspace = subspace.replace(':', '/', 1)
+                    subspace = section.rstrip("/").replace("/", ":")
+                    subspace = subspace.replace(":", "/", 1)
                 else:
-                    subspace = section.rstrip('/').replace(':', '/')
-            section_ns = config_name + '/' + subspace
+                    subspace = section.rstrip("/").replace(":", "/")
+            section_ns = config_name + "/" + subspace
             if not subspace:
                 section_ns = config_name
             self.data._config_section_namespace_map[config_name].update(
-                {section: section_ns})
+                {section: section_ns}
+            )
         return section_ns
 
     def get_format_sections(self, config_name):
         """Return all format-like sections in the current data."""
         format_keys = []
         for section in self.data.config[config_name].sections.now:
-            if (section not in format_keys and
-                    ':' in section and not section.startswith('file:')):
+            if (
+                section not in format_keys
+                and ":" in section
+                and not section.startswith("file:")
+            ):
                 format_keys.append(section)
         format_keys.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         return format_keys
@@ -350,7 +373,7 @@ class ConfigDataHelper(object):
         """Return the path to the config identifier icon or None."""
         icon_path = None
         for filename in self.data.config[config_name].meta_files:
-            if filename.endswith('/images/icon.png'):
+            if filename.endswith("/images/icon.png"):
                 icon_path = filename
                 break
         return icon_path
@@ -380,8 +403,10 @@ class ConfigDataHelper(object):
             if get_enabled:
                 if not sect_data.ignored_reason:
                     return_sections.append(section)
-            elif (metomi.rose.variable.IGNORED_BY_USER in
-                  sect_data.ignored_reason):
+            elif (
+                metomi.rose.variable.IGNORED_BY_USER
+                in sect_data.ignored_reason
+            ):
                 return_sections.append(section)
         return_sections.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         return return_sections
@@ -403,7 +428,7 @@ class ConfigDataHelper(object):
 
     def get_ns_ignored_status(self, namespace):
         """Return the ignored status for a namespace's data."""
-        cache = self.data.namespace_cached_statuses['ignored']
+        cache = self.data.namespace_cached_statuses["ignored"]
         if namespace in cache:
             return cache[namespace]
         config_name = self.util.split_full_ns(self.data, namespace)[0]
@@ -451,7 +476,7 @@ class ConfigDataHelper(object):
         else:
             object_statuses = variable_statuses
         status_counts = list(object_statuses.items())
-        status_counts.sort(key = lambda x: x[1])
+        status_counts.sort(key=lambda x: x[1])
         if not status_counts:
             cache[namespace] = status
             return metomi.rose.config.ConfigNode.STATE_NORMAL
@@ -465,7 +490,7 @@ class ConfigDataHelper(object):
 
     def get_ns_latent_status(self, namespace):
         """Return whether a page has no associated content."""
-        cache = self.data.namespace_cached_statuses['latent']
+        cache = self.data.namespace_cached_statuses["latent"]
         if namespace in cache:
             return cache[namespace]
         config_name = self.util.split_full_ns(self.data, namespace)[0]
@@ -474,8 +499,9 @@ class ConfigDataHelper(object):
         for section in sections:
             if section in config_data.sections.now:
                 # It has a current section associated.
-                section_namespace = (
-                    config_data.sections.now[section].metadata["full_ns"])
+                section_namespace = config_data.sections.now[section].metadata[
+                    "full_ns"
+                ]
                 if section_namespace == namespace:
                     # This is a default page for an existing section.
                     cache[namespace] = False
@@ -490,7 +516,7 @@ class ConfigDataHelper(object):
 
     def clear_namespace_cached_statuses(self, namespace):
         """Reset cached latent, ignored, modified statuses for namespace."""
-        if namespace in self.data.namespace_cached_statuses['ignored']:
-            self.data.namespace_cached_statuses['ignored'].pop(namespace)
-        if namespace in self.data.namespace_cached_statuses['latent']:
-            self.data.namespace_cached_statuses['latent'].pop(namespace)
+        if namespace in self.data.namespace_cached_statuses["ignored"]:
+            self.data.namespace_cached_statuses["ignored"].pop(namespace)
+        if namespace in self.data.namespace_cached_statuses["latent"]:
+            self.data.namespace_cached_statuses["latent"].pop(namespace)

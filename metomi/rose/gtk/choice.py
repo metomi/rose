@@ -19,14 +19,14 @@
 # -----------------------------------------------------------------------------
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk
 
 import metomi.rose
 
 
 class ChoicesListView(Gtk.TreeView):
-
     """Class to hold and display an ordered list of strings.
 
     set_value is a function, accepting a new value string.
@@ -48,22 +48,30 @@ class ChoicesListView(Gtk.TreeView):
 
     """
 
-    def __init__(self, set_value, get_data, handle_search,
-                 title=metomi.rose.config_editor.CHOICE_TITLE_INCLUDED,
-                 get_custom_menu_items=lambda: []):
+    def __init__(
+        self,
+        set_value,
+        get_data,
+        handle_search,
+        title=metomi.rose.config_editor.CHOICE_TITLE_INCLUDED,
+        get_custom_menu_items=lambda: [],
+    ):
         super(ChoicesListView, self).__init__()
         self._set_value = set_value
         self._get_data = get_data
         self._handle_search = handle_search
         self._get_custom_menu_items = get_custom_menu_items
         self.enable_model_drag_dest(
-            [('text/plain', 0, 0)], Gdk.DragAction.MOVE)
+            [("text/plain", 0, 0)], Gdk.DragAction.MOVE
+        )
         self.enable_model_drag_source(
-            Gdk.ModifierType.BUTTON1_MASK, [('text/plain', 0, 0)], Gdk.DragAction.MOVE)
+            Gdk.ModifierType.BUTTON1_MASK,
+            [("text/plain", 0, 0)],
+            Gdk.DragAction.MOVE,
+        )
         self.connect("button-press-event", self._handle_button_press)
         self.connect("drag-data-get", self._handle_drag_get)
-        self.connect_after("drag-data-received",
-                           self._handle_drag_received)
+        self.connect_after("drag-data-received", self._handle_drag_received)
         self.set_rules_hint(True)
         self.connect("row-activated", self._handle_activation)
         self.show()
@@ -73,8 +81,8 @@ class ChoicesListView(Gtk.TreeView):
         else:
             col.set_title(title)
         cell_text = Gtk.CellRendererText()
-        cell_text.set_property('editable', True)
-        cell_text.connect('edited', self._handle_edited)
+        cell_text.set_property("editable", True)
+        cell_text.connect("edited", self._handle_edited)
         col.pack_start(cell_text, True)
         col.set_cell_data_func(cell_text, self._set_cell_text, None)
         self.append_column(col)
@@ -108,7 +116,8 @@ class ChoicesListView(Gtk.TreeView):
             model.append([metomi.rose.config_editor.CHOICE_LABEL_EMPTY])
 
     def _handle_drag_received(
-            self, treeview, drag, xpos, ypos, sel, info, time):
+        self, treeview, drag, xpos, ypos, sel, info, time
+    ):
         """Handle an incoming drag request."""
         if sel.data is None:
             return False
@@ -116,8 +125,10 @@ class ChoicesListView(Gtk.TreeView):
         model = treeview.get_model()
         if drop_info:
             path, position = drop_info
-            if (position == Gtk.TreeViewDropPosition.BEFORE or
-                    position == Gtk.TreeViewDropPosition.INTO_OR_BEFORE):
+            if (
+                position == Gtk.TreeViewDropPosition.BEFORE
+                or position == Gtk.TreeViewDropPosition.INTO_OR_BEFORE
+            ):
                 model.insert(path[0], [sel.data])
             else:
                 model.insert(path[0] + 1, [sel.data])
@@ -127,7 +138,7 @@ class ChoicesListView(Gtk.TreeView):
         self._handle_reordering(model, path)
 
     def _handle_edited(self, cell, path, new_text):
-        """Handle cell text so it can be edited. """
+        """Handle cell text so it can be edited."""
         liststore = self.get_model()
         iter_ = liststore.get_iter(path)
         liststore.set_value(iter_, 0, new_text)
@@ -173,23 +184,23 @@ class ChoicesListView(Gtk.TreeView):
         text = metomi.rose.config_editor.CHOICE_MENU_REMOVE
         actions = [("Remove", Gtk.STOCK_DELETE, text)]
         uimanager = Gtk.UIManager()
-        actiongroup = Gtk.ActionGroup('Popup')
+        actiongroup = Gtk.ActionGroup("Popup")
         actiongroup.add_actions(actions)
         uimanager.insert_action_group(actiongroup)
         uimanager.add_ui_from_string(ui_config_string)
-        remove_item = uimanager.get_widget('/Popup/Remove')
-        remove_item.connect("activate",
-                            lambda b: self._remove_iter(iter_))
-        menu = uimanager.get_widget('/Popup')
+        remove_item = uimanager.get_widget("/Popup/Remove")
+        remove_item.connect("activate", lambda b: self._remove_iter(iter_))
+        menu = uimanager.get_widget("/Popup")
         for menuitem in self._get_custom_menu_items():
             menuitem._listview_model = self.get_model()
             menuitem._listview_iter = iter_
             menuitem.connect_after(
-                "button-press-event",
-                lambda b, e: self._handle_reordering()
+                "button-press-event", lambda b, e: self._handle_reordering()
             )
             menu.append(menuitem)
-        menu.popup_at_widget(event.button, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, event)
+        menu.popup_at_widget(
+            event.button, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, event
+        )
         return False
 
     def _remove_iter(self, iter_):
@@ -213,7 +224,6 @@ class ChoicesListView(Gtk.TreeView):
 
 
 class ChoicesTreeView(Gtk.TreeView):
-
     """Class to hold and display a tree of content.
 
     set_value is a function, accepting a new value string.
@@ -232,10 +242,16 @@ class ChoicesTreeView(Gtk.TreeView):
 
     """
 
-    def __init__(self, set_value, get_data, get_available_data,
-                 get_groups, get_is_implicit=None,
-                 title=metomi.rose.config_editor.CHOICE_TITLE_AVAILABLE,
-                 get_is_included=None):
+    def __init__(
+        self,
+        set_value,
+        get_data,
+        get_available_data,
+        get_groups,
+        get_is_implicit=None,
+        title=metomi.rose.config_editor.CHOICE_TITLE_AVAILABLE,
+        get_is_included=None,
+    ):
         super(ChoicesTreeView, self).__init__()
         # Generate the 'available' sections view.
         self._set_value = set_value
@@ -247,9 +263,13 @@ class ChoicesTreeView(Gtk.TreeView):
         self.set_headers_visible(True)
         self.set_rules_hint(True)
         self.enable_model_drag_dest(
-            [('text/plain', 0, 0)], Gdk.DragAction.MOVE)
+            [("text/plain", 0, 0)], Gdk.DragAction.MOVE
+        )
         self.enable_model_drag_source(
-            Gdk.ModifierType.BUTTON1_MASK, [('text/plain', 0, 0)], Gdk.DragAction.MOVE)
+            Gdk.ModifierType.BUTTON1_MASK,
+            [("text/plain", 0, 0)],
+            Gdk.DragAction.MOVE,
+        )
         self.connect_after("button-release-event", self._handle_button)
         self.connect("drag-begin", self._handle_drag_begin)
         self.connect("drag-data-get", self._handle_drag_get)
@@ -294,12 +314,15 @@ class ChoicesTreeView(Gtk.TreeView):
             groups = self._get_groups(name, ok_content_sections)
             if self._get_is_implicit is None:
                 is_implicit = any(
-                    [self._get_is_included(g, ok_values) for g in groups])
+                    [self._get_is_included(g, ok_values) for g in groups]
+                )
             else:
                 is_implicit = self._get_is_implicit(name)
             if groups:
-                iter_ = model.append(self._name_iter_map[groups[-1]],
-                                     [name, is_included, is_implicit])
+                iter_ = model.append(
+                    self._name_iter_map[groups[-1]],
+                    [name, is_included, is_implicit],
+                )
             else:
                 iter_ = model.append(None, [name, is_included, is_implicit])
             self._name_iter_map[name] = iter_
@@ -314,7 +337,8 @@ class ChoicesTreeView(Gtk.TreeView):
             if self._get_is_implicit is None:
                 groups = self._get_groups(name, ok_content_sections)
                 is_implicit = any(
-                    [self._get_is_included(g, ok_values) for g in groups])
+                    [self._get_is_included(g, ok_values) for g in groups]
+                )
             else:
                 is_implicit = self._get_is_implicit(name)
             if model.get_value(iter_, 1) != is_in_value:
@@ -380,8 +404,9 @@ class ChoicesTreeView(Gtk.TreeView):
             return False
         child_iter = model.iter_children(iter_)
         while child_iter is not None:
-            if (model.get_value(child_iter, 1) or
-                    model.get_value(child_iter, 2)):
+            if model.get_value(child_iter, 1) or model.get_value(
+                child_iter, 2
+            ):
                 return False
             child_iter = model.iter_next(child_iter)
         return True
@@ -416,8 +441,9 @@ class ChoicesTreeView(Gtk.TreeView):
         model = self.get_model()
         can_add = self._check_can_add(r_iter)
         should_add = False
-        if ((should_turn_off is None or should_turn_off) and
-                self._get_is_included(this_name, ok_values)):
+        if (
+            should_turn_off is None or should_turn_off
+        ) and self._get_is_included(this_name, ok_values):
             ok_values.remove(this_name)
         elif should_turn_off is None or not should_turn_off:
             if not can_add:

@@ -19,12 +19,12 @@
 # -----------------------------------------------------------------------------
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 
 class MetaValueWidget(Gtk.Box):
-
     """This class generates an entry and button for a metadata flag value."""
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
@@ -35,8 +35,9 @@ class MetaValueWidget(Gtk.Box):
         self.hook = hook
         self.entry = Gtk.Entry()
         self.entry.set_text(self.value)
-        self.entry.connect("button-release-event",
-                           self._handle_middle_click_paste)
+        self.entry.connect(
+            "button-release-event", self._handle_middle_click_paste
+        )
         self.entry.connect_after("paste-clipboard", self._check_diff)
         self.entry.connect_after("key-release-event", self._check_diff)
         self.entry.connect_after("button-release-event", self._check_diff)
@@ -47,12 +48,9 @@ class MetaValueWidget(Gtk.Box):
         self.button.connect("clicked", self._setter)
         self.button.set_sensitive(False)
         self.button.show()
-        self.pack_start(self.entry, expand=True, fill=True,
-                        padding=0)
-        self.pack_start(self.button, expand=False, fill=False,
-                        padding=0)
-        self.entry.connect('focus-in-event',
-                           self.hook.trigger_scroll)
+        self.pack_start(self.entry, expand=True, fill=True, padding=0)
+        self.pack_start(self.button, expand=False, fill=False, padding=0)
+        self.entry.connect("focus-in-event", self.hook.trigger_scroll)
         self.grab_focus = lambda: self.hook.get_focus(self.entry)
 
     def _check_diff(self, *args):

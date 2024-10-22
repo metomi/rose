@@ -19,7 +19,8 @@
 # -----------------------------------------------------------------------------
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk
 from gi.repository import Pango
 
@@ -32,7 +33,6 @@ from functools import cmp_to_key
 
 
 class BaseSummaryDataPanel(Gtk.Box):
-
     """A base class for summarising data across many namespaces.
 
     Subclasses should provide the following methods:
@@ -49,10 +49,20 @@ class BaseSummaryDataPanel(Gtk.Box):
 
     """
 
-    def __init__(self, sections, variables, sect_ops, var_ops,
-                 search_function, sub_ops,
-                 is_duplicate, arg_str=None):
-        super(BaseSummaryDataPanel, self).__init__(orientation=Gtk.Orientation.VERTICAL)
+    def __init__(
+        self,
+        sections,
+        variables,
+        sect_ops,
+        var_ops,
+        search_function,
+        sub_ops,
+        is_duplicate,
+        arg_str=None,
+    ):
+        super(BaseSummaryDataPanel, self).__init__(
+            orientation=Gtk.Orientation.VERTICAL
+        )
         self.sections = sections
         self.variables = variables
         self._section_data_list = None
@@ -66,22 +76,27 @@ class BaseSummaryDataPanel(Gtk.Box):
         self.group_index = None
         self.util = metomi.rose.config_editor.util.Lookup()
         self.control_widget_hbox = self._get_control_widget_hbox()
-        self.pack_start(self.control_widget_hbox, expand=False, fill=False, padding=0)
+        self.pack_start(
+            self.control_widget_hbox, expand=False, fill=False, padding=0
+        )
         self._prev_store = None
         self._prev_sort_model = None
         self._view = metomi.rose.gtk.util.TooltipTreeView(
-            get_tooltip_func=self.set_tree_tip,
-            multiple_selection=True)
+            get_tooltip_func=self.set_tree_tip, multiple_selection=True
+        )
         self._view.set_rules_hint(True)
         self.sort_util = metomi.rose.gtk.util.TreeModelSortUtil(
-            self._view.get_model, multi_sort_num=2)
+            self._view.get_model, multi_sort_num=2
+        )
         self._view.show()
-        self._view.connect("button-press-event",
-                           self._handle_button_press_event)
-        self._view.connect("key-press-event",
-                           self._handle_key_press_event)
+        self._view.connect(
+            "button-press-event", self._handle_button_press_event
+        )
+        self._view.connect("key-press-event", self._handle_key_press_event)
         self._window = Gtk.ScrolledWindow()
-        self._window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        self._window.set_policy(
+            Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC
+        )
         self.update()
         self._window.add(self._view)
         self._window.show()
@@ -148,29 +163,42 @@ class BaseSummaryDataPanel(Gtk.Box):
         return []
 
     def _get_control_widget_hbox(self):
-        filter_label = Gtk.Label(label=
-            metomi.rose.config_editor.SUMMARY_DATA_PANEL_FILTER_LABEL)
+        filter_label = Gtk.Label(
+            label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_FILTER_LABEL
+        )
         filter_label.show()
         self._filter_widget = Gtk.Entry()
         self._filter_widget.set_width_chars(
-            metomi.rose.config_editor.SUMMARY_DATA_PANEL_FILTER_MAX_CHAR)
+            metomi.rose.config_editor.SUMMARY_DATA_PANEL_FILTER_MAX_CHAR
+        )
         self._filter_widget.connect("changed", self._refilter)
         self._filter_widget.show()
-        group_label = Gtk.Label(label=
-            metomi.rose.config_editor.SUMMARY_DATA_PANEL_GROUP_LABEL)
+        group_label = Gtk.Label(
+            label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_GROUP_LABEL
+        )
         group_label.show()
         self._group_widget = Gtk.ComboBox()
         cell = Gtk.CellRendererText()
         self._group_widget.pack_start(cell, True)
-        self._group_widget.add_attribute(cell, 'text', 0)
+        self._group_widget.add_attribute(cell, "text", 0)
         self._group_widget.connect("changed", self._handle_group_change)
         self._group_widget.show()
         filter_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        filter_hbox.pack_start(group_label, expand=False, fill=False, padding=0)
-        filter_hbox.pack_start(self._group_widget, expand=False, fill=False, padding=0)
-        filter_hbox.pack_start(filter_label, expand=False, fill=False,
-                               padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
-        filter_hbox.pack_start(self._filter_widget, expand=False, fill=False, padding=0)
+        filter_hbox.pack_start(
+            group_label, expand=False, fill=False, padding=0
+        )
+        filter_hbox.pack_start(
+            self._group_widget, expand=False, fill=False, padding=0
+        )
+        filter_hbox.pack_start(
+            filter_label,
+            expand=False,
+            fill=False,
+            padding=metomi.rose.config_editor.SPACING_SUB_PAGE,
+        )
+        filter_hbox.pack_start(
+            self._filter_widget, expand=False, fill=False, padding=0
+        )
         filter_hbox.show()
         return filter_hbox
 
@@ -182,14 +210,15 @@ class BaseSummaryDataPanel(Gtk.Box):
                 self.var_id_map[variable.metadata["id"]] = variable
         data_rows, column_names = self.get_model_data()
         data_rows, column_names, rows_are_descendants = self._apply_grouping(
-            data_rows, column_names, self.group_index)
+            data_rows, column_names, self.group_index
+        )
         self.column_names = column_names
         should_redraw = self.column_names != self._last_column_names
         if data_rows:
             col_types = [str] * len(data_rows[0])
         else:
             col_types = []
-        need_new_store = (should_redraw or self.group_index)
+        need_new_store = should_redraw or self.group_index
         if need_new_store:
             # We need to construct a new TreeModel.
             if self._prev_sort_model is not None:
@@ -222,12 +251,15 @@ class BaseSummaryDataPanel(Gtk.Box):
             sort_model = Gtk.TreeModelSort(filter_model)
             for i in range(len(self.column_names)):
                 sort_model.set_sort_func(i, self.sort_util.sort_column, i)
-            if (self._prev_sort_model is not None and
-                    prev_sort_id[0] is not None):
+            if (
+                self._prev_sort_model is not None
+                and prev_sort_id[0] is not None
+            ):
                 sort_model.set_sort_column_id(*prev_sort_id)
             self._prev_sort_model = sort_model
-            sort_model.connect("sort-column-changed",
-                               self.sort_util.handle_sort_column_change)
+            sort_model.connect(
+                "sort-column-changed", self.sort_util.handle_sort_column_change
+            )
             if should_redraw:
                 self.sort_util.clear_sort_columns()
                 for column in list(self._view.get_columns()):
@@ -253,8 +285,10 @@ class BaseSummaryDataPanel(Gtk.Box):
         expanded_sections = set()
         model = self._view.get_model()
         self._view.map_expanded_rows(
-            lambda r, p:
-            expanded_sections.add(model.get_value(model.get_iter(p), 0)))
+            lambda r, p: expanded_sections.add(
+                model.get_value(model.get_iter(p), 0)
+            )
+        )
 
         should_redraw = self.update_tree_model()
         if should_redraw:
@@ -298,8 +332,7 @@ class BaseSummaryDataPanel(Gtk.Box):
             col.set_title(column_name.replace("_", "__"))
             cell_for_status = Gtk.CellRendererText()
             col.pack_start(cell_for_status, False)
-            col.set_cell_data_func(cell_for_status,
-                                   self.set_tree_cell_status)
+            col.set_cell_data_func(cell_for_status, self.set_tree_cell_status)
             self.add_cell_renderer_for_value(col, column_name)
             if i < len(column_names) - 1:
                 col.set_resizable(True)
@@ -309,16 +342,27 @@ class BaseSummaryDataPanel(Gtk.Box):
     def get_status_from_data(self, node_data):
         """Return markup corresponding to changes since the last save."""
         text = ""
-        mod_markup = metomi.rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP
+        mod_markup = (
+            metomi.rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP
+        )
         err_markup = metomi.rose.config_editor.SUMMARY_DATA_PANEL_ERROR_MARKUP
         if node_data is None:
             return None
         if metomi.rose.variable.IGNORED_BY_SYSTEM in node_data.ignored_reason:
-            text += metomi.rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_SYST_MARKUP
+            text += (
+                metomi.rose.config_editor
+                .SUMMARY_DATA_PANEL_IGNORED_SYST_MARKUP
+            )
         elif metomi.rose.variable.IGNORED_BY_USER in node_data.ignored_reason:
-            text += metomi.rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_USER_MARKUP
+            text += (
+                metomi.rose.config_editor
+                .SUMMARY_DATA_PANEL_IGNORED_USER_MARKUP
+            )
         if metomi.rose.variable.IGNORED_BY_SECTION in node_data.ignored_reason:
-            text += metomi.rose.config_editor.SUMMARY_DATA_PANEL_IGNORED_SECT_MARKUP
+            text += (
+                metomi.rose.config_editor
+                .SUMMARY_DATA_PANEL_IGNORED_SECT_MARKUP
+            )
         if isinstance(node_data, metomi.rose.section.Section):
             # Modified status
             section = node_data.metadata["id"]
@@ -378,8 +422,7 @@ class BaseSummaryDataPanel(Gtk.Box):
         self.search_function(id_)
 
     def _handle_button_press_event(self, treeview, event):
-        pathinfo = treeview.get_path_at_pos(int(event.x),
-                                            int(event.y))
+        pathinfo = treeview.get_path_at_pos(int(event.x), int(event.y))
         if pathinfo is not None:
             path, col = pathinfo[0:2]
             if event.button == 3:
@@ -436,8 +479,15 @@ class BaseSummaryDataPanel(Gtk.Box):
 
         # Ignore all.
         ign_menuitem_box = Gtk.Box()
-        ign_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_NO, Gtk.IconSize.MENU)
-        ign_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE_MULTI)
+        ign_menuitem_icon = Gtk.Image.new_from_icon_name(
+            Gtk.STOCK_NO, Gtk.IconSize.MENU
+        )
+        ign_menuitem_label = Gtk.Label(
+            label=(
+                metomi.rose.config_editor
+                .SUMMARY_DATA_PANEL_MENU_IGNORE_MULTI
+            )
+        )
         ign_menuitem = Gtk.MenuItem()
         ign_menuitem_box.pack_start(ign_menuitem_icon, False, False, 0)
         ign_menuitem_box.pack_start(ign_menuitem_label, False, False, 0)
@@ -445,12 +495,20 @@ class BaseSummaryDataPanel(Gtk.Box):
         ign_menuitem.connect("activate", self._ignore_selected_sections, True)
         ign_menuitem.show()
         menu.append(ign_menuitem)
-        shortcuts.append((metomi.rose.config_editor.ACCEL_IGNORE,
-                          ign_menuitem))
+        shortcuts.append(
+            (metomi.rose.config_editor.ACCEL_IGNORE, ign_menuitem)
+        )
         # Enable all.
         ign_menuitem_box = Gtk.Box()
-        ign_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_YES, Gtk.IconSize.MENU)
-        ign_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE_MULTI)
+        ign_menuitem_icon = Gtk.Image.new_from_icon_name(
+            Gtk.STOCK_YES, Gtk.IconSize.MENU
+        )
+        ign_menuitem_label = Gtk.Label(
+            label=(
+                metomi.rose.config_editor
+                .SUMMARY_DATA_PANEL_MENU_ENABLE_MULTI
+            )
+        )
         ign_menuitem = Gtk.MenuItem()
         ign_menuitem_box.pack_start(ign_menuitem_icon, False, False, 0)
         ign_menuitem_box.pack_start(ign_menuitem_label, False, False, 0)
@@ -458,12 +516,20 @@ class BaseSummaryDataPanel(Gtk.Box):
         ign_menuitem.connect("activate", self._ignore_selected_sections, False)
         ign_menuitem.show()
         menu.append(ign_menuitem)
-        shortcuts.append((metomi.rose.config_editor.ACCEL_IGNORE,
-                          ign_menuitem))
+        shortcuts.append(
+            (metomi.rose.config_editor.ACCEL_IGNORE, ign_menuitem)
+        )
         # Remove all.
         rem_menuitem_box = Gtk.Box()
-        rem_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_REMOVE, Gtk.IconSize.MENU)
-        rem_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE_MULTI)
+        rem_menuitem_icon = Gtk.Image.new_from_icon_name(
+            Gtk.STOCK_REMOVE, Gtk.IconSize.MENU
+        )
+        rem_menuitem_label = Gtk.Label(
+            label=(
+                metomi.rose.config_editor
+                .SUMMARY_DATA_PANEL_MENU_REMOVE_MULTI
+            )
+        )
         rem_menuitem = Gtk.MenuItem()
         rem_menuitem_box.pack_start(rem_menuitem_icon, False, False, 0)
         rem_menuitem_box.pack_start(rem_menuitem_label, False, False, 0)
@@ -471,7 +537,9 @@ class BaseSummaryDataPanel(Gtk.Box):
         rem_menuitem.connect("activate", self._remove_selected_sections)
         rem_menuitem.show()
         menu.append(rem_menuitem)
-        shortcuts.append((metomi.rose.config_editor.ACCEL_REMOVE, rem_menuitem))
+        shortcuts.append(
+            (metomi.rose.config_editor.ACCEL_REMOVE, rem_menuitem)
+        )
 
         # list shortcut keys
         accel = Gtk.AccelGroup()
@@ -479,14 +547,12 @@ class BaseSummaryDataPanel(Gtk.Box):
         for key_press, menuitem in shortcuts:
             key, mod = Gtk.accelerator_parse(key_press)
             menuitem.add_accelerator(
-                'activate',
-                accel,
-                key,
-                mod,
-                Gtk.AccelFlags.VISIBLE
+                "activate", accel, key, mod, Gtk.AccelFlags.VISIBLE
             )
 
-        menu.popup_at_widget(event.button, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, event)
+        menu.popup_at_widget(
+            event.button, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, event
+        )
         return False
 
     def _popup_tree_menu(self, path, col, event):
@@ -499,18 +565,24 @@ class BaseSummaryDataPanel(Gtk.Box):
         this_section = model.get_value(row_iter, sect_index)
         if this_section is not None:
             # Jump to section.
-            label = metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_GO_TO.format(
-                this_section.replace("_", "__"))
+            label = (
+                metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_GO_TO.format(
+                    this_section.replace("_", "__")
+                )
+            )
             menuitem_box = Gtk.Box()
-            menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_JUMP_TO, Gtk.IconSize.MENU)
+            menuitem_icon = Gtk.Image.new_from_icon_name(
+                Gtk.STOCK_JUMP_TO, Gtk.IconSize.MENU
+            )
             menuitem_label = Gtk.Label(label=label)
             menuitem = Gtk.MenuItem()
             menuitem_box.pack_start(menuitem_icon, False, False, 0)
             menuitem_box.pack_start(menuitem_label, False, False, 0)
             Gtk.Container.add(menuitem, menuitem_box)
             menuitem._section = this_section
-            menuitem.connect("activate",
-                             lambda i: self.search_function(i._section))
+            menuitem.connect(
+                "activate", lambda i: self.search_function(i._section)
+            )
             menuitem.show()
             menu.append(menuitem)
             sep = Gtk.SeparatorMenuItem()
@@ -529,122 +601,211 @@ class BaseSummaryDataPanel(Gtk.Box):
             if this_section is not None:
                 # Add section.
                 add_menuitem_box = Gtk.Box()
-                add_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_ADD, Gtk.IconSize.MENU)
-                add_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_ADD)
+                add_menuitem_icon = Gtk.Image.new_from_icon_name(
+                    Gtk.STOCK_ADD, Gtk.IconSize.MENU
+                )
+                add_menuitem_label = Gtk.Label(
+                    label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_ADD
+                )
                 add_menuitem = Gtk.MenuItem()
                 add_menuitem_box.pack_start(add_menuitem_icon, False, False, 0)
-                add_menuitem_box.pack_start(add_menuitem_label, False, False, 0)
+                add_menuitem_box.pack_start(
+                    add_menuitem_label, False, False, 0
+                )
                 Gtk.Container.add(add_menuitem, add_menuitem_box)
-                add_menuitem.connect("activate",
-                                     lambda i: self.add_section())
+                add_menuitem.connect("activate", lambda i: self.add_section())
                 add_menuitem.show()
                 menu.append(add_menuitem)
                 # Copy section.
                 copy_menuitem_box = Gtk.Box()
-                copy_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_COPY, Gtk.IconSize.MENU)
-                copy_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_COPY)
+                copy_menuitem_icon = Gtk.Image.new_from_icon_name(
+                    Gtk.STOCK_COPY, Gtk.IconSize.MENU
+                )
+                copy_menuitem_label = Gtk.Label(
+                    label=(
+                        metomi.rose.config_editor
+                        .SUMMARY_DATA_PANEL_MENU_COPY
+                    )
+                )
                 copy_menuitem = Gtk.MenuItem()
-                copy_menuitem_box.pack_start(copy_menuitem_icon, False, False, 0)
-                copy_menuitem_box.pack_start(copy_menuitem_label, False, False, 0)
+                copy_menuitem_box.pack_start(
+                    copy_menuitem_icon, False, False, 0
+                )
+                copy_menuitem_box.pack_start(
+                    copy_menuitem_label, False, False, 0
+                )
                 Gtk.Container.add(copy_menuitem, copy_menuitem_box)
                 copy_menuitem.connect(
-                    "activate", lambda i: self.copy_section(this_section))
+                    "activate", lambda i: self.copy_section(this_section)
+                )
                 copy_menuitem.show()
                 menu.append(copy_menuitem)
-                if (metomi.rose.variable.IGNORED_BY_USER in
-                        self.sections[this_section].ignored_reason):
+                if (
+                    metomi.rose.variable.IGNORED_BY_USER
+                    in self.sections[this_section].ignored_reason
+                ):
                     # Enable section.
                     enab_menuitem_box = Gtk.Box()
-                    enab_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_YES, Gtk.IconSize.MENU)
-                    enab_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE)
+                    enab_menuitem_icon = Gtk.Image.new_from_icon_name(
+                        Gtk.STOCK_YES, Gtk.IconSize.MENU
+                    )
+                    enab_menuitem_label = Gtk.Label(
+                        label=(
+                            metomi.rose.config_editor
+                            .SUMMARY_DATA_PANEL_MENU_ENABLE
+                        )
+                    )
                     enab_menuitem = Gtk.MenuItem()
-                    enab_menuitem_box.pack_start(enab_menuitem_icon, False, False, 0)
-                    enab_menuitem_box.pack_start(enab_menuitem_label, False, False, 0)
+                    enab_menuitem_box.pack_start(
+                        enab_menuitem_icon, False, False, 0
+                    )
+                    enab_menuitem_box.pack_start(
+                        enab_menuitem_label, False, False, 0
+                    )
                     Gtk.Container.add(enab_menuitem, enab_menuitem_box)
                     enab_menuitem.connect(
                         "activate",
-                        lambda i: self.sub_ops.ignore_section(this_section,
-                                                              False))
+                        lambda i: self.sub_ops.ignore_section(
+                            this_section, False
+                        ),
+                    )
                     enab_menuitem.show()
                     menu.append(enab_menuitem)
-                    shortcuts.append((metomi.rose.config_editor.ACCEL_IGNORE,
-                                      enab_menuitem))
+                    shortcuts.append(
+                        (metomi.rose.config_editor.ACCEL_IGNORE, enab_menuitem)
+                    )
                 else:
                     # Ignore section.
                     ign_menuitem_box = Gtk.Box()
-                    ign_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_NO, Gtk.IconSize.MENU)
-                    ign_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE)
+                    ign_menuitem_icon = Gtk.Image.new_from_icon_name(
+                        Gtk.STOCK_NO, Gtk.IconSize.MENU
+                    )
+                    ign_menuitem_label = Gtk.Label(
+                        label=(
+                            metomi.rose.config_editor
+                            .SUMMARY_DATA_PANEL_MENU_IGNORE
+                        )
+                    )
                     ign_menuitem = Gtk.MenuItem()
-                    ign_menuitem_box.pack_start(ign_menuitem_icon, False, False, 0)
-                    ign_menuitem_box.pack_start(ign_menuitem_label, False, False, 0)
+                    ign_menuitem_box.pack_start(
+                        ign_menuitem_icon, False, False, 0
+                    )
+                    ign_menuitem_box.pack_start(
+                        ign_menuitem_label, False, False, 0
+                    )
                     Gtk.Container.add(ign_menuitem, ign_menuitem_box)
                     ign_menuitem.connect(
                         "activate",
-                        lambda i: self.sub_ops.ignore_section(this_section,
-                                                              True))
+                        lambda i: self.sub_ops.ignore_section(
+                            this_section, True
+                        ),
+                    )
                     ign_menuitem.show()
                     menu.append(ign_menuitem)
-                    shortcuts.append((metomi.rose.config_editor.ACCEL_IGNORE,
-                                      ign_menuitem))
+                    shortcuts.append(
+                        (metomi.rose.config_editor.ACCEL_IGNORE, ign_menuitem)
+                    )
                 # Remove section.
                 rem_menuitem_box = Gtk.Box()
-                rem_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_REMOVE, Gtk.IconSize.MENU)
-                rem_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE)
+                rem_menuitem_icon = Gtk.Image.new_from_icon_name(
+                    Gtk.STOCK_REMOVE, Gtk.IconSize.MENU
+                )
+                rem_menuitem_label = Gtk.Label(
+                    label=(
+                        metomi.rose.config_editor
+                        .SUMMARY_DATA_PANEL_MENU_REMOVE
+                    )
+                )
                 rem_menuitem = Gtk.MenuItem()
                 rem_menuitem_box.pack_start(rem_menuitem_icon, False, False, 0)
-                rem_menuitem_box.pack_start(rem_menuitem_label, False, False, 0)
+                rem_menuitem_box.pack_start(
+                    rem_menuitem_label, False, False, 0
+                )
                 Gtk.Container.add(rem_menuitem, rem_menuitem_box)
                 rem_menuitem.connect(
-                    "activate", lambda i: self.remove_section(this_section))
+                    "activate", lambda i: self.remove_section(this_section)
+                )
                 rem_menuitem.show()
                 menu.append(rem_menuitem)
-                shortcuts.append((metomi.rose.config_editor.ACCEL_REMOVE,
-                                  rem_menuitem))
+                shortcuts.append(
+                    (metomi.rose.config_editor.ACCEL_REMOVE, rem_menuitem)
+                )
             else:  # A group is currently selected.
                 # Ignore all
                 ign_menuitem_box = Gtk.Box()
-                ign_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_NO, Gtk.IconSize.MENU)
-                ign_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_IGNORE)
+                ign_menuitem_icon = Gtk.Image.new_from_icon_name(
+                    Gtk.STOCK_NO, Gtk.IconSize.MENU
+                )
+                ign_menuitem_label = Gtk.Label(
+                    label=(
+                        metomi.rose.config_editor
+                        .SUMMARY_DATA_PANEL_MENU_IGNORE
+                    )
+                )
                 ign_menuitem = Gtk.MenuItem()
                 ign_menuitem_box.pack_start(ign_menuitem_icon, False, False, 0)
-                ign_menuitem_box.pack_start(ign_menuitem_label, False, False, 0)
+                ign_menuitem_box.pack_start(
+                    ign_menuitem_label, False, False, 0
+                )
                 Gtk.Container.add(ign_menuitem, ign_menuitem_box)
-                ign_menuitem.connect("activate",
-                                     self._ignore_selected_sections,
-                                     True)
+                ign_menuitem.connect(
+                    "activate", self._ignore_selected_sections, True
+                )
                 ign_menuitem.show()
                 menu.append(ign_menuitem)
-                shortcuts.append((metomi.rose.config_editor.ACCEL_IGNORE,
-                                  ign_menuitem))
+                shortcuts.append(
+                    (metomi.rose.config_editor.ACCEL_IGNORE, ign_menuitem)
+                )
                 # Enable all
                 ign_menuitem_box = Gtk.Box()
-                ign_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_YES, Gtk.IconSize.MENU)
-                ign_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_ENABLE)
+                ign_menuitem_icon = Gtk.Image.new_from_icon_name(
+                    Gtk.STOCK_YES, Gtk.IconSize.MENU
+                )
+                ign_menuitem_label = Gtk.Label(
+                    label=(
+                        metomi.rose.config_editor
+                        .SUMMARY_DATA_PANEL_MENU_ENABLE
+                    )
+                )
                 ign_menuitem = Gtk.MenuItem()
                 ign_menuitem_box.pack_start(ign_menuitem_icon, False, False, 0)
-                ign_menuitem_box.pack_start(ign_menuitem_label, False, False, 0)
+                ign_menuitem_box.pack_start(
+                    ign_menuitem_label, False, False, 0
+                )
                 Gtk.Container.add(ign_menuitem, ign_menuitem_box)
-                ign_menuitem.connect("activate",
-                                     self._ignore_selected_sections,
-                                     False)
+                ign_menuitem.connect(
+                    "activate", self._ignore_selected_sections, False
+                )
                 ign_menuitem.show()
                 menu.append(ign_menuitem)
-                shortcuts.append((metomi.rose.config_editor.ACCEL_IGNORE,
-                                  ign_menuitem))
+                shortcuts.append(
+                    (metomi.rose.config_editor.ACCEL_IGNORE, ign_menuitem)
+                )
                 # Delete all.
                 rem_menuitem_box = Gtk.Box()
-                rem_menuitem_icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_REMOVE, Gtk.IconSize.MENU)
-                rem_menuitem_label = Gtk.Label(label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_REMOVE)
+                rem_menuitem_icon = Gtk.Image.new_from_icon_name(
+                    Gtk.STOCK_REMOVE, Gtk.IconSize.MENU
+                )
+                rem_menuitem_label = Gtk.Label(
+                    label=(
+                        metomi.rose.config_editor
+                        .SUMMARY_DATA_PANEL_MENU_REMOVE
+                    )
+                )
                 rem_menuitem = Gtk.MenuItem()
                 rem_menuitem_box.pack_start(rem_menuitem_icon, False, False, 0)
-                rem_menuitem_box.pack_start(rem_menuitem_label, False, False, 0)
+                rem_menuitem_box.pack_start(
+                    rem_menuitem_label, False, False, 0
+                )
                 Gtk.Container.add(rem_menuitem, rem_menuitem_box)
                 rem_menuitem.connect(
-                    "activate", self._remove_selected_sections)
+                    "activate", self._remove_selected_sections
+                )
                 rem_menuitem.show()
                 menu.append(rem_menuitem)
-                shortcuts.append((metomi.rose.config_editor.ACCEL_REMOVE,
-                                  rem_menuitem))
+                shortcuts.append(
+                    (metomi.rose.config_editor.ACCEL_REMOVE, rem_menuitem)
+                )
 
             # list shortcut keys
             accel = Gtk.AccelGroup()
@@ -652,11 +813,7 @@ class BaseSummaryDataPanel(Gtk.Box):
             for key_press, menuitem in shortcuts:
                 key, mod = Gtk.accelerator_parse(key_press)
                 menuitem.add_accelerator(
-                    'activate',
-                    accel,
-                    key,
-                    mod,
-                    Gtk.AccelFlags.VISIBLE
+                    "activate", accel, key, mod, Gtk.AccelFlags.VISIBLE
                 )
         menu.popup_at_pointer(event)
         menu.show_all()
@@ -694,7 +851,7 @@ class BaseSummaryDataPanel(Gtk.Box):
             # `Delete` - remove section(s)
             self._remove_selected_sections()
         # detect key combination
-        elif 'GDK_CONTROL_MASK' in event.get_state().value_names:
+        elif "GDK_CONTROL_MASK" in event.get_state().value_names:
             # `Ctrl + ?`
             if event.keyval == Gdk.KEY_i:
                 # `Ctrl + i` - ignore section(s)
@@ -715,17 +872,23 @@ class BaseSummaryDataPanel(Gtk.Box):
                    then enable all sections inserted.
         """
         sections_ = self._get_selected_sections()
-        ignored = [metomi.rose.variable.IGNORED_BY_USER in
-                   self.sections[section_].ignored_reason for
-                   section_ in sections_]
+        ignored = [
+            metomi.rose.variable.IGNORED_BY_USER
+            in self.sections[section_].ignored_reason
+            for section_ in sections_
+        ]
         # If ignore mode is not specified decide whether to ignore or enable.
         if ignore is None:
             ignore = not all(ignored)
         # Filter out sections that are already ignored/enabled.
-        sections_ = [section_ for section_, ignored in zip(sections_, ignored)
-                     if ignored != ignore]
+        sections_ = [
+            section_
+            for section_, ignored in zip(sections_, ignored)
+            if ignored != ignore
+        ]
         self.sub_ops.ignore_sections(
-            sections_, ignore, skip_sub_data_update=False)
+            sections_, ignore, skip_sub_data_update=False
+        )
 
     def remove_section(self, section):
         """Remove a section."""
@@ -743,8 +906,9 @@ class BaseSummaryDataPanel(Gtk.Box):
         """Get the Gtk.TreeIter of this section."""
         iters = []
         sect_index = self.get_section_column_index()
-        self._view.get_model().foreach(self._check_value_iter,
-                                       [sect_index, section, iters])
+        self._view.get_model().foreach(
+            self._check_value_iter, [sect_index, section, iters]
+        )
         if iters:
             return iters[0]
         return None
@@ -765,8 +929,10 @@ class BaseSummaryDataPanel(Gtk.Box):
         if col_name:
             group_index = self.column_names.index(col_name)
             # Any existing grouping changes the order of self.column_names.
-            if (self.group_index is not None and
-                    group_index <= self.group_index):
+            if (
+                self.group_index is not None
+                and group_index <= self.group_index
+            ):
                 group_index -= 1
         else:
             group_index = None
@@ -776,13 +942,14 @@ class BaseSummaryDataPanel(Gtk.Box):
         self.update()
         return False
 
-    def _apply_grouping(self, data_rows, column_names, group_index=None,
-                        descending=False):
+    def _apply_grouping(
+        self, data_rows, column_names, group_index=None, descending=False
+    ):
         rows_are_descendants = []
         if group_index is None:
             return data_rows, column_names, rows_are_descendants
         k = group_index
-        data_rows = [r[k:k + 1] + r[0:k] + r[k + 1:] for r in data_rows]
+        data_rows = [r[k : k + 1] + r[0:k] + r[k + 1 :] for r in data_rows]
         column_names.insert(0, column_names.pop(k))
         if descending:
             data_rows.sort(key=cmp_to_key(self._sort_row_data), reverse=True)
@@ -800,15 +967,13 @@ class BaseSummaryDataPanel(Gtk.Box):
 
 
 class StandardSummaryDataPanel(BaseSummaryDataPanel):
-
     """Class that provides a standard interface to summary data."""
 
     def add_cell_renderer_for_value(self, col, col_title):
         """Add a CellRendererText for the column."""
         cell_for_value = Gtk.CellRendererText()
         col.pack_start(cell_for_value, True)
-        col.set_cell_data_func(cell_for_value,
-                               self._set_tree_cell_value)
+        col.set_cell_data_func(cell_for_value, self._set_tree_cell_value)
 
     def set_tree_cell_status(self, col, cell, model, row_iter, _):
         """Set the status text for a cell in this column."""
@@ -824,8 +989,7 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
             option = self.column_names[col_index]
             id_ = self.util.get_id_from_section_option(section, option)
             node_data = self.var_id_map.get(id_)
-        cell.set_property("markup",
-                          self.get_status_from_data(node_data))
+        cell.set_property("markup", self.get_status_from_data(node_data))
 
     def get_model_data(self):
         """Construct a data model of other page data."""
@@ -851,9 +1015,13 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
                     row_data.append(metomi.rose.gtk.util.safe_str(var.value))
             data_rows.append(row_data)
         if self.is_duplicate:
-            sect_name = metomi.rose.config_editor.SUMMARY_DATA_PANEL_INDEX_TITLE
+            sect_name = (
+                metomi.rose.config_editor.SUMMARY_DATA_PANEL_INDEX_TITLE
+            )
         else:
-            sect_name = metomi.rose.config_editor.SUMMARY_DATA_PANEL_SECTION_TITLE
+            sect_name = (
+                metomi.rose.config_editor.SUMMARY_DATA_PANEL_SECTION_TITLE
+            )
         column_names = [sect_name]
         column_names += sub_var_names
         return data_rows, column_names
@@ -867,8 +1035,7 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
             cell.set_property("width-chars", max_len)
             cell.set_property("ellipsize", Pango.EllipsizeMode.END)
         sect_index = self.get_section_column_index()
-        if (value is not None and col_index == sect_index and
-                self.is_duplicate):
+        if value is not None and col_index == sect_index and self.is_duplicate:
             value = value.split("(")[-1].rstrip(")")
         if col_index == 0 and treemodel.iter_parent(iter_) is not None:
             cell.set_property("visible", False)
@@ -893,14 +1060,18 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
                 return False
             id_data = self.var_id_map[id_]
             value = str(view.get_model().get_value(row_iter, col_index))
-            tip_text = metomi.rose.CONFIG_DELIMITER.join([section, option, value])
+            tip_text = metomi.rose.CONFIG_DELIMITER.join(
+                [section, option, value]
+            )
         tip_text += id_data.metadata.get(metomi.rose.META_PROP_DESCRIPTION, "")
         if tip_text:
             tip_text += "\n"
         for key, value in list(id_data.error.items()):
             tip_text += (
                 metomi.rose.config_editor.SUMMARY_DATA_PANEL_ERROR_TIP.format(
-                    key, value))
+                    key, value
+                )
+            )
         for key in id_data.ignored_reason:
             tip_text += key + "\n"
         if option is not None:

@@ -19,7 +19,8 @@
 # -----------------------------------------------------------------------------
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 import metomi.rose.gtk.util
@@ -27,15 +28,15 @@ import metomi.rose.variable
 
 
 class LogicalArrayValueWidget(Gtk.Box):
-
     """This is a class to represent an array of logical or boolean types."""
 
-    TIP_ADD = 'Add array element'
-    TIP_DEL = 'Delete array element'
+    TIP_ADD = "Add array element"
+    TIP_DEL = "Delete array element"
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
-        super(LogicalArrayValueWidget, self).__init__(homogeneous=False,
-                                                      spacing=0)
+        super(LogicalArrayValueWidget, self).__init__(
+            homogeneous=False, spacing=0
+        )
         self.value = value
         self.metadata = metadata
         self.set_value = set_value
@@ -44,36 +45,48 @@ class LogicalArrayValueWidget(Gtk.Box):
         value_array = metomi.rose.variable.array_split(value)
         if metadata.get(metomi.rose.META_PROP_TYPE) == "boolean":
             # boolean -> true/false
-            self.allowed_values = [metomi.rose.TYPE_BOOLEAN_VALUE_FALSE,
-                                   metomi.rose.TYPE_BOOLEAN_VALUE_TRUE]
-            self.label_dict = dict(list(zip(self.allowed_values,
-                                       self.allowed_values)))
+            self.allowed_values = [
+                metomi.rose.TYPE_BOOLEAN_VALUE_FALSE,
+                metomi.rose.TYPE_BOOLEAN_VALUE_TRUE,
+            ]
+            self.label_dict = dict(
+                list(zip(self.allowed_values, self.allowed_values))
+            )
         elif metadata.get(metomi.rose.META_PROP_TYPE) == "python_boolean":
             # python_boolean -> True/False
-            self.allowed_values = [metomi.rose.TYPE_PYTHON_BOOLEAN_VALUE_FALSE,
-                                   metomi.rose.TYPE_PYTHON_BOOLEAN_VALUE_TRUE]
-            self.label_dict = dict(list(zip(self.allowed_values,
-                                       self.allowed_values)))
+            self.allowed_values = [
+                metomi.rose.TYPE_PYTHON_BOOLEAN_VALUE_FALSE,
+                metomi.rose.TYPE_PYTHON_BOOLEAN_VALUE_TRUE,
+            ]
+            self.label_dict = dict(
+                list(zip(self.allowed_values, self.allowed_values))
+            )
         else:
             # logical -> .true./.false.
-            self.allowed_values = [metomi.rose.TYPE_LOGICAL_VALUE_FALSE,
-                                   metomi.rose.TYPE_LOGICAL_VALUE_TRUE]
+            self.allowed_values = [
+                metomi.rose.TYPE_LOGICAL_VALUE_FALSE,
+                metomi.rose.TYPE_LOGICAL_VALUE_TRUE,
+            ]
             self.label_dict = {
-                metomi.rose.TYPE_LOGICAL_VALUE_FALSE:
-                metomi.rose.TYPE_LOGICAL_FALSE_TITLE,
-                metomi.rose.TYPE_LOGICAL_VALUE_TRUE:
-                metomi.rose.TYPE_LOGICAL_TRUE_TITLE}
+                metomi.rose.TYPE_LOGICAL_VALUE_FALSE: (
+                    metomi.rose.TYPE_LOGICAL_FALSE_TITLE
+                ),
+                metomi.rose.TYPE_LOGICAL_VALUE_TRUE: (
+                    metomi.rose.TYPE_LOGICAL_TRUE_TITLE
+                ),
+            }
 
-        imgs = [(Gtk.STOCK_MEDIA_STOP, Gtk.IconSize.MENU),
-                (Gtk.STOCK_APPLY, Gtk.IconSize.MENU)]
+        imgs = [
+            (Gtk.STOCK_MEDIA_STOP, Gtk.IconSize.MENU),
+            (Gtk.STOCK_APPLY, Gtk.IconSize.MENU),
+        ]
         self.make_log_image = lambda i: Gtk.Image.new_from_stock(*imgs[i])
         self.chars_width = max([len(v) for v in value_array] + [1]) + 1
         self.num_allowed_columns = 3
-        self.entry_table = Gtk.Table(rows=1,
-                                     columns=self.num_allowed_columns,
-                                     homogeneous=True)
-        self.entry_table.connect('focus-in-event',
-                                 self.hook.trigger_scroll)
+        self.entry_table = Gtk.Table(
+            rows=1, columns=self.num_allowed_columns, homogeneous=True
+        )
+        self.entry_table.connect("focus-in-event", self.hook.trigger_scroll)
         self.entry_table.show()
 
         self.entries = []
@@ -89,10 +102,13 @@ class LogicalArrayValueWidget(Gtk.Box):
         self.populate_table()
         self.pack_start(self.button_box, expand=False, fill=False, padding=0)
         self.pack_start(self.entry_table, expand=True, fill=True, padding=0)
-        self.entry_table.connect_after('size-allocate',
-                                       lambda w, e: self.reshape_table())
-        self.connect('focus-in-event',
-                     lambda w, e: self.hook.get_focus(self.get_focus_entry()))
+        self.entry_table.connect_after(
+            "size-allocate", lambda w, e: self.reshape_table()
+        )
+        self.connect(
+            "focus-in-event",
+            lambda w, e: self.hook.get_focus(self.get_focus_entry()),
+        )
 
     def get_focus_entry(self):
         """Get either the last selected button or the last one."""
@@ -105,39 +121,57 @@ class LogicalArrayValueWidget(Gtk.Box):
         self.add_button = Gtk.EventBox()
         self.add_button.set_tooltip_text(self.TIP_ADD)
         self.add_button.add(add_image)
-        self.add_button.connect('button-release-event',
-                                lambda b, e: self.add_entry())
-        self.add_button.connect('enter-notify-event',
-                                lambda b, e: b.set_state(Gtk.StateType.ACTIVE))
-        self.add_button.connect('leave-notify-event',
-                                lambda b, e: b.set_state(Gtk.StateType.NORMAL))
-        del_image = Gtk.Image.new_from_stock(Gtk.STOCK_REMOVE,
-                                             Gtk.IconSize.MENU)
+        self.add_button.connect(
+            "button-release-event", lambda b, e: self.add_entry()
+        )
+        self.add_button.connect(
+            "enter-notify-event",
+            lambda b, e: b.set_state(Gtk.StateType.ACTIVE),
+        )
+        self.add_button.connect(
+            "leave-notify-event",
+            lambda b, e: b.set_state(Gtk.StateType.NORMAL),
+        )
+        del_image = Gtk.Image.new_from_stock(
+            Gtk.STOCK_REMOVE, Gtk.IconSize.MENU
+        )
         del_image.show()
         self.del_button = Gtk.EventBox()
         self.del_button.set_tooltip_text(self.TIP_ADD)
         self.del_button.add(del_image)
         self.del_button.show()
-        self.del_button.connect('button-release-event',
-                                self.remove_entry)
-        self.del_button.connect('enter-notify-event',
-                                lambda b, e: b.set_state(Gtk.StateType.ACTIVE))
-        self.del_button.connect('leave-notify-event',
-                                lambda b, e: b.set_state(Gtk.StateType.NORMAL))
+        self.del_button.connect("button-release-event", self.remove_entry)
+        self.del_button.connect(
+            "enter-notify-event",
+            lambda b, e: b.set_state(Gtk.StateType.ACTIVE),
+        )
+        self.del_button.connect(
+            "leave-notify-event",
+            lambda b, e: b.set_state(Gtk.StateType.NORMAL),
+        )
         self.button_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.button_box.show()
-        self.button_box.pack_start(self.add_button, expand=False, fill=False, padding=0)
-        self.button_box.pack_start(self.del_button, expand=False, fill=False, padding=0)
+        self.button_box.pack_start(
+            self.add_button, expand=False, fill=False, padding=0
+        )
+        self.button_box.pack_start(
+            self.del_button, expand=False, fill=False, padding=0
+        )
 
     def get_entry(self, value_item):
         """Create a widget for this array element."""
-        bad_img = Gtk.Image.new_from_stock(Gtk.STOCK_DIALOG_WARNING,
-                                           Gtk.IconSize.MENU)
+        bad_img = Gtk.Image.new_from_stock(
+            Gtk.STOCK_DIALOG_WARNING, Gtk.IconSize.MENU
+        )
         button = Gtk.ToggleButton()
-        button.options = [metomi.rose.TYPE_LOGICAL_VALUE_FALSE,
-                          metomi.rose.TYPE_LOGICAL_VALUE_TRUE]
-        button.labels = [metomi.rose.TYPE_LOGICAL_FALSE_TITLE,
-                         metomi.rose.TYPE_LOGICAL_TRUE_TITLE]
+        button.options = [
+            metomi.rose.TYPE_LOGICAL_VALUE_FALSE,
+            metomi.rose.TYPE_LOGICAL_VALUE_TRUE,
+        ]
+        button.labels = [
+            metomi.rose.TYPE_LOGICAL_FALSE_TITLE,
+            metomi.rose.TYPE_LOGICAL_TRUE_TITLE,
+        ]
         button.set_tooltip_text(value_item)
         if value_item in self.allowed_values:
             index = self.allowed_values.index(value_item)
@@ -147,7 +181,7 @@ class LogicalArrayValueWidget(Gtk.Box):
         else:
             button.set_inconsistent(True)
             button.set_image(bad_img)
-        button.connect('toggled', self._switch_state_and_set)
+        button.connect("toggled", self._switch_state_and_set)
         button.show()
         return button
 
@@ -172,47 +206,60 @@ class LogicalArrayValueWidget(Gtk.Box):
             focus = self.entries[-1]
         for child in self.entry_table.get_children():
             self.entry_table.remove(child)
-        if (focus is None and self.entry_table.is_focus() and
-                len(self.entries) > 0):
+        if (
+            focus is None
+            and self.entry_table.is_focus()
+            and len(self.entries) > 0
+        ):
             focus = self.entries[-1]
         num_fields = len(self.entries)
         num_rows_now = 1 + (num_fields - 1) / self.num_allowed_columns
         self.entry_table.resize(num_rows_now, self.num_allowed_columns)
-        if (self.max_length.isdigit() and
-                len(self.entries) >= int(self.max_length)):
+        if self.max_length.isdigit() and len(self.entries) >= int(
+            self.max_length
+        ):
             self.add_button.hide()
         else:
             self.add_button.show()
-        if (self.max_length.isdigit() and
-                len(self.entries) <= int(self.max_length)):
+        if self.max_length.isdigit() and len(self.entries) <= int(
+            self.max_length
+        ):
             self.del_button.hide()
         else:
             self.del_button.show()
         if self.has_titles:
-            for col, label in enumerate(self.metadata['element-titles']):
+            for col, label in enumerate(self.metadata["element-titles"]):
                 if col >= len(table_widgets):
                     break
                 widget = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-                label = Gtk.Label(label=self.metadata['element-titles'][col])
+                label = Gtk.Label(label=self.metadata["element-titles"][col])
                 label.show()
                 widget.pack_start(label, expand=True, fill=True)
                 widget.show()
-                self.entry_table.attach(widget,
-                                        col, col + 1,
-                                        0, 1,
-                                        xoptions=Gtk.AttachOptions.FILL,
-                                        yoptions=Gtk.AttachOptions.SHRINK)
+                self.entry_table.attach(
+                    widget,
+                    col,
+                    col + 1,
+                    0,
+                    1,
+                    xoptions=Gtk.AttachOptions.FILL,
+                    yoptions=Gtk.AttachOptions.SHRINK,
+                )
 
         for i, widget in enumerate(table_widgets):
             row = i // self.num_allowed_columns
             if self.has_titles:
                 row += 1
             column = i % self.num_allowed_columns
-            self.entry_table.attach(widget,
-                                    column, column + 1,
-                                    row, row + 1,
-                                    xoptions=Gtk.AttachOptions.FILL,
-                                    yoptions=Gtk.AttachOptions.SHRINK)
+            self.entry_table.attach(
+                widget,
+                column,
+                column + 1,
+                row,
+                row + 1,
+                xoptions=Gtk.AttachOptions.FILL,
+                yoptions=Gtk.AttachOptions.SHRINK,
+            )
         self.grab_focus = lambda: self.hook.get_focus(self.entries[-1])
         self.check_resize()
 
@@ -249,7 +296,7 @@ class LogicalArrayValueWidget(Gtk.Box):
         for widget in self.entries:
             value = widget.get_tooltip_text()
             if value is None:
-                value = ''
+                value = ""
             val_array.append(value)
         new_val = metomi.rose.variable.array_join(val_array)
         self.value = new_val

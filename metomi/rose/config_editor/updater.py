@@ -22,14 +22,21 @@ import metomi.rose.config_editor
 
 
 class Updater(object):
-
     """This handles the updating of various statuses and displays."""
 
-    def __init__(self, data, util, reporter, mainwindow, main_handle,
-                 nav_controller, get_pagelist_func,
-                 update_bar_widgets_func,
-                 refresh_metadata_func,
-                 is_pluggable=False):
+    def __init__(
+        self,
+        data,
+        util,
+        reporter,
+        mainwindow,
+        main_handle,
+        nav_controller,
+        get_pagelist_func,
+        update_bar_widgets_func,
+        refresh_metadata_func,
+        is_pluggable=False,
+    ):
         self.data = data
         self.util = util
         self.reporter = reporter
@@ -64,21 +71,27 @@ class Updater(object):
             if set(section_hashes) ^ set(old_section_hashes):
                 return metomi.rose.config_editor.TREE_PANEL_TIP_CHANGED_CONFIG
         allowed_sections = self.data.helper.get_sections_from_namespace(
-            namespace)
+            namespace
+        )
         save_var_map = {}
         for section in allowed_sections:
             for var in config_data.vars.save.get(section, []):
-                if var.metadata['full_ns'] == namespace:
-                    save_var_map.update({var.metadata['id']: var})
+                if var.metadata["full_ns"] == namespace:
+                    save_var_map.update({var.metadata["id"]: var})
             for var in config_data.vars.now.get(section, []):
-                if var.metadata['full_ns'] == namespace:
-                    var_id = var.metadata['id']
+                if var.metadata["full_ns"] == namespace:
+                    var_id = var.metadata["id"]
                     save_var = save_var_map.get(var_id)
                     if save_var is None:
-                        return metomi.rose.config_editor.TREE_PANEL_TIP_ADDED_VARS
+                        return (
+                            metomi.rose.config_editor.TREE_PANEL_TIP_ADDED_VARS
+                        )
                     if save_var.to_hashable() != var.to_hashable():
                         # Variable has changed in some form.
-                        return metomi.rose.config_editor.TREE_PANEL_TIP_CHANGED_VARS
+                        return (
+                            metomi.rose.config_editor
+                            .TREE_PANEL_TIP_CHANGED_VARS
+                        )
                     save_var_map.pop(var_id)
         if save_var_map:
             # Some variables are now absent.
@@ -89,11 +102,15 @@ class Updater(object):
                 sect_data = config_sections.now.get(section)
                 save_sect_data = config_sections.save.get(section)
                 if (sect_data is None) != (save_sect_data is None):
-                    return metomi.rose.config_editor.TREE_PANEL_TIP_DIFF_SECTIONS
+                    return (
+                        metomi.rose.config_editor.TREE_PANEL_TIP_DIFF_SECTIONS
+                    )
                 if sect_data is not None and save_sect_data is not None:
                     if sect_data.to_hashable() != save_sect_data.to_hashable():
                         return (
-                            metomi.rose.config_editor.TREE_PANEL_TIP_CHANGED_SECTIONS)
+                            metomi.rose.config_editor
+                            .TREE_PANEL_TIP_CHANGED_SECTIONS
+                        )
         return ""
 
     def update_ns_tree_states(self, namespace):
@@ -102,11 +119,13 @@ class Updater(object):
             latent_status = self.data.helper.get_ns_latent_status(namespace)
             ignored_status = self.data.helper.get_ns_ignored_status(namespace)
             ns_names = namespace.lstrip("/").split("/")
-            self.nav_panel.update_statuses(ns_names, latent_status,
-                                           ignored_status)
+            self.nav_panel.update_statuses(
+                ns_names, latent_status, ignored_status
+            )
 
-    def tree_trigger_update(self, only_this_config=None,
-                            only_this_namespace=None):
+    def tree_trigger_update(
+        self, only_this_config=None, only_this_namespace=None
+    ):
         """Reload the tree panel, and perform an update.
 
         If only_this_config is not None, perform an update only on the
@@ -117,8 +136,7 @@ class Updater(object):
 
         """
         if self.nav_panel is not None:
-            self.nav_panel.load_tree(None,
-                                     self.nav_controller.namespace_tree)
+            self.nav_panel.load_tree(None, self.nav_controller.namespace_tree)
             if only_this_namespace is None:
                 self.update_all(only_this_config=only_this_config)
             else:
@@ -126,12 +144,17 @@ class Updater(object):
                 spaces = only_this_namespace.lstrip("/").split("/")
                 for i in range(len(spaces), 0, -1):
                     update_ns = "/" + "/".join(spaces[:i])
-                    self.update_namespace(update_ns,
-                                          skip_sub_data_update=True)
+                    self.update_namespace(update_ns, skip_sub_data_update=True)
                 self.update_ns_sub_data(only_this_namespace)
 
-    def refresh_ids(self, config_name, setting_ids, is_loading=False,
-                    are_errors_done=False, skip_update=False):
+    def refresh_ids(
+        self,
+        config_name,
+        setting_ids,
+        is_loading=False,
+        are_errors_done=False,
+        skip_update=False,
+    ):
         """Refresh and redraw settings if needed."""
         self.pagelist = self.get_pagelist_func()
         nses_to_do = []
@@ -139,17 +162,17 @@ class Updater(object):
             sect, opt = self.util.get_section_option_from_id(changed_id)
             if opt is None:
                 name = self.data.helper.get_default_section_namespace(
-                    sect, config_name)
+                    sect, config_name
+                )
                 if name in [p.namespace for p in self.pagelist]:
                     index = [p.namespace for p in self.pagelist].index(name)
                     page = self.pagelist[index]
                     page.refresh()
             else:
-                var = self.data.helper.get_ns_variable(changed_id,
-                                                       config_name)
+                var = self.data.helper.get_ns_variable(changed_id, config_name)
                 if var is None:
                     continue
-                name = var.metadata['full_ns']
+                name = var.metadata["full_ns"]
                 if name in [p.namespace for p in self.pagelist]:
                     index = [p.namespace for p in self.pagelist].index(name)
                     page = self.pagelist[index]
@@ -158,15 +181,22 @@ class Updater(object):
                 nses_to_do.append(name)
         if not skip_update:
             for name in nses_to_do:
-                self.update_namespace(name, is_loading=is_loading,
-                                      skip_sub_data_update=True)
+                self.update_namespace(
+                    name, is_loading=is_loading, skip_sub_data_update=True
+                )
             self.update_ns_sub_data(nses_to_do)
 
-    def update_all(self, only_this_config=None, is_loading=False,
-                   skip_checking=False, skip_sub_data_update=False):
+    def update_all(
+        self,
+        only_this_config=None,
+        is_loading=False,
+        skip_checking=False,
+        skip_sub_data_update=False,
+    ):
         """Loop over all namespaces and update."""
         unique_namespaces = self.data.helper.get_all_namespaces(
-            only_this_config)
+            only_this_config
+        )
 
         for name in unique_namespaces:
             self.data.helper.clear_namespace_cached_statuses(name)
@@ -203,17 +233,24 @@ class Updater(object):
         if not skip_sub_data_update:
             self.update_ns_sub_data()
 
-    def update_namespace(self, namespace, are_errors_done=False,
-                         is_loading=False,
-                         skip_sub_data_update=False):
+    def update_namespace(
+        self,
+        namespace,
+        are_errors_done=False,
+        is_loading=False,
+        skip_sub_data_update=False,
+    ):
         """Update driver function. Updates the page if open."""
         self.pagelist = self.get_pagelist_func()
         self.data.helper.clear_namespace_cached_statuses(namespace)
         if namespace in [p.namespace for p in self.pagelist]:
             index = [p.namespace for p in self.pagelist].index(namespace)
             page = self.pagelist[index]
-            self.update_status(page, are_errors_done=are_errors_done,
-                               skip_sub_data_update=skip_sub_data_update)
+            self.update_status(
+                page,
+                are_errors_done=are_errors_done,
+                skip_sub_data_update=skip_sub_data_update,
+            )
         else:
             self.update_sections(namespace)
             self.update_ignored_statuses(namespace)
@@ -229,8 +266,9 @@ class Updater(object):
             if not skip_sub_data_update:
                 self.update_ns_sub_data(namespace)
 
-    def update_status(self, page, are_errors_done=False,
-                      skip_sub_data_update=False):
+    def update_status(
+        self, page, are_errors_done=False, skip_sub_data_update=False
+    ):
         """Update ignored statuses and update the tree statuses."""
         self.pagelist = self.get_pagelist_func()
         self.sync_page_var_lists(page)
@@ -254,14 +292,14 @@ class Updater(object):
             namespaces = [namespaces]
         for page in self.pagelist:
             for namespace in namespaces:
-                if (namespace is None or
-                        namespace.startswith(page.namespace)):
+                if namespace is None or namespace.startswith(page.namespace):
                     break
             else:
                 # No namespaces matched this page, skip
                 continue
             page.sub_data = self.data.helper.get_sub_data_for_namespace(
-                page.namespace)
+                page.namespace
+            )
             page.update_sub_data()
 
     def update_ns_info(self, namespace):
@@ -276,10 +314,12 @@ class Updater(object):
         real, miss = self.data.helper.get_data_for_namespace(page.namespace)
         page_real, page_miss = page.panel_data, page.ghost_data
         refresh_vars = []
-        action_vsets = [(page_real.remove, set(page_real) - set(real)),
-                        (page_real.append, set(real) - set(page_real)),
-                        (page_miss.remove, set(page_miss) - set(miss)),
-                        (page_miss.append, set(miss) - set(page_miss))]
+        action_vsets = [
+            (page_real.remove, set(page_real) - set(real)),
+            (page_real.append, set(real) - set(page_real)),
+            (page_miss.remove, set(page_miss) - set(miss)),
+            (page_miss.append, set(miss) - set(page_miss)),
+        ]
 
         for action, v_set in action_vsets:
             for var in v_set:
@@ -288,7 +328,7 @@ class Updater(object):
             for var in v_set:
                 action(var)
         for var in refresh_vars:
-            page.refresh(var.metadata['id'])
+            page.refresh(var.metadata["id"])
 
     def update_config(self, namespace):
         """Update the config object for the macros."""
@@ -311,7 +351,7 @@ class Updater(object):
                 if section in config_data.vars.now:
                     config_data.vars.now.pop(section)
             for variable in variables:
-                var_id = variable.metadata['id']
+                var_id = variable.metadata["id"]
                 option = self.util.get_section_option_from_id(var_id)[1]
                 sect_data.options.append(option)
 
@@ -328,7 +368,7 @@ class Updater(object):
         this_ns_triggers = []
         ns_vars, ns_l_vars = self.data.helper.get_data_for_namespace(namespace)
         for var in ns_vars + ns_l_vars:
-            var_id = var.metadata['id']
+            var_id = var.metadata["id"]
             if not trigger.check_is_id_trigger(var_id, config_data.meta):
                 continue
             if var in ns_l_vars:
@@ -338,8 +378,7 @@ class Updater(object):
             old_val = trig_id_val_dict.get(var_id)
             if old_val != new_val:  # new_val or old_val can be None
                 this_ns_triggers.append(var_id)
-                updated_ids += self.update_ignoreds(config_name,
-                                                    var_id)
+                updated_ids += self.update_ignoreds(config_name, var_id)
 
         if not this_ns_triggers:
             # No reason to update anything.
@@ -347,7 +386,7 @@ class Updater(object):
 
         var_id_map = {}
         for var in config_data.vars.get_all(skip_latent=True):
-            var_id = var.metadata['id']
+            var_id = var.metadata["id"]
             var_id_map.update({var_id: var})
 
         update_nses = []
@@ -357,18 +396,19 @@ class Updater(object):
             if opt is None:
                 sect_vars = config_data.vars.now.get(sect, [])
                 name = self.data.helper.get_default_section_namespace(
-                    sect, config_name)
+                    sect, config_name
+                )
                 if name not in update_section_nses:
                     update_section_nses.append(name)
             else:
                 sect_vars = list(config_data.vars.now.get(sect, []))
                 sect_vars += list(config_data.vars.latent.get(sect, []))
                 for var in list(sect_vars):
-                    if var.metadata['id'] != setting_id:
+                    if var.metadata["id"] != setting_id:
                         sect_vars.remove(var)
             for var in sect_vars:
-                var_ns = var.metadata['full_ns']
-                var_id = var.metadata['id']
+                var_ns = var.metadata["full_ns"]
+                var_id = var.metadata["id"]
                 vsect = self.util.get_section_option_from_id(var_id)[0]
                 if var_ns not in update_nses:
                     update_nses.append(var_ns)
@@ -398,10 +438,13 @@ class Updater(object):
 
         meta_config = config_data.meta
         config_sections = config_data.sections
-        config_data_for_trigger = {"sections": config_sections.now,
-                                   "variables": config_data.vars.now}
-        update_ids = trigger.update(var_id, config_data_for_trigger,
-                                    meta_config)
+        config_data_for_trigger = {
+            "sections": config_sections.now,
+            "variables": config_data.vars.now,
+        }
+        update_ids = trigger.update(
+            var_id, config_data_for_trigger, meta_config
+        )
         update_vars = []
         update_sections = []
         for setting_id in update_ids:
@@ -410,32 +453,37 @@ class Updater(object):
                 update_sections.append(section)
             else:
                 for var in config_data.vars.now.get(section, []):
-                    if var.metadata['id'] == setting_id:
+                    if var.metadata["id"] == setting_id:
                         update_vars.append(var)
                         break
                 else:
                     for var in config_data.vars.latent.get(section, []):
-                        if var.metadata['id'] == setting_id:
+                        if var.metadata["id"] == setting_id:
                             update_vars.append(var)
                             break
         triggered_ns_list = []
         this_id = var_id
-        for namespace, metadata in list(self.data.namespace_meta_lookup.items()):
+        for namespace, metadata in list(
+            self.data.namespace_meta_lookup.items()
+        ):
             this_name = self.util.split_full_ns(self.data, namespace)
             if this_name != config_name:
                 continue
             for section in update_sections:
-                if section in metadata['sections']:
+                if section in metadata["sections"]:
                     triggered_ns_list.append(namespace)
 
         # Update the sections.
-        enabled_sections = [s for s in update_sections
-                            if s in trigger.enabled_dict and
-                            s not in trigger.ignored_dict]
+        enabled_sections = [
+            s
+            for s in update_sections
+            if s in trigger.enabled_dict and s not in trigger.ignored_dict
+        ]
         for section in update_sections:
             # Clear pre-existing errors.
-            sect_vars = (config_data.vars.now.get(section, []) +
-                         config_data.vars.latent.get(section, []))
+            sect_vars = config_data.vars.now.get(
+                section, []
+            ) + config_data.vars.latent.get(section, [])
             sect_data = config_sections.now.get(section)
             if sect_data is None:
                 sect_data = config_sections.latent[section]
@@ -445,42 +493,57 @@ class Updater(object):
             reason = sect_data.ignored_reason
             if section in enabled_sections:
                 # Trigger-enabled sections
-                if (metomi.rose.variable.IGNORED_BY_USER in reason):
+                if metomi.rose.variable.IGNORED_BY_USER in reason:
                     # User-ignored but trigger-enabled
-                    if (meta_config.get(
-                            [section, metomi.rose.META_PROP_COMPULSORY]).value ==
-                            metomi.rose.META_PROP_VALUE_TRUE):
+                    if (
+                        meta_config.get(
+                            [section, metomi.rose.META_PROP_COMPULSORY]
+                        ).value
+                        == metomi.rose.META_PROP_VALUE_TRUE
+                    ):
                         # Doc table: I_u -> E -> compulsory
                         sect_data.error.update(
-                            {metomi.rose.config_editor.WARNING_TYPE_USER_IGNORED:
-                             metomi.rose.config_editor.WARNING_NOT_USER_IGNORABLE})
-                elif (metomi.rose.variable.IGNORED_BY_SYSTEM in reason):
+                            {
+                                metomi.rose.config_editor
+                                .WARNING_TYPE_USER_IGNORED: (
+                                    metomi.rose.config_editor
+                                    .WARNING_NOT_USER_IGNORABLE
+                                )
+                            }
+                        )
+                elif metomi.rose.variable.IGNORED_BY_SYSTEM in reason:
                     # Normal trigger-enabled sections
                     reason.pop(metomi.rose.variable.IGNORED_BY_SYSTEM)
                     for var in sect_vars:
-                        name = var.metadata['full_ns']
+                        name = var.metadata["full_ns"]
                         if name not in triggered_ns_list:
                             triggered_ns_list.append(name)
                         var.ignored_reason.pop(
-                            metomi.rose.variable.IGNORED_BY_SECTION, None)
+                            metomi.rose.variable.IGNORED_BY_SECTION, None
+                        )
             elif section in trigger.ignored_dict:
                 # Trigger-ignored sections
                 parents = trigger.ignored_dict.get(section, {})
                 if parents:
                     help_text = "; ".join(list(parents.values()))
                 else:
-                    help_text = metomi.rose.config_editor.IGNORED_STATUS_DEFAULT
-                reason.update({metomi.rose.variable.IGNORED_BY_SYSTEM: help_text})
+                    help_text = (
+                        metomi.rose.config_editor.IGNORED_STATUS_DEFAULT
+                    )
+                reason.update(
+                    {metomi.rose.variable.IGNORED_BY_SYSTEM: help_text}
+                )
                 for var in sect_vars:
-                    name = var.metadata['full_ns']
+                    name = var.metadata["full_ns"]
                     if name not in triggered_ns_list:
                         triggered_ns_list.append(name)
                     var.ignored_reason.update(
-                        {metomi.rose.variable.IGNORED_BY_SECTION: help_text})
+                        {metomi.rose.variable.IGNORED_BY_SECTION: help_text}
+                    )
         # Update the variables.
         for var in update_vars:
-            var_id = var.metadata.get('id')
-            name = var.metadata.get('full_ns')
+            var_id = var.metadata.get("id")
+            name = var.metadata.get("full_ns")
             if name not in triggered_ns_list:
                 triggered_ns_list.append(name)
             if var_id == this_id:
@@ -488,31 +551,48 @@ class Updater(object):
             for attribute in metomi.rose.config_editor.WARNING_TYPES_IGNORE:
                 if attribute in var.error:
                     var.error.pop(attribute)
-            if (var_id in trigger.enabled_dict and
-                    var_id not in trigger.ignored_dict):
+            if (
+                var_id in trigger.enabled_dict
+                and var_id not in trigger.ignored_dict
+            ):
                 # Trigger-enabled variables
                 if metomi.rose.variable.IGNORED_BY_USER in var.ignored_reason:
                     # User-ignored but trigger-enabled
                     # Doc table: I_u -> E
-                    if (var.metadata.get(metomi.rose.META_PROP_COMPULSORY) ==
-                            metomi.rose.META_PROP_VALUE_TRUE):
+                    if (
+                        var.metadata.get(metomi.rose.META_PROP_COMPULSORY)
+                        == metomi.rose.META_PROP_VALUE_TRUE
+                    ):
                         # Doc table: I_u -> E -> compulsory
                         var.error.update(
-                            {metomi.rose.config_editor.WARNING_TYPE_USER_IGNORED:
-                             metomi.rose.config_editor.WARNING_NOT_USER_IGNORABLE})
-                elif (metomi.rose.variable.IGNORED_BY_SYSTEM in
-                      var.ignored_reason):
+                            {
+                                metomi.rose.config_editor
+                                .WARNING_TYPE_USER_IGNORED: (
+                                    metomi.rose.config_editor
+                                    .WARNING_NOT_USER_IGNORABLE
+                                )
+                            }
+                        )
+                elif (
+                    metomi.rose.variable.IGNORED_BY_SYSTEM
+                    in var.ignored_reason
+                ):
                     # Normal trigger-enabled variables
-                    var.ignored_reason.pop(metomi.rose.variable.IGNORED_BY_SYSTEM)
+                    var.ignored_reason.pop(
+                        metomi.rose.variable.IGNORED_BY_SYSTEM
+                    )
             elif var_id in trigger.ignored_dict:
                 # Trigger-ignored variables
                 parents = trigger.ignored_dict.get(var_id, {})
                 if parents:
                     help_text = "; ".join(list(parents.values()))
                 else:
-                    help_text = metomi.rose.config_editor.IGNORED_STATUS_DEFAULT
+                    help_text = (
+                        metomi.rose.config_editor.IGNORED_STATUS_DEFAULT
+                    )
                 var.ignored_reason.update(
-                    {metomi.rose.variable.IGNORED_BY_SYSTEM: help_text})
+                    {metomi.rose.variable.IGNORED_BY_SYSTEM: help_text}
+                )
         for namespace in triggered_ns_list:
             self.update_tree_status(namespace)
         return update_ids
@@ -526,7 +606,8 @@ class Updater(object):
             config_name = self.util.split_full_ns(self.data, namespace)[0]
             errors = []
             ns_vars, ns_l_vars = self.data.helper.get_data_for_namespace(
-                namespace)
+                namespace
+            )
             for var in ns_vars + ns_l_vars:
                 errors += list(var.error.items())
         else:
@@ -540,29 +621,36 @@ class Updater(object):
             if section in config_data.sections.now:
                 errors += list(config_data.sections.now[section].error.items())
             elif section in config_data.sections.latent:
-                errors += list(config_data.sections.latent[section].error.items())
+                errors += list(
+                    config_data.sections.latent[section].error.items()
+                )
 
         # Set icons.
-        name_tree = namespace.lstrip('/').split('/')
+        name_tree = namespace.lstrip("/").split("/")
         if icon_bool is None:
-            if icon_type == 'changed' or icon_type is None:
+            if icon_type == "changed" or icon_type is None:
                 change = self.namespace_data_is_modified(namespace)
                 self.nav_panel.update_change(name_tree, change)
-                self.nav_panel.set_row_icon(name_tree, bool(change),
-                                            ind_type='changed')
-            if icon_type == 'error' or icon_type is None:
-                self.nav_panel.set_row_icon(name_tree, len(errors),
-                                            ind_type='error')
+                self.nav_panel.set_row_icon(
+                    name_tree, bool(change), ind_type="changed"
+                )
+            if icon_type == "error" or icon_type is None:
+                self.nav_panel.set_row_icon(
+                    name_tree, len(errors), ind_type="error"
+                )
         else:
-            self.nav_panel.set_row_icon(name_tree, icon_bool,
-                                        ind_type=icon_type)
+            self.nav_panel.set_row_icon(
+                name_tree, icon_bool, ind_type=icon_type
+            )
 
     def update_stack_viewer_if_open(self):
         """Update the information in the stack viewer, if open."""
         if self.is_pluggable:
             return False
-        if isinstance(self.mainwindow.log_window,
-                      metomi.rose.config_editor.stack.StackViewer):
+        if isinstance(
+            self.mainwindow.log_window,
+            metomi.rose.config_editor.stack.StackViewer,
+        ):
             self.mainwindow.log_window.update()
 
     def focus_sub_page_if_open(self, namespace, node_id):
@@ -596,65 +684,88 @@ class Updater(object):
             if problem_list:
                 self.main_handle.handle_macro_validation(
                     config_name,
-                    'duplicate.DuplicateChecker.validate',
-                    macro_config, problem_list, no_display=True)
+                    "duplicate.DuplicateChecker.validate",
+                    macro_config,
+                    problem_list,
+                    no_display=True,
+                )
             format_checker = metomi.rose.macros.format.FormatChecker()
             problem_list = format_checker.validate(macro_config, meta_config)
             if problem_list:
                 self.main_handle.handle_macro_validation(
-                    config_name, 'format.FormatChecker.validate',
-                    macro_config, problem_list)
+                    config_name,
+                    "format.FormatChecker.validate",
+                    macro_config,
+                    problem_list,
+                )
 
     def perform_error_check(self, namespace=None, is_loading=False):
         """Loop through system macros and sum errors."""
         configs = list(self.data.config.keys())
         if namespace is not None:
-            config_name = self.util.split_full_ns(self.data,
-                                                  namespace)[0]
+            config_name = self.util.split_full_ns(self.data, namespace)[0]
             configs = [config_name]
         # Compulsory checking.
         for config_name in configs:
             config_data = self.data.config[config_name]
             meta = config_data.meta
-            checker = (
-                self.data.builtin_macros[config_name][
-                    metomi.rose.META_PROP_COMPULSORY])
+            checker = self.data.builtin_macros[config_name][
+                metomi.rose.META_PROP_COMPULSORY
+            ]
             only_these_sections = None
             if namespace is not None:
                 only_these_sections = (
-                    self.data.helper.get_sections_from_namespace(namespace))
+                    self.data.helper.get_sections_from_namespace(namespace)
+                )
             config_data_for_compulsory = {
                 "sections": config_data.sections.now,
-                "variables": config_data.vars.now
+                "variables": config_data.vars.now,
             }
             bad_list = checker.validate_settings(
-                config_data_for_compulsory, config_data.meta,
-                only_these_sections=only_these_sections
+                config_data_for_compulsory,
+                config_data.meta,
+                only_these_sections=only_these_sections,
             )
-            self.apply_macro_validation(config_name,
-                                        metomi.rose.META_PROP_COMPULSORY, bad_list,
-                                        namespace, is_loading=is_loading,
-                                        is_macro_dynamic=True)
+            self.apply_macro_validation(
+                config_name,
+                metomi.rose.META_PROP_COMPULSORY,
+                bad_list,
+                namespace,
+                is_loading=is_loading,
+                is_macro_dynamic=True,
+            )
         # Value checking.
         for config_name in configs:
             config_data = self.data.config[config_name]
             meta = config_data.meta
-            checker = (
-                self.data.builtin_macros[config_name][metomi.rose.META_PROP_TYPE])
+            checker = self.data.builtin_macros[config_name][
+                metomi.rose.META_PROP_TYPE
+            ]
             if namespace is None:
                 real_variables = config_data.vars.get_all(skip_latent=True)
             else:
-                real_variables = (
-                    self.data.helper.get_data_for_namespace(namespace)[0])
+                real_variables = self.data.helper.get_data_for_namespace(
+                    namespace
+                )[0]
             bad_list = checker.validate_variables(real_variables, meta)
-            self.apply_macro_validation(config_name, metomi.rose.META_PROP_TYPE,
-                                        bad_list,
-                                        namespace, is_loading=is_loading,
-                                        is_macro_dynamic=True)
+            self.apply_macro_validation(
+                config_name,
+                metomi.rose.META_PROP_TYPE,
+                bad_list,
+                namespace,
+                is_loading=is_loading,
+                is_macro_dynamic=True,
+            )
 
-    def apply_macro_validation(self, config_name, macro_type, bad_list=None,
-                               namespace=None, is_loading=False,
-                               is_macro_dynamic=False):
+    def apply_macro_validation(
+        self,
+        config_name,
+        macro_type,
+        bad_list=None,
+        namespace=None,
+        is_loading=False,
+        is_macro_dynamic=False,
+    ):
         """Display error icons if a variable is in the wrong state."""
         if bad_list is None:
             bad_list = []
@@ -664,14 +775,17 @@ class Updater(object):
         id_error_dict = {}
         id_warn_dict = {}
         if namespace is None:
-            ok_sections = (list(config_sections.now.keys()) +
-                           list(config_sections.latent.keys()))
+            ok_sections = list(config_sections.now.keys()) + list(
+                config_sections.latent.keys()
+            )
             ok_variables = variables
         else:
             ok_sections = self.data.helper.get_sections_from_namespace(
-                namespace)
-            ok_variables = [v for v in variables
-                            if v.metadata.get('full_ns') == namespace]
+                namespace
+            )
+            ok_variables = [
+                v for v in variables if v.metadata.get("full_ns") == namespace
+            ]
         for section in ok_sections:
             sect_data = config_sections.now.get(section)
             if sect_data is None:
@@ -687,14 +801,17 @@ class Updater(object):
         for var in ok_variables:
             if macro_type in var.error:
                 this_error = var.error.pop(macro_type)
-                id_error_dict.update({var.metadata['id']: this_error})
+                id_error_dict.update({var.metadata["id"]: this_error})
             if macro_type in var.warning:
                 this_warning = var.warning.pop(macro_type)
-                id_warn_dict.update({var.metadata['id']: this_warning})
+                id_warn_dict.update({var.metadata["id"]: this_warning})
         if not bad_list:
-            self.refresh_ids(config_name,
-                             list(id_error_dict.keys()) + list(id_warn_dict.keys()),
-                             is_loading, are_errors_done=is_macro_dynamic)
+            self.refresh_ids(
+                config_name,
+                list(id_error_dict.keys()) + list(id_warn_dict.keys()),
+                is_loading,
+                are_errors_done=is_macro_dynamic,
+            )
             return
         for bad_report in bad_list:
             section = bad_report.section
@@ -702,9 +819,13 @@ class Updater(object):
             info = bad_report.info
             if key is None:
                 setting_id = section
-                if (namespace is not None and section not in
-                        self.data.helper.get_sections_from_namespace(
-                            namespace)):
+                if (
+                    namespace is not None
+                    and section
+                    not in self.data.helper.get_sections_from_namespace(
+                        namespace
+                    )
+                ):
                     continue
                 sect_data = config_sections.now.get(section)
                 if sect_data is None:
@@ -717,16 +838,19 @@ class Updater(object):
                     sect_data.error.setdefault(macro_type, info)
             else:
                 setting_id = self.util.get_id_from_section_option(section, key)
-                var = self.data.helper.get_variable_by_id(setting_id,
-                                                          config_name)
+                var = self.data.helper.get_variable_by_id(
+                    setting_id, config_name
+                )
                 if var is None:
-                    var = self.data.helper.get_variable_by_id(setting_id,
-                                                              config_name,
-                                                              latent=True)
+                    var = self.data.helper.get_variable_by_id(
+                        setting_id, config_name, latent=True
+                    )
                 if var is None:
                     continue
-                if (namespace is not None and
-                        var.metadata['full_ns'] != namespace):
+                if (
+                    namespace is not None
+                    and var.metadata["full_ns"] != namespace
+                ):
                     continue
                 if bad_report.is_warning:
                     var.warning.setdefault(macro_type, info)
@@ -738,23 +862,30 @@ class Updater(object):
                 map_ = id_error_dict
                 if is_loading:
                     self.load_errors += 1
-                    update_text = metomi.rose.config_editor.EVENT_LOAD_ERRORS.format(
-                        self.data.top_level_name, self.load_errors)
+                    update_text = (
+                        metomi.rose.config_editor.EVENT_LOAD_ERRORS.format(
+                            self.data.top_level_name, self.load_errors
+                        )
+                    )
 
-                    self.reporter.report_load_event(update_text,
-                                                    no_progress=True)
+                    self.reporter.report_load_event(
+                        update_text, no_progress=True
+                    )
             if setting_id in map_:
                 # No need for further update, already had warning/error.
                 map_.pop(setting_id)
             else:
                 # New warning or error.
                 map_.update({setting_id: info})
-        self.refresh_ids(config_name,
-                         list(id_error_dict.keys()) + list(id_warn_dict.keys()),
-                         is_loading,
-                         are_errors_done=is_macro_dynamic)
+        self.refresh_ids(
+            config_name,
+            list(id_error_dict.keys()) + list(id_warn_dict.keys()),
+            is_loading,
+            are_errors_done=is_macro_dynamic,
+        )
 
-    def apply_macro_transform(self, config_name, changed_ids,
-                              skip_update=False):
+    def apply_macro_transform(
+        self, config_name, changed_ids, skip_update=False
+    ):
         """Refresh pages with changes."""
         self.refresh_ids(config_name, changed_ids, skip_update=skip_update)

@@ -138,7 +138,7 @@ class Reporter:
         if isinstance(message, bytes):
             message = message.decode()
         if callable(self.event_handler):
-            ret =  self.event_handler(message, kind, level, prefix, clip)
+            ret = self.event_handler(message, kind, level, prefix, clip)
             return ret
         if isinstance(message, Event):
             if kind is None:
@@ -268,9 +268,7 @@ class ReporterContext:
         return str_
 
 
-
 class ReporterContextQueue(ReporterContext):
-
     """A context for the reporter object.
 
     It has the following attributes:
@@ -318,10 +316,9 @@ class ReporterContextQueue(ReporterContext):
                 break
             else:
                 del self._messages_pending[0]
-                
-                
-class Event:
 
+
+class Event:
     """A base class for events suitable for feeding into a Reporter."""
 
     VV = Reporter.VV

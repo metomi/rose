@@ -34,8 +34,8 @@ ERROR_LOCATE_OBJECT = "Could not locate {0}"
 
 MODULES = {}
 
-class ResourceError(Exception):
 
+class ResourceError(Exception):
     """A named resource not found."""
 
     def __init__(self, key):
@@ -209,11 +209,16 @@ def import_object(
         for filename in module_files:
             sys.path.insert(0, os.path.dirname(filename))
             try:
-                spec = importlib.util.spec_from_file_location(filename, filename)
-                if not filename in MODULES:
-                    spec = importlib.util.spec_from_file_location(filename, filename)
+                spec = (
+                    importlib.util.spec_from_file_location(filename, filename)
+                )
+                if filename not in MODULES:
+                    spec = (
+                        importlib.util
+                        .spec_from_file_location(filename, filename)
+                    )
                     module = importlib.util.module_from_spec(spec)
-                    spec.loader.exec_module(module) 
+                    spec.loader.exec_module(module)
                     MODULES[filename] = module
                 else:
                     module = MODULES[filename]

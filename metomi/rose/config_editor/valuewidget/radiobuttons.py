@@ -19,19 +19,20 @@
 # -----------------------------------------------------------------------------
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 import metomi.rose.config_editor
 
 
 class RadioButtonsValueWidget(Gtk.Box):
-
     """This is a class to represent a value as radio buttons."""
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
-        super(RadioButtonsValueWidget, self).__init__(homogeneous=False,
-                                                      spacing=0)
+        super(RadioButtonsValueWidget, self).__init__(
+            homogeneous=False, spacing=0
+        )
         self.value = value
         self.metadata = metadata
         self.set_value = set_value
@@ -50,31 +51,30 @@ class RadioButtonsValueWidget(Gtk.Box):
             if var_titles is not None and var_titles[k]:
                 button_label = var_titles[k]
             if k == 0:
-                radio_button = Gtk.RadioButton(group=None,
-                                               label=button_label,
-                                               use_underline=False)
+                radio_button = Gtk.RadioButton(
+                    group=None, label=button_label, use_underline=False
+                )
                 radio_button.real_value = item
             else:
-                radio_button = Gtk.RadioButton(group=radio_button,
-                                               label=button_label,
-                                               use_underline=False)
+                radio_button = Gtk.RadioButton(
+                    group=radio_button, label=button_label, use_underline=False
+                )
                 radio_button.real_value = item
             if var_titles is not None and var_titles[k]:
                 radio_button.set_tooltip_text("(" + item + ")")
             radio_button.set_active(False)
             if item == self.value:
                 radio_button.set_active(True)
-            radio_button.connect('toggled', self.setter)
-            radio_button.connect('button-press-event', self.setter)
-            radio_button.connect('activate', self.setter)
+            radio_button.connect("toggled", self.setter)
+            radio_button.connect("button-press-event", self.setter)
+            radio_button.connect("activate", self.setter)
 
             if var_titles:
                 vbox.pack_start(radio_button, False, False, 2)
             else:
                 self.pack_start(radio_button, False, False, 10)
             radio_button.show()
-            radio_button.connect('focus-in-event',
-                                 self.hook.trigger_scroll)
+            radio_button.connect("focus-in-event", self.hook.trigger_scroll)
 
         self.grab_focus = lambda: self.hook.get_focus(radio_button)
         if len(var_values) == 1 and self.value == var_values[0]:

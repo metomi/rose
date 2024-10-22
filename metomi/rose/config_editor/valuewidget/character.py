@@ -19,38 +19,43 @@
 # -----------------------------------------------------------------------------
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 from metomi.rose import META_PROP_TYPE
-import metomi.rose.config_editor.util
 
 
 class QuotedTextValueWidget(Gtk.Box):
-
     """This class represents 'character' and 'quoted' types in an entry."""
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
-        super(QuotedTextValueWidget, self).__init__(homogeneous=False,
-                                                    spacing=0)
+        super(QuotedTextValueWidget, self).__init__(
+            homogeneous=False, spacing=0
+        )
         # Importing here prevents cyclic imports
         import metomi.rose.macros.value
+
         self.type = metadata.get(META_PROP_TYPE)
         checker = metomi.rose.macros.value.ValueChecker()
         if self.type == "character":
             self.type_checker = checker.check_character
             self.format_text_in = (
-                metomi.rose.config_editor.util.text_for_character_widget)
+                metomi.rose.config_editor.util.text_for_character_widget
+            )
             self.format_text_out = (
-                metomi.rose.config_editor.util.text_from_character_widget)
+                metomi.rose.config_editor.util.text_from_character_widget
+            )
             self.quote_char = "'"
             self.esc_quote_chars = "''"
         elif self.type == "quoted":
             self.type_checker = checker.check_quoted
             self.format_text_in = (
-                metomi.rose.config_editor.util.text_for_quoted_widget)
+                metomi.rose.config_editor.util.text_for_quoted_widget
+            )
             self.format_text_out = (
-                metomi.rose.config_editor.util.text_from_quoted_widget)
+                metomi.rose.config_editor.util.text_from_quoted_widget
+            )
             self.quote_char = '"'
             self.esc_quote_chars = '\\"'
         self.value = value
@@ -60,17 +65,19 @@ class QuotedTextValueWidget(Gtk.Box):
         self.entry = Gtk.Entry()
         self.in_error = not self.type_checker(self.value)
         self.set_entry_text()
-        self.entry.connect("button-release-event",
-                           self._handle_middle_click_paste)
+        self.entry.connect(
+            "button-release-event", self._handle_middle_click_paste
+        )
         self.entry.connect_after("paste-clipboard", self.setter)
-        self.entry.connect_after("key-release-event",
-                                 lambda e, v: self.setter(e))
-        self.entry.connect_after("button-release-event",
-                                 lambda e, v: self.setter(e))
+        self.entry.connect_after(
+            "key-release-event", lambda e, v: self.setter(e)
+        )
+        self.entry.connect_after(
+            "button-release-event", lambda e, v: self.setter(e)
+        )
         self.entry.show()
-        self.pack_start(self.entry, expand=True, fill=True,
-                        padding=0)
-        self.entry.connect('focus-in-event', self.hook.trigger_scroll)
+        self.pack_start(self.entry, expand=True, fill=True, padding=0)
+        self.entry.connect("focus-in-event", self.hook.trigger_scroll)
         self.grab_focus = lambda: self.hook.get_focus(self.entry)
 
     def set_entry_text(self):

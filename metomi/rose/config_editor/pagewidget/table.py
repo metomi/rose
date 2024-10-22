@@ -21,7 +21,8 @@
 import shlex
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 import metomi.rose.config
@@ -34,7 +35,6 @@ from functools import cmp_to_key
 
 
 class PageTable(Gtk.Table):
-
     """Return a widget table generated from panel_data.
 
     It uses the variable information to create instances of
@@ -47,11 +47,12 @@ class PageTable(Gtk.Table):
     MAX_COLS = 3
     BORDER_WIDTH = metomi.rose.config_editor.SPACING_SUB_PAGE
 
-    def __init__(self, panel_data, ghost_data, var_ops, show_modes,
-                 arg_str=None):
-        super(PageTable, self).__init__(rows=self.MAX_ROWS,
-                                        columns=self.MAX_COLS,
-                                        homogeneous=False)
+    def __init__(
+        self, panel_data, ghost_data, var_ops, show_modes, arg_str=None
+    ):
+        super(PageTable, self).__init__(
+            rows=self.MAX_ROWS, columns=self.MAX_COLS, homogeneous=False
+        )
         self.panel_data = panel_data
         self.ghost_data = ghost_data
         self.var_ops = var_ops
@@ -66,7 +67,7 @@ class PageTable(Gtk.Table):
         new_variable_widget = self.get_variable_widget(variable)
         widget_coordinate_list = []
         for child in self.get_children():
-            top_row = self.child_get(child, 'top_attach')[0]
+            top_row = self.child_get(child, "top_attach")[0]
             variable_widget = child.get_parent()
             if variable_widget not in [x[0] for x in widget_coordinate_list]:
                 widget_coordinate_list.append((variable_widget, top_row))
@@ -84,20 +85,24 @@ class PageTable(Gtk.Table):
                 row_above_new = -1
             else:
                 row_above_new = widget_coordinate_list[
-                    num_vars_above_this - 1][1]
+                    num_vars_above_this - 1
+                ][1]
             for variable_widget, widget_row in widget_coordinate_list:
                 if widget_row > row_above_new:
                     for child in self.get_children():
                         if child.get_parent() == variable_widget:
                             self.remove(child)
             new_variable_widget.insert_into(
-                self, self.MAX_COLS, row_above_new + 1)
+                self, self.MAX_COLS, row_above_new + 1
+            )
             self._show_and_hide_variable_widgets(new_variable_widget)
             rownum = row_above_new + 2
             for variable_widget, widget_row in widget_coordinate_list:
-                if (widget_row > row_above_new and
-                        variable_widget.variable.metadata.get('id') !=
-                        variable.metadata.get('id')):
+                if (
+                    widget_row > row_above_new
+                    and variable_widget.variable.metadata.get("id")
+                    != variable.metadata.get("id")
+                ):
                     variable_widget.insert_into(self, self.MAX_COLS, rownum)
                     rownum += 1
         else:
@@ -118,7 +123,8 @@ class PageTable(Gtk.Table):
             variable,
             self.var_ops,
             is_ghost=is_ghost,
-            show_modes=self.show_modes)
+            show_modes=self.show_modes,
+        )
 
     def reload_variable_widget(self, variable):
         """Reload the widgets for the given variable."""
@@ -129,14 +135,16 @@ class PageTable(Gtk.Table):
         variable_row = None
         for child in self.get_children():
             variable_widget = child.get_parent()
-            if (variable_widget.variable.name == variable.name and
-                    variable_widget.variable.metadata.get('id') ==
-                    variable.metadata.get('id')):
+            if (
+                variable_widget.variable.name == variable.name
+                and variable_widget.variable.metadata.get("id")
+                == variable.metadata.get("id")
+            ):
                 if "index" not in focus_dict:
                     focus_dict["index"] = variable_widget.get_focus_index()
                 if self.get_focus_child() == child:
                     focus_dict["had_focus"] = True
-                top_row = self.child_get(child, 'top_attach')[0]
+                top_row = self.child_get(child, "top_attach")[0]
                 variable_row = top_row
                 self.remove(child)
                 child.destroy()
@@ -155,10 +163,18 @@ class PageTable(Gtk.Table):
         sort_key_vars = []
         for val in self.panel_data + self.ghost_data:
             sort_key = (
-                (val.metadata.get("sort-key", "~")), val.metadata["id"])
+                (val.metadata.get("sort-key", "~")),
+                val.metadata["id"],
+            )
             is_ghost = val in self.ghost_data
             sort_key_vars.append((sort_key, val, is_ghost))
-        sort_key_vars.sort(key=cmp_to_key(lambda x, y: metomi.rose.config_editor.util.null_cmp(x[0], y[0])))
+        sort_key_vars.sort(
+            key=cmp_to_key(
+                lambda x, y: metomi.rose.config_editor.util.null_cmp(
+                    x[0], y[0]
+                )
+            )
+        )
         sort_key_vars.sort(key=lambda x: "=null" in x[1].metadata["id"])
         return [(x[1], x[2]) for x in sort_key_vars]
 
@@ -177,20 +193,26 @@ class PageTable(Gtk.Table):
             ign_reason = variable.ignored_reason
             if variable.error:
                 variable_widget.show()
-            elif (len(variable.metadata.get(
-                    metomi.rose.META_PROP_VALUES, [])) == 1 and
-                    not modes[metomi.rose.config_editor.SHOW_MODE_FIXED]):
+            elif (
+                len(variable.metadata.get(metomi.rose.META_PROP_VALUES, []))
+                == 1
+                and not modes[metomi.rose.config_editor.SHOW_MODE_FIXED]
+            ):
                 variable_widget.hide()
-            elif (variable_widget.is_ghost and
-                  not modes[metomi.rose.config_editor.SHOW_MODE_LATENT]):
+            elif (
+                variable_widget.is_ghost
+                and not modes[metomi.rose.config_editor.SHOW_MODE_LATENT]
+            ):
                 variable_widget.hide()
-            elif ((metomi.rose.variable.IGNORED_BY_SYSTEM in ign_reason or
-                   metomi.rose.variable.IGNORED_BY_SECTION in ign_reason) and
-                  not modes[metomi.rose.config_editor.SHOW_MODE_IGNORED]):
+            elif (
+                metomi.rose.variable.IGNORED_BY_SYSTEM in ign_reason
+                or metomi.rose.variable.IGNORED_BY_SECTION in ign_reason
+            ) and not modes[metomi.rose.config_editor.SHOW_MODE_IGNORED]:
                 variable_widget.hide()
-            elif (metomi.rose.variable.IGNORED_BY_USER in ign_reason and
-                  not (modes[metomi.rose.config_editor.SHOW_MODE_IGNORED] or
-                       modes[metomi.rose.config_editor.SHOW_MODE_USER_IGNORED])):
+            elif metomi.rose.variable.IGNORED_BY_USER in ign_reason and not (
+                modes[metomi.rose.config_editor.SHOW_MODE_IGNORED]
+                or modes[metomi.rose.config_editor.SHOW_MODE_USER_IGNORED]
+            ):
                 variable_widget.hide()
             else:
                 variable_widget.show()
@@ -210,7 +232,6 @@ class PageTable(Gtk.Table):
 
 
 class PageArrayTable(PageTable):
-
     """Return a widget table that treats array values as row elements."""
 
     def __init__(self, *args, **kwargs):
@@ -233,39 +254,46 @@ class PageArrayTable(PageTable):
 
     def get_variable_widget(self, variable, is_ghost=False):
         """Create a variable widget for this variable."""
-        if (metomi.rose.META_PROP_LENGTH in variable.metadata or
-                isinstance(variable.metadata.get(metomi.rose.META_PROP_TYPE), list)):
+        if metomi.rose.META_PROP_LENGTH in variable.metadata or isinstance(
+            variable.metadata.get(metomi.rose.META_PROP_TYPE), list
+        ):
             return metomi.rose.config_editor.variable.RowVariableWidget(
                 variable,
                 self.var_ops,
                 is_ghost=is_ghost,
                 show_modes=self.show_modes,
-                length=self.array_length)
+                length=self.array_length,
+            )
         return metomi.rose.config_editor.variable.VariableWidget(
             variable,
             self.var_ops,
             is_ghost=is_ghost,
-            show_modes=self.show_modes)
+            show_modes=self.show_modes,
+        )
 
     def _set_length(self):
         max_meta_length = 0
         max_values_length = 0
         for variable in self.panel_data + self.ghost_data:
             length = variable.metadata.get(metomi.rose.META_PROP_LENGTH)
-            if (length is not None and length.isdigit() and
-                    int(length) > max_meta_length):
+            if (
+                length is not None
+                and length.isdigit()
+                and int(length) > max_meta_length
+            ):
                 max_meta_length = int(length)
             types = variable.metadata.get(metomi.rose.META_PROP_TYPE)
             if isinstance(types, list) and len(types) > max_meta_length:
                 max_meta_length = len(types)
-            values_length = len(metomi.rose.variable.array_split(variable.value))
+            values_length = len(
+                metomi.rose.variable.array_split(variable.value)
+            )
             if values_length > max_values_length:
                 max_values_length = values_length
         self.array_length = max([max_meta_length, max_values_length])
 
 
 class PageLatentTable(Gtk.Table):
-
     """Return a widget table generated from panel_data.
 
     It uses the variable information to create instances of
@@ -279,40 +307,51 @@ class PageLatentTable(Gtk.Table):
     MAX_ROWS = 2000
     MAX_COLS = 3
 
-    def __init__(self, panel_data, ghost_data, var_ops, show_modes,
-                 arg_str=None):
+    def __init__(
+        self, panel_data, ghost_data, var_ops, show_modes, arg_str=None
+    ):
         super(PageLatentTable, self).__init__(
-            rows=self.MAX_ROWS, columns=self.MAX_COLS, homogeneous=False)
+            rows=self.MAX_ROWS, columns=self.MAX_COLS, homogeneous=False
+        )
         self.show()
         self.num_removes = 0
         self.panel_data = panel_data
         self.ghost_data = ghost_data
         self.var_ops = var_ops
         self.show_modes = show_modes
-        self.title_on = (
-            not self.show_modes[metomi.rose.config_editor.SHOW_MODE_NO_TITLE])
-        self.alt_menu_class = metomi.rose.config_editor.menuwidget.CheckedMenuWidget
+        self.title_on = not self.show_modes[
+            metomi.rose.config_editor.SHOW_MODE_NO_TITLE
+        ]
+        self.alt_menu_class = (
+            metomi.rose.config_editor.menuwidget.CheckedMenuWidget
+        )
         rownum = 0
         v_sort_ids = []
         for val in self.panel_data + self.ghost_data:
-            v_sort_ids.append((val.metadata.get("sort-key", ""),
-                               val.metadata["id"]))
-        v_sort_ids.sort(key=cmp_to_key(
-            lambda x, y: metomi.rose.config.sort_settings(
-                x[0] + "~" + x[1], y[0] + "~" + y[1])))
+            v_sort_ids.append(
+                (val.metadata.get("sort-key", ""), val.metadata["id"])
+            )
+        v_sort_ids.sort(
+            key=cmp_to_key(
+                lambda x, y: metomi.rose.config.sort_settings(
+                    x[0] + "~" + x[1], y[0] + "~" + y[1]
+                )
+            )
+        )
         v_sort_ids.sort(key=lambda x: "=null" in x[1])
         for _, var_id in v_sort_ids:
             is_ghost = False
             for variable in self.panel_data:
-                if variable.metadata['id'] == var_id:
+                if variable.metadata["id"] == var_id:
                     break
             else:
                 for variable in self.ghost_data:
-                    if variable.metadata['id'] == var_id:
+                    if variable.metadata["id"] == var_id:
                         is_ghost = True
                         break
             variable_widget = self.get_variable_widget(
-                variable, is_ghost=is_ghost)
+                variable, is_ghost=is_ghost
+            )
             variable_widget.insert_into(self, self.MAX_COLS, rownum + 1)
             variable_widget.set_sensitive(not is_ghost)
             rownum += 1
@@ -320,8 +359,11 @@ class PageLatentTable(Gtk.Table):
     def get_variable_widget(self, variable, is_ghost=False):
         """Create a variable widget for this variable."""
         return metomi.rose.config_editor.variable.VariableWidget(
-            variable, self.var_ops, is_ghost=is_ghost,
-            show_modes=self.show_modes)
+            variable,
+            self.var_ops,
+            is_ghost=is_ghost,
+            show_modes=self.show_modes,
+        )
 
     def reload_variable_widget(self, variable):
         """Reload the widgets for the given variable."""
@@ -332,14 +374,16 @@ class PageLatentTable(Gtk.Table):
         variable_row = None
         for child in self.get_children():
             variable_widget = child.get_parent()
-            if (variable_widget.variable.name == variable.name and
-                    variable_widget.variable.metadata.get('id') ==
-                    variable.metadata.get('id')):
+            if (
+                variable_widget.variable.name == variable.name
+                and variable_widget.variable.metadata.get("id")
+                == variable.metadata.get("id")
+            ):
                 if "index" not in focus_dict:
                     focus_dict["index"] = variable_widget.get_focus_index()
-                if getattr(self, 'focus_child') == child:
+                if getattr(self, "focus_child") == child:
                     focus_dict["had_focus"] = True
-                top_row = self.child_get(child, 'top_attach')[0]
+                top_row = self.child_get(child, "top_attach")[0]
                 variable_row = top_row
                 self.remove(child)
                 child.destroy()

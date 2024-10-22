@@ -22,7 +22,8 @@ import copy
 import os
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 from gi.repository import GObject
 
@@ -30,15 +31,25 @@ import metomi.rose.gtk.util
 import metomi.rose.macro
 import metomi.rose.upgrade
 
+from metomi.rose.macros.trigger import TriggerMacro
+
 
 class UpgradeController(object):
-
     """Configure the upgrade of configurations."""
 
-    def __init__(self, app_config_dict, handle_transform_func,
-                 parent_window=None, upgrade_inspector=None):
-        buttons = (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
-                   Gtk.STOCK_APPLY, Gtk.ResponseType.ACCEPT)
+    def __init__(
+        self,
+        app_config_dict,
+        handle_transform_func,
+        parent_window=None,
+        upgrade_inspector=None,
+    ):
+        buttons = (
+            Gtk.STOCK_CANCEL,
+            Gtk.ResponseType.REJECT,
+            Gtk.STOCK_APPLY,
+            Gtk.ResponseType.ACCEPT,
+        )
         self.window = Gtk.Dialog(buttons=buttons)
         self.set_transient_for(parent_window)
         self.window.set_title(metomi.rose.config_editor.DIALOG_TITLE_UPGRADE)
@@ -50,14 +61,20 @@ class UpgradeController(object):
         self.use_all_versions = False
         self.treemodel = Gtk.TreeStore(str, str, str, bool)
         self.treeview = metomi.rose.gtk.util.TooltipTreeView(
-            get_tooltip_func=self._get_tooltip)
+            get_tooltip_func=self._get_tooltip
+        )
         self.treeview.show()
         old_pwd = os.getcwd()
         for config_name in config_names:
             app_config = app_config_dict[config_name]["config"]
             app_directory = app_config_dict[config_name]["directory"]
-            meta_value = app_config.get_value([metomi.rose.CONFIG_SECT_TOP,
-                                               metomi.rose.CONFIG_OPT_META_TYPE], "")
+            meta_value = app_config.get_value(
+                [
+                    metomi.rose.CONFIG_SECT_TOP,
+                    metomi.rose.CONFIG_OPT_META_TYPE,
+                ],
+                "",
+            )
             if len(meta_value.split("/")) < 2:
                 continue
             try:
@@ -75,8 +92,7 @@ class UpgradeController(object):
         self.treeview.set_rules_hint(True)
         self.treewindow = Gtk.ScrolledWindow()
         self.treewindow.show()
-        self.treewindow.set_policy(Gtk.PolicyType.NEVER,
-                                   Gtk.PolicyType.NEVER)
+        self.treewindow.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER)
         columns = metomi.rose.config_editor.DIALOG_COLUMNS_UPGRADE
         for i, title in enumerate(columns):
             column = Gtk.TreeViewColumn()
@@ -89,8 +105,9 @@ class UpgradeController(object):
                 self._combo_cell = Gtk.CellRendererCombo()
                 self._combo_cell.set_property("has-entry", False)
                 self._combo_cell.set_property("editable", True)
-                self._combo_cell.connect("changed",
-                                         self._handle_change_version, 2)
+                self._combo_cell.connect(
+                    "changed", self._handle_change_version, 2
+                )
                 cell = self._combo_cell
             else:
                 cell = Gtk.CellRendererText()
@@ -103,25 +120,36 @@ class UpgradeController(object):
         self.treeview.connect("cursor-changed", self._handle_change_cursor)
         self.treewindow.add(self.treeview)
         self.window.vbox.pack_start(
-            self.treewindow, expand=True, fill=True,
-            padding=metomi.rose.config_editor.SPACING_PAGE)
+            self.treewindow,
+            expand=True,
+            fill=True,
+            padding=metomi.rose.config_editor.SPACING_PAGE,
+        )
         label = Gtk.Label(label=metomi.rose.config_editor.DIALOG_LABEL_UPGRADE)
         label.show()
         self.window.vbox.pack_start(
-            label, True, True, metomi.rose.config_editor.SPACING_PAGE)
+            label, True, True, metomi.rose.config_editor.SPACING_PAGE
+        )
         button_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         button_hbox.show()
         all_versions_toggle_button = Gtk.CheckButton(
             label=metomi.rose.config_editor.DIALOG_LABEL_UPGRADE_ALL,
-            use_underline=False)
+            use_underline=False,
+        )
         all_versions_toggle_button.set_active(self.use_all_versions)
-        all_versions_toggle_button.connect("toggled",
-                                           self._handle_toggle_all_versions)
+        all_versions_toggle_button.connect(
+            "toggled", self._handle_toggle_all_versions
+        )
         all_versions_toggle_button.show()
-        button_hbox.pack_start(all_versions_toggle_button, expand=False,
-                               fill=False,
-                               padding=metomi.rose.config_editor.SPACING_SUB_PAGE)
-        self.window.vbox.pack_end(button_hbox, expand=False, fill=False, padding=0)
+        button_hbox.pack_start(
+            all_versions_toggle_button,
+            expand=False,
+            fill=False,
+            padding=metomi.rose.config_editor.SPACING_SUB_PAGE,
+        )
+        self.window.vbox.pack_end(
+            button_hbox, expand=False, fill=False, padding=0
+        )
         self.ok_button = self.window.action_area.get_children()[0]
         self.window.set_focus(all_versions_toggle_button)
         self.window.set_focus(self.ok_button)
@@ -132,7 +160,9 @@ class UpgradeController(object):
         extra = 2 * metomi.rose.config_editor.SPACING_PAGE
         for i in [0, 1]:
             new_size[i] = min([my_size[i] + extra, max_size[i]])
-        self.treewindow.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        self.treewindow.set_policy(
+            Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC
+        )
         self.window.set_default_size(*new_size)
         response = self.window.run()
         old_pwd = os.getcwd()
@@ -154,41 +184,56 @@ class UpgradeController(object):
                 macro_config = copy.deepcopy(config)
                 try:
                     new_config, change_list = manager.transform(
-                        macro_config, custom_inspector=upgrade_inspector)
+                        macro_config, custom_inspector=upgrade_inspector
+                    )
                 except Exception as exc:
                     metomi.rose.gtk.dialog.run_dialog(
                         metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
                         type(exc).__name__ + ": " + str(exc),
                         metomi.rose.config_editor.ERROR_UPGRADE.format(
-                            config_name.lstrip("/"))
+                            config_name.lstrip("/")
+                        ),
                     )
                     iter_ = self.treemodel.iter_next(iter_)
                     continue
-                macro_id = (type(manager).__name__ + "." +
-                            metomi.rose.macro.TRANSFORM_METHOD)
-                if handle_transform_func(config_name, macro_id,
-                                         new_config, change_list,
-                                         triggers_ok=True):
+                macro_id = (
+                    type(manager).__name__
+                    + "."
+                    + metomi.rose.macro.TRANSFORM_METHOD
+                )
+                if handle_transform_func(
+                    config_name,
+                    macro_id,
+                    new_config,
+                    change_list,
+                    triggers_ok=True,
+                ):
                     meta_config = metomi.rose.macro.load_meta_config(
-                        new_config, config_type=metomi.rose.SUB_CONFIG_NAME,
-                        ignore_meta_error=True
+                        new_config,
+                        config_type=metomi.rose.SUB_CONFIG_NAME,
+                        ignore_meta_error=True,
                     )
-                    trig_macro = metomi.rose.macros.trigger.TriggerMacro()
+                    trig_macro = TriggerMacro()
                     macro_config = copy.deepcopy(new_config)
                     macro_id = (
-                        metomi.rose.upgrade.MACRO_UPGRADE_TRIGGER_NAME + "." +
-                        metomi.rose.macro.TRANSFORM_METHOD
+                        metomi.rose.upgrade.MACRO_UPGRADE_TRIGGER_NAME
+                        + "."
+                        + metomi.rose.macro.TRANSFORM_METHOD
                     )
-                    if not trig_macro.validate_dependencies(macro_config,
-                                                            meta_config):
-                        new_trig_config, trig_change_list = (
-                            metomi.rose.macros.trigger.TriggerMacro().transform(
-                                macro_config, meta_config)
+                    if not trig_macro.validate_dependencies(
+                        macro_config, meta_config
+                    ):
+                        (
+                            new_trig_config,
+                            trig_change_list,
+                        ) = TriggerMacro().transform(macro_config, meta_config)
+                        handle_transform_func(
+                            config_name,
+                            macro_id,
+                            new_trig_config,
+                            trig_change_list,
+                            triggers_ok=True,
                         )
-                        handle_transform_func(config_name, macro_id,
-                                              new_trig_config,
-                                              trig_change_list,
-                                              triggers_ok=True)
                 iter_ = self.treemodel.iter_next(iter_)
         os.chdir(old_pwd)
         self.window.destroy()
@@ -227,8 +272,9 @@ class UpgradeController(object):
     def _handle_toggle_upgrade(self, cell, path, col_index):
         iter_ = self.treemodel.get_iter(path)
         value = self.treemodel.get_value(iter_, col_index)
-        if (self.treemodel.get_value(iter_, 1) ==
-                self.treemodel.get_value(iter_, 2)):
+        if self.treemodel.get_value(iter_, 1) == self.treemodel.get_value(
+            iter_, 2
+        ):
             self.treemodel.set_value(iter_, col_index, False)
         else:
             self.treemodel.set_value(iter_, col_index, not value)
@@ -268,10 +314,12 @@ class UpgradeController(object):
         next_tag = manager.get_new_tag(only_named=not self.use_all_versions)
         if next_tag is None:
             self.treemodel.append(
-                None, [config_name, current_tag, current_tag, False])
+                None, [config_name, current_tag, current_tag, False]
+            )
         else:
             self.treemodel.append(
-                None, [config_name, current_tag, next_tag, True])
+                None, [config_name, current_tag, next_tag, True]
+            )
         listmodel = Gtk.ListStore(str)
         tags = manager.get_tags(only_named=not self.use_all_versions)
         if not tags:

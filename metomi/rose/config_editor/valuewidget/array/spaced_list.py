@@ -21,7 +21,8 @@
 import shlex
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 import metomi.rose.config_editor.util
@@ -30,7 +31,6 @@ import metomi.rose.variable
 
 
 class SpacedListValueWidget(Gtk.Box):
-
     """This is a class to represent a list separated by spaces."""
 
     TIP_ADD = "Add array element"
@@ -41,8 +41,9 @@ class SpacedListValueWidget(Gtk.Box):
     TIP_RIGHT = "Move array element right"
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
-        super(SpacedListValueWidget, self).__init__(homogeneous=False,
-                                                    spacing=0)
+        super(SpacedListValueWidget, self).__init__(
+            homogeneous=False, spacing=0
+        )
         self.value = value
         self.metadata = metadata
         self.set_value = set_value
@@ -54,10 +55,10 @@ class SpacedListValueWidget(Gtk.Box):
         self.last_selected_src = None
         # Designate the number of allowed columns - 10 for 4 chars width
         self.num_allowed_columns = 3
-        self.entry_table = Gtk.Table(rows=1,
-                                     columns=self.num_allowed_columns,
-                                     homogeneous=True)
-        self.entry_table.connect('focus-in-event', self.hook.trigger_scroll)
+        self.entry_table = Gtk.Table(
+            rows=1, columns=self.num_allowed_columns, homogeneous=True
+        )
+        self.entry_table.connect("focus-in-event", self.hook.trigger_scroll)
         self.entry_table.show()
 
         self.entries = []
@@ -69,12 +70,17 @@ class SpacedListValueWidget(Gtk.Box):
 
         self.generate_buttons()
         self.populate_table()
-        self.pack_start(self.add_del_button_box, expand=False, fill=False, padding=0)
+        self.pack_start(
+            self.add_del_button_box, expand=False, fill=False, padding=0
+        )
         self.pack_start(self.entry_table, expand=True, fill=True, padding=0)
-        self.entry_table.connect_after('size-allocate',
-                                       lambda w, e: self.reshape_table())
-        self.connect('focus-in-event',
-                     lambda w, e: self.hook.get_focus(self.get_focus_entry()))
+        self.entry_table.connect_after(
+            "size-allocate", lambda w, e: self.reshape_table()
+        )
+        self.connect(
+            "focus-in-event",
+            lambda w, e: self.hook.get_focus(self.get_focus_entry()),
+        )
 
     def force_scroll(self, widget=None):
         """Adjusts a scrolled window to display the correct widget."""
@@ -106,10 +112,10 @@ class SpacedListValueWidget(Gtk.Box):
 
     def get_focus_index(self):
         """Get the focus and position within the table of entries."""
-        text = ''
+        text = ""
         for my_entry in self.entries:
             val = my_entry.get_text()
-            prefix = get_next_delimiter(self.value[len(text):], val)
+            prefix = get_next_delimiter(self.value[len(text) :], val)
             if prefix is None:
                 return
             if my_entry == self.entry_table.get_focus_child():
@@ -150,7 +156,7 @@ class SpacedListValueWidget(Gtk.Box):
         left_arrow = Gtk.ToolButton()
         left_arrow.set_icon_name("pan-start-symbolic")
         left_arrow.show()
-        left_arrow.connect('clicked', lambda x: self.move_element(-1))
+        left_arrow.connect("clicked", lambda x: self.move_element(-1))
         left_event_box = Gtk.EventBox()
         left_event_box.add(left_arrow)
         left_event_box.show()
@@ -158,49 +164,68 @@ class SpacedListValueWidget(Gtk.Box):
         right_arrow = Gtk.ToolButton()
         right_arrow.set_icon_name("pan-end-symbolic")
         right_arrow.show()
-        right_arrow.connect('clicked', lambda x: self.move_element(1))
+        right_arrow.connect("clicked", lambda x: self.move_element(1))
         right_event_box = Gtk.EventBox()
         right_event_box.add(right_arrow)
         right_event_box.show()
         right_event_box.set_tooltip_text(self.TIP_RIGHT)
         self.arrow_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.arrow_box.show()
-        self.arrow_box.pack_start(left_event_box, expand=False, fill=False, padding=0)
-        self.arrow_box.pack_end(right_event_box, expand=False, fill=False, padding=0)
+        self.arrow_box.pack_start(
+            left_event_box, expand=False, fill=False, padding=0
+        )
+        self.arrow_box.pack_end(
+            right_event_box, expand=False, fill=False, padding=0
+        )
         self.set_arrow_sensitive(False, False)
-        del_image = Gtk.Image.new_from_stock(Gtk.STOCK_REMOVE,
-                                             Gtk.IconSize.MENU)
+        del_image = Gtk.Image.new_from_stock(
+            Gtk.STOCK_REMOVE, Gtk.IconSize.MENU
+        )
         del_image.show()
         self.del_button = Gtk.EventBox()
         self.del_button.set_tooltip_text(self.TIP_DEL)
         self.del_button.add(del_image)
         self.del_button.show()
-        self.del_button.connect('button-release-event',
-                                lambda b, e: self.remove_entry())
-        self.del_button.connect('enter-notify-event',
-                                lambda b, e: b.set_state(Gtk.StateType.ACTIVE))
-        self.del_button.connect('leave-notify-event',
-                                lambda b, e: b.set_state(Gtk.StateType.NORMAL))
+        self.del_button.connect(
+            "button-release-event", lambda b, e: self.remove_entry()
+        )
+        self.del_button.connect(
+            "enter-notify-event",
+            lambda b, e: b.set_state(Gtk.StateType.ACTIVE),
+        )
+        self.del_button.connect(
+            "leave-notify-event",
+            lambda b, e: b.set_state(Gtk.StateType.NORMAL),
+        )
         self.button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self.button_box.show()
-        self.button_box.pack_start(self.arrow_box, expand=False, fill=True, padding=0)
+        self.button_box.pack_start(
+            self.arrow_box, expand=False, fill=True, padding=0
+        )
         add_image = Gtk.Image.new_from_stock(Gtk.STOCK_ADD, Gtk.IconSize.MENU)
         add_image.show()
         self.add_button = Gtk.EventBox()
         self.add_button.set_tooltip_text(self.TIP_ADD)
         self.add_button.add(add_image)
         self.add_button.show()
-        self.add_button.connect('button-release-event',
-                                lambda b, e: self.add_entry())
-        self.add_button.connect('enter-notify-event',
-                                lambda b, e: b.set_state(Gtk.StateType.ACTIVE))
-        self.add_button.connect('leave-notify-event',
-                                lambda b, e: b.set_state(Gtk.StateType.NORMAL))
+        self.add_button.connect(
+            "button-release-event", lambda b, e: self.add_entry()
+        )
+        self.add_button.connect(
+            "enter-notify-event",
+            lambda b, e: b.set_state(Gtk.StateType.ACTIVE),
+        )
+        self.add_button.connect(
+            "leave-notify-event",
+            lambda b, e: b.set_state(Gtk.StateType.NORMAL),
+        )
         self.add_del_button_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.add_del_button_box.pack_start(
-            self.add_button, expand=False, fill=False, padding=0)
+            self.add_button, expand=False, fill=False, padding=0
+        )
         self.add_del_button_box.pack_start(
-            self.del_button, expand=False, fill=False, padding=0)
+            self.del_button, expand=False, fill=False, padding=0
+        )
         self.add_del_button_box.show()
 
     def set_arrow_sensitive(self, is_left_sensitive, is_right_sensitive):
@@ -217,8 +242,10 @@ class SpacedListValueWidget(Gtk.Box):
         if entry is None:
             return
         old_index = self.entries.index(entry)
-        if (old_index + num_places_right < 0 or
-                old_index + num_places_right > len(self.entries) - 1):
+        if (
+            old_index + num_places_right < 0
+            or old_index + num_places_right > len(self.entries) - 1
+        ):
             return
         self.entries.remove(entry)
         self.entries.insert(old_index + num_places_right, entry)
@@ -229,17 +256,14 @@ class SpacedListValueWidget(Gtk.Box):
         """Create a gtk Entry for this array element."""
         entry = Gtk.Entry()
         entry.set_text(str(value_item))
-        entry.connect('focus-in-event',
-                      self._handle_focus_on_entry)
-        entry.connect("button-release-event",
-                      self._handle_middle_click_paste)
+        entry.connect("focus-in-event", self._handle_focus_on_entry)
+        entry.connect("button-release-event", self._handle_middle_click_paste)
         entry.connect_after("paste-clipboard", self.setter)
-        entry.connect_after("key-release-event",
-                            lambda e, v: self.setter(e))
-        entry.connect_after("button-release-event",
-                            lambda e, v: self.setter(e))
-        entry.connect('focus-out-event',
-                      self._handle_focus_off_entry)
+        entry.connect_after("key-release-event", lambda e, v: self.setter(e))
+        entry.connect_after(
+            "button-release-event", lambda e, v: self.setter(e)
+        )
+        entry.connect("focus-out-event", self._handle_focus_off_entry)
         entry.set_width_chars(self.chars_width - 1)
         entry.show()
         return entry
@@ -258,27 +282,34 @@ class SpacedListValueWidget(Gtk.Box):
             position = focus_widget.get_position()
         for child in self.entry_table.get_children():
             self.entry_table.remove(child)
-        if (focus_widget is None and self.entry_table.is_focus() and
-                len(self.entries) > 0):
+        if (
+            focus_widget is None
+            and self.entry_table.is_focus()
+            and len(self.entries) > 0
+        ):
             focus_widget = self.entries[-1]
             position = len(focus_widget.get_text())
         num_fields = len(self.entries + [self.button_box])
         num_rows_now = 1 + (num_fields - 1) / self.num_allowed_columns
         self.entry_table.resize(num_rows_now, self.num_allowed_columns)
-        if (self.max_length.isdigit() and
-                len(self.entries) >= int(self.max_length)):
+        if self.max_length.isdigit() and len(self.entries) >= int(
+            self.max_length
+        ):
             self.add_button.hide()
         else:
             self.add_button.show()
-        if (self.max_length.isdigit() and
-                len(self.entries) <= int(self.max_length)):
+        if self.max_length.isdigit() and len(self.entries) <= int(
+            self.max_length
+        ):
             self.del_button.hide()
         elif len(self.entries) == 0:
             self.del_button.hide()
         else:
             self.del_button.show()
-        if (self.last_selected_src is not None and
-                self.last_selected_src in self.entries):
+        if (
+            self.last_selected_src is not None
+            and self.last_selected_src in self.entries
+        ):
             index = self.entries.index(self.last_selected_src)
             if index == 0:
                 self.set_arrow_sensitive(False, True)
@@ -288,19 +319,23 @@ class SpacedListValueWidget(Gtk.Box):
             self.set_arrow_sensitive(False, False)
 
         if self.has_titles:
-            for col, label in enumerate(self.metadata['element-titles']):
+            for col, label in enumerate(self.metadata["element-titles"]):
                 if col >= len(table_widgets) - 1:
                     break
                 widget = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-                label = Gtk.Label(label=self.metadata['element-titles'][col])
+                label = Gtk.Label(label=self.metadata["element-titles"][col])
                 label.show()
                 widget.pack_start(label, expand=True, fill=True, padding=0)
                 widget.show()
-                self.entry_table.attach(widget,
-                                        col, col + 1,
-                                        0, 1,
-                                        xoptions=Gtk.AttachOptions.FILL,
-                                        yoptions=Gtk.AttachOptions.SHRINK)
+                self.entry_table.attach(
+                    widget,
+                    col,
+                    col + 1,
+                    0,
+                    1,
+                    xoptions=Gtk.AttachOptions.FILL,
+                    yoptions=Gtk.AttachOptions.SHRINK,
+                )
 
         for i, widget in enumerate(table_widgets):
             if isinstance(widget, Gtk.Entry):
@@ -309,17 +344,22 @@ class SpacedListValueWidget(Gtk.Box):
             if self.has_titles:
                 row += 1
             column = i % self.num_allowed_columns
-            self.entry_table.attach(widget,
-                                    column, column + 1,
-                                    row, row + 1,
-                                    xoptions=Gtk.AttachOptions.FILL,
-                                    yoptions=Gtk.AttachOptions.SHRINK)
+            self.entry_table.attach(
+                widget,
+                column,
+                column + 1,
+                row,
+                row + 1,
+                xoptions=Gtk.AttachOptions.FILL,
+                yoptions=Gtk.AttachOptions.SHRINK,
+            )
         if focus_widget is not None:
             focus_widget.grab_focus()
             focus_widget.set_position(position)
             focus_widget.select_region(position, position)
         self.grab_focus = lambda: self.hook.get_focus(
-            self._get_widget_for_focus())
+            self._get_widget_for_focus()
+        )
         self.check_resize()
 
     def reshape_table(self):
@@ -337,30 +377,38 @@ class SpacedListValueWidget(Gtk.Box):
 
     def add_entry(self):
         """Add a new entry (with null text) to the variable array."""
-        entry = self.get_entry('')
-        entry.connect('focus-in-event', lambda w, e: self.force_scroll(w))
+        entry = self.get_entry("")
+        entry.connect("focus-in-event", lambda w, e: self.force_scroll(w))
         self.last_selected_src = entry
         self.entries.append(entry)
         self._adjust_entry_length()
         self.populate_table(focus_widget=entry)
-        if (self.metadata.get(metomi.rose.META_PROP_COMPULSORY) !=
-                metomi.rose.META_PROP_VALUE_TRUE):
+        if (
+            self.metadata.get(metomi.rose.META_PROP_COMPULSORY)
+            != metomi.rose.META_PROP_VALUE_TRUE
+        ):
             self.setter(entry)
 
     def remove_entry(self):
         """Remove the last selected or the last entry."""
-        if (self.last_selected_src is not None and
-                self.last_selected_src in self.entries):
+        if (
+            self.last_selected_src is not None
+            and self.last_selected_src in self.entries
+        ):
             text = self.last_selected_src.get_text()
             entry = self.entries.pop(
-                self.entries.index(self.last_selected_src))
+                self.entries.index(self.last_selected_src)
+            )
             self.last_selected_src = None
         else:
             text = self.entries[-1].get_text()
             entry = self.entries.pop()
         self.populate_table()
-        if (self.metadata.get(metomi.rose.META_PROP_COMPULSORY) !=
-                metomi.rose.META_PROP_VALUE_TRUE or text):
+        if (
+            self.metadata.get(metomi.rose.META_PROP_COMPULSORY)
+            != metomi.rose.META_PROP_VALUE_TRUE
+            or text
+        ):
             # Optional, or compulsory but not blank.
             self.setter(entry)
 
@@ -370,15 +418,17 @@ class SpacedListValueWidget(Gtk.Box):
         # Prevent str without "" breaking the underlying Python syntax
         for e in self.entries:
             v = e.get_text()
-            if v in ("False", "True"): # Boolean
+            if v in ("False", "True"):  # Boolean
                 val_array.append(v)
-            elif (len(v) == 0) or (v[:1].isdigit()): # Empty or numeric
+            elif (len(v) == 0) or (v[:1].isdigit()):  # Empty or numeric
                 val_array.append(v)
-            elif not v.startswith('"'): # Str - add in leading and trailing "
+            elif not v.startswith('"'):  # Str - add in leading and trailing "
                 val_array.append('"' + v + '"')
                 e.set_text('"' + v + '"')
-                e.set_position(len(v)+1)
-            elif (not v.endswith('"')) or (len(v) == 1): # Str - add in trailing "
+                e.set_position(len(v) + 1)
+            elif (not v.endswith('"')) or (
+                len(v) == 1
+            ):  # Str - add in trailing "
                 val_array.append(v + '"')
                 e.set_text(v + '"')
                 e.set_position(len(v))
@@ -391,8 +441,9 @@ class SpacedListValueWidget(Gtk.Box):
             if widget is not None and not widget.is_focus():
                 widget.grab_focus()
                 widget.set_position(len(widget.get_text()))
-                widget.select_region(widget.get_position(),
-                                     widget.get_position())
+                widget.select_region(
+                    widget.get_position(), widget.get_position()
+                )
         entries_have_spaces = any(" " in v for v in val_array)
         new_value = spaced_array_join(val_array)
         if new_value != self.value:
@@ -406,9 +457,12 @@ class SpacedListValueWidget(Gtk.Box):
                     focus_index = None
                     for i, val in enumerate(val_array):
                         if "" in val:
-                            val_post_comma = val[:val.index("") + 1]
-                            focus_index = len(spaced_array_join(
-                                new_val_array[:i] + [val_post_comma]))
+                            val_post_comma = val[: val.index("") + 1]
+                            focus_index = len(
+                                spaced_array_join(
+                                    new_val_array[:i] + [val_post_comma]
+                                )
+                            )
                     self.populate_table()
                     self.set_focus_index(focus_index)
         return False
@@ -439,12 +493,11 @@ class SpacedListValueWidget(Gtk.Box):
             except AttributeError:
                 self.last_selected_src.drag_unhighlight()
         self.last_selected_src = widget
-        is_start = (widget in self.entries and self.entries[0] == widget)
-        is_end = (widget in self.entries and self.entries[-1] == widget)
+        is_start = widget in self.entries and self.entries[0] == widget
+        is_end = widget in self.entries and self.entries[-1] == widget
         self.set_arrow_sensitive(not is_start, not is_end)
-        if widget.get_text() != '':
-            widget.select_region(widget.get_position(),
-                                 widget.get_position())
+        if widget.get_text() != "":
+            widget.select_region(widget.get_position(), widget.get_position())
         return False
 
     def _handle_middle_click_paste(self, widget, event):

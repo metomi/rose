@@ -21,21 +21,22 @@
 import sys
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 import metomi.rose.config_editor
 
 
 class IntSpinButtonValueWidget(Gtk.Box):
-
     """This is a class to represent an integer with a spin button."""
 
-    WARNING_MESSAGE = 'Warning:\n  variable value: {0}\n  widget value: {1}'
+    WARNING_MESSAGE = "Warning:\n  variable value: {0}\n  widget value: {1}"
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
-        super(IntSpinButtonValueWidget, self).__init__(homogeneous=False,
-                                                       spacing=0)
+        super(IntSpinButtonValueWidget, self).__init__(
+            homogeneous=False, spacing=0
+        )
         self.value = value
         self.metadata = metadata
         self.set_value = set_value
@@ -54,11 +55,11 @@ class IntSpinButtonValueWidget(Gtk.Box):
 
         if value_ok:
             entry = self.make_spinner(int_value)
-            signal = 'changed'
+            signal = "changed"
         else:
             entry = Gtk.Entry()
             entry.set_text(self.value)
-            signal = 'activate'
+            signal = "activate"
 
         self.change_id = entry.connect(signal, self.setter)
 
@@ -70,24 +71,24 @@ class IntSpinButtonValueWidget(Gtk.Box):
         self.warning_img = Gtk.Image()
         if not value_ok:
             self.warning_img = Gtk.Image()
-            self.warning_img.set_from_stock(Gtk.STOCK_DIALOG_WARNING,
-                                            Gtk.IconSize.MENU)
+            self.warning_img.set_from_stock(
+                Gtk.STOCK_DIALOG_WARNING, Gtk.IconSize.MENU
+            )
             self.warning_img.set_tooltip_text(
-                metomi.rose.config_editor.WARNING_INTEGER_OUT_OF_BOUNDS)
+                metomi.rose.config_editor.WARNING_INTEGER_OUT_OF_BOUNDS
+            )
             self.warning_img.show()
             self.pack_start(self.warning_img, False, False, 0)
 
         self.grab_focus = lambda: self.hook.get_focus(entry)
 
     def make_spinner(self, int_value):
-        my_adj = Gtk.Adjustment(value=int_value,
-                                upper=self.upper,
-                                lower=self.lower,
-                                step_incr=1)
+        my_adj = Gtk.Adjustment(
+            value=int_value, upper=self.upper, lower=self.lower, step_incr=1
+        )
 
         spin_button = Gtk.SpinButton(adjustment=my_adj, digits=0)
-        spin_button.connect('focus-in-event',
-                            self.hook.trigger_scroll)
+        spin_button.connect("focus-in-event", self.hook.trigger_scroll)
 
         spin_button.set_numeric(True)
 
