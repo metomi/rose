@@ -22,7 +22,8 @@ import ast
 import shlex
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk
 
 import metomi.rose.config_editor
@@ -33,8 +34,8 @@ import metomi.rose.variable
 
 from functools import cmp_to_key
 
-class ChoicesValueWidget(Gtk.Box):
 
+class ChoicesValueWidget(Gtk.Box):
     """This represents a value as actual/available choices.
 
     Arguments are standard, except for the custom arg_str argument,
@@ -79,29 +80,25 @@ class ChoicesValueWidget(Gtk.Box):
     OPTIONS = {
         "all_group": [
             ["--all-group"],
-            {"action": "store",
-             "metavar": "CHOICE"}],
+            {"action": "store", "metavar": "CHOICE"},
+        ],
         "choices": [
             ["--choices"],
-            {"action": "append",
-             "default": None,
-             "metavar": "CHOICE"}],
+            {"action": "append", "default": None, "metavar": "CHOICE"},
+        ],
         "editable": [
             ["--editable"],
-            {"action": "store_true",
-             "default": False}],
-        "format": [
-            ["--format"],
-            {"action": "store",
-             "metavar": "FORMAT"}],
+            {"action": "store_true", "default": False},
+        ],
+        "format": [["--format"], {"action": "store", "metavar": "FORMAT"}],
         "guess_groups": [
             ["--guess-groups"],
-            {"action": "store_true",
-             "default": False}]}
+            {"action": "store_true", "default": False},
+        ],
+    }
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
-        super(ChoicesValueWidget, self).__init__(homogeneous=False,
-                                                 spacing=0)
+        super(ChoicesValueWidget, self).__init__(homogeneous=False, spacing=0)
         self.value = value
         self.metadata = metadata
         self.set_value = set_value
@@ -127,7 +124,8 @@ class ChoicesValueWidget(Gtk.Box):
         self._listview = metomi.rose.gtk.choice.ChoicesListView(
             self._set_value_listview,
             self._get_value_values,
-            self._handle_search)
+            self._handle_search,
+        )
         self._listview.show()
         list_frame = Gtk.Frame()
         list_frame.show()
@@ -141,7 +139,8 @@ class ChoicesValueWidget(Gtk.Box):
             self._get_value_values,
             self._get_available_values,
             self._get_groups,
-            self._get_is_implicit)
+            self._get_is_implicit,
+        )
         self._treeview.show()
         tree_frame = Gtk.Frame()
         tree_frame.show()
@@ -151,10 +150,8 @@ class ChoicesValueWidget(Gtk.Box):
             add_widget = self._get_add_widget()
             tree_vbox.pack_end(add_widget, expand=False, fill=False, padding=0)
         self.pack_start(tree_vbox, expand=True, fill=True)
-        self._listview.connect('focus-in-event',
-                               self.hook.trigger_scroll)
-        self._treeview.connect('focus-in-event',
-                               self.hook.trigger_scroll)
+        self._listview.connect("focus-in-event", self.hook.trigger_scroll)
+        self._treeview.connect("focus-in-event", self.hook.trigger_scroll)
         self.grab_focus = lambda: self.hook.get_focus(self._listview)
 
     def _handle_search(self, name):
@@ -166,8 +163,11 @@ class ChoicesValueWidget(Gtk.Box):
         add_entry.connect("changed", self._handle_combo_choice)
         add_entry.get_child().connect(
             "key-press-event",
-            lambda w, e: self._handle_text_choice(add_entry, e))
-        add_entry.set_tooltip_text(metomi.rose.config_editor.CHOICE_TIP_ENTER_CUSTOM)
+            lambda w, e: self._handle_text_choice(add_entry, e),
+        )
+        add_entry.set_tooltip_text(
+            metomi.rose.config_editor.CHOICE_TIP_ENTER_CUSTOM
+        )
         add_entry.show()
         self._set_available_hints(add_entry)
         add_hbox.pack_end(add_entry, expand=True, fill=True, padding=0)
@@ -191,8 +191,9 @@ class ChoicesValueWidget(Gtk.Box):
 
     def _handle_text_choice(self, comboboxentry, event):
         if Gdk.keyval_name(event.keyval) in ["Return", "KP_Enter"]:
-            self._add_custom_choice(comboboxentry,
-                                    comboboxentry.get_child().get_text())
+            self._add_custom_choice(
+                comboboxentry, comboboxentry.get_child().get_text()
+            )
         return False
 
     def _add_custom_choice(self, comboboxentry, new_name):
@@ -200,8 +201,9 @@ class ChoicesValueWidget(Gtk.Box):
         if not new_name:
             text = metomi.rose.config_editor.ERROR_BAD_NAME.format("''")
             title = metomi.rose.config_editor.DIALOG_TITLE_ERROR
-            metomi.rose.gtk.dialog.run_dialog(metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
-                                       text, title)
+            metomi.rose.gtk.dialog.run_dialog(
+                metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR, text, title
+            )
             return False
         new_values = self._get_value_values() + [entry.get_text()]
         entry.set_text("")
@@ -241,7 +243,11 @@ class ChoicesValueWidget(Gtk.Box):
         if not self.should_guess_groups or not self.should_show_kinship:
             return default_groups
         ok_groups = [n for n in names if set(n).issubset(name) and n != name]
-        ok_groups.sort(key=cmp_to_key(lambda x, y: set(x).issubset(y) - set(y).issubset(x)))
+        ok_groups.sort(
+            key=cmp_to_key(
+                lambda x, y: set(x).issubset(y) - set(y).issubset(x)
+            )
+        )
         for group in default_groups:
             if group in ok_groups:
                 ok_groups.remove(group)

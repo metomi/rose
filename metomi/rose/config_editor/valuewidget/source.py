@@ -22,7 +22,8 @@
 import shlex
 
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 import metomi.rose.config
@@ -32,8 +33,8 @@ import metomi.rose.gtk.choice
 
 from functools import cmp_to_key
 
-class SourceValueWidget(Gtk.Box):
 
+class SourceValueWidget(Gtk.Box):
     """This class generates a special widget for the file source variable.
 
     It cheats by passing in a special VariableOperations instance as
@@ -49,7 +50,9 @@ class SourceValueWidget(Gtk.Box):
         self.set_value = set_value
         self.hook = hook
         self.var_ops = arg_str
-        formats = [f for f in metomi.rose.formats.__dict__ if not f.startswith('__')]
+        formats = [
+            f for f in metomi.rose.formats.__dict__ if not f.startswith("__")
+        ]
         self.formats = formats
         self.formats_ok = None
         self._ok_content_sections = set([None])
@@ -59,25 +62,30 @@ class SourceValueWidget(Gtk.Box):
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         vbox.show()
         formats_check_button = Gtk.CheckButton(
-            metomi.rose.config_editor.FILE_CONTENT_PANEL_FORMAT_LABEL)
+            metomi.rose.config_editor.FILE_CONTENT_PANEL_FORMAT_LABEL
+        )
         formats_check_button.set_active(not self.formats_ok)
         formats_check_button.connect("toggled", self._toggle_formats)
         formats_check_button.show()
         formats_check_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         formats_check_hbox.show()
-        formats_check_hbox.pack_end(formats_check_button, expand=False,
-                                    fill=False, padding=0)
-        vbox.pack_start(formats_check_hbox, expand=False, fill=False, padding=0)
+        formats_check_hbox.pack_end(
+            formats_check_button, expand=False, fill=False, padding=0
+        )
+        vbox.pack_start(
+            formats_check_hbox, expand=False, fill=False, padding=0
+        )
         treeviews_hbox = Gtk.HPaned()
         treeviews_hbox.show()
         self._listview = metomi.rose.gtk.choice.ChoicesListView(
             self._set_listview,
             self._get_included_sources,
             self._handle_search,
-            get_custom_menu_items=self._get_custom_menu_items
+            get_custom_menu_items=self._get_custom_menu_items,
         )
         self._listview.set_tooltip_text(
-            metomi.rose.config_editor.FILE_CONTENT_PANEL_TIP)
+            metomi.rose.config_editor.FILE_CONTENT_PANEL_TIP
+        )
         frame = Gtk.Frame()
         frame.show()
         frame.add(self._listview)
@@ -96,10 +104,13 @@ class SourceValueWidget(Gtk.Box):
         adder_hook = metomi.rose.config_editor.valuewidget.ValueWidgetHook()
         self._adder = (
             metomi.rose.config_editor.valuewidget.files.FileChooserValueWidget(
-                adder_value, adder_metadata, adder_set_value, adder_hook))
+                adder_value, adder_metadata, adder_set_value, adder_hook
+            )
+        )
         self._adder.entry.connect("activate", self._add_file_source)
         self._adder.entry.set_tooltip_text(
-            metomi.rose.config_editor.TIP_VALUE_ADD_URI)
+            metomi.rose.config_editor.TIP_VALUE_ADD_URI
+        )
         self._adder.show()
         treeviews_hbox.add1(value_vbox)
         treeviews_hbox.add2(self._available_frame)
@@ -127,10 +138,11 @@ class SourceValueWidget(Gtk.Box):
             self._get_available_sections,
             self._get_groups,
             title=metomi.rose.config_editor.FILE_CONTENT_PANEL_TITLE,
-            get_is_included=self._get_section_is_included
+            get_is_included=self._get_section_is_included,
         )
         self._available_treeview.set_tooltip_text(
-            metomi.rose.config_editor.FILE_CONTENT_PANEL_OPT_TIP)
+            metomi.rose.config_editor.FILE_CONTENT_PANEL_OPT_TIP
+        )
         self._available_frame.show()
         if not self.formats_ok:
             self._available_frame.hide()
@@ -139,14 +151,19 @@ class SourceValueWidget(Gtk.Box):
     def _get_custom_menu_items(self):
         """Return some custom menuitems for use in the list view."""
         menuitem_box = Gtk.Box()
-        menuitem_icon = Gtk.Image.new_from_icon_name("dialog-question", Gtk.IconSize.MENU)
-        menuitem_label = Gtk.Label(label=metomi.rose.config_editor.FILE_CONTENT_PANEL_MENU_OPTIONAL)
+        menuitem_icon = Gtk.Image.new_from_icon_name(
+            "dialog-question", Gtk.IconSize.MENU
+        )
+        menuitem_label = Gtk.Label(
+            label=metomi.rose.config_editor.FILE_CONTENT_PANEL_MENU_OPTIONAL
+        )
         menuitem = Gtk.MenuItem()
         menuitem_box.pack_start(menuitem_icon, False, False, 0)
         menuitem_box.pack_start(menuitem_label, False, False, 0)
         Gtk.Container.add(menuitem, menuitem_box)
         menuitem.connect(
-            "button-press-event", self._toggle_menu_optional_status)
+            "button-press-event", self._toggle_menu_optional_status
+        )
         menuitem.show()
         return [menuitem]
 
@@ -159,8 +176,9 @@ class SourceValueWidget(Gtk.Box):
         if included_sections is None:
             included_sections = self._get_included_sources()
         for i, included_section in enumerate(included_sections):
-            if (included_section.startswith("(") and
-                    included_section.endswith(")")):
+            if included_section.startswith("(") and included_section.endswith(
+                ")"
+            ):
                 included_sections[i] = included_section[1:-1]
         return section in included_sections
 
@@ -181,7 +199,9 @@ class SourceValueWidget(Gtk.Box):
                 if section_all not in ok_content_sections:
                     ok_content_sections.append(section_all)
             ok_content_sections.append(section)
-        ok_content_sections.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
+        ok_content_sections.sort(
+            key=cmp_to_key(metomi.rose.config.sort_settings)
+        )
         ok_content_sections.sort(key=cmp_to_key(self._sort_settings_duplicate))
         return ok_content_sections
 
@@ -247,8 +267,9 @@ class SourceValueWidget(Gtk.Box):
         iter_ = menuitem._listview_iter
         model = menuitem._listview_model
         old_section_value = model.get_value(iter_, 0)
-        if (old_section_value.startswith("(") and
-                old_section_value.endswith(")")):
+        if old_section_value.startswith("(") and old_section_value.endswith(
+            ")"
+        ):
             section_value = old_section_value[1:-1]
         else:
             section_value = "(" + old_section_value + ")"

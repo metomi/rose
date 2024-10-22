@@ -20,7 +20,8 @@
 
 from gi.repository import GObject
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 import metomi.rose.config_editor.util
@@ -44,10 +45,8 @@ class HintsValueWidget(Gtk.Box):
         self.entry.connect_after("button-release-event", self._setter)
         self.entry.show()
         GObject.idle_add(self._set_completion, self.metadata)
-        self.pack_start(self.entry, expand=True, fill=True,
-                        padding=0)
-        self.entry.connect('focus-in-event',
-                           hook.trigger_scroll)
+        self.pack_start(self.entry, expand=True, fill=True, padding=0)
+        self.entry.connect("focus-in-event", hook.trigger_scroll)
         self.grab_focus = lambda: hook.get_focus(self.entry)
 
     def _setter(self, *args):
@@ -67,7 +66,7 @@ class HintsValueWidget(Gtk.Box):
         self.entry.set_position(focus_index)
 
     def _set_completion(self, metadata):
-        """ Return a predictive text model for value-hints."""
+        """Return a predictive text model for value-hints."""
         completion = Gtk.EntryCompletion()
         model = Gtk.ListStore(str)
         var_hints = metadata.get(metomi.rose.META_PROP_VALUE_HINTS)

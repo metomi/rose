@@ -24,7 +24,6 @@ import metomi.rose.config_editor
 
 
 class NavTreeManager(object):
-
     """This controls the navigation namespace tree structure."""
 
     def __init__(self, data, util, reporter, tree_trigger_update):
@@ -38,7 +37,7 @@ class NavTreeManager(object):
         """Determine if the namespace is in the tree or not."""
         if ns is None:
             return False
-        spaces = ns.lstrip('/').split('/')
+        spaces = ns.lstrip("/").split("/")
         subtree = self.namespace_tree
         while spaces:
             if spaces[0] not in subtree:
@@ -47,14 +46,18 @@ class NavTreeManager(object):
             spaces.pop(0)
         return True
 
-    def reload_namespace_tree(self, only_this_namespace=None,
-                              only_this_config=None,
-                              skip_update=False):
+    def reload_namespace_tree(
+        self,
+        only_this_namespace=None,
+        only_this_config=None,
+        skip_update=False,
+    ):
         """Make the tree of namespaces and load to the tree panel."""
         # Clear the old namespace tree information (selectively if necessary).
         if only_this_namespace is not None and only_this_config is None:
-            config_name = self.util.split_full_ns(self.data,
-                                                  only_this_namespace)[0]
+            config_name = self.util.split_full_ns(
+                self.data, only_this_namespace
+            )[0]
             only_this_config = config_name
             clear_namespace = only_this_namespace.rsplit("/", 1)[0]
             self.clear_namespace_tree(clear_namespace)
@@ -67,18 +70,20 @@ class NavTreeManager(object):
             configs = list(self.data.config.keys())
             configs.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
             configs.sort(
-                key=lambda x: self.data.config[x].config_type == metomi.rose.TOP_CONFIG_NAME
+                key=lambda x: self.data.config[x].config_type
+                == metomi.rose.TOP_CONFIG_NAME
             )
         else:
             configs = [only_this_config]
         for config_name in configs:
             config_data = self.data.config[config_name]
             if only_this_namespace:
-                top_spaces = only_this_namespace.lstrip('/').split('/')[:-1]
+                top_spaces = only_this_namespace.lstrip("/").split("/")[:-1]
             else:
-                top_spaces = config_name.lstrip('/').split('/')
-            self.update_namespace_tree(top_spaces, self.namespace_tree,
-                                       prev_spaces=[])
+                top_spaces = config_name.lstrip("/").split("/")
+            self.update_namespace_tree(
+                top_spaces, self.namespace_tree, prev_spaces=[]
+            )
             self.data.load_metadata_for_namespaces(config_name)
             # Load tree from sections (usually vast majority of tree nodes)
             self.data.load_node_namespaces(config_name)
@@ -86,32 +91,36 @@ class NavTreeManager(object):
                 ns = section_data.metadata["full_ns"]
                 self.data.namespace_meta_lookup.setdefault(ns, {})
                 self.data.namespace_meta_lookup[ns].setdefault(
-                    'title', ns.split('/')[-1])
-                spaces = ns.lstrip('/').split('/')
-                self.update_namespace_tree(spaces,
-                                           self.namespace_tree,
-                                           prev_spaces=[])
+                    "title", ns.split("/")[-1]
+                )
+                spaces = ns.lstrip("/").split("/")
+                self.update_namespace_tree(
+                    spaces, self.namespace_tree, prev_spaces=[]
+                )
             # Now load tree from variables
             for var in config_data.vars.get_all():
-                ns = var.metadata['full_ns']
+                ns = var.metadata["full_ns"]
                 self.data.namespace_meta_lookup.setdefault(ns, {})
                 self.data.namespace_meta_lookup[ns].setdefault(
-                    'title', ns.split('/')[-1])
-                spaces = ns.lstrip('/').split('/')
-                self.update_namespace_tree(spaces,
-                                           self.namespace_tree,
-                                           prev_spaces=[])
+                    "title", ns.split("/")[-1]
+                )
+                spaces = ns.lstrip("/").split("/")
+                self.update_namespace_tree(
+                    spaces, self.namespace_tree, prev_spaces=[]
+                )
         if not skip_update:
             # Perform an update.
-            self.tree_trigger_update(only_this_config=only_this_config,
-                                     only_this_namespace=only_this_namespace)
+            self.tree_trigger_update(
+                only_this_config=only_this_config,
+                only_this_namespace=only_this_namespace,
+            )
 
     def clear_namespace_tree(self, namespace=None):
         """Clear the namespace tree, or a subtree from namespace."""
         if namespace is None:
             spaces = []
         else:
-            spaces = namespace.lstrip('/').split('/')
+            spaces = namespace.lstrip("/").split("/")
         tree = self.namespace_tree
         for space in spaces:
             if space not in tree:
@@ -130,12 +139,15 @@ class NavTreeManager(object):
             this_ns = "/" + "/".join(prev_spaces + [spaces[0]])
             change = ""
             meta = self.data.namespace_meta_lookup.get(this_ns, {})
-            meta.setdefault('title', spaces[0])
+            meta.setdefault("title", spaces[0])
             latent_status = self.data.helper.get_ns_latent_status(this_ns)
             ignored_status = self.data.helper.get_ns_ignored_status(this_ns)
-            statuses = {metomi.rose.config_editor.SHOW_MODE_LATENT: latent_status,
-                        metomi.rose.config_editor.SHOW_MODE_IGNORED: ignored_status}
+            statuses = {
+                metomi.rose.config_editor.SHOW_MODE_LATENT: latent_status,
+                metomi.rose.config_editor.SHOW_MODE_IGNORED: ignored_status,
+            }
             subtree.setdefault(spaces[0], [{}, meta, statuses, change])
             prev_spaces += [spaces[0]]
-            self.update_namespace_tree(spaces[1:], subtree[spaces[0]][0],
-                                       prev_spaces)
+            self.update_namespace_tree(
+                spaces[1:], subtree[spaces[0]][0], prev_spaces
+            )
