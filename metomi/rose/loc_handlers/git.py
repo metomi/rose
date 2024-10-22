@@ -16,10 +16,19 @@
 # -----------------------------------------------------------------------------
 """A handler of Git locations."""
 
+import errno
 import os
 import re
 import tempfile
+from typing import TYPE_CHECKING, Optional, Tuple
 from urllib.parse import urlparse
+
+from metomi.rose.popen import RosePopenError
+
+if TYPE_CHECKING:
+    from metomi.rose.config_processors.fileinstall import (
+        PullableLocHandlersManager,
+    )
 
 
 REC_COMMIT_HASH = re.compile(r"^[0-9a-f]+$")
@@ -33,23 +42,27 @@ class GitLocHandler:
     WEB_SCHEMES = ["https"]
     URI_SEPARATOR = "::"
 
-    def __init__(self, manager):
+    def __init__(self, manager: 'PullableLocHandlersManager'):
         self.manager = manager
         # Determine (just once) what git version we have, if any.
-        ret_code, versiontext, stderr = self.manager.popen.run(
-            "git", "version")
-        if ret_code:
-            # Git not installed.
-            self.git_version = None
-        else:
-            # Git is installed, get the version.
-            version_nums = []
-            for num_string in versiontext.split()[-1].split("."):
-                try:
-                    version_nums.append(int(num_string))
-                except ValueError:
-                    break
-            self.git_version = tuple(version_nums)
+        try:
+            _ret_code, versiontext, _stderr = self.manager.popen.run(
+                self.GIT, "version"
+            )
+        except RosePopenError as exc:
+            if exc.ret_code == errno.ENOENT:
+                # Git not installed.
+                self.git_version: Optional[Tuple[int, ...]] = None
+                return
+            raise
+        # Git is installed, get the version.
+        version_nums = []
+        for num_string in versiontext.split()[-1].split("."):
+            try:
+                version_nums.append(int(num_string))
+            except ValueError:
+                break
+        self.git_version = tuple(version_nums)
 
     def can_pull(self, loc):
         """Determine if this is a suitable handler for loc."""
@@ -65,7 +78,7 @@ class GitLocHandler:
             scheme in self.WEB_SCHEMES
             and not os.path.exists(loc.name)  # same as svn...
             and not self.manager.popen.run(
-                "git", "ls-remote", "--exit-code", remote)[0]
+                self.GIT, "ls-remote", "--exit-code", remote)[0]
             # https://superuser.com/questions/227509/git-ping-check-if-remote-repository-exists
         )
 
@@ -111,27 +124,28 @@ class GitLocHandler:
         with tempfile.TemporaryDirectory() as tmpdirname:
             git_dir_opt = f"--git-dir={tmpdirname}/.git"
             await self.manager.popen.run_ok_async(
-                "git", git_dir_opt, "init"
+                self.GIT, git_dir_opt, "init"
             )
             if self.git_version >= (2, 25, 0) and path != "./":
                 # sparse-checkout available and suitable for this case.
                 await self.manager.popen.run_ok_async(
-                    "git", git_dir_opt, "sparse-checkout", "set", path,
+                    self.GIT, git_dir_opt, "sparse-checkout", "set", path,
                     "--no-cone"
                 )
                 await self.manager.popen.run_ok_async(
-                    "git", git_dir_opt, "fetch", "--depth=1",
+                    self.GIT, git_dir_opt, "fetch", "--depth=1",
                     "--filter=blob:none", remote, loc.key
                 )
             else:
                 # Fallback.
                 await self.manager.popen.run_ok_async(
-                    "git", git_dir_opt, "fetch", "--depth=1", remote, loc.key
+                    self.GIT, git_dir_opt, "fetch", "--depth=1", remote,
+                    loc.key
                 )
 
             # Checkout to temporary location, then extract only 'path' later.
             await self.manager.popen.run_ok_async(
-                "git", git_dir_opt, f"--work-tree={tmpdirname}", "checkout",
+                self.GIT, git_dir_opt, f"--work-tree={tmpdirname}", "checkout",
                 loc.key
             )
             name = tmpdirname + "/" + path
@@ -165,7 +179,7 @@ class GitLocHandler:
 
         """
         ret_code, info, _ = self.manager.popen.run(
-            "git", "ls-remote", "--exit-code", remote, ref)
+            self.GIT, "ls-remote", "--exit-code", remote, ref)
         if ret_code and ret_code != 2:
             # repo not found
             raise ValueError(f"ls-remote: could not locate '{remote}'")

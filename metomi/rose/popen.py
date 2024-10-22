@@ -268,7 +268,7 @@ class RosePopener:
         except OSError as exc:
             if exc.filename is None and args:
                 exc.filename = args[0]
-            raise RosePopenError(args, 1, "", str(exc))
+            raise RosePopenError(args, exc.errno, "", str(exc)) from None
         return proc
 
     def run_nohup_gui(self, cmd):
