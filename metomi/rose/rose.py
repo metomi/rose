@@ -319,6 +319,8 @@ def _doc(ns):
             continue
         if (ns, sub_cmd) in DEAD_ENDS:
             continue
+        if (ns == 'rose') and (sub_cmd == 'launch-splash-screen'):
+            continue
         print('\n==================================================')
         print(f'{ns} {sub_cmd}')
         print('==================================================\n')
