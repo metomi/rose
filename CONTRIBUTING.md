@@ -55,6 +55,7 @@ below:
  - Mark Dawson (Met Office, UK)
  - Joe Marsh Rossney (UK Centre for Ecology & Hydrology)
  - Dimitrios Theodorakis (Met Office, UK)
+ - Joseph Abram (Met Office, UK)
 <!-- end-shortlog -->
 
 (All contributors are identifiable with email addresses in the version control
