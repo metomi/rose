@@ -53,6 +53,7 @@ below:
  - Ronnie Dutta (Met Office, UK)
  - Roddy Sharp (Met Office, UK)
  - Mark Dawson (Met Office, UK)
+ - Joe Marsh Rossney (UK Centre for Ecology & Hydrology)
  - Dimitrios Theodorakis (Met Office, UK)
 <!-- end-shortlog -->
 

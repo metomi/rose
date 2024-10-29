@@ -53,7 +53,7 @@ jobs:
           STATUS="$(git status --short)"
           if [[ -n "$STATUS" ]]; then
             echo "$STATUS"
-            echo "::set-output name=changed::true"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "::notice::No updates to the tutorials"
           fi
