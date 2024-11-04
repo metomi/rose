@@ -10,66 +10,87 @@ Rose runs on Unix-like systems including Linux and MacOS.
 Quick Installation
 ------------------
 
-With ``conda`` (recommended)::
+With ``conda``  / ``mamba`` (recommended)::
 
-   $ conda install metomi-rose
+   $ conda install -c conda-forge metomi-rose
 
-With ``pip`` (you will need to ensure `Non Python Dependencies`_ are met)::
+With ``pip``::
 
    $ pip install metomi-rose
 
-Installing With Cylc
-^^^^^^^^^^^^^^^^^^^^
+Optional dependencies
+^^^^^^^^^^^^^^^^^^^^^
 
-Rose does not require and is distributed independently of `Cylc`_.
+Rose has optional dependencies that enable extra functionalities.
+
+Run :ref:`command-rose-check-software` to see which optional
+dependencies are satisfied you your installation.
+
+Cylc
+""""
+
+`Cylc`_ is a workflow engine which supports Rose configurations.
 
 To use Rose with Cylc you will need to install `Cylc Flow`_ and `Cylc Rose`_
 into the same Python environment as Rose.
 
-With ``conda`` (recommended)::
+With ``conda`` / ``mamba`` (recommended)::
 
-   $ conda install cylc-flow cylc-rose
+   $ conda install -c conda-forge cylc-flow cylc-rose metomi-rose
 
-With ``pip`` (you will need to ensure `Non Python Dependencies`_ are met)::
+With ``pip``::
 
-   $ pip install cylc-flow cylc-rose
+   $ pip install cylc-flow cylc-rose metomi-rose
 
 .. note::
 
    `Cylc`_ is a distributed system, not all dependencies are required on all
    platforms.
 
-   See the `Cylc`_ installation instructions for more information.
+   See the :ref:`Cylc installation instructions <cylc:installation>` for more
+   information.
 
-   .. TODO
+Git
+"""
 
-      This reference will pass once intersphinx has a more contemporary
-      version of cylc-doc to point at (see conf.py)
+Some Rose commands can be configured to acquire files from Git repositories:
 
-      See the :ref:`Cylc installation instructions <cylc:installation>` for more
-      information.
+* ``rose app-run``
+* ``rose task-run``
+* ``cylc install``
 
-Non Python Dependencies
-^^^^^^^^^^^^^^^^^^^^^^^
+Ensure Git is installed to activate this support if required.
 
-The following packages are installed by ``conda`` but not by ``pip``:
+Subversion
+""""""""""
 
-* FCM
+Subversion & `FCM`_ are required for :ref:`Rosie <tutorial-rosie>`
+and for installing files from Subversion using FCM keywords by:
+
+* ``rose app-run``
+* ``rose task-run``
+* ``cylc install``
+
+The following dependencies are required for subversion support:
+
+* `FCM`_
 * Perl
-* Python3
 * Subversion
 
-If installing via ``pip`` run :ref:`command-rose-check-software` to ensure
-non-Python dependencies are satisfied.
+Run :ref:`command-rose-check-software` to ensure all required dependencies are
+installed.
 
-.. note::
+Graphviz
+""""""""
 
-   Subversion & FCM are required for installing files from Subversion using FCM
-   keywords by:
+Rose has some optional graphing functionalities which require GraphViz.
 
-   + ``rose app-run``
-   + ``rose task-run``
-   + ``cylc install``
+The Conda Forge ``metomi-rose`` package has this support enabled by default.
+
+If installing via ``pip``, you will need to provide Graphviz, then install
+Rose with the ``graph`` optional dependency::
+
+   $ pip install metomi-rose[graph]
 
 
 Configuring Rose
