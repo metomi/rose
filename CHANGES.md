@@ -10,7 +10,7 @@ updated. Only the first match gets replaced, so it's fine to leave the old
 ones in. -->
 
 
-## 2.3.1 (<span actions:bind='release-date'>Released 2024-07-18</span>)
+## 2.3.1 (<span actions:bind='release-date'>Released 2024-11-11</span>)
 
 ### Fixes
 
