@@ -47,8 +47,8 @@ root directory to install file targets with a relative path:
          cloned ``REPOSITORY_URL``, git checkout'ed ``TREEISH``, and extracted
          the path ``PATHSPEC`` within the clone. It may help to think
          of the parts of the location as ``git:Where::What::When``.
-         
-         ..rubric:: Examples:
+
+         .. rubric:: Examples:
 
          .. code-block:: rose
 
