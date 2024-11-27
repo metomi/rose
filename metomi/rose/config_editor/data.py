@@ -534,8 +534,10 @@ class ConfigDataManager(object):
         if opt_exceptions:
             err_text = ""
             err_format = metomi.rose.config_editor.ERROR_LOAD_OPT_CONFS_FORMAT
-            for path, exc in sorted(opt_exceptions.items()):
-                err_text += err_format.format(path, type(exc).__name__, exc)
+            for path, exception in sorted(opt_exceptions.items()):
+                err_text += err_format.format(
+                    path, type(exception).__name__, exception
+                )
             err_text = err_text.rstrip()
             text = metomi.rose.config_editor.ERROR_LOAD_OPT_CONFS.format(
                 err_text
