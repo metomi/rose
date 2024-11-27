@@ -54,8 +54,6 @@ file that looks like this:
 
 .. code-block:: cylc
 
-   [scheduler]
-       UTC mode = True # Ignore DST
    [scheduling]
        [[graph]]
            R1 = lander
