@@ -83,7 +83,7 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/', None),
 }
 
-rst_epilog = open('hyperlinks.rst', 'r').read()
+rst_epilog = open('hyperlinks.txt', 'r').read()
 
 # Slide (hieroglyph) settings.
 slide_theme = 'single-level'
