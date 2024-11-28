@@ -1,4 +1,4 @@
- .. include:: ../../hyperlinks.rst
+
     :start-line: 1
 
 
