@@ -261,5 +261,9 @@ file_grep "$TEST_KEY_PREFIX-TOTAL-RAN" \
     "$INFO_PATTERN TOTAL: 8" \
     "$FILE"
 #-------------------------------------------------------------------------------
+if [[ $FOO == 'true' ]];then
+    exit 0
+fi
+
 purge
 exit 0

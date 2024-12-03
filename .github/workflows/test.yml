@@ -78,7 +78,7 @@ jobs:
   test:
     needs: lint
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 45
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
@@ -198,11 +198,12 @@ jobs:
           pytest
 
       - name: Functional Tests
-        timeout-minutes: 30
+        timeout-minutes: 10
         id: functest
         working-directory: rose
         env:
           OBJC_DISABLE_INITIALIZE_FORK_SAFETY: YES
+          FOO: true
         run: |
           # rose tests should pass first time around
           etc/bin/rose-test-battery -j 4 --state=save
