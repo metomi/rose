@@ -118,10 +118,11 @@ __META_CONFIG__
 init_macro envswitch.py < $TEST_SOURCE_DIR/lib/custom_macro_corrupt.py
 run_fail "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+sed -i 's/ expected an indented block .*//' "${TEST_KEY}.err"  # error message varies with Python version
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
 [V] rose.metadata_check.MetadataChecker: issues: 1
     namelist:macro_nl=my_macro_var1=macro=envswitch.LogicalTransformer
-        Could not import envswitch.LogicalTransformer: IndentationError: expected an indented block (envswitch.py, line 33)
+        Could not import envswitch.LogicalTransformer: IndentationError:
 __ERROR__
 teardown
 #-------------------------------------------------------------------------------

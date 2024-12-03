@@ -17,7 +17,6 @@
 """This package contains the Python code for Rose utilities.
 
 This module contains the constants that are used globally within these.
-
 """
 
 # File format syntax
