@@ -203,6 +203,7 @@ jobs:
         working-directory: rose
         env:
           OBJC_DISABLE_INITIALIZE_FORK_SAFETY: YES
+          FOO: true
         run: |
           # rose tests should pass first time around
           etc/bin/rose-test-battery -j 4 --state=save
