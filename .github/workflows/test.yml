@@ -78,7 +78,7 @@ jobs:
   test:
     needs: lint
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 45
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
@@ -198,7 +198,7 @@ jobs:
           pytest
 
       - name: Functional Tests
-        timeout-minutes: 30
+        timeout-minutes: 10
         id: functest
         working-directory: rose
         env:
