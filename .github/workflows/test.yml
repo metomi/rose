@@ -83,7 +83,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ['ubuntu-latest']
-        python-version: ['3.7', '3.8', '3.9']
+        python-version: ['3.8', '3.9']
         include:
           - os: 'macos-latest'
             python-version: '3.8'
@@ -137,12 +137,12 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu')
         run: |
           sudo apt-get update
-          sudo apt-get install -y shellcheck sqlite3 at graphviz graphviz-dev
+          sudo apt-get install -y shellcheck sqlite3 at graphviz graphviz-dev libgirepository1.0-dev python3-gi libgtk-3-dev gobject-introspection gir1.2-gtk-3.0
 
       - name: Install Rose
         working-directory: rose
         run: |
-          pip install ."[tests,docs${{ (startsWith(matrix.os, 'ubuntu') && ',graph,rosa') || '' }}]"
+          pip install ."[tests,docs${{ (startsWith(matrix.os, 'ubuntu') && ',graph,rosa,rose-edit') || '' }}]" gobject
           yarn install
 
       - name: Install Cylc
@@ -242,11 +242,11 @@ jobs:
       - name: install graphviz
         run: |
           sudo apt-get update
-          sudo apt-get install -y graphviz pkg-config libgraphviz-dev
+          sudo apt-get install -y graphviz pkg-config libgraphviz-dev libgirepository1.0-dev python3-gi libgtk-3-dev gobject-introspection gir1.2-gtk-3.0
 
       - name: Install Rose
         run: |
-          pip install -e .[docs,graph]
+          pip install -e .[docs,graph,rose-edit]
 
       - name: Install Cylc
         uses: cylc/release-actions/install-cylc-components@v1

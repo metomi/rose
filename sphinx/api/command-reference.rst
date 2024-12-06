@@ -16,12 +16,11 @@ Rose Commands
 rose config-edit
 ^^^^^^^^^^^^^^^^
 
-.. warning::
+.. code-block:: bash
 
-   The Rose Edit GUI has not yet been reimplemented in Rose 2.
-
-   The old Rose 2019 (Python 2) GUI remains compatible with Rose 2
-   configurations.
+   rose config-edit
+   # or simply
+   rose edit
 
 .. _command-rose-suite-run:
 
