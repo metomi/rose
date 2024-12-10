@@ -233,6 +233,8 @@ def _get_sub_cmds(ns):
         set(PYTHON_SUB_CMDS) | BASH_SUB_CMDS
     ) - set(DEAD_ENDS):
         if ns_ == ns:
+            if (ns == 'rose') and (sub_cmd == 'launch-splash-screen'):
+                continue
             yield sub_cmd
 
 
