@@ -243,6 +243,8 @@ def load_entry_point(entry_point: 'EntryPoint'):
 def _get_sub_cmds(ns):
     for ns_, sub_cmd in set(PYTHON_SUB_CMDS) | BASH_SUB_CMDS:
         if ns_ == ns:
+            if (ns == 'rose') and (sub_cmd == 'launch-splash-screen'):
+                continue
             yield sub_cmd
 
 
