@@ -61,13 +61,13 @@ class RosieDiscoServiceRoot(object):
                 ResourceLocator.default().get_util_home(
                     "lib", "html", "template", "rosie-disco")))
         db_url_map = {}
-        for key, node in rose_conf.get(["rosie-db"]).value.items():
+        for key, node in list(rose_conf.get(["rosie-db"]).value.items()):
             if key.startswith("db.") and key[3:]:
                 db_url_map[key[3:]] = node.value
         self.db_url_map = db_url_map
         if not self.db_url_map:
             self.db_url_map = {}
-        for key, db_url in self.db_url_map.items():
+        for key, db_url in list(self.db_url_map.items()):
             setattr(self, key, RosieDiscoService(self.props, key, db_url))
 
     @cherrypy.expose

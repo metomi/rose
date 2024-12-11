@@ -154,7 +154,7 @@ class VariableOperations(object):
 
     def fix_var_ignored(self, variable):
         """Fix any variable ignore state errors."""
-        ignored_reasons = variable.ignored_reason.keys()
+        ignored_reasons = list(variable.ignored_reason.keys())
         new_reason_dict = {}  # Enable, by default.
         old_reason = variable.ignored_reason.copy()
         if rose.variable.IGNORED_BY_SECTION in old_reason:
@@ -218,10 +218,10 @@ class VariableOperations(object):
             if rose.config_editor.WARNING_TYPE_NOT_TRIGGER in variable.error:
                 variable.error.pop(
                     rose.config_editor.WARNING_TYPE_NOT_TRIGGER)
-        my_ignored_keys = variable.ignored_reason.keys()
+        my_ignored_keys = list(variable.ignored_reason.keys())
         if rose.variable.IGNORED_BY_SECTION in my_ignored_keys:
             my_ignored_keys.remove(rose.variable.IGNORED_BY_SECTION)
-        old_ignored_keys = old_reason.keys()
+        old_ignored_keys = list(old_reason.keys())
         if rose.variable.IGNORED_BY_SECTION in old_ignored_keys:
             old_ignored_keys.remove(rose.variable.IGNORED_BY_SECTION)
         if len(my_ignored_keys) > len(old_ignored_keys):

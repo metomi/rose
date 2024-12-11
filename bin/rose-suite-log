@@ -64,4 +64,4 @@
 #     --view
 #         Launch web browser to view suite log.
 #-------------------------------------------------------------------------------
-exec python -m rose.suite_log "$@"
+exec python3 -m rose.suite_log "$@"

@@ -73,7 +73,7 @@ class VariableWidget(object):
         self.is_inconsistent = False
         if 'type' in variable.error:
             self._set_inconsistent(self.valuewidget, variable)
-        self.errors = variable.error.keys()
+        self.errors = list(variable.error.keys())
         self.menuwidget = self.get_menuwidget(variable)
         self.generate_labelwidget()
         self.generate_contentwidget()
@@ -343,7 +343,7 @@ class VariableWidget(object):
             if "'Ignore'" not in self.menuwidget.option_ui:
                 self.menuwidget.old_option_ui = self.menuwidget.option_ui
                 self.menuwidget.old_actions = self.menuwidget.actions
-            if ign_map.keys() == [rose.variable.IGNORED_BY_SECTION]:
+            if list(ign_map.keys()) == [rose.variable.IGNORED_BY_SECTION]:
                 # Not ignored in itself, so give Ignore option.
                 if "'Enable'" in self.menuwidget.option_ui:
                     self.menuwidget.option_ui = re.sub(
@@ -524,7 +524,7 @@ class VariableWidget(object):
         else:
             self._set_consistent(self.valuewidget, variable)
         self.variable = variable
-        self.errors = variable.error.keys()
+        self.errors = list(variable.error.keys())
         self.valuewidget.handle_type_error(rose.META_PROP_TYPE in self.errors)
         self.menuwidget.refresh(variable)
         self.keywidget.refresh(variable)

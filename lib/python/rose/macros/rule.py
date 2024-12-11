@@ -115,7 +115,7 @@ class FailureRuleChecker(rose.macro.MacroBase):
                 f_type = self.WARNING_RULE_FAILED
             else:
                 f_type = self.ERROR_RULE_FAILED
-            for setting_id, rule_msg_list in rule_data[rule_type].items():
+            for setting_id, rule_msg_list in list(rule_data[rule_type].items()):
                 section, option = self._get_section_option_from_id(setting_id)
                 for (rule, message) in rule_msg_list:
                     info = None
@@ -224,7 +224,7 @@ class RuleEvaluator(rose.macro.MacroBase):
         sci_num_count = -1
 
         # any/all processing.
-        for array_func_key, rec_regex in self.REC_ARRAY.items():
+        for array_func_key, rec_regex in list(self.REC_ARRAY.items()):
             for search_result in rec_regex.findall(rule):
                 start, var_id, operator, value, end = search_result
                 if var_id == "this":
@@ -264,7 +264,7 @@ class RuleEvaluator(rose.macro.MacroBase):
         # Strings into proper string variables.
         for search_result in self.REC_VALUE.findall(rule):
             value_string = search_result.strip('"')
-            for key, value in local_map.items():
+            for key, value in list(local_map.items()):
                 if value == value_string:
                     break
             else:
@@ -278,7 +278,7 @@ class RuleEvaluator(rose.macro.MacroBase):
             proper_id = search_result.replace("this", setting_id)
             value_string = get_value_from_id(
                 proper_id, config, meta_config, setting_id)
-            for key, value in local_map.items():
+            for key, value in list(local_map.items()):
                 if value == value_string:
                     break
             else:
@@ -292,7 +292,7 @@ class RuleEvaluator(rose.macro.MacroBase):
         for search_result in self.REC_CONFIG_ID.findall(rule):
             value_string = get_value_from_id(
                 search_result, config, meta_config, setting_id)
-            for key, value in local_map.items():
+            for key, value in list(local_map.items()):
                 if value == value_string:
                     break
             else:

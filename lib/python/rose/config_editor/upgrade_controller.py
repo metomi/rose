@@ -214,7 +214,7 @@ class UpgradeController(object):
 
     def _handle_change_version(self, cell, path, new, col_index):
         iter_ = self.treemodel.get_iter(path)
-        if isinstance(new, basestring):
+        if isinstance(new, str):
             new_value = new
         else:
             new_value = cell.get_property("model").get_value(new, 0)

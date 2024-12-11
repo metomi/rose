@@ -41,7 +41,7 @@ import shlex
 from smtplib import SMTP
 import socket
 import sqlalchemy as al
-from StringIO import StringIO
+from io import StringIO
 import sys
 from tempfile import TemporaryFile
 from time import mktime, strptime
@@ -68,7 +68,7 @@ class RosieWriteDAO(object):
         """Perform a delete on table key, using kwargs to select rows."""
         table = self._get_table(key)
         where = None
-        for col, value in kwargs.items():
+        for col, value in list(kwargs.items()):
             if where is None:
                 where = table.c[col] == value
             else:
@@ -132,7 +132,7 @@ class RosieSvnPostCommitHook(object):
         # Do nothing if prefix is not registered
         conf = ResourceLocator.default().get_conf()
         rosie_db_node = conf.get(["rosie-db"], no_ignore=True)
-        for key, node in rosie_db_node.value.items():
+        for key, node in list(rosie_db_node.value.items()):
             if node.is_ignored() or not key.startswith("repos."):
                 continue
             if os.path.realpath(repos) == os.path.realpath(node.value):
@@ -406,7 +406,7 @@ class RosieSvnPostCommitHook(object):
             "date": changeset_attribs["date"]})
         for name in ["owner", "project", "title"]:
             cols[name] = branch_attribs[info_key].get_value([name])
-        if branch_attribs["from_path"] and vc_attrs["branch"] == u"trunk":
+        if branch_attribs["from_path"] and vc_attrs["branch"] == "trunk":
             from_names = branch_attribs["from_path"].split("/")[:self.LEN_ID]
             cols["from_idx"] = (
                 changeset_attribs["prefix"] + "-" + "".join(from_names))
@@ -439,11 +439,11 @@ class RosieSvnPostCommitHook(object):
         keys_str = " ".join(shlex.split(keys_str)).decode("utf-8")
         if keys_str:
             try:
-                dao.insert(META_TABLE_NAME, name=u"known_keys", value=keys_str)
+                dao.insert(META_TABLE_NAME, name="known_keys", value=keys_str)
             except al.exc.IntegrityError:
                 dao.update(
-                    META_TABLE_NAME, (u"name",),
-                    name=u"known_keys", value=keys_str)
+                    META_TABLE_NAME, ("name",),
+                    name="known_keys", value=keys_str)
 
 
 def main():

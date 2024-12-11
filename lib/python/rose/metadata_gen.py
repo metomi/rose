@@ -64,7 +64,7 @@ def metadata_gen(config, meta_config=None, auto_type=False, prop_map={}):
                 # Add duplicate = true at base and modifier level (if needed).
                 meta_config.set([meta_sect, rose.META_PROP_DUPLICATE],
                                 rose.META_PROP_VALUE_TRUE)
-            for prop_key, prop_value in prop_map.items():
+            for prop_key, prop_value in list(prop_map.items()):
                 meta_config.set([meta_sect, prop_key], prop_value)
         if option is None:
             continue
@@ -73,7 +73,7 @@ def metadata_gen(config, meta_config=None, auto_type=False, prop_map={}):
         if meta_config.get([meta_opt]) is not None:
             continue
         meta_config.set([meta_opt])
-        for prop_key, prop_value in prop_map.items():
+        for prop_key, prop_value in list(prop_map.items()):
             meta_config.set([meta_opt, prop_key], prop_value)
         if auto_type:
             opt_type, length = type_gen(node.value)

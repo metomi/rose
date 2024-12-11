@@ -120,7 +120,7 @@ class SchemeHandlersManager(object):
         handler = self.get_handler(item)
         if handler:
             return handler
-        for handler in self.handlers.values():
+        for handler in list(self.handlers.values()):
             can_handle = getattr(handler, self.can_handle, None)
             if (callable(can_handle) and can_handle(item)):
                 return handler

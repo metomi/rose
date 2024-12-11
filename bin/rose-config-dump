@@ -47,4 +47,4 @@
 #     --quiet, -q
 #         Decrement verbosity. Do not report modified files.
 #-------------------------------------------------------------------------------
-exec python -m rose.config_dump "$@"
+exec python3 -m rose.config_dump "$@"

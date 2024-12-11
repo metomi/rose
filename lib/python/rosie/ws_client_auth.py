@@ -37,7 +37,7 @@ from rose.resource import ResourceLocator
 import shlex
 import socket
 import sys
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 
 class UndefinedRosiePrefixWS(Exception):
@@ -395,7 +395,7 @@ class RosieWSClientAuthManager(object):
                     "--window-icon=" + icon_path,
                     "--text=" + prompt)[1].strip()
             else:
-                username = raw_input(prompt)
+                username = input(prompt)
             if not username:
                 raise KeyboardInterrupt(self.STR_CANCELLED)
             if username and username != self.username:

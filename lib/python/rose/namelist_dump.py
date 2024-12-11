@@ -99,7 +99,7 @@ def namelist_dump(args=None, output_file=None, case_mode=None):
         groups_in_file[group.file].append(group)
 
     # Add contents to relevant file: sections
-    for file, groups in groups_in_file.items():
+    for file, groups in list(groups_in_file.items()):
         section = "file:" + file
         if file == sys.stdin.name:
             section = "file:STDIN"
@@ -112,7 +112,7 @@ def namelist_dump(args=None, output_file=None, case_mode=None):
         config.set([section, "source"], " ".join(group_sections))
 
     # Add namelist: sections
-    for name, groups in groups_by_name.items():
+    for name, groups in list(groups_by_name.items()):
         for group in groups:
             section = "namelist:" + tr_case(group.name, case_mode)
             if len(groups) > 1:

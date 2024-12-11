@@ -20,7 +20,7 @@
 
 import multiprocessing
 import os
-import Queue
+import queue
 import re
 import shlex
 import subprocess
@@ -268,7 +268,7 @@ class ToolBar(gtk.Toolbar):
                 separator = gtk.SeparatorToolItem()
                 separator.show()
                 self.insert(separator, 0)
-            if isinstance(stock, basestring) and stock.startswith("gtk."):
+            if isinstance(stock, str) and stock.startswith("gtk."):
                 stock = getattr(gtk, stock.replace("gtk.", "", 1))
             if callable(stock):
                 widget = stock()
@@ -320,7 +320,7 @@ class AsyncStatusbar(gtk.Statusbar):
     def update(self):
         try:
             message = self.queue.get(block=False)
-        except Queue.Empty:
+        except queue.Empty:
             pass
         else:
             self.push(self.ctx_id, message)
@@ -355,7 +355,7 @@ class AsyncLabel(gtk.Label):
     def update(self):
         try:
             message = self.queue.get(block=False)
-        except Queue.Empty:
+        except queue.Empty:
             pass
         else:
             self.set_text(message)
@@ -542,7 +542,7 @@ class TreeModelSortUtil(object):
 
     def cmp_(self, value1, value2):
         """Perform a useful form of 'cmp'"""
-        if (isinstance(value1, basestring) and isinstance(value2, basestring)):
+        if (isinstance(value1, str) and isinstance(value2, str)):
             if value1.isdigit() and value2.isdigit():
                 return cmp(float(value1), float(value2))
             return rose.config.sort_settings(value1, value2)

@@ -311,7 +311,7 @@ class ChoicesTreeView(gtk.TreeView):
         ok_values = self._get_data()
         model = self.get_model()
         ok_content_sections = self._get_available_data()
-        for name, iter_ in self._name_iter_map.items():
+        for name, iter_ in list(self._name_iter_map.items()):
             is_in_value = self._get_is_included(name, ok_values)
             if self._get_is_implicit is None:
                 groups = self._get_groups(name, ok_content_sections)

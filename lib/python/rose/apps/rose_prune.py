@@ -219,7 +219,7 @@ class RosePruneApp(BuiltinApp):
         if nodes is None:
             return [], set()
         cycle_formats = {}
-        for key, node in nodes.items():
+        for key, node in list(nodes.items()):
             if node.is_ignored():
                 continue
             if key.startswith("cycle-format{") and key.endswith("}"):
@@ -252,7 +252,7 @@ class RosePruneApp(BuiltinApp):
                 cycle_set.add(cycle)
                 if cycle_args:
                     cycle_strs = {"cycle": cycle}
-                    for key, cycle_format in cycle_formats.items():
+                    for key, cycle_format in list(cycle_formats.items()):
                         if self._get_cycling_mode() == "integer":
                             cycle_strs[key] = cycle_format % int(cycle)
                         else:  # date time cycling

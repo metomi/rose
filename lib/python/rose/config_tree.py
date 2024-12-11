@@ -194,9 +194,9 @@ class _Test(object):
         """Test if actual == expect."""
         self.test_num += 1
         if actual == expect:
-            print "ok %d - %s" % (self.test_num, key)
+            print("ok %d - %s" % (self.test_num, key))
         else:
-            print "not ok %d - %s" % (self.test_num, key)
+            print("not ok %d - %s" % (self.test_num, key))
 
     def test1(self):
         """Test: configuration file only."""
@@ -260,7 +260,7 @@ type=grilled
 echo "Making breakfast $@"
 """)
         handle.close()
-        os.chmod("t2/bin/make-breakfast", 0755)
+        os.chmod("t2/bin/make-breakfast", 0o755)
         os.mkdir("t2/etc")
         for key, val in (
                 ("sausage", "10 fat sausages"),
@@ -462,7 +462,7 @@ type=grilled
 
     def run(self):
         """Run the tests."""
-        print self.test_plan
+        print(self.test_plan)
 
         cwd = os.getcwd()
         work_dir = mkdtemp()
@@ -485,7 +485,7 @@ type=grilled
 if __name__ == "__main__":
     # These modules are only required for running the self tests.
     from rose.config import ConfigDumper
-    from StringIO import StringIO
+    from io import StringIO
     from shutil import rmtree
     from tempfile import mkdtemp
     _Test().run()

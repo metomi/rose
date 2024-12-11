@@ -18,5 +18,5 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import filesystem
-import summary_data
+from . import filesystem
+from . import summary_data

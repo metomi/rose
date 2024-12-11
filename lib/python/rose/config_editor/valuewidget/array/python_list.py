@@ -456,7 +456,7 @@ def python_array_split(value):
         return value_array
     cast_value_array = []
     for value in value_array:
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             cast_value_array.append('"' + value + '"')
         else:
             cast_value_array.append(str(value))

@@ -86,7 +86,7 @@ class Dummy(object):
     """Convert a dict into an object."""
 
     def __init__(self, **kwargs):
-        for key, value in kwargs.items():
+        for key, value in list(kwargs.items()):
             setattr(self, key, value)
 
 
@@ -193,7 +193,7 @@ class Runner(object):
             opts = Dummy(**opts)
         cwd = os.getcwd()
         environ = {}
-        for k, v in os.environ.items():
+        for k, v in list(os.environ.items()):
             environ[k] = v
         uuid = str(uuid4())
         work_files = []
@@ -221,7 +221,7 @@ class Runner(object):
                 pass
             # Reset os.environ
             os.environ = {}
-            for k, v in environ.items():
+            for k, v in list(environ.items()):
                 os.environ[k] = v
 
     __call__ = run

@@ -74,7 +74,7 @@ class RoseArchEvent(Event):
             t_info,
             ret_code_str)
         if target.status != target.ST_OLD:
-            for source in sorted(target.sources.values(),
+            for source in sorted(list(target.sources.values()),
                                  lambda s1, s2: cmp(s1.name, s2.name)):
                 ret += "\n%s\t%s (%s)" % (
                     target.status, source.name, source.orig_name)
@@ -267,7 +267,7 @@ class RoseArchApp(BuiltinApp):
                         exc)
             else:
                 rename_parser = None
-            for source in target.sources.values():
+            for source in list(target.sources.values()):
                 dict_ = {
                     "cycle": os.getenv("ROSE_TASK_CYCLE_TIME"),
                     "name": source.name}
@@ -312,12 +312,12 @@ class RoseArchApp(BuiltinApp):
             # Rename/edit sources
             target.status = target.ST_BAD
             rename_required = False
-            for source in target.sources.values():
+            for source in list(target.sources.values()):
                 if source.name != source.orig_name:
                     rename_required = True
                     break
             if rename_required or target.source_edit_format:
-                for source in target.sources.values():
+                for source in list(target.sources.values()):
                     source.path = os.path.join(work_dir, source.name)
                     app_runner.fs_util.makedirs(
                         os.path.dirname(source.path))
@@ -340,7 +340,7 @@ class RoseArchApp(BuiltinApp):
             if target.work_source_path:
                 sources = [target.work_source_path]
             else:
-                for source in target.sources.values():
+                for source in list(target.sources.values()):
                     sources.append(source.path)
             command = target.command_format % {
                 "sources": app_runner.popen.list_to_shell_str(sources),
@@ -509,7 +509,7 @@ class RoseArchDAO(object):
         conn.execute(t_stmt, t_stmt_args)
         sh_stmt = r"INSERT INTO " + self.T_SOURCES + " VALUES (?, ?, ?)"
         sh_stmt_args = [target.name]
-        for checksum, source in target.sources.items():
+        for checksum, source in list(target.sources.items()):
             conn.execute(sh_stmt, sh_stmt_args + [source.name, checksum])
         conn.commit()
 

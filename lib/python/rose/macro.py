@@ -363,14 +363,14 @@ class MacroBaseRoseEdit(MacroBase):
         """Return all sections within config_data."""
         sections = []
         if isinstance(config_data, rose.config.ConfigNode):
-            for key, node in config_data.value.items():
+            for key, node in list(config_data.value.items()):
                 if isinstance(node.value, dict):
                     sections.append(key)
             if "" not in sections:
                 sections.append("")
         else:
-            for key in set(config_data["sections"].keys() +
-                           config_data["variables"].keys()):
+            for key in set(list(config_data["sections"].keys()) +
+                           list(config_data["variables"].keys())):
                 sections.append(key)
         return sections
 
@@ -782,7 +782,7 @@ def get_macros_for_config(config=None,
     modules = []
     if include_custom:  # Suite specified macros.
         meta_filepaths = [
-            os.path.join(v, k) for k, v in meta_config_tree.files.items()]
+            os.path.join(v, k) for k, v in list(meta_config_tree.files.items())]
         modules.extend(load_meta_macro_modules(meta_filepaths))
     if include_system:  # Default macros.
         import rose.macros  # Done to avoid cyclic top-level imports.
@@ -804,12 +804,12 @@ def check_config_integrity(app_config):
             return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
                 node, "node", type(node), "rose.config.ConfigNode"))
         if (not isinstance(node.value, dict) and
-                not isinstance(node.value, basestring)):
+                not isinstance(node.value, str)):
             return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
                 node.value, "node.value", type(node.value),
                 "dict, basestring"
             ))
-        if not isinstance(node.state, basestring):
+        if not isinstance(node.state, str):
             return MacroReturnedCorruptConfigError(ERROR_RETURN_TYPE.format(
                 node.state, "node.state", type(node.state), "basestring"))
         if node.state not in [rose.config.ConfigNode.STATE_NORMAL,
@@ -823,12 +823,12 @@ def check_config_integrity(app_config):
                 "list"
             ))
         for comment in node.comments:
-            if not isinstance(comment, basestring):
+            if not isinstance(comment, str):
                 return MacroReturnedCorruptConfigError(
                     ERROR_RETURN_TYPE.format(
                         comment, "comment", type(comment), "basestring"))
         for key in keys:
-            if not isinstance(key, basestring):
+            if not isinstance(key, str):
                 return MacroReturnedCorruptConfigError(
                     ERROR_RETURN_TYPE.format(
                         key, "key", type(key), "basestring"))
@@ -890,7 +890,7 @@ def update_optional_values(res, optionals, optional_values,
         del optionals["optional_config_name"]
     for key in set(optionals) & set(optional_values):
         res[key] = optional_values[key]
-    res.update(get_user_values(optionals, res.keys()))
+    res.update(get_user_values(optionals, list(res.keys())))
     optional_values.update(res)
 
 
@@ -937,7 +937,7 @@ def pretty_format_config(config, ignore_error=False):
         config (rose.config.ConfigNode): The Config node to convert.
 
     """
-    for s_key, s_node in config.value.items():
+    for s_key, s_node in list(config.value.items()):
         scheme = s_key
         if ":" in scheme:
             scheme = scheme.split(":", 1)[0]
@@ -1034,7 +1034,7 @@ def get_metadata_for_config_id(setting_id, meta_config):
         node = meta_config.get([no_modifier_id], no_ignore=True)
         # Get metadata for namelist:foo
         if node is not None:
-            for opt, opt_node in node.value.items():
+            for opt, opt_node in list(node.value.items()):
                 if not opt_node.is_ignored():
                     metadata.update({opt: opt_node.value})
             if option is None and rose.META_PROP_TITLE in metadata:
@@ -1048,7 +1048,7 @@ def get_metadata_for_config_id(setting_id, meta_config):
     node = meta_config.get([search_id], no_ignore=True)
     # If modifier, get metadata for namelist:foo{bar}
     if node is not None:
-        for opt, opt_node in node.value.items():
+        for opt, opt_node in list(node.value.items()):
             if not opt_node.is_ignored():
                 metadata.update({opt: opt_node.value})
     if rose.META_PROP_TITLE in metadata:
@@ -1153,7 +1153,7 @@ def run_macros(config_map, meta_config, config_name, macro_names,
         new_combined_config_map = combine_opt_config_map(config_map)
         macro_config_problems_map = {}
         optional_values = {}
-        for conf_key, config in new_combined_config_map.items():
+        for conf_key, config in list(new_combined_config_map.items()):
             config_problems_map = report_config(
                 config, meta_config, macros_by_type[VALIDATE_METHOD], modules,
                 macro_tuples, opt_non_interactive,
@@ -1162,11 +1162,11 @@ def run_macros(config_map, meta_config, config_name, macro_names,
             )
             if config_problems_map:
                 rc = 1
-            for macro, problem_list in config_problems_map.items():
+            for macro, problem_list in list(config_problems_map.items()):
                 macro_config_problems_map.setdefault(macro, {})
                 problem_list.sort(report_sort)
                 macro_config_problems_map[macro][conf_key] = problem_list
-        problem_macros = macro_config_problems_map.keys()
+        problem_macros = list(macro_config_problems_map.keys())
         problem_macros.sort()
         for macro_name in problem_macros:
             config_problems_map = macro_config_problems_map[macro_name]
@@ -1182,7 +1182,7 @@ def run_macros(config_map, meta_config, config_name, macro_names,
     if REPORT_METHOD in macros_by_type:
         new_combined_config_map = combine_opt_config_map(config_map)
         optional_values = {}
-        for conf_key, config in new_combined_config_map.items():
+        for conf_key, config in list(new_combined_config_map.items()):
             report_config(
                 config, meta_config, macros_by_type[REPORT_METHOD], modules,
                 macro_tuples, opt_non_interactive,
@@ -1281,7 +1281,7 @@ def handle_transform(config_map, new_config_map, change_map, macro_id,
     """Prompt the user to go ahead with macro changes and dump the output."""
     user_allowed_changes = False
     has_changes = False
-    for change_list in change_map.values():
+    for change_list in list(change_map.values()):
         for report in change_list:
             if not report.is_warning:
                 has_changes = True
@@ -1307,7 +1307,7 @@ def combine_opt_config_map(config_map):
     """Combine optional configurations with a main configuration."""
     new_combined_config_map = {}
     main_config = config_map[None]
-    for conf_key, config in config_map.items():
+    for conf_key, config in list(config_map.items()):
         if conf_key is None:
             new_combined_config_map[None] = copy.deepcopy(config)
             continue
@@ -1393,7 +1393,7 @@ def apply_macro_to_config_map(config_map, meta_config, macro_function,
 
 def _get_user_accept():
     try:
-        user_input = raw_input(PROMPT_ACCEPT_CHANGES)
+        user_input = input(PROMPT_ACCEPT_CHANGES)
     except EOFError:
         user_allowed_changes = False
     else:
@@ -1404,13 +1404,13 @@ def _get_user_accept():
 def get_user_values(options, ignore=None):
     if ignore is None:
         ignore = []
-    for key, val in options.items():
+    for key, val in list(options.items()):
         if key in ignore:
             continue
         entered = False
         while not entered:
             try:
-                user_input = raw_input("Value for " + str(key) + " (default " +
+                user_input = input("Value for " + str(key) + " (default " +
                                        str(val) + "): ")
             except EOFError:
                 user_input = ""
@@ -1474,7 +1474,7 @@ def load_conf_from_file(conf_dir, config_file_path, mode="macro"):
         config_file_path, more_keys=optional_keys,
         return_config_map=True)
     standard_format_config(app_config)
-    for _, config in config_map.items():
+    for _, config in list(config_map.items()):
         standard_format_config(config)
 
     # Load meta config if it exists.

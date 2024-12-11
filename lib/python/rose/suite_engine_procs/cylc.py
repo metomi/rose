@@ -130,6 +130,8 @@ class CylcProcessor(SuiteEngineProcessor):
 
     def get_suite_jobs_auths(self, suite_name, cycle_name_tuples=None):
         """Return remote ["[user@]host", ...] for submitted jobs."""
+        # Broken in Cylc8, we can just skip it
+        return None
         auths = []
         stmt = "SELECT DISTINCT user_at_host FROM task_jobs"
         stmt_where_list = []
@@ -522,7 +524,7 @@ class CylcProcessor(SuiteEngineProcessor):
             bash_cmd_prefix += "mkdir -p %s\n" % log_dir
             bash_cmd_prefix += "cd %s\n" % log_dir
             if host_environ:
-                for key, value in host_environ.items():
+                for key, value in list(host_environ.items()):
                     val = self.popen.list_to_shell_str([value])
                     bash_cmd_prefix += "%s=%s\n" % (key, val)
                     bash_cmd_prefix += "export %s\n" % (key)
@@ -683,6 +685,7 @@ class CylcSuiteDAO(object):
         self.db_f_name = db_f_name
         self.conn = None
         self.cursor = None
+        cherrypy.log("CylcSuiteDAO.init()")
 
     def close(self):
         """Close the DB connection."""
@@ -696,14 +699,17 @@ class CylcSuiteDAO(object):
 
     def commit(self):
         """Commit any changes to current connection."""
+        cherrypy.log("CylcSuiteDAO.commit()")
         if self.conn is not None:
             self.conn.commit()
 
     def connect(self, is_new=False):
         """Connect to the DB. Set the cursor. Return the connection."""
+        cherrypy.log("CylcSuiteDAO.connect()")
         if self.cursor is not None:
             return self.cursor
         if not is_new and not os.access(self.db_f_name, os.F_OK | os.R_OK):
+            cherrypy.log("CylcSuiteDAO file unaccessible: " + self.db_f_name)
             return None
         for _ in range(self.N_CONNECT_TRIES):
             try:
@@ -715,26 +721,32 @@ class CylcSuiteDAO(object):
                 self.conn = None
                 self.cursor = None
             else:
+                cherrypy.log("CylcSuiteDAO.connect break")
                 break
         return self.conn
 
     def execute(self, stmt, stmt_args=None, commit=False):
         """Execute a statement. Return the cursor."""
+        cherrypy.log("CylcSuiteDAO.execute()")
         if stmt_args is None:
             stmt_args = []
         for _ in range(self.N_CONNECT_TRIES):
             if self.connect() is None:
+                cherrypy.log("CylcSuiteDAO.execute no connection")
                 return []
             try:
                 self.cursor.execute(stmt, stmt_args)
-            except sqlite3.OperationalError:
+            except sqlite3.OperationalError as e:
+                cherrypy.log("CylcSuiteDAO.execute error: " + str(e))
                 sleep(self.CONNECT_RETRY_DELAY)
                 self.conn = None
                 self.cursor = None
-            except sqlite3.ProgrammingError:
+            except sqlite3.ProgrammingError as e:
+                cherrypy.log("CylcSuiteDAO.execute error: " + str(e))
                 self.conn = None
                 self.cursor = None
             else:
+                cherrypy.log("CylcSuiteDAO.execute break!")
                 break
         if self.cursor is None:
             return []

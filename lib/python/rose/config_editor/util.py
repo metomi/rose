@@ -77,7 +77,7 @@ class Lookup(object):
     def split_full_ns(self, data, full_namespace):
         """Return the config name and the internal namespace from full ns."""
         if full_namespace not in self.full_ns_split_lookup:
-            for config_name in data.config.keys():
+            for config_name in list(data.config.keys()):
                 if config_name == '/' + data.top_level_name:
                     continue
                 if full_namespace.startswith(config_name + '/'):
@@ -118,7 +118,7 @@ def launch_node_info_dialog(node, changes, search_function):
                  "\n")
     text += rose.config_editor.DIALOG_NODE_INFO_DATA
     try:
-        att_list = vars(node).items()
+        att_list = list(vars(node).items())
     except TypeError:
         # vars will fail when __slots__ are used.
         att_list = node.getattrs()
@@ -220,7 +220,7 @@ def _pretty_format_data(data, global_indent=0, indent=4, width=60):
     delim = rose.config_editor.DIALOG_NODE_INFO_DELIMITER
     if isinstance(data, dict) and data:
         text = ""
-        for key, val in data.items():
+        for key, val in list(data.items()):
             text += "\n" + " " * global_indent
             sub_prefix = sub_name.format(safe_str(key)) + delim
             sub_ind0 = global_indent + len(sub_prefix)

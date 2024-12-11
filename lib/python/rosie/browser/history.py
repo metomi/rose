@@ -78,12 +78,12 @@ class HistoryManager():
     def print_archive(self):
         """Print the history archive."""
         for l in self.archive:
-            print str(l)
+            print(str(l))
 
     def print_session(self):
         """Print the session history."""
         for l in self.session_log:
-            print str(l)
+            print(str(l))
 
     def load_history(self):
         """Load in the archived search history."""

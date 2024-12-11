@@ -151,11 +151,11 @@ class ConfigDataHelper(object):
         config_name = self.util.split_full_ns(self.data, ns)[0]
         config_data = self.data.config[config_name]
         real_sections = []
-        for section, sect_data in config_data.sections.now.items():
+        for section, sect_data in list(config_data.sections.now.items()):
             if section in allowed_sections:
                 real_sections.append(sect_data)
         latent_sections = []
-        for section, sect_data in config_data.sections.latent.items():
+        for section, sect_data in list(config_data.sections.latent.items()):
             if section in allowed_sections:
                 latent_sections.append(sect_data)
         return real_sections, latent_sections
@@ -165,11 +165,11 @@ class ConfigDataHelper(object):
         sub_data = {"sections": {}, "variables": {}}
         config_name = self.util.split_full_ns(self.data, ns)[0]
         config_data = self.data.config[config_name]
-        for sect, sect_data in config_data.sections.now.items():
+        for sect, sect_data in list(config_data.sections.now.items()):
             sect_ns = sect_data.metadata["full_ns"]
             if sect_ns.startswith(ns):
                 sub_data["sections"].update({sect: sect_data})
-        for sect, variables in config_data.vars.now.items():
+        for sect, variables in list(config_data.vars.now.items()):
             for variable in variables:
                 if variable.metadata["full_ns"].startswith(ns):
                     sub_data["variables"].setdefault(sect, [])
@@ -272,7 +272,7 @@ class ConfigDataHelper(object):
 
     def get_all_namespaces(self, only_this_config=None):
         """Return all unique namespaces."""
-        nses = self.data.namespace_meta_lookup.keys()
+        nses = list(self.data.namespace_meta_lookup.keys())
         if only_this_config is not None:
             nses = [n for n in nses if n.startswith(only_this_config)]
         return nses
@@ -283,12 +283,12 @@ class ConfigDataHelper(object):
         if config_name is not None:
             config_names = [config_name]
         else:
-            config_names = self.data.config.keys()
+            config_names = list(self.data.config.keys())
         for config_name in config_names:
             section_store = self.data.config[config_name].sections
             miss_sections = []
-            real_sections = section_store.now.keys()
-            for section in section_store.latent.keys():
+            real_sections = list(section_store.now.keys())
+            for section in list(section_store.latent.keys()):
                 if section not in real_sections:
                     miss_sections.append(section)
             for section in self.data.config[config_name].vars.latent:
@@ -373,7 +373,7 @@ class ConfigDataHelper(object):
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         config_data = self.data.config[config_name]
         if namespace == config_name:
-            sections = config_data.sections.now.keys()
+            sections = list(config_data.sections.now.keys())
         else:
             sections = self.get_sections_from_namespace(namespace)
         return_sections = []
@@ -393,7 +393,7 @@ class ConfigDataHelper(object):
         config_name = self.util.split_full_ns(self.data, namespace)[0]
         config_data = self.data.config[config_name]
         if namespace == config_name:
-            sections = config_data.sections.now.keys()
+            sections = list(config_data.sections.now.keys())
         else:
             sections = self.get_sections_from_namespace(namespace)
         return_sections = []
@@ -453,7 +453,7 @@ class ConfigDataHelper(object):
             object_statuses = default_section_statuses
         else:
             object_statuses = variable_statuses
-        status_counts = object_statuses.items()
+        status_counts = list(object_statuses.items())
         status_counts.sort(lambda x, y: cmp(x[1], y[1]))
         if not status_counts:
             cache[namespace] = status

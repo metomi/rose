@@ -77,7 +77,7 @@ class SuiteInfo(Event):
 
     def __str__(self):
 
-        dict_row = dict(self.args[0].items())
+        dict_row = dict(list(self.args[0].items()))
         out = ""
         out = out + "id: %s\n" % dict_row["idx"]
         for key in sorted(dict_row.keys()):
@@ -244,11 +244,11 @@ def _display_maps(opts, ws_client, dict_rows, url=None):
 
     for dict_row in dict_rows:
         out = opts.print_format
-        for key, value in dict_row.items():
+        for key, value in list(dict_row.items()):
             if "%" + key in out:
-                out = unicode(out).replace(
-                    u"%" + unicode(key), unicode(value), 1)
-        out = unicode(out.replace("%%", "%").expandtabs().rstrip())
+                out = str(out).replace(
+                    "%" + str(key), str(value), 1)
+        out = str(out.replace("%%", "%").expandtabs().rstrip())
 
         report(SuiteEvent(out.expandtabs() + "\n"), prefix="",
                clip=terminal_cols)

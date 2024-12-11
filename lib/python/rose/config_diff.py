@@ -23,7 +23,7 @@ import ast
 import re
 import os
 import shlex
-import StringIO
+import io
 import sys
 import tempfile
 
@@ -122,7 +122,7 @@ def format_metadata_as_text(metadata, only_these_options=None):
         if value is None:
             continue
         id_node.set([property_], value=value)
-    string_file = StringIO.StringIO()
+    string_file = io.StringIO()
     rose.config.dump(id_node, target=string_file)
     return string_file.getvalue()
 
@@ -235,7 +235,7 @@ def load_override_config():
         ["rose-config-diff"])
     if conf is None:
         return
-    for key, node in conf.value.items():
+    for key, node in list(conf.value.items()):
         if node.is_ignored():
             continue
         try:

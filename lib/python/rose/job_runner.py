@@ -50,7 +50,7 @@ class JobManager(object):
         self.jobs = jobs
         self.ready_jobs = []
         if not names:
-            names = jobs.keys()
+            names = list(jobs.keys())
         for name in names:
             self.ready_jobs.append(self.jobs[name])
         self.working_jobs = {}
@@ -60,7 +60,7 @@ class JobManager(object):
         """Return the next job that requires processing."""
         while self.ready_jobs:
             job = self.ready_jobs.pop()
-            for dep_key, dep_job in job.pending_for.items():
+            for dep_key, dep_job in list(job.pending_for.items()):
                 if dep_job.state == dep_job.ST_DONE:
                     job.pending_for.pop(dep_key)
                     if job.name in dep_job.needed_by:
@@ -81,7 +81,7 @@ class JobManager(object):
         """Return failed/pending jobs when there are no ready/working ones."""
         jobs = self.dead_jobs
         if not self.has_jobs:
-            for job in self.jobs.values():
+            for job in list(self.jobs.values()):
                 if job.pending_for:
                     jobs.append(job)
         return jobs
@@ -100,7 +100,7 @@ class JobManager(object):
         job.update(job_proxy)
         if job_proxy.exc is None:
             job.state = job.ST_DONE
-            for up_key, up_job in job.needed_by.items():
+            for up_key, up_job in list(job.needed_by.items()):
                 job.needed_by.pop(up_key)
                 up_job.pending_for.pop(job.name)
                 if not up_job.pending_for:
@@ -195,7 +195,7 @@ class JobRunner(object):
         results = {}
         while job_manager.has_jobs():
             # Process results, if any is ready
-            for name, result in results.items():
+            for name, result in list(results.items()):
                 if result.ready():
                     results.pop(name)
                     job_proxy, args_of_events = result.get()

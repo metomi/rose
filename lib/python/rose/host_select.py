@@ -77,7 +77,7 @@ class HostThresholdNotMetEvent(Event):
                    "method": threshold_conf.method,
                    "method_arg": threshold_conf.method_arg,
                    "value": threshold_conf.value}
-        for key, value in fmt_map.items():
+        for key, value in list(fmt_map.items()):
             if value is None:
                 fmt_map[key] = ""
         return self.FMT % fmt_map
@@ -172,7 +172,7 @@ class HostSelector(object):
         if method is None:
             method = self.RANK_METHOD_DEFAULT
         if method not in self.scorers:
-            for value in globals().values():
+            for value in list(globals().values()):
                 if (isinstance(value, type) and
                         issubclass(value, RandomScorer) and
                         value.KEY == method):
@@ -366,7 +366,7 @@ class HostSelector(object):
         time0 = time()
         while host_proc_dict:
             sleep(self.SSH_CMD_POLL_DELAY)
-            for host_name, proc in host_proc_dict.items():
+            for host_name, proc in list(host_proc_dict.items()):
                 if proc.poll() is None:
                     score = None
                 elif proc.wait():

@@ -40,8 +40,8 @@ class IntSpinButtonValueWidget(gtk.HBox):
         self.metadata = metadata
         self.set_value = set_value
         self.hook = hook
-        self.upper = sys.maxint
-        self.lower = -sys.maxint - 1
+        self.upper = sys.maxsize
+        self.lower = -sys.maxsize - 1
 
         tooltip_text = None
         try:

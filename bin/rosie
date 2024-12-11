@@ -1,1 +1,170 @@
-rose
+#!/usr/bin/env bash
+#-------------------------------------------------------------------------------
+# (C) British Crown Copyright 2012-7 Met Office.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+#-------------------------------------------------------------------------------
+# NAME
+#     rose - environment for running scientific suites and applications
+#     rosie - revision/organisation of suites for identification/exploration
+#     rosa - rosie's admin utilities
+#
+# SYNOPSIS
+#     # "rose", "rosie" and "rosa" has the following interfaces:
+#     rose UTIL [ARGS ...] # Invoke a utility
+#     rose help            # Print help and list available utilities
+#     rose help UTIL ...   # Print help for UTIL ...
+#     rose version         # Print version information
+#
+# DESCRIPTION
+#     Simple launcher for utilities in the "rose", "rosie" or "rosa"
+#     name-spaces. Launch a "rose", "rosie" or "rosa" utility with the given
+#     ARGS.
+#-------------------------------------------------------------------------------
+if ${ROSE_DEBUG:-false}; then
+    set -x
+fi
+. $(dirname $0)/../lib/bash/rose_init
+rose_init
+
+# Print actual command of a command alias
+get_alias() {
+    local NAME=$1
+    local ALIAS=$(sed '/^#/d' $ROSE_HOME_BIN/$ROSE_NS-$NAME || true)
+    if [[ $(wc -l <<<"$ALIAS") == 1 ]] \
+        && grep -q "^exec \$(dirname \$0)/$ROSE_NS-.* \"\$@\"\$" <<<"$ALIAS"
+    then
+        ALIAS=${ALIAS#"exec \$(dirname \$0)/$ROSE_NS-"}
+        ALIAS=${ALIAS%' "$@"'}
+        echo $ALIAS
+    fi
+}
+
+# Print help for a given utility
+help_util() {
+    local NAME=$1
+    local COMMAND=$ROSE_HOME_BIN/$ROSE_NS-$NAME
+    if [[ ! -r $COMMAND ]]; then
+        echo "$1: utility not found." >&2
+        return 1
+    fi
+    local ALIAS=$(get_alias $NAME)
+    if [[ -n $ALIAS ]]; then
+        COMMAND=$ROSE_HOME_BIN/$ROSE_NS-$ALIAS
+        COMMAND=${COMMAND%% *}
+    fi
+    case $(head -1 -- $COMMAND) in
+    *bash*)
+        awk '{
+            if (/^# NAME/) {
+                do {print substr($0, 3)} while (getline && !/^#----------/);
+            }
+        }' $COMMAND | ${PAGER:-less}
+        ;;
+    *python*)
+        $COMMAND --help | ${PAGER:-less} # FIXME: not too pretty at the moment
+        ;;
+    esac
+    return
+}
+
+# Ensure that ITEM_STR is at the beginning of PATH_STR
+path_lead() {
+    local PATH_STR=$1
+    local ITEM_STR=$2
+    if [[ -z ${PATH_STR:-} ]]; then
+        echo "$ITEM_STR"
+    elif [[ "$PATH_STR" != "$ITEM_STR" && "$PATH_STR" != $ITEM_STR:* ]]; then
+        while [[ "$PATH_STR" == *:$ITEM_STR ]]; do
+            PATH_STR=${PATH_STR%:$ITEM_STR}
+        done
+        while [[ "$PATH_STR" == *:$ITEM_STR:* ]]; do
+            local PATH_HEAD=${PATH_STR%:$ITEM_STR:*}
+            local PATH_TAIL=${PATH_STR##*:$ITEM_STR:}
+            PATH_STR="$PATH_HEAD:$PATH_TAIL"
+        done
+        echo "$ITEM_STR:$PATH_STR"
+    else
+        echo "$PATH_STR"
+    fi
+}
+
+
+# Print Rose version
+function print_version() {
+    echo "Rose $ROSE_VERSION ($ROSE_HOME)"
+}
+
+#-------------------------------------------------------------------------------
+UTIL="help"
+if (($# > 0)); then
+    UTIL=$1
+    shift 1
+fi
+
+case $UTIL in
+help|h|?|--help|-h)
+    if (($# == 0)); then
+        {
+            print_version
+            rose_usage
+            echo
+            echo "$ROSE_NS provides the following utilities:"
+            for U in $(cd $ROSE_HOME_BIN && ls $ROSE_NS-*); do
+                NAME=$(sed "s/^$ROSE_NS-\\(.*\\)\$/\1/" <<<$U)
+                ALIAS=$(get_alias $NAME)
+                if [[ -n $ALIAS ]]; then
+                    echo "    $NAME"
+                    echo "        (=$ALIAS)"
+                else
+                    echo "    $NAME"
+                    sed '1,/^# DESCRIPTION$/d;{s/^# /    /;q;}' \
+                        $ROSE_HOME_BIN/$U
+                fi
+            done
+        } | ${PAGER:-less}
+        exit 0
+    fi
+    RC=0
+    for U in "$@"; do
+        if [[ $U == 'help' || $U == 'version' ]]; then
+            continue
+        fi
+        help_util $U || RC=$?
+    done
+    exit $RC
+    :;;
+version|--version|-V)
+    print_version
+    exit
+    :;;
+esac
+
+COMMAND=$(dirname $0)/$ROSE_NS-$UTIL
+if [[ ! -f $COMMAND || ! -x $COMMAND ]]; then
+    echo "$ROSE_NS: $UTIL: unknown utility. Abort." >&2
+    echo "Type \"$ROSE_NS help\" for a list of utilities." >&2
+    exit 1
+fi
+if (($# > 0)) && [[ $1 == '--help' || $1 == '-h' ]]; then
+    help_util $UTIL
+    exit
+fi
+PATH=$(path_lead "${PATH:-}" "$ROSE_HOME_BIN")
+PYTHONPATH=$(path_lead "${PYTHONPATH:-}" "$ROSE_HOME/lib/python")
+ROSE_UTIL=$UTIL
+export PATH PYTHONPATH ROSE_UTIL
+exec $COMMAND "$@"

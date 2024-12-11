@@ -18,7 +18,7 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import Queue
+import queue
 import time
 import threading
 
@@ -63,7 +63,7 @@ class LocalStatusUpdater(threading.Thread):
         """Check for any new communicated info and if so run a hook."""
         try:
             local_suites = self.queue.get_nowait()
-        except Queue.Empty:
+        except queue.Empty:
             return
         self.local_suites = local_suites
         gobject.idle_add(self.update_hook, local_suites)

@@ -90,7 +90,7 @@ class MenuWidget(gtk.HBox):
             option_ui_middle = (
                 option_ui_middle.replace("<menuitem action='Ignore'/>", ''))
         var_type = variable.metadata.get(rose.META_PROP_TYPE, '')
-        var_values = variable.metadata.get(rose.META_PROP_VALUES, range(2))
+        var_values = variable.metadata.get(rose.META_PROP_VALUES, list(range(2)))
         error_types = rose.config_editor.WARNING_TYPES_IGNORE
         if (set(error_types) & set(variable.error.keys()) or
             set(error_types) & set(variable.warning.keys()) or
@@ -181,12 +181,12 @@ class MenuWidget(gtk.HBox):
         hover_string = 'Variable options'
         if variable.warning:
             hover_string = rose.config_editor.VAR_MENU_TIP_WARNING
-            for warn, warn_info in variable.warning.items():
+            for warn, warn_info in list(variable.warning.items()):
                 hover_string += "(" + warn + "): " + warn_info + '\n'
             hover_string = hover_string.rstrip('\n')
         if variable.error:
             hover_string = rose.config_editor.VAR_MENU_TIP_ERROR
-            for err, err_info in variable.error.items():
+            for err, err_info in list(variable.error.items()):
                 hover_string += "(" + err + "): " + err_info + '\n'
             hover_string = hover_string.rstrip('\n')
         if self.is_ghost:
@@ -211,8 +211,8 @@ class MenuWidget(gtk.HBox):
                             lambda b: self.trigger_remove())
         edit_item = uimanager.get_widget('/Options/Edit')
         edit_item.connect("activate", self.launch_edit)
-        errors = self.my_variable.error.keys()
-        warnings = self.my_variable.warning.keys()
+        errors = list(self.my_variable.error.keys())
+        warnings = list(self.my_variable.warning.keys())
         ns = self.my_variable.metadata["full_ns"]
         search_function = lambda i: self.var_ops.search_for_var(ns, i)
         dialog_func = rose.gtk.dialog.run_hyperlink_dialog

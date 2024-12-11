@@ -150,7 +150,7 @@ class RoseBunchApp(BuiltinApp):
             self.incremental = rose.env.env_var_process(self.incremental)
 
         multi_args = conf_tree.node.get_value([self.ARGS_SECTION], {})
-        for key, val in multi_args.items():
+        for key, val in list(multi_args.items()):
             multi_args[key].value = rose.env.env_var_process(val.value)
 
         self.command_format = rose.env.env_var_process(
@@ -168,7 +168,7 @@ class RoseBunchApp(BuiltinApp):
 
         if instances:
             try:
-                instances = range(int(rose.env.env_var_process(instances)))
+                instances = list(range(int(rose.env.env_var_process(instances))))
             except ValueError:
                 raise ConfigValueError([self.BUNCH_SECTION,
                                         "command-instances"],
@@ -182,7 +182,7 @@ class RoseBunchApp(BuiltinApp):
             else:
                 item, val = sorted(multi_args.items())[0]
                 arglength = len(shlex.split(val.value))
-            self.invocation_names = range(0, arglength)
+            self.invocation_names = list(range(0, arglength))
         else:
             arglength = len(self.invocation_names)
 
@@ -235,7 +235,7 @@ class RoseBunchApp(BuiltinApp):
         abort = False
 
         while procs or (commands and not abort):
-            for key, proc in procs.items():
+            for key, proc in list(procs.items()):
                 if proc.poll() is not None:
                     procs.pop(key)
                     if proc.returncode:
@@ -460,7 +460,7 @@ class RoseBunchDAO(object):
 
         args = []
 
-        for key, value in res.items():
+        for key, value in list(res.items()):
             args.append((key, value))
 
         i_stmt = ("INSERT OR REPLACE INTO " + self.TABLE_CONFIG +

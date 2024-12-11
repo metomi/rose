@@ -20,7 +20,7 @@
 
 import multiprocessing
 import os
-import Queue
+import queue
 import re
 import shlex
 import subprocess
@@ -202,7 +202,7 @@ class DialogProcess(object):
                 while True:
                     try:
                         new_text = self.event_queue.get(False)
-                    except Queue.Empty:
+                    except queue.Empty:
                         break
                     end = self.text_buffer.get_end_iter()
                     tag = gtk

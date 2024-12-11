@@ -165,7 +165,7 @@ class SectionOperations(object):
             # The section must not be justifiably triggered ignored.
             ign_errors = [e for e in rose.config_editor.WARNING_TYPES_IGNORE
                           if e != rose.config_editor.WARNING_TYPE_ENABLED]
-            my_errors = sect_data.error.keys()
+            my_errors = list(sect_data.error.keys())
             if (not override and
                     (rose.variable.IGNORED_BY_SYSTEM in
                      sect_data.ignored_reason) and
@@ -226,7 +226,7 @@ class SectionOperations(object):
             config_data.vars.now.pop(section)
         namespace = old_section_data.metadata["full_ns"]
         ns_list = [namespace]
-        for ns, values in self.__data.namespace_meta_lookup.items():
+        for ns, values in list(self.__data.namespace_meta_lookup.items()):
             sections = values.get('sections')
             if sections == [section]:
                 if ns not in ns_list:

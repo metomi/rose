@@ -165,22 +165,25 @@ class ConfigNode(object):
 
     """
 
-    __slots__ = ["STATE_NORMAL", "STATE_USER_IGNORED",
-                 "STATE_SYST_IGNORED", "value", "state", "comments"]
+    __slots__ = ("STATE_NORMAL", "STATE_USER_IGNORED",
+                 "STATE_SYST_IGNORED", "value", "state", "comments")
 
-    STATE_NORMAL = ""
-    """The default state of a ConfigNode."""
-    STATE_USER_IGNORED = "!"
-    """ConfigNode state if it has been specifically ignored in the config."""
-    STATE_SYST_IGNORED = "!!"
-    """ConfigNode state if a metadata opperation has logically ignored the
-    config."""
-
-    def __init__(self, value=None, state=STATE_NORMAL, comments=None):
+    def __init__(self, value=None, state=None, comments=None):
         if value is None:
             value = {}
         if comments is None:
             comments = []
+
+        if state is None:
+            self.STATE_NORMAL = ""
+        else:
+            self.STATE_NORMAL = state
+        """The default state of a ConfigNode."""
+        self.STATE_USER_IGNORED = "!"
+        """ConfigNode state if it has been specifically ignored in the config."""
+        self.STATE_SYST_IGNORED = "!!"
+        """ConfigNode state if a metadata opperation has logically ignored the
+        config."""
         self.value = value
         self.state = state
         self.comments = comments
@@ -206,7 +209,7 @@ class ConfigNode(object):
 
     def __iter__(self):
         if isinstance(self.value, dict):
-            for key in self.value.keys():
+            for key in list(self.value.keys()):
                 yield key
 
     def __eq__(self, other):
@@ -284,7 +287,7 @@ class ConfigNode(object):
         while stack:
             node_keys, node = stack.pop(0)
             if isinstance(node.value, dict):
-                for key in node.value.keys():
+                for key in list(node.value.keys()):
                     child_keys = node_keys + [key]
                     subnode = self.get(child_keys, no_ignore)
                     if subnode is not None:
@@ -1074,7 +1077,7 @@ class ConfigDumper(object):
             for comment in root.comments:
                 handle.write(self._comment_format(comment))
             blank = "\n"
-        root_keys = root.value.keys()
+        root_keys = list(root.value.keys())
         root_keys.sort(sort_sections)
         root_option_keys = []
         section_keys = []
@@ -1102,7 +1105,7 @@ class ConfigDumper(object):
                 "state": section_node.state,
                 "key": section_key,
                 "close": CHAR_SECTION_CLOSE})
-            keys = section_node.value.keys()
+            keys = list(section_node.value.keys())
             keys.sort(sort_option_items)
             for key in keys:
                 value = section_node.value[key]
@@ -1565,8 +1568,8 @@ def sort_element(elem_1, elem_2):
 
 def sort_settings(setting_1, setting_2):
     """Sort sections and options, by numeric element if possible."""
-    if (not isinstance(setting_1, basestring) or
-            not isinstance(setting_2, basestring)):
+    if (not isinstance(setting_1, str) or
+            not isinstance(setting_2, str)):
         return cmp(setting_1, setting_2)
     match_1 = REC_SETTING_ELEMENT.match(setting_1)
     match_2 = REC_SETTING_ELEMENT.match(setting_2)

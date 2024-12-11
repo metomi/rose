@@ -35,4 +35,4 @@
 #     --verbose, -v
 #         Increment verbosity.
 #-------------------------------------------------------------------------------
-exec python -m rose.suite_scan "$@"
+exec python3 -m rose.suite_scan "$@"

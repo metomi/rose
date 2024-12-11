@@ -34,10 +34,10 @@ from rose.scheme_handler import SchemeHandlersManager
 import shlex
 from shutil import rmtree
 import sqlite3
-from StringIO import StringIO
+from io import StringIO
 import sys
 from tempfile import mkdtemp
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 
 class ConfigProcessorForFile(ConfigProcessorBase):
@@ -67,7 +67,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # Find all the "file:*" nodes.
         nodes = {}
         if item == self.SCHEME:
-            for key, node in conf_tree.node.value.items():
+            for key, node in list(conf_tree.node.value.items()):
                 if node.is_ignored() or not key.startswith(self.PREFIX):
                     continue
                 nodes[key] = node
@@ -187,7 +187,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # * Its real name.
         # * The checksums of its paths.
         # * Whether it can be considered unchanged.
-        for source in sources.values():
+        for source in list(sources.values()):
             try:
                 for pattern, scheme in config_schemes:
                     if fnmatch(source.name, pattern):
@@ -220,7 +220,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         # * Target exists, but does not have a database entry.
         # * Target exists, but does not match settings in database.
         # * Target exists, but a source cannot be considered unchanged.
-        for target in targets.values():
+        for target in list(targets.values()):
             if target.real_name:
                 target.is_out_of_date = (
                     not os.path.islink(target.name) or
@@ -332,7 +332,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 rmtree(work_dir)
 
         # Target checksum compare and report
-        for target in targets.values():
+        for target in list(targets.values()):
             if (not target.is_out_of_date or
                     target.loc_type == target.TYPE_TREE):
                 continue
@@ -653,7 +653,7 @@ class LocDAO(object):
                         for dep_loc in loc.dep_locs:
                             data["dep_names"]["args_list"].append(
                                 [loc.name, dep_loc.name])
-                for table, datum in data.items():
+                for table, datum in list(data.items()):
                     if datum["args_list"]:
                         conn.executemany(
                             ("INSERT OR REPLACE INTO %s VALUES(%s)" %

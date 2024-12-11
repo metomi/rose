@@ -742,7 +742,7 @@ def load_override_config(sections, my_globals=None):
         conf = ResourceLocator.default().get_conf().get([section])
         if conf is None:
             continue
-        for key, node in conf.value.items():
+        for key, node in list(conf.value.items()):
             if node.is_ignored():
                 continue
             try:

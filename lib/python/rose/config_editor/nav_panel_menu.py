@@ -70,8 +70,8 @@ class NavPanelHandler(object):
                 else:
                     help_str = sections[0]
                 help_str = help_str.split(':', 1)[0]
-                for config_section in (config_data.sections.now.keys() +
-                                       config_data.sections.latent.keys()):
+                for config_section in (list(config_data.sections.now.keys()) +
+                                       list(config_data.sections.latent.keys())):
                     if config_section.startswith(help_str + ":"):
                         help_str = help_str + ":"
         else:
@@ -94,7 +94,7 @@ class NavPanelHandler(object):
             config_data = self.data.config[config_name]
             return config_data.is_preview
         except KeyError:
-            print config_name
+            print(config_name)
             return False
 
     def copy_request(self, base_ns, new_section=None, skip_update=False):
@@ -112,7 +112,7 @@ class NavPanelHandler(object):
     def create_request(self):
         """Handle a create configuration request."""
         if not any(v.config_type == rose.TOP_CONFIG_NAME
-                   for v in self.data.config.values()):
+                   for v in list(self.data.config.values())):
             text = rose.config_editor.WARNING_APP_CONFIG_CREATE
             title = rose.config_editor.WARNING_APP_CONFIG_CREATE_TITLE
             rose.gtk.dialog.run_dialog(rose.gtk.dialog.DIALOG_TYPE_ERROR,
@@ -129,7 +129,7 @@ class NavPanelHandler(object):
 
     def ignore_request(self, base_ns, is_ignored):
         """Handle an ignore or enable section request."""
-        config_names = self.data.config.keys()
+        config_names = list(self.data.config.keys())
         if base_ns is not None and '/' in base_ns:
             config_name, subsp = self.util.split_full_ns(self.data, base_ns)
             prefer_name_sections = {
@@ -233,7 +233,7 @@ class NavPanelHandler(object):
 
     def remove_request(self, base_ns):
         """Handle a delete section request."""
-        config_names = self.data.config.keys()
+        config_names = list(self.data.config.keys())
         if base_ns is not None and '/' in base_ns:
             config_name, subsp = self.util.split_full_ns(self.data, base_ns)
             prefer_name_sections = {
@@ -245,7 +245,7 @@ class NavPanelHandler(object):
         sorter = rose.config.sort_settings
         for config_name in config_names:
             config_data = self.data.config[config_name]
-            config_sect_dict[config_name] = config_data.sections.now.keys()
+            config_sect_dict[config_name] = list(config_data.sections.now.keys())
             config_sect_dict[config_name].sort(rose.config.sort_settings)
             if config_name in prefer_name_sections:
                 prefer_name_sections[config_name].sort(
@@ -282,7 +282,7 @@ class NavPanelHandler(object):
         config_sect_dict = {}
         for config_name in self.data.config:
             config_data = self.data.config[config_name]
-            config_sect_dict[config_name] = config_data.sections.now.keys()
+            config_sect_dict[config_name] = list(config_data.sections.now.keys())
             config_sect_dict[config_name].sort(rose.config.sort_settings)
             if config_name in prefer_name_sections:
                 prefer_name_sections[config_name].sort(
@@ -343,7 +343,7 @@ class NavPanelHandler(object):
             if self.data.config[config_name].is_preview:
                 return False
             cloneable = self.is_ns_duplicate(namespace)
-            is_top = (namespace in self.data.config.keys())
+            is_top = (namespace in list(self.data.config.keys()))
             is_fixable = bool(self.get_ns_errors(namespace))
             has_content = self.data.helper.is_ns_content(namespace)
             is_unsaved = self.data.helper.get_config_has_unsaved_changes(

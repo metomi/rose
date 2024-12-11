@@ -23,7 +23,7 @@ pygtk.require('2.0')
 import gtk
 
 import rose.config_editor
-import radiobuttons
+from . import radiobuttons
 
 
 class BoolValueWidget(radiobuttons.RadioButtonsValueWidget):
@@ -79,7 +79,7 @@ class BoolValueWidget(radiobuttons.RadioButtonsValueWidget):
     def setter(self, widget, variable):
         if widget.get_active():
             label_value = widget.get_label()
-            for real_item, label in self.label_dict.items():
+            for real_item, label in list(self.label_dict.items()):
                 if label == label_value:
                     chosen_value = real_item
                     break

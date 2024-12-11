@@ -41,4 +41,4 @@
 #     --service-root, -R
 #         (For start only.) Include web service name under root of URL.
 #-------------------------------------------------------------------------------
-exec python -m rose.bush "$@"
+exec python3 -m rose.bush "$@"

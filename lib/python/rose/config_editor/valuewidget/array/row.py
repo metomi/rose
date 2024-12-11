@@ -103,7 +103,7 @@ class RowArrayValueWidget(gtk.HBox):
         if self.unlimited:
             self.num_rows, rem = divmod(len(self.value_array), columns)
             self.num_rows += [1, 0][rem == 0]
-            self.max_rows = sys.maxint
+            self.max_rows = sys.maxsize
         else:
             self.num_rows = int(self.array_length)
             num, rem = divmod(len(self.value_array), columns)
@@ -368,7 +368,7 @@ class RowArrayValueWidget(gtk.HBox):
                 elif hasattr(child, 'get_child'):
                     child_list.append(child.get_child())
                 i += 1
-        for key, value in max_width.items():
+        for key, value in list(max_width.items()):
             if value < self.MIN_WIDTH_CHARS:
                 max_width[key] = self.MIN_WIDTH_CHARS
         # Set max width

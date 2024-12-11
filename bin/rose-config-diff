@@ -104,4 +104,4 @@
 #         instead of:
 #         rose config-diff --ignore=namelist:bar --ignore=namelist:baz ...
 #-------------------------------------------------------------------------------
-exec python -m rose.config_diff "$@"
+exec python3 -m rose.config_diff "$@"

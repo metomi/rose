@@ -259,7 +259,7 @@ class GroupOperations(object):
                 (var.metadata.get(rose.META_PROP_COMPULSORY) ==
                  rose.META_PROP_VALUE_TRUE)):
                 self.var_ops.add_var(var, skip_update=True)
-        for opt_name, value in opt_map.items():
+        for opt_name, value in list(opt_map.items()):
             var_id = self.util.get_id_from_section_option(
                 new_section_name, opt_name)
             metadata = self.data.helper.get_metadata_for_config_id(
@@ -287,8 +287,8 @@ class GroupOperations(object):
         section_base = re.sub('(.*)\(\w+\)$', r"\1", section)
         existing_sections = []
         clone_vars = []
-        existing_sections = config_data.vars.now.keys()
-        existing_sections.extend(config_data.sections.now.keys())
+        existing_sections = list(config_data.vars.now.keys())
+        existing_sections.extend(list(config_data.sections.now.keys()))
         for variable in config_data.vars.now.get(section, []):
             clone_vars.append(variable.copy())
         if new_section is None:

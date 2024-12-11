@@ -21,20 +21,20 @@
 import re
 
 import rose
-import array.entry
-import array.mixed
-import array.logical
-import array.python_list
-import array.spaced_list
-import booltoggle
-import character
-import combobox
-import files
-import intspin
-import meta
-import radiobuttons
-import text
-import valuehints
+from .array import entry
+from .array import mixed
+from .array import logical
+from .array import python_list
+from .array import spaced_list
+from . import booltoggle
+from . import character
+from . import combobox
+from . import files
+from . import intspin
+from . import meta
+from . import radiobuttons
+from . import text
+from . import valuehints
 
 
 class ValueWidgetHook(object):

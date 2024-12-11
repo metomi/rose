@@ -81,8 +81,8 @@ class Variable(object):
             comments = []
         self.metadata = self.process_metadata(metadata)
         self.old_value = value
-        self.flags = dict(flags.items())
-        self.ignored_reason = dict(ignored_reason.items())
+        self.flags = dict(list(flags.items()))
+        self.ignored_reason = dict(list(ignored_reason.items()))
         self.error = error
         self.warning = warning
         self.comments = comments
@@ -410,7 +410,7 @@ def _scan_trigger_string(string):
             # Quote state change.
             is_in_quotes[letter] = not is_in_quotes[letter]
         if not any(is_in_quotes.values()) and not is_escaped:
-            for delim, token in delim_tokens.items():
+            for delim, token in list(delim_tokens.items()):
                 if string[i:i + len(delim)] == delim:
                     # String next contains a valid delimiter
                     # Yield the built-up item and a token
@@ -422,7 +422,7 @@ def _scan_trigger_string(string):
         is_escaped = (letter == esc_char and not is_escaped)
         if (letter == esc_char and is_escaped and
                 not any(is_in_quotes.values()) and i + 1 < len(string)):
-            for delim, token in delim_tokens.items():
+            for delim, token in list(delim_tokens.items()):
                 if string[i + 1:i + 1 + len(delim)] == delim:
                     # A valid escape character before a delimiter.
                     # Discard the escape character for the parsed text.

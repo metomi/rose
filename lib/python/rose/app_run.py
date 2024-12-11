@@ -372,7 +372,7 @@ class AppRunner(Runner):
 
         # Free format files not defined in the configuration file
         file_section_prefix = self.config_pm.get_handler("file").PREFIX
-        for rel_path, conf_dir in conf_tree.files.items():
+        for rel_path, conf_dir in list(conf_tree.files.items()):
             if not rel_path.startswith("file" + os.sep):
                 continue
             name = rel_path[len("file" + os.sep):]

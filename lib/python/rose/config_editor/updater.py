@@ -56,10 +56,10 @@ class Updater(object):
             if config_name not in self.data.saved_config_names:
                 return rose.config_editor.TREE_PANEL_TIP_ADDED_CONFIG
             section_hashes = []
-            for sect, sect_data in config_sections.now.items():
+            for sect, sect_data in list(config_sections.now.items()):
                 section_hashes.append(sect_data.to_hashable())
             old_section_hashes = []
-            for sect, sect_data in config_sections.save.items():
+            for sect, sect_data in list(config_sections.save.items()):
                 old_section_hashes.append(sect_data.to_hashable())
             if set(section_hashes) ^ set(old_section_hashes):
                 return rose.config_editor.TREE_PANEL_TIP_CHANGED_CONFIG
@@ -172,7 +172,7 @@ class Updater(object):
             self.data.helper.clear_namespace_cached_statuses(ns)
 
         if only_this_config is None:
-            configs = self.data.config.keys()
+            configs = list(self.data.config.keys())
         else:
             configs = [only_this_config]
         for config_name in configs:
@@ -224,7 +224,7 @@ class Updater(object):
                 self.update_bar_widgets_func()
             self.update_stack_viewer_if_open()
             self.update_ns_tree_states(namespace)
-            if namespace in self.data.config.keys():
+            if namespace in list(self.data.config.keys()):
                 self.update_metadata_id(namespace)
             if not skip_sub_data_update:
                 self.update_ns_sub_data(namespace)
@@ -243,7 +243,7 @@ class Updater(object):
         self.update_stack_viewer_if_open()
         page.update_info()
         self.update_ns_tree_states(page.namespace)
-        if page.namespace in self.data.config.keys():
+        if page.namespace in list(self.data.config.keys()):
             self.update_metadata_id(page.namespace)
         if not skip_sub_data_update:
             self.update_ns_sub_data(page.namespace)
@@ -386,7 +386,7 @@ class Updater(object):
             if ns != namespace:
                 # We don't need another update of namespace.
                 self.update_namespace(ns)
-        for var_id in trig_id_val_dict.keys() + updated_ids:
+        for var_id in list(trig_id_val_dict.keys()) + updated_ids:
             var = var_id_map.get(var_id)
             if var is None:
                 if var_id in trig_id_val_dict:
@@ -425,7 +425,7 @@ class Updater(object):
         triggered_ns_list = []
         this_id = var_id
         nses = []
-        for namespace, metadata in self.data.namespace_meta_lookup.items():
+        for namespace, metadata in list(self.data.namespace_meta_lookup.items()):
             this_name = self.util.split_full_ns(self.data, namespace)
             if this_name != config_name:
                 continue
@@ -472,7 +472,7 @@ class Updater(object):
                 # Trigger-ignored sections
                 parents = trigger.ignored_dict.get(section, {})
                 if parents:
-                    help_text = "; ".join(parents.values())
+                    help_text = "; ".join(list(parents.values()))
                 else:
                     help_text = rose.config_editor.IGNORED_STATUS_DEFAULT
                 reason.update({rose.variable.IGNORED_BY_SYSTEM: help_text})
@@ -513,7 +513,7 @@ class Updater(object):
                 # Trigger-ignored variables
                 parents = trigger.ignored_dict.get(var_id, {})
                 if parents:
-                    help_text = "; ".join(parents.values())
+                    help_text = "; ".join(list(parents.values()))
                 else:
                     help_text = rose.config_editor.IGNORED_STATUS_DEFAULT
                 var.ignored_reason.update(
@@ -526,14 +526,14 @@ class Updater(object):
         """Update the tree statuses."""
         if self.nav_panel is None:
             return
-        if isinstance(page_or_ns, basestring):
+        if isinstance(page_or_ns, str):
             namespace = page_or_ns
             config_name = self.util.split_full_ns(self.data, namespace)[0]
             errors = []
             ns_vars, ns_l_vars = self.data.helper.get_data_for_namespace(
                 namespace)
             for var in ns_vars + ns_l_vars:
-                errors += var.error.items()
+                errors += list(var.error.items())
         else:
             namespace = page_or_ns.namespace
             config_name = self.util.split_full_ns(self.data, namespace)[0]
@@ -543,9 +543,9 @@ class Updater(object):
         ns_sections = self.data.helper.get_sections_from_namespace(namespace)
         for section in ns_sections:
             if section in config_data.sections.now:
-                errors += config_data.sections.now[section].error.items()
+                errors += list(config_data.sections.now[section].error.items())
             elif section in config_data.sections.latent:
-                errors += config_data.sections.latent[section].error.items()
+                errors += list(config_data.sections.latent[section].error.items())
 
         # Set icons.
         name_tree = namespace.lstrip('/').split('/')
@@ -612,7 +612,7 @@ class Updater(object):
 
     def perform_error_check(self, namespace=None, is_loading=False):
         """Loop through system macros and sum errors."""
-        configs = self.data.config.keys()
+        configs = list(self.data.config.keys())
         if namespace is not None:
             config_name = self.util.split_full_ns(self.data,
                                                   namespace)[0]
@@ -671,8 +671,8 @@ class Updater(object):
         id_error_dict = {}
         id_warn_dict = {}
         if namespace is None:
-            ok_sections = (config_sections.now.keys() +
-                           config_sections.latent.keys())
+            ok_sections = (list(config_sections.now.keys()) +
+                           list(config_sections.latent.keys()))
             ok_variables = variables
         else:
             ok_sections = self.data.helper.get_sections_from_namespace(
@@ -700,7 +700,7 @@ class Updater(object):
                 id_warn_dict.update({var.metadata['id']: this_warning})
         if not bad_list:
             self.refresh_ids(config_name,
-                             id_error_dict.keys() + id_warn_dict.keys(),
+                             list(id_error_dict.keys()) + list(id_warn_dict.keys()),
                              is_loading, are_errors_done=is_macro_dynamic)
             return
         for bad_report in bad_list:
@@ -757,7 +757,7 @@ class Updater(object):
                 # New warning or error.
                 map_.update({setting_id: info})
         self.refresh_ids(config_name,
-                         id_error_dict.keys() + id_warn_dict.keys(),
+                         list(id_error_dict.keys()) + list(id_warn_dict.keys()),
                          is_loading,
                          are_errors_done=is_macro_dynamic)
 

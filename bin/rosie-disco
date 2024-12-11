@@ -38,4 +38,4 @@
 #     --service-root, -R
 #         (For start only.) Include web service name under root of URL.
 #-------------------------------------------------------------------------------
-exec python -m rosie.ws "$@"
+exec python3 -m rosie.ws "$@"

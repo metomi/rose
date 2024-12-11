@@ -41,7 +41,7 @@ class RoseArchTarGzip(object):
         Use work_dir to dump results.
 
         """
-        sources = target.sources.values()
+        sources = list(target.sources.values())
         scheme = target.compress_scheme
         if (len(sources) == 1 and
                 sources[0].path.endswith("." + target.compress_scheme)):

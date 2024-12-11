@@ -77,7 +77,7 @@ class TaskRunner(Runner):
                                               t.suite_dir,
                                               path_globs,
                                               full_mode=is_changed)
-        for k, prepend_paths in prepend_paths_map.items():
+        for k, prepend_paths in list(prepend_paths_map.items()):
             orig_paths = []
             orig_v = os.getenv(k, "")
             if orig_v:

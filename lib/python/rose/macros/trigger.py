@@ -54,14 +54,14 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
         self.enabled_dict = {}
         self.evaluator = rose.macros.rule.RuleEvaluator()
         self.rec_rule = rose.macros.rule.REC_EXPR_IS_THIS_RULE
-        for setting_id, sect_node in meta_config.value.items():
+        for setting_id, sect_node in list(meta_config.value.items()):
             if sect_node.is_ignored():
                 continue
             opt_node = sect_node.get([rose.META_PROP_TRIGGER], no_ignore=True)
             if opt_node is not None:
                 expr = opt_node.value
                 id_value_dict = rose.variable.parse_trigger_expression(expr)
-                for trig_id, values in id_value_dict.items():
+                for trig_id, values in list(id_value_dict.items()):
                     if values == []:
                         id_value_dict.update({trig_id: [None]})
                 self.trigger_family_lookup.update({setting_id: id_value_dict})
@@ -102,7 +102,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             old, new = None, None
             if var_id in self.ignored_dict:
                 node.state = trig_ignored
-                if not any(var_id in v for v in prev_ignoreds.values()):
+                if not any(var_id in v for v in list(prev_ignoreds.values())):
                     old, new = state_map[enabled], state_map[trig_ignored]
             elif var_id in prev_ignoreds[trig_ignored]:
                 node.state = enabled
@@ -160,7 +160,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                 # Definitely enabled.
                 is_ignored = False
             if not sum([var_id in v for v in
-                        self.trigger_family_lookup.values()]):
+                        list(self.trigger_family_lookup.values())]):
                 # Not triggered by anything, so must be enabled.
                 is_ignored = False
             section, option = self._get_section_option_from_id(start_id)
@@ -208,7 +208,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             # Check the children of this id
             id_val_map = self._get_family_dict(
                 this_id, config_data, meta_config)
-            for child_id, vals in id_val_map.items():
+            for child_id, vals in list(id_val_map.items()):
                 if has_ignored_parent or value is None:
                     help_text = self.IGNORED_STATUS_PARENT.format(this_id)
                     self.ignored_dict.setdefault(child_id, {})
@@ -290,7 +290,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                     id_ranks[child_id] = depth + 1
                 stack.append((child_id, depth + 1))
         ranked_ids = []
-        for id_, rank in id_ranks.items():
+        for id_, rank in list(id_ranks.items()):
             ranked_ids.append((rank, id_))
         ranked_ids.sort()
         return ranked_ids
@@ -336,22 +336,22 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             meta_config = rose.config.ConfigNode()
         if not hasattr(self, 'trigger_family_lookup'):
             self._setup_triggers(meta_config)
-        config_sections = config.value.keys()
-        meta_settings = [k for k in meta_config.value.keys()
+        config_sections = list(config.value.keys())
+        meta_settings = [k for k in list(meta_config.value.keys())
                          if not meta_config.value[k].is_ignored()]
         allowed_repetitions = {}
-        trigger_ids = self.trigger_family_lookup.keys()
+        trigger_ids = list(self.trigger_family_lookup.keys())
         trigger_ids.sort()
         for var_id in trigger_ids:
             allowed_repetitions[var_id] = 0
-        for id_value_dict in self.trigger_family_lookup.values():
+        for id_value_dict in list(self.trigger_family_lookup.values()):
             for var_id in id_value_dict:
                 allowed_repetitions.setdefault(var_id, 0)
                 allowed_repetitions[var_id] += 1
         for start_id in trigger_ids:
             id_value_dict = self._get_family_dict(start_id, config,
                                                   meta_config)
-            triggered_ids = id_value_dict.keys()
+            triggered_ids = list(id_value_dict.keys())
             triggered_ids.sort()
             if self._check_is_id_dupl(start_id, meta_config):
                 st_sect, st_opt = self._get_section_option_from_id(start_id)
@@ -361,7 +361,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                         return self._get_error_report_for_id(
                             start_id, config,
                             self.ERROR_DUPL_TRIG.format(st_sect))
-            for value_list in id_value_dict.values():
+            for value_list in list(id_value_dict.values()):
                 for string in [s for s in value_list if s is not None]:
                     if self.rec_rule.search(string):
                         try:
@@ -383,7 +383,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                 id_list.append(var_id)
                 child_ids.sort()
                 if var_id in config_sections:
-                    child_ids += config.get([var_id]).value.keys()
+                    child_ids += list(config.get([var_id]).value.keys())
                 for child_id in child_ids:
                     base_id = self._get_stripped_id(child_id, meta_config)
                     if base_id not in meta_settings:
@@ -391,7 +391,7 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
                             child_id, config, self.ERROR_MISSING_METADATA)
                     if child_id in self.trigger_family_lookup:
                         grandchildren = (
-                            self.trigger_family_lookup[child_id].keys())
+                            list(self.trigger_family_lookup[child_id].keys()))
                         grandchildren.sort()
                         stack.insert(1, (child_id, grandchildren))
                         if (id_list.count(child_id) + 1 >
@@ -424,14 +424,14 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
             sect, opt = self._get_section_option_from_id(setting_id)
             base_sect = rose.macro.REC_ID_STRIP.sub("", sect)
             trig_id = self._get_id_from_section_option(base_sect, opt)
-            items = self.trigger_family_lookup.get(trig_id, {}).items()
+            items = list(self.trigger_family_lookup.get(trig_id, {}).items())
             for i, (child_id, vals) in enumerate(items):
                 ch_sect, ch_opt = self._get_section_option_from_id(child_id)
                 if rose.macro.REC_ID_STRIP.sub("", ch_sect) == base_sect:
                     new_id = self._get_id_from_section_option(sect, ch_opt)
                     items[i] = (new_id, vals)
             return dict(items)
-        items = self.trigger_family_lookup.get(setting_id, {}).items()
+        items = list(self.trigger_family_lookup.get(setting_id, {}).items())
         dupl_adjusted_items = []
         while items:
             child_id, vals = items.pop(0)
@@ -527,9 +527,9 @@ class TriggerMacro(rose.macro.MacroBaseRoseEdit):
     def get_all_ids(self):
         """Return all setting ids involved in the triggers."""
         ids = []
-        for trigger_id in self.trigger_family_lookup.keys():
+        for trigger_id in list(self.trigger_family_lookup.keys()):
             ids.append(trigger_id)
-        for id_value_dict in self.trigger_family_lookup.values():
+        for id_value_dict in list(self.trigger_family_lookup.values()):
             for triggered_id in id_value_dict:
                 if triggered_id not in ids:
                     ids.append(triggered_id)

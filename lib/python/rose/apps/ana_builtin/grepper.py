@@ -264,7 +264,7 @@ class FilePattern(SingleCommandPattern):
         matched_groups = self.search_for_matches()
 
         # Check that the number of matchings found is equal in all files
-        group_lens = [len(groups) for groups in matched_groups.values()]
+        group_lens = [len(groups) for groups in list(matched_groups.values())]
         for igroup, group_len in enumerate(group_lens[1:]):
             if group_len != group_lens[0]:
                 msg = ("File ({0}) matches pattern {1} times, but File ({2}) "

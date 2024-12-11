@@ -330,7 +330,7 @@ def _translate_strftime_token(strftime_token, dump_mode=False,
         get_time_zone_translate_info()
     )
     attr_names = STRFTIME_TRANSLATE_INFO[strftime_token]
-    if isinstance(attr_names, basestring):
+    if isinstance(attr_names, str):
         if dump_mode:
             return attr_names, []
         return re.escape(attr_names), []

@@ -110,6 +110,7 @@ class RoseBushDAO(object):
 
     def __init__(self):
         self.daos = {}
+        cherrypy.log("BushDAO.init")
 
     def get_suite_broadcast_states(self, user_name, suite_name):
         """Return broadcast states of a suite.
@@ -117,6 +118,7 @@ class RoseBushDAO(object):
         [[point, name, key, value], ...]
 
         """
+        cherrypy.log("bush_dao.get_suite_broadcast_states()")
         # Check if "broadcast_states" table is available or not
         if not self._db_has_table(user_name, suite_name, "broadcast_states"):
             return
@@ -136,6 +138,7 @@ class RoseBushDAO(object):
         [[time, change, point, name, key, value], ...]
 
         """
+        cherrypy.log("bush_dao.get_suite_broadcast_events()")
         # Check if "broadcast_events" table is available or not
         if not self._db_has_table(user_name, suite_name, "broadcast_events"):
             return {}
@@ -157,6 +160,7 @@ class RoseBushDAO(object):
 
         paths -- if specified, are added to the end of the path.
         """
+        cherrypy.log("bush_dao.get_suite_dir_rel()")
         return CylcProcessor.get_suite_dir_rel(suite_name, *paths)
 
     def get_suite_job_entries(
@@ -197,6 +201,7 @@ class RoseBushDAO(object):
                       "err": {...},
                       ...}}
         """
+        cherrypy.log("bush_dao.get_suite_job_entries()")
         where_expr, where_args = self._get_suite_job_entries_where(
             cycles, tasks, task_status, job_status)
 
@@ -222,8 +227,7 @@ class RoseBushDAO(object):
                 " task_states.submit_num AS submit_num_max," +
                 " task_states.status AS task_status," +
                 " time_submit, submit_status," +
-                " time_run, time_run_exit, run_signal, run_status," +
-                " user_at_host, batch_sys_name, batch_sys_job_id" +
+                " time_run, time_run_exit, run_signal, run_status" +
                 " FROM task_jobs JOIN task_states USING (cycle, name)" +
                 where_expr +
                 " ORDER BY " +
@@ -237,8 +241,7 @@ class RoseBushDAO(object):
             (
                 cycle, name, submit_num, submit_num_max, task_status,
                 time_submit, submit_status,
-                time_run, time_run_exit, run_signal, run_status,
-                user_at_host, batch_sys_name, batch_sys_job_id
+                time_run, time_run_exit, run_signal, run_status
             ) = row[1:]
             entry = {
                 "cycle": cycle,
@@ -250,9 +253,9 @@ class RoseBushDAO(object):
                 "submit_status": submit_status,
                 "run_signal": run_signal,
                 "run_status": run_status,
-                "host": user_at_host,
-                "submit_method": batch_sys_name,
-                "submit_method_id": batch_sys_job_id,
+                "host": "",
+                "submit_method": "",
+                "submit_method_id": "",
                 "logs": {},
                 "seq_logs_indexes": {}}
             entries.append(entry)
@@ -268,6 +271,7 @@ class RoseBushDAO(object):
 
         Get query's "WHERE" expression and its arguments.
         """
+        cherrypy.log("bush_dao._get_suite_job_entries_where()")
         where_exprs = []
         where_args = []
         if cycles:
@@ -383,7 +387,7 @@ class RoseBushDAO(object):
 
         # Sequential logs
         for entry in entries:
-            for filename, filename_items in entry["logs"].items():
+            for filename, filename_items in list(entry["logs"].items()):
                 seq_log_match = self.REC_SEQ_LOG.match(filename)
                 if not seq_log_match:
                     continue
@@ -393,7 +397,7 @@ class RoseBushDAO(object):
                 if seq_key not in entry["seq_logs_indexes"]:
                     entry["seq_logs_indexes"][seq_key] = {}
                 entry["seq_logs_indexes"][seq_key][index_str] = filename
-            for seq_key, indexes in entry["seq_logs_indexes"].items():
+            for seq_key, indexes in list(entry["seq_logs_indexes"].items()):
                 # Only one item, not a sequence
                 if len(indexes) <= 1:
                     entry["seq_logs_indexes"].pop(seq_key)
@@ -401,12 +405,12 @@ class RoseBushDAO(object):
                 # the template can sort them as numbers
                 try:
                     int_indexes = {}
-                    for index_str, filename in indexes.items():
+                    for index_str, filename in list(indexes.items()):
                         int_indexes[int(index_str)] = filename
                     entry["seq_logs_indexes"][seq_key] = int_indexes
                 except ValueError:
                     pass
-            for filename, log_dict in entry["logs"].items():
+            for filename, log_dict in list(entry["logs"].items()):
                 # Unset seq_key for singular items
                 if log_dict["seq_key"] not in entry["seq_logs_indexes"]:
                     log_dict["seq_key"] = None
@@ -493,6 +497,7 @@ class RoseBushDAO(object):
         and of_n_entries is the total number of entries.
 
         """
+        cherrypy.log("bush_dao.get_suite_cycles_summary()")
         of_n_entries = 0
         stmt = ("SELECT COUNT(DISTINCT cycle) FROM task_states WHERE " +
                 "submit_num > 0")
@@ -519,12 +524,15 @@ class RoseBushDAO(object):
         try:
             for item in os.listdir(os.path.join(user_suite_dir, "log")):
                 if item.startswith("job-") and item.endswith(".tar.gz"):
+                    cherrypy.log(
+                            "bush_dao.get_suite_cycles_summary:.log_cycles " +
+                            item[4:-7])
                     targzip_log_cycles.append(item[4:-7])
         except OSError:
             pass
 
         states_stmt = {}
-        for key, names in self.TASK_STATUS_GROUPS.items():
+        for key, names in list(self.TASK_STATUS_GROUPS.items()):
             states_stmt[key] = " OR ".join(
                 ["status=='%s'" % (name) for name in names])
         stmt = (
@@ -614,6 +622,7 @@ class RoseBushDAO(object):
         * server: host:port of server, if available
 
         """
+        cherrypy.log("bush_dao.get_suite_state_summary()")
         ret = {
             "is_running": False,
             "is_failed": False,
@@ -621,6 +630,17 @@ class RoseBushDAO(object):
         dao = self._db_init(user_name, suite_name)
         if not os.access(dao.db_f_name, os.F_OK | os.R_OK):
             return ret
+        except FileNotFoundError:
+            cherrypy.log(
+                "CylcSuiteDAO.connect: File does not exist: " +
+                str(port_file_path))
+            return ret
+        except multiprocessing.pool.MaybeEncodingError:
+            cherrypy.log(
+                "CylcSuiteDAO.connect: File encoding error: " +
+                str(port_file_path))
+            return ret
+
 
         port_file_path = os.path.expanduser(
             os.path.join(
@@ -664,17 +684,24 @@ class RoseBushDAO(object):
 
     def _db_close(self, user_name, suite_name):
         """Close a named database connection."""
+        cherrypy.log("bush_dao._db_close()")
         key = (user_name, suite_name)
         if self.daos.get(key) is not None:
             self.daos[key].close()
 
     def _db_exec(self, user_name, suite_name, stmt, stmt_args=None):
         """Execute a query on a named database connection."""
+        cherrypy.log("bush_dao._db_exec()")
         daos = self._db_init(user_name, suite_name)
-        return daos.execute(stmt, stmt_args)
+        cherrypy.log("bush_dao._db_exec stmt: " + str(stmt) + " stmt_args: " +
+                str(stmt_args))
+        result = daos.execute(stmt, stmt_args)
+        cherrypy.log("bush_dao._db_exec.result: " + str(result))
+        return result
 
     def _db_has_table(self, user_name, suite_name, table_name):
         """Return True if table_name exists in the suite database."""
+        cherrypy.log("bush_dao._db_has_table()")
         cursor = self._db_exec(
             user_name, suite_name,
             "SELECT name FROM sqlite_master WHERE name==?", [table_name])
@@ -682,6 +709,7 @@ class RoseBushDAO(object):
 
     def _db_init(self, user_name, suite_name):
         """Initialise a named database connection."""
+        cherrypy.log("bush_dao._db_init()")
         key = (user_name, suite_name)
         if key not in self.daos:
             prefix = "~"

@@ -47,4 +47,4 @@
 #     optional ROSE_META_PATH
 #         Prepend $ROSE_META_PATH to the metadata search path.
 #-------------------------------------------------------------------------------
-exec python -m rose.upgrade "$@"
+exec python3 -m rose.upgrade "$@"

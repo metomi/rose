@@ -70,4 +70,4 @@
 #     --next
 #         Print the next available suite ID in the repository
 #-------------------------------------------------------------------------------
-exec python -m rosie.suite_id "$@"
+exec python3 -m rosie.suite_id "$@"

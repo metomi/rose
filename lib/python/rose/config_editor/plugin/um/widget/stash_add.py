@@ -96,7 +96,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
 
         # Automatically hide columns which have fixed-value metadata.
         self._hidden_column_names = []
-        for key, metadata in self.stash_meta_lookup.items():
+        for key, metadata in list(self.stash_meta_lookup.items()):
             if "=" in key:
                 continue
             values_string = metadata.get(rose.META_PROP_VALUES, "0, 1")
@@ -173,7 +173,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         """Return a list of data tuples and columns"""
         data_rows = []
         columns = ["Section", "Item", "Description", "?", "#"]
-        sections = self.stash_lookup.keys()
+        sections = list(self.stash_lookup.keys())
         sections.sort(self.sort_util.cmp_)
         mod_markup = rose.config_editor.SUMMARY_DATA_PANEL_MODIFIED_MARKUP
         props_excess = [self.STASH_PARSE_DESC_OPT, self.STASH_PARSE_ITEM_OPT,
@@ -181,7 +181,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         for section in sections:
             if section == "-1":
                 continue
-            items = self.stash_lookup[section].keys()
+            items = list(self.stash_lookup[section].keys())
             items.sort(self.sort_util.cmp_)
             for item in items:
                 data = self.stash_lookup[section][item]
@@ -261,7 +261,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             name = "Requests"
             if stash_request_num != "None":
                 sect_streqs = self.request_lookup.get(stash_section, {})
-                streqs = sect_streqs.get(stash_item, {}).keys()
+                streqs = list(sect_streqs.get(stash_item, {}).keys())
                 streqs.sort(rose.config.sort_settings)
                 if streqs:
                     value = "\n    " + "\n    ".join(streqs)
@@ -323,7 +323,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             while child_iter is not None:
                 num = self._store.get_value(child_iter, num_streqs_index)
                 info = self._store.get_value(child_iter, streq_info_index)
-                if isinstance(num, basestring) and num.isdigit():
+                if isinstance(num, str) and num.isdigit():
                     num_streq_children += int(num)
                 if info and not streq_info_children:
                     streq_info_children = info
@@ -388,8 +388,8 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
         filt_text = self._filter_widget.get_text()
         if not filt_text:
             return True
-        for col_text in model.get(iter_, *range(len(self.column_names))):
-            if (isinstance(col_text, basestring) and
+        for col_text in model.get(iter_, *list(range(len(self.column_names)))):
+            if (isinstance(col_text, str) and
                     filt_text.lower() in col_text.lower()):
                 return True
         child_iter = model.iter_children(iter_)
@@ -562,7 +562,7 @@ class AddStashDiagnosticsPanelv1(gtk.VBox):
             help_menuitem.connect("activate", self._launch_record_help)
             help_menuitem.show()
             menu.append(help_menuitem)
-        streqs = self.request_lookup.get(section, {}).get(item, {}).keys()
+        streqs = list(self.request_lookup.get(section, {}).get(item, {}).keys())
         if streqs:
             view_menuitem = gtk.ImageMenuItem(stock_id=gtk.STOCK_FIND)
             view_menuitem.set_label(label="View...")

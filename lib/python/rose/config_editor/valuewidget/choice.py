@@ -108,7 +108,7 @@ class ChoicesValueWidget(gtk.HBox):
 
         self.opt_parser = rose.opt_parse.RoseOptionParser()
         self.opt_parser.OPTIONS = self.OPTIONS
-        self.opt_parser.add_my_options(*self.OPTIONS.keys())
+        self.opt_parser.add_my_options(*list(self.OPTIONS.keys()))
         opts, args = self.opt_parser.parse_args(shlex.split(arg_str))
         self.all_group = opts.all_group
         self.groups = []

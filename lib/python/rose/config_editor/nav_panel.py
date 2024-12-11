@@ -188,7 +188,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
         self.visible_iter_map = {}
         if row is None:
             self.data_store.clear()
-        initials = namespace_subtree.items()
+        initials = list(namespace_subtree.items())
         initials.sort(self.sort_tree_items)
         stack = []
         if row is None:
@@ -219,7 +219,7 @@ class PageNavigationPanel(gtk.ScrolledWindow):
             new_keylist = keylist + [key]
             name_iter_map["/".join(new_keylist)] = new_row
             if type(value) is dict:
-                newer_initials = value.items()
+                newer_initials = list(value.items())
                 newer_initials.sort(self.sort_tree_items)
                 for x in newer_initials:
                     stack.append([new_row] + [list(new_keylist)] + list(x))

@@ -27,7 +27,7 @@ import sys
 import threading
 import time
 import traceback
-from urlparse import urlparse
+from urllib.parse import urlparse
 import warnings
 import webbrowser
 
@@ -109,7 +109,7 @@ class MainWindow(gtk.Window):
         self.config = locator.get_conf()
 
         self.usernames = {}
-        for prefix in self.ws_client.auth_managers.keys():
+        for prefix in list(self.ws_client.auth_managers.keys()):
             self.usernames[prefix] = self.config.get_value(
                 ["rosie-id", "prefix-username." + prefix],
                 default=pwd.getpwuid(os.getuid()).pw_name)
@@ -1282,7 +1282,7 @@ class MainWindow(gtk.Window):
         """Run the suite, if possible."""
         if not isinstance(args, list):
             args = []
-        for key, value in kwargs.items():
+        for key, value in list(kwargs.items()):
             args.extend([key, value])
         suite_local_copy = SuiteId(
             self.get_selected_suite_id()).to_local_copy()

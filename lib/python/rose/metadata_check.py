@@ -173,7 +173,7 @@ def _check_value_titles(title_value, values_value):
 
 def _check_type(value):
     types = rose.variable.parse_type_expression(value)
-    if isinstance(types, basestring):
+    if isinstance(types, str):
         types = [types]
     if " " in value and "," not in value:
         types = [value]
@@ -244,7 +244,7 @@ def metadata_check(meta_config, meta_dir=None,
     allowed_properties = get_allowed_metadata_properties()
     reports = []
     module_files = _get_module_files(meta_dir)
-    sections = meta_config.value.keys()
+    sections = list(meta_config.value.keys())
     sections.sort(rose.config.sort_settings)
     for section in sections:
         node = meta_config.value[section]
@@ -270,7 +270,7 @@ def metadata_check(meta_config, meta_dir=None,
                 value = node.get_value([rose.META_PROP_LENGTH])
                 reports.append(rose.macro.MacroReport(
                     section, rose.META_PROP_LENGTH, value, info))
-        options = node.value.keys()
+        options = list(node.value.keys())
         options.sort(rose.config.sort_settings)
         for option in options:
             opt_node = node.value[option]

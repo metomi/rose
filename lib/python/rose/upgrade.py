@@ -126,7 +126,7 @@ class MacroUpgrade(rose.macro.MacroBase):
         file_map = {}
         file_map[MACRO_UPGRADE_RESOURCE_FILE_ADD] = add_path
         file_map[MACRO_UPGRADE_RESOURCE_FILE_REMOVE] = rem_path
-        for key, path in file_map.items():
+        for key, path in list(file_map.items()):
             if os.path.isfile(path):
                 file_map[key] = rose.config.load(path)
             else:
@@ -206,7 +206,7 @@ class MacroUpgrade(rose.macro.MacroBase):
         # Add parent section if missing.
         if option is not None and config.get([section]) is None:
             self.add_setting(config, [section])
-        if value is not None and not isinstance(value, basestring):
+        if value is not None and not isinstance(value, str):
             text = "New value {0} for {1} is not a string"
             raise ValueError(text.format(repr(value), id_))
 
@@ -233,7 +233,7 @@ class MacroUpgrade(rose.macro.MacroBase):
             raise TypeError(text)
         if info is None:
             info = self.INFO_CHANGED_VAR.format(repr(node.value), repr(value))
-        if value is not None and not isinstance(value, basestring):
+        if value is not None and not isinstance(value, str):
             text = "New value {0} for {1} is not a string"
             raise ValueError(text.format(repr(value), id_))
         node.value = value

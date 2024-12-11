@@ -96,7 +96,7 @@ class KeyWidget(gtk.VBox):
         event_box.connect('button-press-event', self.handle_launch_help)
         self.update_comment_display()
         self.entry.show()
-        for key, value in self.show_modes.items():
+        for key, value in list(self.show_modes.items()):
             if key not in [rose.config_editor.SHOW_MODE_CUSTOM_DESCRIPTION,
                            rose.config_editor.SHOW_MODE_CUSTOM_HELP,
                            rose.config_editor.SHOW_MODE_CUSTOM_TITLE]:

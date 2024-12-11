@@ -557,7 +557,7 @@ class Duration(object):
         other_data = other.get_days_and_seconds()
         return cmp(my_data, other_data)
 
-    def __nonzero__(self):
+    def __bool__(self):
         for attr in ["years", "months", "weeks", "days", "hours",
                      "minutes", "seconds"]:
             if getattr(self, attr, None):
@@ -768,12 +768,12 @@ class TimePoint(object):
             (time_zone_minute, "time_zone_minute", None, int)
         )
         if (dump_format is not None and not
-                isinstance(dump_format, basestring)):
+                isinstance(dump_format, str)):
             raise BadInputError(
                 BadInputError.TYPE,
                 "dump_format", repr(dump_format), type(dump_format))
         if (truncated_dump_format is not None and not
-                isinstance(truncated_dump_format, basestring)):
+                isinstance(truncated_dump_format, str)):
             raise BadInputError(
                 BadInputError.TYPE,
                 "truncated_dump_format", repr(truncated_dump_format),
@@ -1600,7 +1600,7 @@ class TimePoint(object):
             if self.time_zone.hours == 0 and self.time_zone.minutes == 0:
                 time_string += "Z"
             else:
-                time_string += u"+hh:mm"
+                time_string += "+hh:mm"
         return date_string + time_string
 
     def _get_truncated_dump_format(self):
@@ -1672,7 +1672,7 @@ class TimePoint(object):
             if self.time_zone.hours == 0 and self.time_zone.minutes == 0:
                 time_string += "Z"
             else:
-                time_string += u"+hh:mm"
+                time_string += "+hh:mm"
         if date_string == "YY":
             date_string = "-YY"
             time_string = time_string.replace(":", "")
@@ -1773,7 +1773,7 @@ def _get_weeks_in_year(year, calendar_mode=None):
     cal_year_next, cal_ord_days_next = get_ordinal_date_week_date_start(
         year + 1)
     diff_days = cal_ord_days_next - cal_ord_days
-    for intervening_year in xrange(cal_year, cal_year_next):
+    for intervening_year in range(cal_year, cal_year_next):
         diff_days += get_days_in_year(intervening_year)
     return diff_days / CALENDAR.DAYS_IN_WEEK
 
@@ -2089,7 +2089,7 @@ def _iter_months_days(is_leap_year, month_of_year, day_of_month,
     if in_reverse:
         if month_of_year is None:
             for month_num, days in reversed(source):
-                day_range = range(days, 0, -1)
+                day_range = list(range(days, 0, -1))
                 for day in day_range:
                     results.append((month_num, day))
         else:
@@ -2097,23 +2097,23 @@ def _iter_months_days(is_leap_year, month_of_year, day_of_month,
                 if month_num > month_of_year:
                     continue
                 elif month_num == month_of_year and day_of_month is not None:
-                    day_range = range(day_of_month, 0, -1)
+                    day_range = list(range(day_of_month, 0, -1))
                 else:
-                    day_range = range(days, 0, -1)
+                    day_range = list(range(days, 0, -1))
                 for day in day_range:
                     results.append((month_num, day))
     else:
         if month_of_year is None:
             for month_num, days in source:
-                day_range = range(1, days + 1)
+                day_range = list(range(1, days + 1))
                 for day in day_range:
                     results.append((month_num, day))
         else:
             for month_num, days in source[month_of_year - 1:]:
                 if month_num == month_of_year and day_of_month is not None:
-                    day_range = range(day_of_month, days + 1)
+                    day_range = list(range(day_of_month, days + 1))
                 else:
-                    day_range = range(1, days + 1)
+                    day_range = list(range(1, days + 1))
                 for day in day_range:
                     results.append((month_num, day))
     return results

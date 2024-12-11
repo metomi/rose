@@ -282,7 +282,7 @@ class DisplayBox(gtk.VBox):
                 prev_row = self.treestore.insert(None, i, this_row + [True])
                 prev_val = this_row[0]
                 row_group_headers.setdefault(prev_val, prev_row)
-        for group_val, row_iter in row_group_headers.items():
+        for group_val, row_iter in list(row_group_headers.items()):
             if group_val in expanded_groups:
                 path = self.treestore.get_path(row_iter)
                 self.treeview.expand_to_path(path)

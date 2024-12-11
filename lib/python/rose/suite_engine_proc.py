@@ -296,13 +296,13 @@ class TaskProps(object):
              "dir_etc": "ROSE_ETC"}
 
     def __init__(self, **kwargs):
-        for attr_key, env_key in self.ATTRS.items():
+        for attr_key, env_key in list(self.ATTRS.items()):
             if kwargs.get(attr_key) is not None:
                 setattr(self, attr_key, kwargs.get(attr_key))
             elif env_key.endswith("%s"):
                 setattr(self, attr_key, {})
                 prefix = env_key.replace("%s", "")
-                for key, value in os.environ.items():
+                for key, value in list(os.environ.items()):
                     if key == prefix or not key.startswith(prefix):
                         continue
                     try:
@@ -321,7 +321,7 @@ class TaskProps(object):
             attr_value = getattr(self, attr_key)
             if attr_value is not None:
                 if isinstance(attr_value, dict):
-                    for key, value in attr_value.items():
+                    for key, value in list(attr_value.items()):
                         yield (env_key % key, str(value))
                 else:
                     yield (env_key, str(attr_value))
@@ -533,7 +533,7 @@ class SuiteEngineProcessor(object):
         # Note: should we create the offsets directories?
         for dir_ in (
                 [tprops.dir_data, tprops.dir_data_cycle] +
-                tprops.dir_data_cycle_offsets.values()):
+                list(tprops.dir_data_cycle_offsets.values())):
             if dir_ is None:
                 continue
             if os.path.exists(dir_) and not os.path.isdir(dir_):

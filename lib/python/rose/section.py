@@ -56,9 +56,9 @@ class Section(object):
             flags = {}
         if comments is None:
             comments = []
-        self.metadata = dict(metadata.items())
-        self.flags = dict(flags.items())
-        self.ignored_reason = dict(ignored_reason.items())
+        self.metadata = dict(list(metadata.items()))
+        self.flags = dict(list(flags.items()))
+        self.ignored_reason = dict(list(ignored_reason.items()))
         self.error = error
         self.warning = warning
         self.comments = comments

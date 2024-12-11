@@ -157,7 +157,7 @@ class SuiteRunner(Runner):
         auto_items = {"ROSE_ORIG_HOST": self.host_selector.get_local_host(),
                       "ROSE_VERSION": ResourceLocator.default().get_version(),
                       suite_engine_key: suite_engine_version}
-        for key, val in auto_items.items():
+        for key, val in list(auto_items.items()):
             requested_value = conf_tree.node.get_value(["env", key])
             if requested_value:
                 if key == "ROSE_VERSION" and val != requested_value:
@@ -259,7 +259,7 @@ class SuiteRunner(Runner):
 
         # Process Files
         cwd = os.getcwd()
-        for rel_path, conf_dir in conf_tree.files.items():
+        for rel_path, conf_dir in list(conf_tree.files.items()):
             if (conf_dir == cwd or
                     any(fnmatchcase(os.sep + rel_path, exclude)
                         for exclude in self.SYNC_EXCLUDES) or

@@ -34,7 +34,7 @@ class DuplicateChecker(rose.macro.MacroBase):
         """Return a list of errors, if any."""
         self.reports = []
         sect_error_no_dupl = {}
-        sect_keys = config.value.keys()
+        sect_keys = list(config.value.keys())
         sorter = rose.config.sort_settings
         sect_keys.sort(sorter)
         for section in sect_keys:
@@ -64,7 +64,7 @@ class DuplicateChecker(rose.macro.MacroBase):
         return self.reports
 
     def _get_has_metadata(self, metadata, basic_section, meta_config):
-        if metadata.keys() != ["id"]:
+        if list(metadata.keys()) != ["id"]:
             return True
         for meta_keys, meta_node in meta_config.walk(no_ignore=True):
             meta_section = meta_keys[0]

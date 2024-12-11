@@ -23,6 +23,7 @@ import cherrypy
 from fnmatch import fnmatch
 from glob import glob
 import jinja2
+import math
 import mimetypes
 import os
 import re
@@ -37,8 +38,9 @@ import tarfile
 from tempfile import NamedTemporaryFile
 from time import gmtime, strftime
 import traceback
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
+cherrypy.config.update({'environment': 'production'})
 
 class RoseBushService(object):
 
@@ -59,6 +61,7 @@ class RoseBushService(object):
     VIEW_SIZE_MAX = 10 * 1024 * 1024  # 10MB
 
     def __init__(self, *args, **kwargs):
+        cherrypy.log("bush.init()")
         self.exposed = True
         self.bush_dao = RoseBushDAO()
         rose_conf = ResourceLocator.default().get_conf()
@@ -79,11 +82,13 @@ class RoseBushService(object):
     @classmethod
     def url2hyperlink(cls, text):
         """Turn http or https link into a hyperlink."""
+        cherrypy.log("bush.url2hyperlink()")
         return cls.REC_URL.sub(r'<a href="\g<1>">\g<1></a>', text)
 
     @cherrypy.expose
     def index(self, form=None):
         """Display a page to input user ID and suite ID."""
+        cherrypy.log("bush.index()")
         data = {
             "logo": self.logo,
             "title": self.title,
@@ -101,6 +106,7 @@ class RoseBushService(object):
     @cherrypy.expose
     def broadcast_states(self, user, suite, form=None):
         """List current broadcasts of a running or completed suite."""
+        cherrypy.log("bush.broadcast_states()")
         data = {
             "logo": self.logo,
             "title": self.title,
@@ -132,6 +138,7 @@ class RoseBushService(object):
     @cherrypy.expose
     def broadcast_events(self, user, suite, form=None):
         """List broadcasts history of a running or completed suite."""
+        cherrypy.log("bush.broadcast_events()")
         data = {
             "logo": self.logo,
             "title": self.title,
@@ -163,6 +170,7 @@ class RoseBushService(object):
             self, user, suite, page=1, order=None, per_page=None,
             no_fuzzy_time="0", form=None):
         """List cycles of a running or completed suite."""
+        cherrypy.log("bush.cycles()")
         conf = ResourceLocator.default().get_conf()
         per_page_default = int(conf.get_value(
             ["rose-bush", "cycles-per-page"], self.CYCLES_PER_PAGE))
@@ -200,7 +208,7 @@ class RoseBushService(object):
             self.bush_dao.get_suite_cycles_summary(
                 user, suite, order, per_page, (page - 1) * per_page))
         if per_page:
-            data["n_pages"] = data["of_n_entries"] / per_page
+            data["n_pages"] = math.ceil(data["of_n_entries"] / per_page)
             if data["of_n_entries"] % per_page != 0:
                 data["n_pages"] += 1
         else:
@@ -257,6 +265,7 @@ class RoseBushService(object):
                 return a JSON data structure.
 
         """
+        cherrypy.log("bush.taskjobs()")
         conf = ResourceLocator.default().get_conf()
         per_page_default = int(conf.get_value(
             ["rose-bush", "jobs-per-page"], self.JOBS_PER_PAGE))
@@ -329,7 +338,7 @@ class RoseBushService(object):
         data["entries"] = entries
         data["of_n_entries"] = of_n_entries
         if per_page:
-            data["n_pages"] = of_n_entries / per_page
+            data["n_pages"] = math.ceil(of_n_entries / per_page)
             if of_n_entries % per_page != 0:
                 data["n_pages"] += 1
         else:
@@ -351,12 +360,13 @@ class RoseBushService(object):
 
         Convert "no_status" to "task_status" argument of self.taskjobs.
         """
+        cherrypy.log("bush.jobs()")
         task_status = None
         if no_status:
             task_status = []
             if not isinstance(no_status, list):
                 no_status = [no_status]
-            for key, values in self.bush_dao.TASK_STATUS_GROUPS.items():
+            for key, values in list(self.bush_dao.TASK_STATUS_GROUPS.items()):
                 if key not in no_status:
                     task_status += values
         return self.taskjobs(
@@ -373,6 +383,7 @@ class RoseBushService(object):
                 return a JSON data structure.
 
         """
+        cherrypy.log("bush.suites()")
         user_suite_dir_root = self._get_user_suite_dir_root(user)
         conf = ResourceLocator.default().get_conf()
         per_page_default = int(conf.get_value(
@@ -433,17 +444,26 @@ class RoseBushService(object):
             except OSError:
                 continue
 
-        if order == "name_asc":
-            data["entries"].sort(key=lambda entry: entry["name"])
-        elif order == "name_desc":
-            data["entries"].sort(key=lambda entry: entry["name"], reverse=True)
-        elif order == "time_asc":
-            data["entries"].sort(self._sort_summary_entries, reverse=True)
-        else:  # order == "time_desc"
-            data["entries"].sort(self._sort_summary_entries)
+        try:
+            if order == "name_asc":
+                data["entries"].sort(key=lambda entry: entry["name"])
+            elif order == "name_desc":
+                data["entries"].sort(key=lambda entry: entry["name"],
+                    reverse=True)
+            elif order == "time_asc":
+                data["entries"].sort(key=lambda x: x["name"], reverse=True)
+                data["entries"].sort(key=lambda x: x.get("last_activity_time"),
+                    reverse=True)
+            else:  # order == "time_desc"
+                data["entries"].sort(key=lambda x: x["name"])
+                data["entries"].sort(key=lambda x: x.get("last_activity_time"))
+        except TypeError:
+            # Empty entries create a NoneType vs str comparison
+            pass
+
         data["of_n_entries"] = len(data["entries"])
         if per_page:
-            data["n_pages"] = data["of_n_entries"] / per_page
+            data["n_pages"] = math.ceil(data["of_n_entries"] / per_page)
             if data["of_n_entries"] % per_page != 0:
                 data["n_pages"] += 1
             offset = (page - 1) * per_page
@@ -456,7 +476,7 @@ class RoseBushService(object):
             rose_suite_info = os.path.join(user_suite_dir, "rose-suite.info")
             try:
                 info_root = rose.config.load(rose_suite_info)
-                for key, node in info_root.value.items():
+                for key, node in list(info_root.value.items()):
                     if (node.is_ignored() or
                             not isinstance(node.value, str)):
                         continue
@@ -471,6 +491,7 @@ class RoseBushService(object):
 
     def get_file(self, user, suite, path, path_in_tar=None, mode=None):
         """Returns file information / content or a cherrypy response."""
+        cherrypy.log("bush.get_file()")
         f_name = self._get_user_suite_dir(user, suite, path)
         conf = ResourceLocator.default().get_conf()
         view_size_max = int(conf.get_value(
@@ -480,6 +501,8 @@ class RoseBushService(object):
             try:
                 tar_info = tar_f.getmember(path_in_tar)
             except KeyError:
+                cherrypy.log.error("Unable to find " + path_in_tar +
+                        "in tar file")
                 raise cherrypy.HTTPError(404)
             f_size = tar_info.size
             handle = tar_f.extractfile(path_in_tar)
@@ -487,7 +510,7 @@ class RoseBushService(object):
                 mime = self.MIME_TEXT_PLAIN
             else:
                 mime = mimetypes.guess_type(
-                    urllib.pathname2url(path_in_tar))[0]
+                    urllib.request.pathname2url(path_in_tar))[0]
             handle.seek(0)
             if (mode == "download" or
                     f_size > view_size_max or
@@ -511,7 +534,7 @@ class RoseBushService(object):
             if open(f_name).read(2) == "#!":
                 mime = self.MIME_TEXT_PLAIN
             else:
-                mime = mimetypes.guess_type(urllib.pathname2url(f_name))[0]
+                mime = mimetypes.guess_type(urllib.request.pathname2url(f_name))[0]
             if not mime:
                 mime = self.MIME_TEXT_PLAIN
             if (mode == "download" or
@@ -524,7 +547,7 @@ class RoseBushService(object):
         try:
             if mode in [None, "text"]:
                 text = jinja2.escape(text)
-            lines = [unicode(line) for line in text.splitlines()]
+            lines = [str(line) for line in text.splitlines()]
         except UnicodeDecodeError:
             if path_in_tar:
                 handle.seek(0)
@@ -561,18 +584,22 @@ class RoseBushService(object):
 
     def get_last_activity_time(self, user, suite):
         """Returns last activity time for a suite based on database stat"""
+        cherrypy.log("bush.get_last_activity_time()")
         for name in [os.path.join("log", "db"), "cylc-suite.db"]:
             fname = os.path.join(self._get_user_suite_dir(user, suite), name)
             try:
                 return strftime(
                     "%Y-%m-%dT%H:%M:%SZ", gmtime(os.stat(fname).st_mtime))
-            except OSError:
+            except OSError as e:
+                cherrypy.log.error("bush.get_last_activity_time().error: "
+                        + str(e))
                 continue
 
     @cherrypy.expose
     def viewsearch(self, user, suite, path=None, path_in_tar=None, mode=None,
                    search_string=None, search_mode=None):
         """Search a text log file."""
+        cherrypy.log("bush.viewsearch()")
         # get file or serve raw data
         file_output = self.get_file(
             user, suite, path, path_in_tar=path_in_tar, mode=mode)
@@ -614,7 +641,7 @@ class RoseBushService(object):
             # no search is being performed, client is requesting the whole
             # page
             if mode in [None, "text"]:
-                line_numbers = range(1, len(lines) + 1)
+                line_numbers = list(range(1, len(lines) + 1))
             else:
                 line_numbers = []
             lines = [[line] for line in lines]
@@ -629,6 +656,7 @@ class RoseBushService(object):
     def view(self, user, suite, path, path_in_tar=None, mode=None,
              no_fuzzy_time="0"):
         """View a text log file."""
+        cherrypy.log("bush.view()")
         # get file or serve raw data
         file_output = self.get_file(
             user, suite, path, path_in_tar=path_in_tar, mode=mode)
@@ -665,6 +693,7 @@ class RoseBushService(object):
 
     def _get_suite_logs_info(self, user, suite):
         """Return a dict with suite logs and Rosie suite info."""
+        cherrypy.log("bush._get_suite_logs_info()")
         data = {"info": {}, "files": {}}
         user_suite_dir = self._get_user_suite_dir(user, suite)
 
@@ -673,7 +702,7 @@ class RoseBushService(object):
         if os.path.isfile(info_name):
             try:
                 info_root = rose.config.load(info_name)
-                for key, node in info_root.value.items():
+                for key, node in list(info_root.value.items()):
                     if node.is_ignored() or not isinstance(node.value, str):
                         continue
                     data["info"][key] = node.value
@@ -717,44 +746,43 @@ class RoseBushService(object):
         Return path on success.
 
         """
+        cherrypy.log("bush._check_dir_access()")
         if not os.path.exists(path):
+            cherrypy.log.error(
+                    "bush._check_dir_access: Path does not exist: " + path)
             raise cherrypy.HTTPError(404)
         if not os.access(path, os.R_OK):
+            cherrypy.log.error(
+                    "bush._check_dir_access: Path is not accessible: " + path)
+
             raise cherrypy.HTTPError(403)
         return path
 
     @staticmethod
     def _get_user_home(user):
-        """Return, e.g. ~/cylc-run/ for a cylc suite.
-
-        N.B. os.path.expanduser does not fail if ~user is invalid.
-
-        """
+        """Return, the path for a user cylc suite."""
+        cherrypy.log("bush._get_user_home()")
         try:
             return pwd.getpwnam(user).pw_dir
         except KeyError:
             raise cherrypy.HTTPError(404)
 
     def _get_user_suite_dir_root(self, user):
-        """Return, e.g. ~user/cylc-run/ for a cylc suite."""
+        """Return /cylc-run/ for a cylc suite."""
+        cherrypy.log("bush._get_user_suite_dir_root()")
         return self._check_dir_access(os.path.join(
             self._get_user_home(user),
             self.bush_dao.SUITE_DIR_REL_ROOT))
 
     def _get_user_suite_dir(self, user, suite, *paths):
-        """Return, e.g. ~user/cylc-run/suite/... for a cylc suite."""
-        return self._check_dir_access(os.path.join(
+        """Return, /cylc-run/suite/... for a cylc suite."""
+        cherrypy.log("bush._get_user_suite_dir()")
+        result = self._check_dir_access(os.path.join(
             self._get_user_home(user),
             self.bush_dao.SUITE_DIR_REL_ROOT,
             suite,
             *paths))
-
-    @staticmethod
-    def _sort_summary_entries(suite1, suite2):
-        """Sort suites by last_activity_time."""
-        return (cmp(suite2.get("last_activity_time"),
-                    suite1.get("last_activity_time")) or
-                cmp(suite1["name"], suite2["name"]))
+        return result
 
 
 if __name__ == "__main__":

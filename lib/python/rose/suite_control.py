@@ -159,7 +159,7 @@ def prompt(action, suite_name, host):
     """Prompt user to confirm action for suite_name at host."""
     if not host:
         host = "localhost"
-    return raw_input(PROMPT % (action, suite_name, host)).strip() in [YES]
+    return input(PROMPT % (action, suite_name, host)).strip() in [YES]
 
 
 def main():

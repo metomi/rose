@@ -383,7 +383,7 @@ class MenuBar(object):
 
     def add_prefix_choices(self):
         """Add the prefix choices."""
-        self.prefixes = self.ws_client.auth_managers.keys()
+        self.prefixes = list(self.ws_client.auth_managers.keys())
         self.prefixes.sort()
         self.prefixes.reverse()
         for prefix in self.prefixes:
@@ -415,7 +415,7 @@ class MenuBar(object):
         key_list = []
         mod_list = []
         action_list = []
-        for key_press, accel_func in accel_dict.items():
+        for key_press, accel_func in list(accel_dict.items()):
             key, mod = gtk.accelerator_parse(key_press)
             self.accelerators.lookup[str(key) + str(mod)] = accel_func
             self.accelerators.connect_group(

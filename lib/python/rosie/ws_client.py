@@ -85,7 +85,7 @@ class RosieWSClient(object):
         conf_rosie_id = conf.get(["rosie-id"], no_ignore=True)
         if conf_rosie_id is None:
             raise RosieWSClientConfError()
-        for key, node in conf_rosie_id.value.items():
+        for key, node in list(conf_rosie_id.value.items()):
             if node.is_ignored() or not key.startswith("prefix-ws."):
                 continue
             prefix = key.replace("prefix-ws.", "")
@@ -157,11 +157,11 @@ class RosieWSClient(object):
         # Process the requests in parallel
         pool = Pool(len(request_details))
         results = {}
-        for url, request_detail in request_details.items():
+        for url, request_detail in list(request_details.items()):
             results[url] = pool.apply_async(
                 requests.get, [url], request_detail["requests_kwargs"])
         while results:
-            for url, result in results.items():
+            for url, result in list(results.items()):
                 if not result.ready():
                     continue
                 results.pop(url)
@@ -336,7 +336,7 @@ class RosieWSClient(object):
                 results.extend(data)
         result_idx_branches = []
         for result in results:
-            result_idx_branches.append((result[u"idx"], result[u"branch"]))
+            result_idx_branches.append((result["idx"], result["branch"]))
 
         # A branch may have been deleted - query with all_revs=1.
         # We only want to use all_revs on demand as it's slow.
@@ -359,10 +359,10 @@ class RosieWSClient(object):
                 more_results.extend(data)
             new_results = {}
             for result in more_results:
-                idx_branch = (result[u"idx"], result[u"branch"])
+                idx_branch = (result["idx"], result["branch"])
                 if (idx_branch not in new_results or
-                        result[u"revision"] >
-                        new_results[idx_branch][u"revision"]):
+                        result["revision"] >
+                        new_results[idx_branch]["revision"]):
                     new_results.update({idx_branch: result})
             for _, result in sorted(new_results.items()):
                 results.append(result)

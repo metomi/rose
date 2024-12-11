@@ -21,7 +21,7 @@
 
 import os
 from tempfile import mkdtemp
-from urlparse import urlparse
+from urllib.parse import urlparse
 import xml.parsers.expat
 
 
@@ -101,7 +101,7 @@ class SvnInfoXMLParser(object):
         self.state["index"] = ":".join(self.state["stack"][2:])
         if self.state["entry"]:
             self.state["entry"][self.state["index"]] = ""
-        for key, value in attr_map.items():
+        for key, value in list(attr_map.items()):
             name = key
             if self.state["index"]:
                 name = self.state["index"] + ":" + key

@@ -123,4 +123,4 @@
 #     "cylc help register"
 #     "cylc help run"
 #-------------------------------------------------------------------------------
-exec python -m rose.suite_run "$@"
+exec python3 -m rose.suite_run "$@"

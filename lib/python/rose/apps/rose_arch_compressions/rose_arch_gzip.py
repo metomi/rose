@@ -39,7 +39,7 @@ class RoseArchGzip(object):
         Use work_dir to dump results.
 
         """
-        for source in target.sources.values():
+        for source in list(target.sources.values()):
             if source.path.endswith("." + target.compress_scheme):
                 continue  # assume already done
             name_gz = source.name + "." + target.compress_scheme

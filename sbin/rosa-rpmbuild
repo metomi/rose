@@ -81,7 +81,7 @@ rm -fr %{buildroot}
 mkdir -p %{buildroot}/etc/bash_completion.d %{buildroot}/opt %{buildroot}/usr/bin
 cp -p %_sourcedir/$NAME-$REV_BASE_DOT/etc/rose-bash-completion %{buildroot}/etc/bash_completion.d
 cp -pr %_sourcedir/$NAME-$REV_BASE_DOT %{buildroot}/opt/$NAME
-python -m compileall %{buildroot}/opt/$NAME/lib
+python3 -m compileall %{buildroot}/opt/$NAME/lib
 cp -p %_sourcedir/$NAME-$REV_BASE_DOT/usr/bin/rose %{buildroot}/usr/bin/rose
 cp -p %_sourcedir/$NAME-$REV_BASE_DOT/usr/bin/rose %{buildroot}/usr/bin/rosie
 

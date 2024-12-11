@@ -124,15 +124,15 @@ class _Test(object):
     def ok(self, key, cond):
         self.test_num += 1
         if cond:
-            print "ok %d - %s" % (self.test_num, key)
+            print("ok %d - %s" % (self.test_num, key))
         else:
-            print "not ok %d - %s" % (self.test_num, key)
+            print("not ok %d - %s" % (self.test_num, key))
 
     def test(self, key, actual, expect):
         self.ok(key, actual == expect)
 
     def run(self):
-        print self.test_plan
+        print(self.test_plan)
 
         # Test good cases
         self.base_names_of["O"] = []

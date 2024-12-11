@@ -53,7 +53,7 @@ def get_node_state_attrs(config, section, option=None, allowed_sections=None):
     node_attrs = {}
     if option is None:
         node_attrs["shape"] = SHAPE_NODE_SECTION
-    if not config.value.keys():
+    if not list(config.value.keys()):
         # Empty configuration - we can assume pure metadata.
         return node_attrs
     if allowed_sections is None:
@@ -220,7 +220,7 @@ def output_graph(graph, debug_mode=False, filename=None, format="svg"):
     graph.draw(image_file_handle.name, prog="dot")
     if debug_mode:
         image_file_handle.seek(0)
-        print image_file_handle.read()
+        print(image_file_handle.read())
         image_file_handle.close()
         return
     rose.external.launch_image_viewer(image_file_handle.name, run_fg=True)
@@ -240,7 +240,7 @@ def _load_override_config():
         ["rose-metadata-graph"])
     if conf is None:
         return
-    for key, node in conf.value.items():
+    for key, node in list(conf.value.items()):
         if node.is_ignored():
             continue
         try:
@@ -279,7 +279,7 @@ def main():
             config,
             directory=opts.conf_dir,
         )
-        if not meta_config.value.keys():
+        if not list(meta_config.value.keys()):
             _exit_with_metadata_fail()
     elif os.path.exists(meta_config_file_path):
         config = rose.config.ConfigNode()

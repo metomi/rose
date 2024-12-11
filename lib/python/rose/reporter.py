@@ -19,7 +19,7 @@
 # -----------------------------------------------------------------------------
 """Reporter for diagnostic messages."""
 
-import Queue
+import queue
 
 import multiprocessing
 import os
@@ -157,7 +157,7 @@ class Reporter(object):
         if level is None:
             level = self.DEFAULT
         msg = None
-        for key, context in self.contexts.items():
+        for key, context in list(self.contexts.items()):
             if context.is_closed():
                 self.contexts.pop(key)  # remove contexts with closed handles
                 continue
@@ -176,10 +176,10 @@ class Reporter(object):
                     msg = message
 
                 try:
-                    msg = unicode(msg)
+                    msg = str(msg)
                 except UnicodeDecodeError:
                     try:
-                        msg = unicode(msg, 'utf-8')
+                        msg = str(msg, 'utf-8')
                     except TypeError:
                         msg = str(msg)
                     except UnicodeEncodeError:
@@ -312,7 +312,7 @@ class ReporterContextQueue(ReporterContext):
         for message in list(self._messages_pending):
             try:
                 self.queue.put(self._messages_pending[0], block=False)
-            except Queue.Full:
+            except queue.Full:
                 break
             self._messages_pending.pop(0)
 

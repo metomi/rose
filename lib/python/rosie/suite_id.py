@@ -262,7 +262,7 @@ class SuiteId(object):
         locations = cls.get_prefix_locations()
         if not locations:
             raise SuiteIdLocationError(root)
-        for key, value in locations.items():
+        for key, value in list(locations.items()):
             if value == root:
                 return key
         else:
@@ -290,7 +290,7 @@ class SuiteId(object):
         rosie_id_node = config.get(["rosie-id"], no_ignore=True)
         if rosie_id_node is None:
             return ret
-        for key, node in rosie_id_node.value.items():
+        for key, node in list(rosie_id_node.value.items()):
             if node.state:
                 continue
             if key.startswith("prefix-location."):
@@ -572,7 +572,7 @@ def main():
             suite_id = SuiteId.get_latest(prefix=arg)
             if suite_id is not None:
                 report(str(suite_id) + "\n", level=0)
-        elif opts.next:
+        elif opts.__next__:
             suite_id = SuiteId.get_next(prefix=arg)
             if suite_id is not None:
                 report(str(suite_id) + "\n", level=0)

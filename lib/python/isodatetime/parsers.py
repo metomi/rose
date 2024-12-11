@@ -173,7 +173,7 @@ class TimePointParser(object):
             self._date_regex_map.setdefault(format_type, {})
             self._time_regex_map.setdefault(format_type, {})
             self._time_zone_regex_map.setdefault(format_type, [])
-            for date_key in date_map[format_type].keys():
+            for date_key in list(date_map[format_type].keys()):
                 self._date_regex_map[format_type].setdefault(date_key, [])
                 regex_list = self._date_regex_map[format_type][date_key]
                 for date_expr in self.get_expressions(
@@ -181,7 +181,7 @@ class TimePointParser(object):
                     date_regex = self.parse_date_expression_to_regex(
                         date_expr)
                     regex_list.append([re.compile(date_regex), date_expr])
-            for time_key in time_map[format_type].keys():
+            for time_key in list(time_map[format_type].keys()):
                 self._time_regex_map[format_type].setdefault(time_key, [])
                 regex_list = self._time_regex_map[format_type][time_key]
                 for time_expr in self.get_expressions(
@@ -275,13 +275,13 @@ class TimePointParser(object):
             if date_info.pop("year_sign", "+") == "-":
                 year *= -1
             date_info["year"] = year
-        for key, value in date_info.items():
+        for key, value in list(date_info.items()):
             try:
                 date_info[key] = int(value)
             except (TypeError, ValueError):
                 pass
         info.update(date_info)
-        for key, value in time_info.items():
+        for key, value in list(time_info.items()):
             if key.endswith("_decimal"):
                 value = "0." + value
             try:
@@ -344,7 +344,7 @@ class TimePointParser(object):
         if not result:
             raise StrptimeConversionError(source, data_string)
         info = result.groupdict()
-        for property_, value in info.items():
+        for property_, value in list(info.items()):
             if property_ in data.PARSE_PROPERTY_TRANSLATORS:
                 info.pop(property_)
                 translator = data.PARSE_PROPERTY_TRANSLATORS[property_]
@@ -361,7 +361,7 @@ class TimePointParser(object):
         date_info = {}
         time_info = {}
         time_zone_info = {}
-        for key, value in info.items():
+        for key, value in list(info.items()):
             if key in date_info_keys:
                 date_info[key] = value
             elif key in time_info_keys:
@@ -381,7 +381,7 @@ class TimePointParser(object):
                 type_keys.remove(type_key)
         if not self.allow_truncated and "truncated" in type_keys:
             type_keys.remove("truncated")
-        for format_key, type_regex_map in self._date_regex_map.items():
+        for format_key, type_regex_map in list(self._date_regex_map.items()):
             for type_key in type_keys:
                 regex_list = type_regex_map[type_key]
                 for regex, expr in regex_list:
@@ -397,10 +397,10 @@ class TimePointParser(object):
             bad_formats = []
         if bad_types is None:
             bad_types = []
-        for format_key, type_regex_map in self._time_regex_map.items():
+        for format_key, type_regex_map in list(self._time_regex_map.items()):
             if format_key in bad_formats:
                 continue
-            for type_key, regex_list in type_regex_map.items():
+            for type_key, regex_list in list(type_regex_map.items()):
                 if type_key in bad_types:
                     continue
                 for regex, expr in regex_list:
@@ -413,7 +413,7 @@ class TimePointParser(object):
         """Return the properties from a time zone string."""
         if bad_formats is None:
             bad_formats = []
-        for format_key, regex_list in self._time_zone_regex_map.items():
+        for format_key, regex_list in list(self._time_zone_regex_map.items()):
             if format_key in bad_formats:
                 continue
             for regex, expr in regex_list:
@@ -560,7 +560,7 @@ class DurationParser(object):
             if not result:
                 continue
             result_map = result.groupdict()
-            for key, value in result_map.items():
+            for key, value in list(result_map.items()):
                 if value is None:
                     result_map.pop(key)
                     continue

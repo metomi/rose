@@ -56,7 +56,7 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
     def get_compulsory_data(self, meta_config):
         """Return a list of compulsory=true basic (no duplicate info) ids."""
         compulsory_data = {}
-        for setting_id, sect_node in meta_config.value.items():
+        for setting_id, sect_node in list(meta_config.value.items()):
             if sect_node.is_ignored() or isinstance(sect_node.value, str):
                 continue
             if (sect_node.get_value([rose.META_PROP_COMPULSORY]) ==
@@ -128,7 +128,7 @@ class CompulsoryChecker(rose.macro.MacroBaseRoseEdit):
             self.compulsory_data = self.get_compulsory_data(meta_config)
         self._generate_aliases_for_sections(config_data)
         if only_these_sections is None:
-            basic_sections_to_check = self.compulsory_data.keys()
+            basic_sections_to_check = list(self.compulsory_data.keys())
         else:
             basic_sections_to_check = []
             alias_sections_to_check = []

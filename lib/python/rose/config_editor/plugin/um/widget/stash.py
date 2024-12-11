@@ -175,12 +175,12 @@ class BaseStashSummaryDataPanelv1(
 
     def get_model_data(self):
         """(Override) Construct a data model of other page data."""
-        sub_sect_names = self.sections.keys()
+        sub_sect_names = list(self.sections.keys())
         sub_var_names = []
         self.var_id_map = {}
         section_sort_keys = {}
         # Apply the correct default sorting (section, item)
-        for section, variables in self.variables.items():
+        for section, variables in list(self.variables.items()):
             for variable in variables:
                 self.var_id_map[variable.metadata["id"]] = variable
                 if variable.name not in sub_var_names:
@@ -208,7 +208,7 @@ class BaseStashSummaryDataPanelv1(
                     while len(section_sort_keys[section]) < 3:
                         section_sort_keys[section].append(None)
                     section_sort_keys[section][2] = variable.value
-        for section, sort_list in section_sort_keys.items():
+        for section, sort_list in list(section_sort_keys.items()):
             while len(sort_list) < 4:
                 sort_list.append(None)
             sort_list[3] = section
@@ -369,7 +369,7 @@ class BaseStashSummaryDataPanelv1(
             tip_text = rose.CONFIG_DELIMITER.join(
                 [section, option, value]) + "\n"
             if (option in self.OPTION_NL_MAP and
-                    option in self._profile_location_map.keys()):
+                    option in list(self._profile_location_map.keys())):
                 profile_id = self._profile_location_map[option].get(value)
                 if profile_id is not None:
                     profile_sect = self.util.get_section_option_from_id(
@@ -378,7 +378,7 @@ class BaseStashSummaryDataPanelv1(
         tip_text += id_data.metadata.get(rose.META_PROP_DESCRIPTION, "")
         if tip_text:
             tip_text += "\n"
-        for key, value in id_data.error.items():
+        for key, value in list(id_data.error.items()):
             tip_text += (
                 rose.config_editor.SUMMARY_DATA_PANEL_ERROR_TIP.format(
                     key, value))
@@ -469,7 +469,7 @@ class BaseStashSummaryDataPanelv1(
         self._package_lookup = {}
         self._package_profile_lookup = {}
         package_profiles = {}
-        for sect, node in self.package_config.value.items():
+        for sect, node in list(self.package_config.value.items()):
             if not isinstance(node.value, dict) or node.is_ignored():
                 continue
             base_sect = sect.rsplit("(", 1)[0]
@@ -489,7 +489,7 @@ class BaseStashSummaryDataPanelv1(
                             self._package_lookup[package][profile].append(
                                 profile_node.value)
                 continue
-            for profile, profile_nl in self.OPTION_NL_MAP.items():
+            for profile, profile_nl in list(self.OPTION_NL_MAP.items()):
                 if base_sect == profile_nl:
                     name_node = node.get([profile], no_ignore=True)
                     if name_node is not None:
@@ -555,7 +555,7 @@ class BaseStashSummaryDataPanelv1(
     def _handle_cell_combo_change(self, combo_cell, path_string, new,
                                   col_title):
         # Handle a gtk.CellRendererCombo (variable) value change.
-        if isinstance(new, basestring):
+        if isinstance(new, str):
             new_value = new
         else:
             new_value = combo_cell.get_property("model").get_value(new, 0)
@@ -618,7 +618,7 @@ class BaseStashSummaryDataPanelv1(
     def _get_request_changes(self):
         # Return a list of request indices with changes.
         changed_requests = {}
-        for section, sect_data in self.sections.items():
+        for section, sect_data in list(self.sections.items()):
             changes = self.sect_ops.get_section_changes(sect_data)
             if changes:
                 changed_requests.update({section: changes})
@@ -718,11 +718,11 @@ class BaseStashSummaryDataPanelv1(
         # Retrieve which profiles (namelists like domain) are available.
         self._available_profile_map = {}
         self._profile_location_map = {}
-        ok_var_names = self.OPTION_NL_MAP.keys()
-        ok_sect_names = self.OPTION_NL_MAP.values()
+        ok_var_names = list(self.OPTION_NL_MAP.keys())
+        ok_sect_names = list(self.OPTION_NL_MAP.values())
         for name in ok_var_names:
             self._available_profile_map[name] = []
-        for id_, value in self.sub_ops.get_var_id_values().items():
+        for id_, value in list(self.sub_ops.get_var_id_values().items()):
             section, option = self.util.get_section_option_from_id(id_)
             if (option in ok_var_names and
                     any(section.startswith(n) for n in ok_sect_names)):
@@ -730,13 +730,13 @@ class BaseStashSummaryDataPanelv1(
                 self._profile_location_map[option].update({value: id_})
                 self._available_profile_map.setdefault(option, [])
                 self._available_profile_map[option].append(value)
-        for profile_names in self._available_profile_map.values():
+        for profile_names in list(self._available_profile_map.values()):
             profile_names.sort()
 
     def _package_add(self, package):
         # Add a package of new requests, and profiles if needed.
         sections_for_adding = []
-        for sect_type, values in self._package_lookup[package].items():
+        for sect_type, values in list(self._package_lookup[package].items()):
             if sect_type == self.STREQ_NL_BASE:
                 sections_for_adding.extend(values)
             else:
@@ -750,7 +750,7 @@ class BaseStashSummaryDataPanelv1(
             node = self.package_config.get([section], no_ignore=True)
             if node is None or not isinstance(node.value, dict):
                 continue
-            for opt, node in node.value.items():
+            for opt, node in list(node.value.items()):
                 opt_name_values.update({opt: node.value})
             if section not in self.sections:
                 self.sub_ops.add_section(section, opt_map=opt_name_values)
@@ -759,7 +759,7 @@ class BaseStashSummaryDataPanelv1(
         # Create a menu below the widget for package actions.
         menu = gtk.Menu()
         packages = {}
-        for section, vars_ in self.variables.items():
+        for section, vars_ in list(self.variables.items()):
             for var in vars_:
                 if var.name == self.STREQ_NL_PACKAGE_OPT:
                     is_ignored = (rose.variable.IGNORED_BY_USER in
@@ -831,7 +831,7 @@ class BaseStashSummaryDataPanelv1(
         self._update_available_profiles()
         sections_for_removing = []
         profile_streqs = {}
-        for section, vars_ in self.variables.items():
+        for section, vars_ in list(self.variables.items()):
             for var in vars_:
                 if var.name == self.STREQ_NL_PACKAGE_OPT:
                     if (only_this_package is None or
@@ -846,7 +846,7 @@ class BaseStashSummaryDataPanelv1(
                     profile_streqs[var.name][var.value].append(section)
         streq_remove_list = list(sections_for_removing)
         for profile_type in profile_streqs:
-            for name, streq_list in profile_streqs[profile_type].items():
+            for name, streq_list in list(profile_streqs[profile_type].items()):
                 if all([s in streq_remove_list for s in streq_list]):
                     # This is only referenced by sections about to be removed.
                     profile_id = self._profile_location_map.get(
@@ -861,7 +861,7 @@ class BaseStashSummaryDataPanelv1(
     def _packages_enable(self, only_this_package=None, disable=False):
         # Enable or user-ignore requests matching these packages.
         sections_for_changing = []
-        for section, vars_ in self.variables.items():
+        for section, vars_ in list(self.variables.items()):
             for var in vars_:
                 if var.name == self.STREQ_NL_PACKAGE_OPT:
                     if (only_this_package is None or

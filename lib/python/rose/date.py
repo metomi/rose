@@ -43,8 +43,8 @@ class RoseDateTimeOperator(object):
 
     """A class to parse and print date string with an offset."""
 
-    CURRENT_TIME_DUMP_FORMAT = u"CCYY-MM-DDThh:mm:ss+hh:mm"
-    CURRENT_TIME_DUMP_FORMAT_Z = u"CCYY-MM-DDThh:mm:ssZ"
+    CURRENT_TIME_DUMP_FORMAT = "CCYY-MM-DDThh:mm:ss+hh:mm"
+    CURRENT_TIME_DUMP_FORMAT_Z = "CCYY-MM-DDThh:mm:ssZ"
 
     NEGATIVE = "-"
 
@@ -367,11 +367,11 @@ def _print_time_point(date_time_oper, opts, args):
         for offset in opts.offsets1:
             time_point = date_time_oper.date_shift(time_point, offset)
     if opts.print_format:
-        print date_time_oper.date_format(opts.print_format, time_point)
+        print(date_time_oper.date_format(opts.print_format, time_point))
     elif parse_format:
-        print date_time_oper.date_format(parse_format, time_point)
+        print(date_time_oper.date_format(parse_format, time_point))
     else:
-        print str(time_point)
+        print(str(time_point))
 
 
 def _print_duration(date_time_oper, opts, args):
@@ -390,7 +390,7 @@ def _print_duration(date_time_oper, opts, args):
     if opts.duration_print_format:
         _convert_duration(date_time_oper, opts, [out])
         sys.exit(0)
-    print out
+    print(out)
 
 
 def _convert_duration(date_time_oper, opts, args):
@@ -401,11 +401,11 @@ def _convert_duration(date_time_oper, opts, args):
     options = {'S': time, 'M': time / 60, 'H': time / 3600}
     if opts.duration_print_format.upper() in options:
         # supplied duration format is valid (upper removes case-sensitivity)
-        print options[opts.duration_print_format.upper()]
+        print(options[opts.duration_print_format.upper()])
     else:
         # supplied duration format not valid
-        print 'Invalid date/time format, please use one of H, M, S ' + \
-            '(hours, minutes, seconds)'
+        print('Invalid date/time format, please use one of H, M, S ' + \
+            '(hours, minutes, seconds)')
         sys.exit(1)
 
 
