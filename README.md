@@ -26,7 +26,7 @@ Rose: a framework for managing and running meteorological suites.
 
 ## Copyright and Terms of Use
 
-Copyright (C) 2012-<span actions:bind='current-year'>2024</span> British Crown (Met Office) &amp; Contributors
+Copyright (C) 2012-<span actions:bind='current-year'>2025</span> British Crown (Met Office) &amp; Contributors
 
 Rose is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
