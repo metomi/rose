@@ -128,7 +128,7 @@ while (($# > 0)); do
     --help)
         rose_help
         exit
-        :;;
+        ;;
     --command-file=*)
         ROSE_COMMAND_FILE=${1#*=}
         shift 1
