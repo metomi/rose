@@ -16,7 +16,7 @@
 {% if HOST != 'localhost' %}
                 my_task_2
 {% endif %}
-                WARM[-PT12H]:finish-all => rose_prune
+                WARM[-PT12H]:succeed-all => rose_prune
             """
 
 [runtime]
