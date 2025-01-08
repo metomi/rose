@@ -9,7 +9,7 @@ creating a new release entry be sure to copy & paste the span tag with the
 updated. Only the first match gets replaced, so it's fine to leave the old
 ones in. -->
 
-## 2.3.2 (<span actions:bind='release-date'>Released 2024-11-11</span>)
+## 2.3.2 (<span actions:bind='release-date'>Released 2025-01-08</span>)
 
 ### Fixes
 
