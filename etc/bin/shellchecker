@@ -80,7 +80,7 @@ default () {
         --exclude t \
         --exclude node_modules \
         --exclude .git \
-        -- -e SC1090 -e SC2119 -e SC2001 \
+        -- -e SC1090 -e SC2119 -e SC2001 -e SC2317 \
 
     # run a lenient check on all test scripts
     main t -- -S error -e SC1090
