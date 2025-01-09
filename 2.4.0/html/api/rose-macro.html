@@ -1,0 +1,590 @@
+
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rose Macro API &mdash; Rose Documentation 2.4.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=659b1fac" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/diff_selector.css?v=9704a72b" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/grid_table.css?v=0285b42e" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/hieroglyph_theme_addons.css?v=814c2015" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tutorial.css?v=b869d33c" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/addons.css?v=d1f804c3" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=466af0f7" />
+
+  
+    <link rel="shortcut icon" href="../_static/rose-favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=4d935f96"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/js/diff_selector.js?v=3109bfa4"></script>
+      <script src="../_static/js/minicylc.js?v=ddc882fd"></script>
+      <script src="../_static/js/spoiler.js?v=12631137"></script>
+      <script src="../_static/js/addons.js?v=39bd7dee"></script>
+      <script src="../_static/js/versioning.js?v=df0214e8"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Rose Upgrade Macro API" href="rose-upgrader-macros.html" />
+    <link rel="prev" title="rose_prune" href="built-in/rose_prune.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/rose-logo-crop.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/rose/index.html">Rose Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rose API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="configuration/index.html">Rose Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="other.html">Other Python API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rose-built-in-applications.html">Rose Built-In Applications</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Rose Macro API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#location">Location</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#writing-macros">Writing Macros</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#validator-reporter-macros">Validator / Reporter Macros</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#transformer-macros">Transformer Macros</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#optional-arguments">Optional Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-metomi.rose.macro">Python API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.macro.MacroBase"><code class="docutils literal notranslate"><span class="pre">MacroBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.macro.MacroBase.add_report"><code class="docutils literal notranslate"><span class="pre">MacroBase.add_report()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.macro.MacroBase.get_metadata_for_config_id"><code class="docutils literal notranslate"><span class="pre">MacroBase.get_metadata_for_config_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.macro.MacroBase.get_resource_path"><code class="docutils literal notranslate"><span class="pre">MacroBase.get_resource_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.macro.MacroBase.pretty_format_config"><code class="docutils literal notranslate"><span class="pre">MacroBase.pretty_format_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metomi.rose.macro.MacroBase.standard_format_config"><code class="docutils literal notranslate"><span class="pre">MacroBase.standard_format_config()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.macro.MacroReport"><code class="docutils literal notranslate"><span class="pre">MacroReport</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../terms.html">Rose Terms Of Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../course/um-ut.html">UM User Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Rose Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Rose Macro API</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/metomi/rose/blob/master/sphinx/api/rose-macro.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rose-macro-api">
+<span id="api-rose-macro"></span><h1>Rose Macro API<a class="headerlink" href="#rose-macro-api" title="Link to this heading"></a></h1>
+<p>Rose macros manipulate or check configurations, often based on their
+metadata. There are four types of macros:</p>
+<dl class="simple">
+<dt>Checkers (validators)</dt><dd><p>Check a configuration, perhaps using metadata.</p>
+</dd>
+<dt>Changers (transformers)</dt><dd><p>Change a configuration e.g. adding/removing options.</p>
+</dd>
+<dt>Upgraders</dt><dd><p>Special transformer macros for upgrading and downgrading configurations
+(covered in the <a class="reference internal" href="rose-upgrader-macros.html#rose-upgr-macros"><span class="std std-ref">Upgrade Macro API</span></a>).</p>
+</dd>
+<dt>Reporters</dt><dd><p>output information about a configuration.</p>
+</dd>
+</dl>
+<p>They can be run within <a class="reference internal" href="command-reference.html#command-rose-config-edit"><span class="std std-ref">rose config-edit</span></a> or via
+<a class="reference internal" href="command-reference.html#command-rose-macro"><span class="std std-ref">rose macro</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This section covers validator, transformer and reporter macros. For upgrader
+macros see <a class="reference internal" href="rose-upgrader-macros.html#rose-upgr-macros"><span class="std std-ref">Upgrade Macro API</span></a>.</p>
+</div>
+<p>There are built-in Rose macros that handle standard behaviour such as trigger
+changing and type checking.</p>
+<p>Macros use a Python API, and should be written in Python, unless you are
+doing something very fancy. In the absence of a Python house style, it’s
+usual to follow the standard Python style guidance (<a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">PEP8</a>, <a class="reference external" href="https://www.python.org/dev/peps/pep-0257/">PEP257</a>).</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>You should avoid writing validator macros if the checking can be expressed
+via <a class="reference internal" href="configuration/metadata.html#metadata-values"><span class="std std-ref">metadata</span></a>.</p>
+</div>
+<section id="location">
+<h2>Location<a class="headerlink" href="#location" title="Link to this heading"></a></h2>
+<p>A module containing macros should be stored under a directory
+<code class="docutils literal notranslate"><span class="pre">lib/python/macros/</span></code> in the metadata for a configuration. This directory
+should be a Python package.</p>
+<p>When developing macros for Rose internals, macros should be placed in the
+<a class="reference internal" href="other.html#module-metomi.rose.macros" title="metomi.rose.macros"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metomi.rose.macros</span></code></a> package in the Rose Python library. They should be
+referenced by the <code class="docutils literal notranslate"><span class="pre">lib/python/rose/macros/__init__.py</span></code> classes and a call to
+them can be added in the <code class="docutils literal notranslate"><span class="pre">lib/python/rose/config_editor/main.py</span></code> module if
+they need to be run implicitly by the config editor.</p>
+</section>
+<section id="writing-macros">
+<h2>Writing Macros<a class="headerlink" href="#writing-macros" title="Link to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For basic usage see the <a class="reference internal" href="../tutorial/rose/furthertopics/macro-development.html#macro-dev"><span class="std std-ref">macro tutorial</span></a>.</p>
+</div>
+<p>Validator, transformer and reporter macros are Python classes which subclass
+from <a class="reference internal" href="#metomi.rose.macro.MacroBase" title="metomi.rose.macro.MacroBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">metomi.rose.macro.MacroBase</span></code></a>
+(<a class="reference internal" href="#api-rose-macro-base"><span class="std std-ref">API</span></a>).</p>
+<p>These macros implement their behaviours by providing a <code class="docutils literal notranslate"><span class="pre">validate</span></code>,
+<code class="docutils literal notranslate"><span class="pre">transform</span></code> or <code class="docutils literal notranslate"><span class="pre">report</span></code> method. A macro can contain any combination of
+these methods so, for example, a macro might be both a validator and a
+transformer.</p>
+<p>These methods should accept two <a class="reference internal" href="configuration/api.html#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">metomi.rose.config.ConfigNode</span></code></a>
+instances as arguments - one is the configuration, and one is the metadata
+configuration that provides information about the configuration items.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>See also <a class="reference internal" href="configuration/api.html#config-api"><span class="std std-ref">Python</span></a>.</p>
+</div>
+<section id="validator-reporter-macros">
+<h3>Validator / Reporter Macros<a class="headerlink" href="#validator-reporter-macros" title="Link to this heading"></a></h3>
+<p>A validator macro should look like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">metomi.rose.macro</span>
+
+<span class="k">class</span> <span class="nc">SomeValidator</span><span class="p">(</span><span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">MacroBase</span><span class="p">):</span>
+
+<span class="sd">&quot;&quot;&quot;This does some kind of check.&quot;&quot;&quot;</span>
+
+<span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="c1"># Some check on config appends to self.reports using self.add_report</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+</pre></div>
+</div>
+<p>The returned list should be a list of <a class="reference internal" href="#metomi.rose.macro.MacroReport" title="metomi.rose.macro.MacroReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">metomi.rose.macro.MacroReport</span></code></a>
+objects containing the section, option, value, and warning strings (info) for
+each setting that is in error. These are initialised behind the scenes by
+calling the inherited method <a class="reference internal" href="#metomi.rose.macro.MacroBase.add_report" title="metomi.rose.macro.MacroBase.add_report"><code class="xref py py-meth docutils literal notranslate"><span class="pre">metomi.rose.macro.MacroBase.add_report()</span></code></a>.
+This has the form:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">add_report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">is_warning</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>This means that you should call it with the relevant section first, then the
+relevant option, then the relevant value, then the relevant error message,
+and optionally a warning flag that we’ll discuss later. If the setting is a
+section, the option should be <code class="docutils literal notranslate"><span class="pre">None</span></code> and the value None. For example,</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">editor_value</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="s2">&quot;env&quot;</span><span class="p">,</span> <span class="s2">&quot;MY_FAVOURITE_STREAM_EDITOR&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">if</span> <span class="n">editor_value</span> <span class="o">!=</span> <span class="s2">&quot;sed&quot;</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_report</span><span class="p">(</span><span class="s2">&quot;env&quot;</span><span class="p">,</span>                         <span class="c1"># Section</span>
+                        <span class="s2">&quot;MY_FAVOURITE_STREAM_EDITOR&quot;</span><span class="p">,</span>  <span class="c1"># Option</span>
+                        <span class="n">editor_value</span><span class="p">,</span>                  <span class="c1"># Value</span>
+                        <span class="s2">&quot;Should be &#39;sed&#39;!&quot;</span><span class="p">)</span>            <span class="c1"># Message</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+</pre></div>
+</div>
+<p>Validator macros have the option to give warnings, which do not count as
+formal errors in the Rose config editor GUI. These should be used when
+something <em>may</em> be wrong, such as warning when using an
+advanced-developer-only option. They are invoked by passing a 5th argument
+to <a class="reference internal" href="#metomi.rose.macro.MacroBase.add_report" title="metomi.rose.macro.MacroBase.add_report"><code class="xref py py-meth docutils literal notranslate"><span class="pre">metomi.rose.macro.MacroBase.add_report()</span></code></a>, <code class="docutils literal notranslate"><span class="pre">is_warning</span></code>, like so:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">add_report</span><span class="p">(</span><span class="s2">&quot;env&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;MY_FAVOURITE_STREAM_EDITOR&quot;</span><span class="p">,</span>
+                <span class="n">editor_value</span><span class="p">,</span>
+                <span class="s2">&quot;Could be &#39;sed&#39;&quot;</span><span class="p">,</span>
+                <span class="n">is_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="transformer-macros">
+<h3>Transformer Macros<a class="headerlink" href="#transformer-macros" title="Link to this heading"></a></h3>
+<p>A transformer macro should look like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">metomi.rose.macro</span>
+
+<span class="k">class</span> <span class="nc">SomeTransformer</span><span class="p">(</span><span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">MacroBase</span><span class="p">):</span>
+
+<span class="sd">&quot;&quot;&quot;This does some kind of change to the config.&quot;&quot;&quot;</span>
+
+<span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="c1"># Some operation on config which calls self.add_report for each change.</span>
+    <span class="k">return</span> <span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+</pre></div>
+</div>
+<p>The returned list should be a list of 4-tuples containing the section,
+option, value, and information strings for each setting that was changed
+(e.g. added, removed, value changed). If the setting is a section, the
+option should be <code class="docutils literal notranslate"><span class="pre">None</span></code> and the value None. If an option was removed,
+the value should be the old value - otherwise it should be the new one
+(added/changed). For example,</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add some more snow control.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="s2">&quot;namelist:snowflakes&quot;</span><span class="p">])</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s2">&quot;namelist:snowflakes&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_report</span><span class="p">(</span><span class="n">list_of_changes</span><span class="p">,</span>
+                        <span class="s2">&quot;namelist:snowflakes&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="s2">&quot;Updated snow handling in time for Christmas&quot;</span><span class="p">)</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="s2">&quot;namelist:snowflakes&quot;</span><span class="p">,</span> <span class="s2">&quot;l_unique&quot;</span><span class="p">],</span> <span class="s2">&quot;.true.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_report</span><span class="p">(</span><span class="s2">&quot;namelist:snowflakes&quot;</span><span class="p">,</span> <span class="s2">&quot;l_unique&quot;</span><span class="p">,</span> <span class="s2">&quot;.true.&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;So far, anyway.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+</pre></div>
+</div>
+<p>The current working directory within a macro is always the configuration’s
+directory. This makes it easy to access non-<code class="docutils literal notranslate"><span class="pre">rose-app.conf</span></code> files (e.g.
+in the <code class="docutils literal notranslate"><span class="pre">file/</span></code> subdirectory).</p>
+<p>There are also reporter macros which can be used where you need to output
+some information about a configuration. A reporter macro takes the same form
+as validator and transform macros but does not require a return value.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Write some information about the configuration to a report file.</span>
+
+<span class="sd">    Note: report methods do not have a return value.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;report/file&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">report_file</span><span class="p">:</span>
+        <span class="n">report_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="s2">&quot;namelist:snowflakes&quot;</span><span class="p">])))</span>
+</pre></div>
+</div>
+</section>
+<section id="optional-arguments">
+<h3>Optional Arguments<a class="headerlink" href="#optional-arguments" title="Link to this heading"></a></h3>
+<p>Macros also support the use of keyword arguments, giving you the ability to
+have the user specify some input or override to your macro. For example a
+transformer macro could be written as follows to allow the user to input
+<code class="docutils literal notranslate"><span class="pre">some_value</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">some_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Some transformer macro&quot;&quot;&quot;</span>
+    <span class="k">return</span>
+</pre></div>
+</div>
+<p>On running your macro the user will be prompted to supply values for these
+arguments or accept the default values.</p>
+<p>There is a special keyword argument called <code class="docutils literal notranslate"><span class="pre">optional_config_name</span></code> which is
+set to the name of the optional configuration the macro is being run on, or
+<code class="docutils literal notranslate"><span class="pre">None</span></code> if only the default configuration is being used.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Python keyword arguments require default values (<code class="docutils literal notranslate"><span class="pre">=None</span></code> in this
+example). You should add error handling for the input accordingly.</p>
+</div>
+</section>
+</section>
+<section id="module-metomi.rose.macro">
+<span id="python-api"></span><span id="api-rose-macro-base"></span><h2>Python API<a class="headerlink" href="#module-metomi.rose.macro" title="Link to this heading"></a></h2>
+<p>Module to list or run available custom macros for a configuration.</p>
+<p>It also stores macro base classes and macro library functions.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="metomi.rose.macro.MacroBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metomi.rose.macro.</span></span><span class="sig-name descname"><span class="pre">MacroBase</span></span><a class="reference internal" href="../_modules/metomi/rose/macro.html#MacroBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.macro.MacroBase" title="Link to this definition"></a></dt>
+<dd><p>Base class for macros for validating or transforming configurations.</p>
+<dl>
+<dt>Synopsis:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">metomi.rose.macro</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">SomeValidator</span><span class="p">(</span><span class="n">metomi</span><span class="o">.</span><span class="n">rose</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">MacroBase</span><span class="p">):</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="w">   </span><span class="sd">&#39;&#39;&#39;Important: Add a docstring for your macro like this.</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="sd">   A macro class should implement one of the following methods:</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="sd">   &#39;&#39;&#39;</span>
+<span class="gp">...</span>
+<span class="gp">... </span>   <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="gp">... </span>       <span class="c1"># Some check on config appends to self.reports using</span>
+<span class="gp">... </span>       <span class="c1"># self.add_report.</span>
+<span class="gp">... </span>       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+<span class="gp">...</span>
+<span class="gp">... </span>   <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="gp">... </span>       <span class="c1"># Some operation on config which calls self.add_report</span>
+<span class="gp">... </span>       <span class="c1"># for each change.</span>
+<span class="gp">... </span>       <span class="k">return</span> <span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+<span class="gp">...</span>
+<span class="gp">... </span>   <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="gp">... </span>       <span class="c1"># Perform some analysis of the config but return nothing.</span>
+<span class="gp">... </span>       <span class="k">pass</span>
+</pre></div>
+</div>
+<p>Keyword arguments can be used, <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">macro</span></code> will prompt the user to
+provide values for these arguments when the macro is run.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">answer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="c1"># User will be prompted to provide a value for &quot;answer&quot;.</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+</pre></div>
+</div>
+<p>There is a special keyword argument called <code class="docutils literal notranslate"><span class="pre">optional_config_name</span></code>
+which is set to the name of the optional configuration a macro is
+running on, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if only the default configuration is being
+used.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="gp">... </span>           <span class="n">optional_config_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">optional_config_name</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Macro is being run using the &quot;</span><span class="si">%s</span><span class="s1">&quot; &#39;</span>
+<span class="gp">... </span>              <span class="s1">&#39;optional configuration&#39;</span> <span class="o">%</span> <span class="n">optional_config_name</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.macro.MacroBase.add_report">
+<span class="sig-name descname"><span class="pre">add_report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/macro.html#MacroBase.add_report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.macro.MacroBase.add_report" title="Link to this definition"></a></dt>
+<dd><p>Add a metomi.rose.macro.MacroReport.</p>
+<p>See <a class="reference internal" href="#metomi.rose.macro.MacroReport" title="metomi.rose.macro.MacroReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">metomi.rose.macro.MacroReport</span></code></a> for details of arguments.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># An example validator macro which adds a report to the setting</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># env=MY_FAVOURITE_STREAM_EDITOR.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">My_Macro</span><span class="p">(</span><span class="n">MacroBase</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="n">editor_value</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+<span class="gp">... </span>            <span class="p">[</span><span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="s1">&#39;MY_FAVOURITE_STREAM_EDITOR&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">value</span>
+<span class="gp">... </span>        <span class="k">if</span> <span class="n">editor_value</span> <span class="o">!=</span> <span class="s1">&#39;sed&#39;</span><span class="p">:</span>
+<span class="gp">... </span>            <span class="bp">self</span><span class="o">.</span><span class="n">add_report</span><span class="p">(</span>
+<span class="gp">... </span>                <span class="s1">&#39;env&#39;</span><span class="p">,</span>                         <span class="c1"># Section</span>
+<span class="gp">... </span>                <span class="s1">&#39;MY_FAVOURITE_STREAM_EDITOR&#39;</span><span class="p">,</span>  <span class="c1"># Option</span>
+<span class="gp">... </span>                <span class="n">editor_value</span><span class="p">,</span>                  <span class="c1"># Value</span>
+<span class="gp">... </span>                <span class="s1">&#39;Should be &quot;sed&quot;!&#39;</span><span class="p">)</span>            <span class="c1"># Message</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.macro.MacroBase.get_metadata_for_config_id">
+<span class="sig-name descname"><span class="pre">get_metadata_for_config_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">setting_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta_config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/macro.html#MacroBase.get_metadata_for_config_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.macro.MacroBase.get_metadata_for_config_id" title="Link to this definition"></a></dt>
+<dd><p>Return a dict of metadata properties and values for a setting id.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>setting_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The name of the setting to extract metadata for.</p></li>
+<li><p><strong>meta_config</strong> (<a class="reference internal" href="configuration/api.html#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><em>metomi.rose.config.ConfigNode</em></a>) – Config node containing
+the metadata to extract from.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing metadata options.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a rose app.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;rose-app.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">app_config</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">_</span> <span class="o">=</span> <span class="n">app_config</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">[foo]</span>
+<span class="gp">... </span><span class="s1">bar=2</span>
+<span class="gp">... </span><span class="s1">    &#39;&#39;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="s1">&#39;meta&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;meta/rose-meta.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">meta_config</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">_</span> <span class="o">=</span> <span class="n">meta_config</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="s1">[foo=bar]</span>
+<span class="gp">... </span><span class="s1">values = 1,2,3</span>
+<span class="gp">... </span><span class="s1">    &#39;&#39;&#39;</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Load config.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">app_conf</span><span class="p">,</span> <span class="n">config_map</span><span class="p">,</span> <span class="n">meta_config</span> <span class="o">=</span> <span class="n">load_conf_from_file</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;rose-app.conf&#39;</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Extract metadata for foo=bar.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_metadata_for_config_id</span><span class="p">(</span><span class="s1">&#39;foo=bar&#39;</span><span class="p">,</span> <span class="n">meta_config</span><span class="p">)</span>
+<span class="go">{&#39;values&#39;: &#39;1,2,3&#39;, &#39;id&#39;: &#39;foo=bar&#39;}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.macro.MacroBase.get_resource_path">
+<span class="sig-name descname"><span class="pre">get_resource_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/macro.html#MacroBase.get_resource_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.macro.MacroBase.get_resource_path" title="Link to this definition"></a></dt>
+<dd><p>Load the resource according to the path of the calling macro.</p>
+<p>The returned path will be based on the macro location under
+<code class="docutils literal notranslate"><span class="pre">lib/python</span></code> in the metadata directory.</p>
+<p>If the calling macro is <code class="docutils literal notranslate"><span class="pre">lib/python/macro/levels.py</span></code>,
+and the filename is <code class="docutils literal notranslate"><span class="pre">rules.json</span></code>, the returned path will be
+<code class="docutils literal notranslate"><span class="pre">etc/macro/levels/rules.json</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The filename of the resource to request the path
+to.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The path to the requested resource.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.macro.MacroBase.pretty_format_config">
+<span class="sig-name descname"><span class="pre">pretty_format_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/macro.html#MacroBase.pretty_format_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.macro.MacroBase.pretty_format_config" title="Link to this definition"></a></dt>
+<dd><p>Standardise the keys and values of a config node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<a class="reference internal" href="configuration/api.html#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><em>metomi.rose.config.ConfigNode</em></a>) – The config node to convert.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.macro.MacroBase.standard_format_config">
+<span class="sig-name descname"><span class="pre">standard_format_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/macro.html#MacroBase.standard_format_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.macro.MacroBase.standard_format_config" title="Link to this definition"></a></dt>
+<dd><p>Standardise any degenerate representations e.g. namelist repeats.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<a class="reference internal" href="configuration/api.html#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><em>metomi.rose.config.ConfigNode</em></a>) – The config node to convert.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="metomi.rose.macro.MacroReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metomi.rose.macro.</span></span><span class="sig-name descname"><span class="pre">MacroReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">section</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">option</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_warning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/macro.html#MacroReport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.macro.MacroReport" title="Link to this definition"></a></dt>
+<dd><p>Class to hold information about a macro issue.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>section</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The name of the section to attach this report to.</p></li>
+<li><p><strong>option</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The name of the option (within the section) to
+attach this report to.</p></li>
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><em>object</em></a>) – The value of the configuration associated with this
+report.</p></li>
+<li><p><strong>info</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – Text information describing the nature of the report.</p></li>
+<li><p><strong>is_warning</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – If True then this report will be logged as a
+warning.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">report</span> <span class="o">=</span> <span class="n">MacroReport</span><span class="p">(</span><span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="s1">&#39;WORLD&#39;</span><span class="p">,</span> <span class="s1">&#39;Earth&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                     <span class="s1">&#39;World changed to Earth&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="built-in/rose_prune.html" class="btn btn-neutral float-left" title="rose_prune" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rose-upgrader-macros.html" class="btn btn-neutral float-right" title="Rose Upgrade Macro API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright : Copyright (C) British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2.4.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2.4.0";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "api/rose-macro";
+    </script>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+
+
+</body>
+</html>

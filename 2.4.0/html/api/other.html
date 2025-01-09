@@ -1,0 +1,418 @@
+
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Other Python API Docs &mdash; Rose Documentation 2.4.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=659b1fac" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/diff_selector.css?v=9704a72b" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/grid_table.css?v=0285b42e" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/hieroglyph_theme_addons.css?v=814c2015" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tutorial.css?v=b869d33c" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/addons.css?v=d1f804c3" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=466af0f7" />
+
+  
+    <link rel="shortcut icon" href="../_static/rose-favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=4d935f96"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/js/diff_selector.js?v=3109bfa4"></script>
+      <script src="../_static/js/minicylc.js?v=ddc882fd"></script>
+      <script src="../_static/js/spoiler.js?v=12631137"></script>
+      <script src="../_static/js/addons.js?v=39bd7dee"></script>
+      <script src="../_static/js/versioning.js?v=df0214e8"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Rose Bash Library" href="rose-bash-library.html" />
+    <link rel="prev" title="Rose Environment Variables" href="environment-variables.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/rose-logo-crop.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/rose/index.html">Rose Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rose API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="configuration/index.html">Rose Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Other Python API Docs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#metomi.rose.reporter.Reporter"><code class="docutils literal notranslate"><span class="pre">Reporter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.reporter.Reporter.default"><code class="docutils literal notranslate"><span class="pre">Reporter.default()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.reporter.Reporter.format_msg"><code class="docutils literal notranslate"><span class="pre">Reporter.format_msg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.reporter.Reporter.report"><code class="docutils literal notranslate"><span class="pre">Reporter.report()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#metomi.rose.popen.RosePopener"><code class="docutils literal notranslate"><span class="pre">RosePopener</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.popen.RosePopener.get_cmd"><code class="docutils literal notranslate"><span class="pre">RosePopener.get_cmd()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.popen.RosePopener.handle_event"><code class="docutils literal notranslate"><span class="pre">RosePopener.handle_event()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.popen.RosePopener.list_to_shell_str"><code class="docutils literal notranslate"><span class="pre">RosePopener.list_to_shell_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.popen.RosePopener.run"><code class="docutils literal notranslate"><span class="pre">RosePopener.run()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.popen.RosePopener.run_async"><code class="docutils literal notranslate"><span class="pre">RosePopener.run_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.popen.RosePopener.run_bg"><code class="docutils literal notranslate"><span class="pre">RosePopener.run_bg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.popen.RosePopener.run_bg_async"><code class="docutils literal notranslate"><span class="pre">RosePopener.run_bg_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.popen.RosePopener.run_nohup_gui"><code class="docutils literal notranslate"><span class="pre">RosePopener.run_nohup_gui()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.popen.RosePopener.run_ok"><code class="docutils literal notranslate"><span class="pre">RosePopener.run_ok()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.popen.RosePopener.run_simple"><code class="docutils literal notranslate"><span class="pre">RosePopener.run_simple()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.popen.RosePopener.shlex_join"><code class="docutils literal notranslate"><span class="pre">RosePopener.shlex_join()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.popen.RosePopener.which"><code class="docutils literal notranslate"><span class="pre">RosePopener.which()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rose-built-in-applications.html">Rose Built-In Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../terms.html">Rose Terms Of Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../course/um-ut.html">UM User Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Rose Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Other Python API Docs</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/metomi/rose/blob/master/sphinx/api/other.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-metomi.rose.reporter">
+<span id="other-python-api-docs"></span><h1>Other Python API Docs<a class="headerlink" href="#module-metomi.rose.reporter" title="Link to this heading"></a></h1>
+<p>Reporter for diagnostic messages.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="metomi.rose.reporter.Reporter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metomi.rose.reporter.</span></span><span class="sig-name descname"><span class="pre">Reporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contexts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_on_exc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/reporter.html#Reporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.reporter.Reporter" title="Link to this definition"></a></dt>
+<dd><p>Report diagnostic messages.</p>
+<p>Note: How about the “logging” module in the standard library? It needs a
+lot of fiddling to get it working in our reporting model. We want:
+* [FAIL] in any verbosity to stderr.
+* [WARN] in default verbosity to stderr.
+* Raw output to stdout in any verbosity.
+* [INFO] in default verbosity to stdout.
+* [INFO] in -v verbosity to stdout.
+* [INFO] in -vv verbosity to stdout.
+* and everything goes to the log file with -vv verbosity by default.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.reporter.Reporter.default">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/reporter.html#Reporter.default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.reporter.Reporter.default" title="Link to this definition"></a></dt>
+<dd><p>Return the default reporter.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.reporter.Reporter.format_msg">
+<span class="sig-name descname"><span class="pre">format_msg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/reporter.html#Reporter.format_msg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.reporter.Reporter.format_msg" title="Link to this definition"></a></dt>
+<dd><p>Format a message for reporting.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.reporter.Reporter.report">
+<span class="sig-name descname"><span class="pre">report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/reporter.html#Reporter.report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.reporter.Reporter.report" title="Link to this definition"></a></dt>
+<dd><p>Report a message, if relevant for the reporter contexts.</p>
+<dl class="simple">
+<dt>message:</dt><dd><p>The message to report. An Event, an Exception, an object
+with a __str__ method, or a callable that returns an object
+with a __str__ method.</p>
+</dd>
+<dt>kind:</dt><dd><p>The message kind. The default is determined by message.
+If it is an Event, the default is message.kind. If it is an
+Exception, the default is KIND_ERR. Otherwise, the default
+is KIND_OUT.</p>
+</dd>
+<dt>level:</dt><dd><p>The level of the message. The default is determined by
+message. If it is an Event, the default is message.level.
+If it is an Exception, the default is FAIL. Otherwise, the
+default is DEFAULT.</p>
+</dd>
+<dt>prefix:</dt><dd><p>Prefix each line of the message with this prefix.
+Default is context dependent.</p>
+</dd>
+<dt>clip:</dt><dd><p>The maximum length of the message to print.</p>
+</dd>
+</dl>
+<p>If self.event_handler is defined, self.event_handler with all the
+arguments and return its result instead.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p id="module-metomi.rose.popen">Wraps Python’s subprocess.Popen.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="metomi.rose.popen.RosePopener">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metomi.rose.popen.</span></span><span class="sig-name descname"><span class="pre">RosePopener</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_handler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/popen.html#RosePopener"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.popen.RosePopener" title="Link to this definition"></a></dt>
+<dd><p>Wrap Python’s subprocess.Popen.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.popen.RosePopener.get_cmd">
+<span class="sig-name descname"><span class="pre">get_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/metomi/rose/popen.html#RosePopener.get_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.popen.RosePopener.get_cmd" title="Link to this definition"></a></dt>
+<dd><p>Return default options and arguments of a known command as a list.</p>
+<p>If a setting [external] &lt;key&gt; is defined in the site/user
+configuration, use the setting.</p>
+<p>Otherwise, if RosePopener.ENVS_OF_CMDS[key] exists, it looks for each
+environment variable in the list in RosePopener.ENVS_OF_CMDS[key] in
+order. If the environment variable is defined and is not a null string,
+use the value of the environment variable.</p>
+<p>Otherwise, return RosePopener.CMDS[key]</p>
+<p>key: must be a key of RosePopener.CMDS
+args: if specified, will be added to the returned list</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.popen.RosePopener.handle_event">
+<span class="sig-name descname"><span class="pre">handle_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/popen.html#RosePopener.handle_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.popen.RosePopener.handle_event" title="Link to this definition"></a></dt>
+<dd><p>Handle an event using the runner’s event handler.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.popen.RosePopener.list_to_shell_str">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">list_to_shell_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.13)"><span class="pre">Iterable</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../_modules/metomi/rose/popen.html#RosePopener.list_to_shell_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.popen.RosePopener.list_to_shell_str" title="Link to this definition"></a></dt>
+<dd><p>Convert a list of strings into a shell command, escaping whitespace
+and quotes, but otherwise allowing special chars so user defined
+commands can run without sanitisation.</p>
+<p>Examples:
+&gt;&gt;&gt; RosePopener.list_to_shell_str([])
+‘’
+&gt;&gt;&gt; _ = RosePopener.list_to_shell_str([“it’s”])
+&gt;&gt;&gt; print(_)
+it's
+&gt;&gt;&gt; _
+“it\’s”
+&gt;&gt;&gt; RosePopener.list_to_shell_str([“echo”, “-n”, “Multiple words”])
+‘echo -n Multiple\ words’
+&gt;&gt;&gt; RosePopener.list_to_shell_str([“ls”, “my_dir;allow_this”])
+‘ls my_dir;allow_this’
+&gt;&gt;&gt; RosePopener.list_to_shell_str([“what”, “about”, “globs*”])
+‘what about globs*’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.popen.RosePopener.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/popen.html#RosePopener.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.popen.RosePopener.run" title="Link to this definition"></a></dt>
+<dd><p>Provide a Rose-friendly interface to subprocess.Popen.</p>
+<p>Return ret_code, out, err.</p>
+<p>If kwargs[“stdin”] is a str, communicate it to the command via a pipe.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.popen.RosePopener.run_async">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/popen.html#RosePopener.run_async"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.popen.RosePopener.run_async" title="Link to this definition"></a></dt>
+<dd><p>Provide a Rose-friendly interface to subprocess.Popen.</p>
+<p>Return ret_code, out, err.</p>
+<p>If kwargs[“stdin”] is a str, communicate it to the command via a pipe.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.popen.RosePopener.run_bg">
+<span class="sig-name descname"><span class="pre">run_bg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/popen.html#RosePopener.run_bg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.popen.RosePopener.run_bg" title="Link to this definition"></a></dt>
+<dd><p>Provide a Rose-friendly interface to subprocess.Popen.</p>
+<p>Return a subprocess.Popen object.</p>
+<p>If kwargs[“stdin”] is a str, turn it into subprocess.PIPE.
+However, it cannot communicate stdin to the Popen object,
+because the Popen.communicate() method implies a wait().</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.popen.RosePopener.run_bg_async">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run_bg_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/popen.html#RosePopener.run_bg_async"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.popen.RosePopener.run_bg_async" title="Link to this definition"></a></dt>
+<dd><p>Provide a Rose-friendly interface to subprocess.Popen.</p>
+<p>Return a subprocess.Popen object.</p>
+<p>If kwargs[“stdin”] is a str, turn it into subprocess.PIPE.
+However, it cannot communicate stdin to the Popen object,
+because the Popen.communicate() method implies a wait().</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.popen.RosePopener.run_nohup_gui">
+<span class="sig-name descname"><span class="pre">run_nohup_gui</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/popen.html#RosePopener.run_nohup_gui"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.popen.RosePopener.run_nohup_gui" title="Link to this definition"></a></dt>
+<dd><p>Launch+detach a GUI command with nohup.</p>
+<p>Launch the GUI command with <cite>nohup bash -c ‘exec …’</cite> redirecting
+standard input and outputs from and to <cite>/dev/null</cite>, and setting it to
+become a process group leader. Equivalent to a double fork.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – command string of the GUI.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Return (subprocess.Popen):</dt><dd><p>Return the process object for the “nohup” command.
+Return None if no DISPLAY is set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.popen.RosePopener.run_ok">
+<span class="sig-name descname"><span class="pre">run_ok</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/popen.html#RosePopener.run_ok"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.popen.RosePopener.run_ok" title="Link to this definition"></a></dt>
+<dd><p>Same as RosePopener.run, but raise RosePopenError if ret_code != 1.</p>
+<p>Return out, err.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.popen.RosePopener.run_simple">
+<span class="sig-name descname"><span class="pre">run_simple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/popen.html#RosePopener.run_simple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.popen.RosePopener.run_simple" title="Link to this definition"></a></dt>
+<dd><p>Similar to RosePopener.run_ok, but event handle stdout and stderr.</p>
+<p>kwargs[“stderr_level”] – set event level of stderr
+kwargs[“stdout_level”] – set event level of stdout</p>
+<p>Return None.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.popen.RosePopener.shlex_join">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shlex_join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.13)"><span class="pre">Iterable</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../_modules/metomi/rose/popen.html#RosePopener.shlex_join"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.popen.RosePopener.shlex_join" title="Link to this definition"></a></dt>
+<dd><p>Convert a list of strings into a shell command, safely quoting
+when the strings contain whitespace and special chars.</p>
+<p>Basically a back-port of shlex.join(), needed for py 3.7.</p>
+<p>Examples:
+&gt;&gt;&gt; RosePopener.shlex_join([])
+‘’
+&gt;&gt;&gt; RosePopener.shlex_join([“echo”, “-n”, “Multiple words”])
+“echo -n ‘Multiple words’”
+&gt;&gt;&gt; RosePopener.shlex_join([“ls”, “my_dir;foiled_injection”])
+“ls ‘my_dir;foiled_injection’”
+&gt;&gt;&gt; RosePopener.shlex_join([“what”, “about”, “globs*”])
+“what about ‘globs*’”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.popen.RosePopener.which">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">which</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/popen.html#RosePopener.which"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.popen.RosePopener.which" title="Link to this definition"></a></dt>
+<dd><p>Search an executable file name in PATH, and return its full path.</p>
+<p>If name is an absolute path and is an executable file, return name.
+If name is not found in PATH, return None.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p id="module-metomi.rose.macros">Module to contain internal system macros for operating on a configuration.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="environment-variables.html" class="btn btn-neutral float-left" title="Rose Environment Variables" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rose-bash-library.html" class="btn btn-neutral float-right" title="Rose Bash Library" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright : Copyright (C) British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2.4.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2.4.0";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "api/other";
+    </script>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+
+
+</body>
+</html>
