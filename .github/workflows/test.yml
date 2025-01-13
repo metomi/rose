@@ -29,8 +29,8 @@ on:
       cylc_rose_repo:
         description: The cylc-rose repo to test against
         required: false
-  schedule:
-  - cron: '37 04 * * 1-5' # 03:37, Monday-Friday
+  # schedule:
+  # - cron: '37 04 * * 1-5' # 04:37, Monday-Friday
 
 defaults:
   run:
