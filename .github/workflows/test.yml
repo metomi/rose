@@ -29,8 +29,8 @@ on:
       cylc_rose_repo:
         description: The cylc-rose repo to test against
         required: false
-  schedule:
-  - cron: '37 04 * * 1-5' # 03:37, Monday-Friday
+  # schedule:
+  # - cron: '37 04 * * 1-5' # 04:37, Monday-Friday
 
 defaults:
   run:
@@ -82,9 +82,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-22.04']
-        python-version: ['3.7', '3.8', '3.9']
+        os: ['ubuntu-latest']
+        python-version: ['3.8', '3.9', '3.x']
         include:
+          - os: ubuntu-22.04
+            python-version: '3.7'
           - os: 'macos-latest'
             python-version: '3.8'
 
