@@ -462,9 +462,14 @@ class EntryArrayValueWidget(Gtk.Box):
         # Prevent str without "" breaking the underlying Python syntax
         for e in self.entries:
             v = e.get_text()
+            try:
+                float(v)
+                v_is_float = True
+            except:
+                v_is_float = False
             if v in ("False", "True"):  # Boolean
                 val_array.append(v)
-            elif (len(v) == 0) or (v[:1].isdigit()):  # Empty or numeric
+            elif (len(v) == 0) or v_is_float:  # Empty or numeric
                 val_array.append(v)
             elif not v.startswith('"'):  # Str - add in leading and trailing "
                 val_array.append('"' + v + '"')
