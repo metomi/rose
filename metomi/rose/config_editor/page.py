@@ -901,7 +901,7 @@ class ConfigPage(Gtk.Box):
                     (metomi.rose.META_PROP_TYPE in widget.errors)
                     != (metomi.rose.META_PROP_TYPE in variable.error)
                     and hasattr(widget, "needs_type_error_refresh")
-                    and not widget.needs_type_error_refresh()
+                    and widget.needs_type_error_refresh()
                 ):
                     return widget.type_error_refresh(variable)
                 else:

@@ -137,7 +137,6 @@ class TextMultilineValueWidget(Gtk.Box):
         self.entrybuffer.place_cursor(iter_)
 
     def setter(self, widget):
-        print(widget)
         text = Gtk.TextBuffer.get_text(
             widget,
             widget.get_start_iter(),
