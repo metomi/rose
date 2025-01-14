@@ -137,7 +137,13 @@ class TextMultilineValueWidget(Gtk.Box):
         self.entrybuffer.place_cursor(iter_)
 
     def setter(self, widget):
-        text = widget.get_text(widget.get_start_iter(), widget.get_end_iter())
+        print(widget)
+        text = Gtk.TextBuffer.get_text(
+            widget,
+            widget.get_start_iter(),
+            widget.get_end_iter(),
+            False
+            )
         if text != self.value:
             self.value = text
             self.set_value(self.value)
