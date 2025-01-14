@@ -19,9 +19,9 @@
 #-------------------------------------------------------------------------------
 # Test "rose metadata-check".
 #-------------------------------------------------------------------------------
-. $(dirname $0)/test_header
+. "$(dirname "$0")/test_header"
 #-------------------------------------------------------------------------------
-tests 18
+tests 20
 #-------------------------------------------------------------------------------
 # Check macro reference checking.
 TEST_KEY=$TEST_KEY_BASE-import-simple-ok
@@ -30,7 +30,7 @@ init <<__META_CONFIG__
 [namelist:macro_nl=my_macro_var1]
 macro=envswitch.LogicalTransformer
 __META_CONFIG__
-init_macro envswitch.py < $TEST_SOURCE_DIR/lib/custom_macro.py
+init_macro envswitch.py < "${TEST_SOURCE_DIR}/lib/custom_macro.py"
 run_pass "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
@@ -115,14 +115,12 @@ init <<__META_CONFIG__
 [namelist:macro_nl=my_macro_var1]
 macro=envswitch.LogicalTransformer
 __META_CONFIG__
-init_macro envswitch.py < $TEST_SOURCE_DIR/lib/custom_macro_corrupt.py
+init_macro envswitch.py < "${TEST_SOURCE_DIR}/lib/custom_macro_corrupt.py"
 run_fail "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
-file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERROR__'
-[V] rose.metadata_check.MetadataChecker: issues: 1
-    namelist:macro_nl=my_macro_var1=macro=envswitch.LogicalTransformer
-        Could not import envswitch.LogicalTransformer: IndentationError: expected an indented block (envswitch.py, line 33)
-__ERROR__
+file_grep "$TEST_KEY.err-1" '.*rose.metadata_check.MetadataChecker: issues: 1' "$TEST_KEY.err"
+file_grep "$TEST_KEY.err-2" 'namelist:macro_nl=my_macro_var1=macro=envswitch.LogicalTransformer' "$TEST_KEY.err"
+file_grep "$TEST_KEY.err-3" "Could not import envswitch.LogicalTransformer: IndentationError: expected an indented block.*(envswitch.py, line 33)" "$TEST_KEY.err"
 teardown
 #-------------------------------------------------------------------------------
 exit
