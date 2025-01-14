@@ -28,6 +28,8 @@ from . import array
 from . import booltoggle
 from . import character
 from . import combobox
+# flake8: noqa: F401
+from . import files
 from . import intspin
 from . import meta
 from . import radiobuttons
