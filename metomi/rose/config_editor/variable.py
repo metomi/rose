@@ -25,7 +25,7 @@ import re
 import gi
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 
 import metomi.rose.config_editor.keywidget
 import metomi.rose.config_editor.menuwidget
@@ -370,6 +370,7 @@ class VariableWidget(object):
             )
         return False
 
+
     def remove_from(self, container):
         """Removes the child widgets of an instance from the 'container'."""
         container.num_removes += 1
@@ -568,22 +569,33 @@ class VariableWidget(object):
                 widget_list.append(widget.get_child())
 
     def _set_consistent(self, valuewidget, variable):
-        normal_style = Gtk.Style()
-        normal_base = normal_style.base[Gtk.StateType.NORMAL]
-        normal_fg = normal_style.fg[Gtk.StateType.NORMAL]
-        normal_text = normal_style.text[Gtk.StateType.NORMAL]
-        valuewidget.modify_base(Gtk.StateType.NORMAL, normal_base)
+        normal_style = valuewidget.get_style_context()
+        normal_text = normal_style.get_color(Gtk.StateType.NORMAL)
+        valuewidget.override_color(Gtk.StateType.NORMAL)
         self.is_inconsistent = True
-        for widget in valuewidget.get_children():
-            widget.modify_text(Gtk.StateType.NORMAL, normal_text)
+        widget_list = valuewidget.get_children()
+        while widget_list:
+            widget = widget_list.pop()
+            # Convert from Gdk RGBA to Gdk Color
+            normal_text_color = Gdk.Color(
+                                          int(normal_text.red * 255),
+                                          int(normal_text.green * 255),
+                                          int(normal_text.blue * 255)
+                                          )
+            widget.modify_text(Gtk.StateType.NORMAL, normal_text_color)
+            # widget.override_color(Gtk.StateType.NORMAL)
             if hasattr(widget, "set_inconsistent"):
                 widget.set_inconsistent(False)
             if isinstance(widget, Gtk.Entry):
-                widget.modify_fg(Gtk.StateType.NORMAL, normal_fg)
+                widget.modify_fg(Gtk.StateType.NORMAL, normal_text_color)
             if hasattr(widget, "get_group") and hasattr(
                 widget.get_group(), "set_inconsistent"
             ):
                 widget.get_group().set_inconsistent(False)
+            if hasattr(widget, "get_children"):
+                widget_list.extend(widget.get_children())
+            elif hasattr(widget, "get_child"):
+                widget_list.append(widget.get_child())
 
     def _get_focus(self, widget_for_focus):
         widget_for_focus.grab_focus()
@@ -610,9 +622,10 @@ class VariableWidget(object):
             self._set_consistent(self.valuewidget, variable)
         self.variable = variable
         self.errors = list(variable.error.keys())
-        self.valuewidget.handle_type_error(
-            metomi.rose.META_PROP_TYPE in self.errors
-        )
+        if (hasattr(self.valuewidget, "needs_type_error_refresh")):
+            self.valuewidget.handle_type_error(
+                metomi.rose.META_PROP_TYPE in self.errors
+            )
         self.menuwidget.refresh(variable)
         self.keywidget.refresh(variable)
 

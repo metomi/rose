@@ -129,12 +129,9 @@ class EntryArrayValueWidget(Gtk.Box):
     def get_focus_entry(self):
         """Get either the last selected entry or the last one."""
         if self.last_selected_src is not None:
-            print("last selected ------------------------")
             return self.last_selected_src
         if len(self.entries) > 0:
-            print("last entry ------------------------")
             return self.entries[-1]
-        print("none ------------------------")
         return None
 
     def get_focus_index(self):
@@ -169,6 +166,9 @@ class EntryArrayValueWidget(Gtk.Box):
         for i, val in enumerate(value_array):
             prefix = get_next_delimiter(self.value[len(text) :], val)
             if prefix is None:
+                return
+            if prefix == "":
+                self.entries[i].grab_focus()
                 return
             if (
                 len(text + prefix + val) >= focus_index
@@ -459,30 +459,9 @@ class EntryArrayValueWidget(Gtk.Box):
     def setter(self, widget):
         """Reconstruct the new variable value from the entry array."""
         val_array = []
-        # Prevent str without "" breaking the underlying Python syntax
         for e in self.entries:
             v = e.get_text()
-            try:
-                float(v)
-                v_is_float = True
-            except:
-                v_is_float = False
-            if v in ("False", "True"):  # Boolean
-                val_array.append(v)
-            elif (len(v) == 0) or v_is_float:  # Empty or numeric
-                val_array.append(v)
-            elif not v.startswith('"'):  # Str - add in leading and trailing "
-                val_array.append('"' + v + '"')
-                e.set_text('"' + v + '"')
-                e.set_position(len(v) + 1)
-            elif (not v.endswith('"')) or (
-                len(v) == 1
-            ):  # Str - add in trailing "
-                val_array.append(v + '"')
-                e.set_text(v + '"')
-                e.set_position(len(v))
-            else:
-                val_array.append(v)
+            val_array.append(v)
         max_length = max([len(v) for v in val_array] + [1])
         if max_length + 1 != self.chars_width:
             self.chars_width = max_length + 1
