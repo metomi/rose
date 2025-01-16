@@ -772,7 +772,7 @@ The metadata options for a configuration fall into four categories:
 
          .. code-block:: rose
 
-            widget[rose-config-edit]=rose.config_editor.valuewidget.radiobuttons.RadioButtonsValueWidget
+            widget[rose-config-edit]=metomi.rose.config_editor.valuewidget.radiobuttons.RadioButtonsValueWidget
 
          Another useful Rose built-in widget to use is the array element
          aligning page widget,
@@ -793,7 +793,7 @@ The metadata options for a configuration fall into four categories:
          .. code-block:: rose
 
             [namelist:meal_choices]
-            widget[rose-config-edit]=rose.config_editor.pagewidget.table.PageArrayTable
+            widget[rose-config-edit]=metomi.rose.config_editor.pagewidget.table.PageArrayTable
 
          to align the elements on the page like this:
 
