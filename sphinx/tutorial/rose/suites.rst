@@ -193,8 +193,6 @@ Using a Rose workflow configuration with Cylc 8
       .. code-block:: diff
 
          + #!jinja2
-         [scheduler]
-             UTC mode = True
 
    #. **Write suite metadata**
 
@@ -255,8 +253,6 @@ Using a Rose workflow configuration with Cylc 8
 
       .. code-block:: diff
 
-          [scheduler]
-              UTC mode = True
           [task parameters]
              # A list of the weather stations we will be fetching observations from.
          -   station = camborne, heathrow, shetland, aldergrove

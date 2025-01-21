@@ -134,9 +134,7 @@ The ``flow.cylc`` file
 
 Next we will look at the ``rose-stem/flow.cylc`` file.
 
-The ``flow.cylc`` file starts off with ``UTC mode = True``, which you
-should already be :ref:`familiar with <tutorial-cylc-datetime-utc>`.
-The next part is a Jinja2 block which links the group names the user
+The section is a Jinja2 block which links the group names the user
 can specify with the :term:`graph <graph>` for that group. In this
 case, the group ``command_spaceship`` gives you the graph:
 
