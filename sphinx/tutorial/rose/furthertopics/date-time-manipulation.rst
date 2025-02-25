@@ -119,9 +119,12 @@ Which can be used to provide custom offset directory locations:
 
    # Cylc task script
    CYCLE_POINT_MINUS_P1D=$(isodatetime "${CYLC_TASK_CYCLE_POINT} --offset -P1D)"
-   SHARE_CYCLE_DIR_MINUS_P1D="${CYLC_WORKFLOW_SHARE_DIR}/cycle/${CYCLE_POINT_MINUS_P1D}"
-   mkdir -p "${SHARE_CYCLE_DIR_MINUS_P1D}"
-   echo "I believe in ..." > "${SHARE_CYCLE_DIR_MINUS_P1D}/somefile"
 
+   TODAYS_DATA="${CYLC_WORKFLOW_SHARE_DIR}/cycle/${CYLC)TASK_CYCLE_POINT}/output.data"
+   YESTERDAYS_DATA="${CYLC_WORKFLOW_SHARE_DIR}/cycle/${CYCLE_POINT_MINUS_P1D}/output.data"
+
+   # Here I'm imagining a day-to-day comparison program
+   # (This is an example, not a built in Cylc program):
+   python -m compare.py "${YESTERDAYS_DATA}" "${TODAYS_DATA}"
 
 .. TODO - Write a short practical using ROSE_DATAC and isodatetime.
