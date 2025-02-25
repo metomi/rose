@@ -9,6 +9,11 @@ creating a new release entry be sure to copy & paste the span tag with the
 updated. Only the first match gets replaced, so it's fine to leave the old
 ones in. -->
 
+## 2.4.1 (<span actions:bind='release-date'>Pending</span>)
+
+[#2855](https://github.com/metomi/rose/pull/2855) -
+Make Rose compatible with sqlite3 versions 3.46.0+.
+
 ## 2.4.0 (<span actions:bind='release-date'>Released 2025-01-08</span>)
 
 No significant changes. Released for consistency with Cylc release cycle.

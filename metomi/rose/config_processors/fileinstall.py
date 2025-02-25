@@ -724,7 +724,7 @@ class LocDAO:
         """Create the database file if it does not exist."""
         conn = self.get_conn()
         cur = conn.execute(
-            """SELECT name FROM sqlite_master WHERE type="table"
+            """SELECT name FROM sqlite_master WHERE type='table'
                ORDER BY name"""
         )
         names = [str(row[0]) for row in cur.fetchall()]
