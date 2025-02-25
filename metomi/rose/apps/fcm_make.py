@@ -18,7 +18,6 @@
 
 from contextlib import suppress
 import os
-from pipes import quote
 import shlex
 import sys
 from tempfile import mkdtemp
@@ -135,7 +134,7 @@ class FCMMakeApp(BuiltinApp):
                                 "! test -e %(name)s/%(uuid)s && "
                                 + "(ls -d %(name)s || true) && rm -fr %(name)s"
                             )
-                            % {"name": quote(name), "uuid": uuid},
+                            % {"name": shlex.quote(name), "uuid": uuid},
                         )
                         out = app_runner.popen.run_ok(*cmd)[0]
                         for line in out.splitlines():
