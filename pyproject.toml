@@ -1,0 +1,145 @@
+# Copyright (C) British Crown (Met Office) & Contributors.
+#
+# This file is part of Rose, a framework for meteorological suites.
+#
+# Rose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Rose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Rose. If not, see <http://www.gnu.org/licenses/>.
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "metomi-rose"
+description = "Rose, a framework for meteorological suites."
+authors = [
+    { name = "British Crown (Met Office) & Contributors", email = "metomi@metoffice.gov.uk" }
+]
+readme = "README.md"
+license = { text = "GPL" }
+keywords = ["hpc", "weather-modelling", "weather-model", "meteorological-suites", "meteorological-modelling", "meteorological-models"]
+classifiers = [
+    "Environment :: Console",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Intended Audience :: Science/Research",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.7",
+    "Topic :: Scientific/Engineering :: Atmospheric Science"
+]
+requires-python = ">=3.7"
+dynamic = ["version"]
+dependencies = [
+    "aiofiles",
+    "jinja2>=2.10.1",
+    "keyring==23.*",
+    "ldap3",
+    "metomi-isodatetime==1!3.*",
+    "psutil>=5.6.0",
+    "requests",
+    "sqlalchemy==1.*",
+    "importlib_metadata>=5.0; python_version < '3.12'",
+    "importlib_resources>=2.0; python_version < '3.9'"
+]
+
+[project.urls]
+Homepage = "https://metomi.github.io/rose/doc/html/index.html"
+Repository = "https://github.com/metomi/rose"
+Changelog = "https://github.com/metomi/rose/blob/master/CHANGES.md"
+
+[project.optional-dependencies]
+docs = [
+    "cylc-sphinx-extensions[all]>=1.2.0",
+    "hieroglyph>=2.1.0",
+    "sphinx",
+    "sphinx_rtd_theme",
+    "sphinxcontrib-httpdomain",
+    "sphinxcontrib-svg2pdfconverter"
+]
+graph = [
+    "pygraphviz>1.0,!=1.8"
+]
+tests = [
+    "aiosmtpd",
+    "pytest"
+    # Note: some tests also depend on cylc-rose which has to be the
+    # development version installed manually (because the latest production
+    # version is pinned to the previous rose release)
+]
+lint = [
+    "flake8>=4.0.0",
+    "flake8-type-checking; python_version > '3.7'",
+    "mypy>=0.800",
+    "types-aiofiles"
+]
+rosa = []
+# disco = [
+#     TODO: rosie disco has been disabled due to the removal of WSGI support at
+#     Tornado 6.
+#     tornado
+# ]
+all = [
+    "metomi-rose[lint]",
+    "metomi-rose[docs]",
+    "metomi-rose[graph]",
+    "metomi-rose[tests]",
+    "metomi-rose[rosa]"
+]
+
+[project.scripts]
+rose = "metomi.rose.rose:rose"
+rosie = "metomi.rose.rose:rosie"
+rosa = "metomi.rose.rose:rosa"
+
+[project.entry-points."rose.commands"]
+"app-run" = "metomi.rose.app_run:main"
+"app-upgrade" = "metomi.rose.upgrade:main"
+"check-software" = "metomi.rose.check_software:main"
+"config" = "metomi.rose.config_cli:main"
+"config-diff" = "metomi.rose.config_diff:main"
+"config-dump" = "metomi.rose.config_dump:main"
+"date" = "metomi.rose.date_cli:main"
+"env-cat" = "metomi.rose.env_cat:main"
+"host-select" = "metomi.rose.host_select:main"
+"host-select-client" = "metomi.rose.host_select_client:main"
+"macro" = "metomi.rose.macro:main"
+"metadata-check" = "metomi.rose.metadata_check:main"
+"metadata-gen" = "metomi.rose.metadata_gen:main"
+"metadata-graph" = "metomi.rose.metadata_graph:main [graph]"
+"namelist-dump" = "metomi.rose.namelist_dump:main"
+"resource" = "metomi.rose.resource:main"
+"task-env" = "metomi.rose.task_env:main"
+"task-run" = "metomi.rose.task_run:main"
+
+[project.entry-points."rosie.commands"]
+"checkout" = "metomi.rosie.vc:checkout"
+"create" = "metomi.rosie.vc:create"
+"delete" = "metomi.rosie.vc:delete"
+# "disco" = "metomi.rosie.ws:main [disco]"
+"go" = "metomi.rosie.browser:main"
+"graph" = "metomi.rosie.graph:main [graph]"
+"hello" = "metomi.rosie.ws_client_cli:hello"
+"id" = "metomi.rosie.suite_id:main"
+"lookup" = "metomi.rosie.ws_client_cli:lookup"
+"ls" = "metomi.rosie.ws_client_cli:list_local_suites"
+
+[tool.setuptools.packages.find]
+include = ["metomi*"]
+exclude = ["metomi.rose.tests*", "metomi.rosie.tests*"]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = { attr = "metomi.rose.__version__" }
