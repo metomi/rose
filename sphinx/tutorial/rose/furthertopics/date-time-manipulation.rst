@@ -120,7 +120,7 @@ Which can be used to provide custom offset directory locations:
    # Cylc task script
    CYCLE_POINT_MINUS_P1D=$(isodatetime "${CYLC_TASK_CYCLE_POINT} --offset -P1D)"
 
-   TODAYS_DATA="${CYLC_WORKFLOW_SHARE_DIR}/cycle/${CYLC)TASK_CYCLE_POINT}/output.data"
+   TODAYS_DATA="${CYLC_WORKFLOW_SHARE_DIR}/cycle/${CYLC_TASK_CYCLE_POINT}/output.data"
    YESTERDAYS_DATA="${CYLC_WORKFLOW_SHARE_DIR}/cycle/${CYCLE_POINT_MINUS_P1D}/output.data"
 
    # Here I'm imagining a day-to-day comparison program
