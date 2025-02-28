@@ -27,7 +27,16 @@ authors = [
 ]
 readme = "README.md"
 license = { text = "GPL" }
-keywords = ["hpc", "weather-modelling", "weather-model", "meteorological-suites", "meteorological-modelling", "meteorological-models"]
+keywords = [
+    "hpc",
+    "weather-modelling",
+    "weather-model",
+    "meteorological-suites",
+    "meteorological-modelling",
+    "meteorological-models",
+    "workflows",
+    "workflow-automation",
+]
 classifiers = [
     "Environment :: Console",
     "Environment :: Web Environment",
