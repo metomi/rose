@@ -76,18 +76,20 @@ pattern = ^[A->>Z\][\w\s,]+\.$
 __META_CONFIG__
 run_fail "$TEST_KEY" rose metadata-check -C ../config
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
+# Update Python error messages to match latest version:
+sed -i 's/Invalid syntax: error:/Invalid syntax: PatternError:/g' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
 [V] rose.metadata_check.MetadataChecker: issues: 5
     namelist:values_nl1=my_array=pattern=(?} oo){1,-9}(\d*,{\s*)*\d*$
-        Invalid syntax: error: unknown extension ?} at position 1
+        Invalid syntax: PatternError: unknown extension ?} at position 1
     namelist:values_nl1=my_char=pattern=+'.*'$
-        Invalid syntax: error: nothing to repeat at position 0
+        Invalid syntax: PatternError: nothing to repeat at position 0
     namelist:values_nl1=my_int=pattern=^\d+(?& \e)
-        Invalid syntax: error: unknown extension ?& at position 5
+        Invalid syntax: PatternError: unknown extension ?& at position 5
     namelist:values_nl1=my_nocase=pattern=(?i see a silhouette)^camelcase$
-        Invalid syntax: error: missing -, : or ) at position 3
+        Invalid syntax: PatternError: missing -, : or ) at position 3
     namelist:values_nl1=my_raw=pattern=^[A->>Z\][\w\s,]+\.$
-        Invalid syntax: error: bad character range A-> at position 2
+        Invalid syntax: PatternError: bad character range A-> at position 2
 __ERROR__
 teardown
 #-------------------------------------------------------------------------------
