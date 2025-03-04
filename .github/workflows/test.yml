@@ -30,7 +30,6 @@ on:
         description: The cylc-rose repo to test against
         required: false
   schedule:
-    # Run daily to keep the cylc-admin status page up-to-date (even if MacOS consistenly failing for the time being)
     - cron: '37 04 * * 1-5' # 04:37, Monday-Friday
 
 defaults:
