@@ -158,6 +158,8 @@ file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<'__ERR__'
 __ERR__
 TEST_KEY="$TEST_KEY_BASE-bad-archive-8"
 sed '/^\[FAIL\] /!d' "${FILE_PREFIX}8/01/job.err" >"${TEST_KEY}.err"
+# Iron out differences between error messages in Python versions:
+sed -i 's/PatternError:/error:/g' "$TEST_KEY.err"
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <<'__ERR__'
 [FAIL] foo://20130101T1200Z/planet-n.tar.gz: bad rename-parser: planet-(?P<planet>[MVEJSUN]\w+.txt: error: missing ), unterminated subpattern at position 7
 __ERR__
