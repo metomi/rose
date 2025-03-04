@@ -338,28 +338,30 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 TEST_KEY=$TEST_KEY_BASE-custom-diff-tool-config-graphical
 cat >conf/rose.conf <<__ROSE_CONF__
 [external]
-gdiff_tool=diff -y
+gdiff_tool=diff --unified --label=a --label=b
 __ROSE_CONF__
 run_fail "$TEST_KEY" rose config-diff -g $TEST_DIR/app{1,2}/rose-app.conf
-# Note: two column layout assumes 8 space tabs.
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__DIFF__'
-# description=Environment variable configuration		# description=Environment variable configuration
-[env]								[env]
-# description=The number of gears available.		      <
-# title=Gearbox Gears					      <
-# 1 reverse, 5 forward					      <
-GEARBOX_GEARS=6						      <
-# help=1  3  5						      <
-#     =|  |  |						      <
-#     =-------						      <
-#     =|  |  |						      <
-#     =2  4  R						      <
-GEARSTICK_DECORATION=golfball					GEARSTICK_DECORATION=golfball
-							      >
-							      >	# description=Different choices of locking methods, if availa
-							      >	[namelist:locking]
-							      >	# title=Air Locking?
-							      >	air_locking=.false.
+--- a
++++ b
+@@ -1,12 +1,8 @@
+ # description=Environment variable configuration
+ [env]
+-# description=The number of gears available.
+-# title=Gearbox Gears
+-# 1 reverse, 5 forward
+-GEARBOX_GEARS=6
+-# help=1  3  5
+-#     =|  |  |
+-#     =-------
+-#     =|  |  |
+-#     =2  4  R
+ GEARSTICK_DECORATION=golfball
++
++# description=Different choices of locking methods, if available.
++[namelist:locking]
++# title=Air Locking?
++air_locking=.false.
 __DIFF__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
