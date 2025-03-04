@@ -30,7 +30,7 @@ on:
         description: The cylc-rose repo to test against
         required: false
   schedule:
-  - cron: '37 04 * * 1-5' # 03:37, Monday-Friday
+    - cron: '37 04 * * 1-5' # 04:37, Monday-Friday
 
 defaults:
   run:
@@ -78,16 +78,17 @@ jobs:
   test:
     needs: lint
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 45
+    timeout-minutes: ${{ contains(matrix.os, 'macos') && 30 || 20 }}
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-22.04']
-        python-version: ['3.7', '3.8', '3.9']
+        os: ['ubuntu-latest']
+        python-version: ['3.8', '3.9', '3.x']
         include:
+          - os: ubuntu-22.04
+            python-version: '3.7'
           - os: 'macos-latest'
             python-version: '3.8'
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -198,7 +199,7 @@ jobs:
           pytest
 
       - name: Functional Tests
-        timeout-minutes: 30
+        timeout-minutes: ${{ contains(matrix.os, 'macos') && 20 || 10 }}
         id: functest
         working-directory: rose
         env:
@@ -209,6 +210,7 @@ jobs:
 
       - name: Re-Run Fails
         if: failure() && steps.functest.outcome == 'failure'
+        timeout-minutes: ${{ contains(matrix.os, 'macos') && 10 || 5 }}
         working-directory: rose
         env:
           OBJC_DISABLE_INITIALIZE_FORK_SAFETY: YES
@@ -227,7 +229,7 @@ jobs:
   docs:
     needs: lint
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
