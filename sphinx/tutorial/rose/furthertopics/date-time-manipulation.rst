@@ -101,7 +101,7 @@ The share directory
       <run directory>/share/cycle/<cycle>
 
    These are called the ``share/cycle`` directories.
-   ``CYLC_SHARE_CYCLE_DIR`` provides the path to::
+   ``CYLC_TASK_SHARE_CYCLE_DIR`` provides the path to::
 
       "$CYLC_WORKFLOW_SHARE_DIR/cycle/$CYLC_TASK_CYCLE_POINT"
 
