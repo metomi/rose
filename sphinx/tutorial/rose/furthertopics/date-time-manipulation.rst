@@ -11,7 +11,7 @@ present cycle using::
    cylc cyclepoint --offset-hours=-3
 
 The `isodatetime`_ command provides functionality
-beyond ``cylc cyclepoint``. Cylc also provides the ``CYLC_SHARE_CYCLE_DIR``
+beyond ``cylc cyclepoint``. Cylc also provides the ``CYLC_TASK_SHARE_CYCLE_DIR``
 environment variable which provides an easy way to get the path of the
 ``share/cycle/<point>`` directory.
 
