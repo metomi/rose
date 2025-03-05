@@ -74,7 +74,7 @@ The ``ROSE_DATAC`` Environment Variable
 
 .. note::
 
-   From Cylc 8.3.1 the variable ``CYLC_SHARE_CYCLE_DIR`` should be preferred
+   From Cylc 8.5.0 the variable ``CYLC_TASK_SHARE_CYCLE_DIR`` should be preferred
    to ``ROSE_DATAC``.
 
 There are two locations where task output is likely to be located:
