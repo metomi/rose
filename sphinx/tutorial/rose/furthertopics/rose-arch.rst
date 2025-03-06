@@ -24,7 +24,6 @@ file that looks like this:
 .. code-block:: cylc
 
    [scheduler]
-       UTC mode = True # Ignore DST
        [[events]]
            abort on workflow timeout = True
            workflow timeout = PT1H
