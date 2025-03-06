@@ -36,6 +36,9 @@ defaults:
   run:
     shell: bash  # macos default shell is zsh
 
+env:
+  FORCE_COLOR: 2
+
 jobs:
   lint:
     runs-on: ubuntu-latest
