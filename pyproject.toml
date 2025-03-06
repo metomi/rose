@@ -87,7 +87,7 @@ tests = [
     # version is pinned to the previous rose release)
 ]
 lint = [
-    "flake8>=4.0.0",
+    "flake8>=6.0.0; python_version > '3.7'",
     "flake8-type-checking; python_version > '3.7'",
     "mypy>=0.800",
     "types-aiofiles"
