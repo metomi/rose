@@ -34,7 +34,7 @@ on:
 
 defaults:
   run:
-    shell: micromamba-shell {0}
+    shell: bash -c "exec $CONDA_PREFIX/bin/bash -elo pipefail {0}"
 
 jobs:
   lint:
@@ -52,12 +52,12 @@ jobs:
       - name: Configure Python
         uses: mamba-org/setup-micromamba@v2
         with:
-          generate-run-shell: true
           cache-environment: true
           post-cleanup: 'all'
           environment-name: rose-lint
           create-args: >-
             python=${{ matrix.python-version }}
+            bash
             shellcheck
 
       - name: Install Rose
@@ -101,12 +101,12 @@ jobs:
       - name: Configure Python
         uses: mamba-org/setup-micromamba@v2
         with:
-          generate-run-shell: true
           cache-environment: true
           post-cleanup: 'all'
           environment-name: rose-test
           create-args: >-
             python=${{ matrix.python-version }}
+            bash
             coreutils
             sed
             sqlite
@@ -120,12 +120,11 @@ jobs:
       - name: Brew Install
         if: startsWith(matrix.os, 'macos')
         run: |
-          # install a modern version of Bash (Mac OS uses zsh as default shell)
-          brew install bash subversion
+          brew install subversion
 
           # supress a mac os error
+          # see NOTE in t/rosie-lookup/00-basic.t
           cat >> "$HOME/.bashrc" <<__HERE__
-            # see NOTE in t/rosie-lookup/00-basic.t
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
           __HERE__
 
@@ -234,12 +233,12 @@ jobs:
       - name: Configure Python
         uses: mamba-org/setup-micromamba@v2
         with:
-          generate-run-shell: true
           cache-environment: true
           post-cleanup: 'all'
           environment-name: rose-docs
           create-args: >-
             python=${{ matrix.python-version }}
+            bash
             pygraphviz
 
       - name: Install Rose
