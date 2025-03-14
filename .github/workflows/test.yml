@@ -38,6 +38,7 @@ defaults:
 
 env:
   FORCE_COLOR: 2
+  PIP_PROGRESS_BAR: off
 
 jobs:
   lint:

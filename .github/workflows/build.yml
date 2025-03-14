@@ -12,8 +12,17 @@ on:
       - '.gitignore'
       - '.github/workflows/build.yml'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash -leo pipefail {0}
+
 env:
   FORCE_COLOR: 2
+  PIP_PROGRESS_BAR: off
 
 jobs:
   build:
@@ -22,21 +31,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-latest']
-        python: ['3.8', '3.9', '3']
-        include:
-          - os: 'ubuntu-22.04'
-            python: '3.7'
+        os: ['ubuntu-latest', 'macos-latest']
+        python: ['3.7', '3.8', '3.9', '3']
+        exclude:
           - os: 'macos-latest'
-            python: '3.8'
+            python: '3.7'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Configure Python
+        uses: mamba-org/setup-micromamba@v2
         with:
-          python-version: ${{ matrix.python }}
+          cache-environment: true
+          post-cleanup: 'all'
+          environment-name: rose-build
+          create-args: >-
+            python=${{ matrix.python }}
 
       - name: Build
         uses: cylc/release-actions/build-python-package@v1
