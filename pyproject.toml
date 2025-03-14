@@ -89,7 +89,8 @@ tests = [
 lint = [
     "flake8>=6.0.0; python_version > '3.7'",
     "flake8-type-checking; python_version > '3.7'",
-    "mypy>=0.800",
+    # Upper-pin to last py-3.7-compatible version:
+    "mypy>=0.800,<1.9",
     "types-aiofiles"
 ]
 rosa = []
