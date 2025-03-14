@@ -29,18 +29,21 @@ on:
       cylc_rose_repo:
         description: The cylc-rose repo to test against
         required: false
-  # schedule:
-  # - cron: '37 04 * * 1-5' # 04:37, Monday-Friday
+  schedule:
+    - cron: '37 04 * * 1-5' # 04:37, Monday-Friday
 
 defaults:
   run:
-    shell: bash  # macos default shell is zsh
+    shell: bash -c "exec $CONDA_PREFIX/bin/bash -elo pipefail {0}"
 
 env:
   FORCE_COLOR: 2
 
 jobs:
   lint:
+    strategy:
+      matrix:
+        python-version: ['3.9']
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
@@ -50,14 +53,15 @@ jobs:
           ref: ${{ inputs.rose_ref || github.sha }}
 
       - name: Configure Python
-        uses: actions/setup-python@v5
+        uses: mamba-org/setup-micromamba@v2
         with:
-          python-version: 3.9
-
-      - name: Apt-Get Install
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y shellcheck
+          cache-environment: true
+          post-cleanup: 'all'
+          environment-name: rose-lint
+          create-args: >-
+            python=${{ matrix.python-version }}
+            bash
+            shellcheck
 
       - name: Install Rose
         run: |
@@ -79,19 +83,16 @@ jobs:
 
 
   test:
-    needs: lint
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 45
+    timeout-minutes: ${{ contains(matrix.os, 'macos') && 30 || 20 }}
     strategy:
       fail-fast: false
       matrix:
         os: ['ubuntu-latest']
-        python-version: ['3.8', '3.9', '3.x']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12', '3']
         include:
-          - os: ubuntu-22.04
-            python-version: '3.7'
           - os: 'macos-latest'
-            python-version: '3.8'
+            python-version: '3.8'  # oldest arm64 build on conda-forge
 
     steps:
       - name: Checkout
@@ -101,9 +102,20 @@ jobs:
           path: rose
 
       - name: Configure Python
-        uses: actions/setup-python@v5
+        uses: mamba-org/setup-micromamba@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          cache-environment: true
+          post-cleanup: 'all'
+          environment-name: rose-test
+          create-args: >-
+            python=${{ matrix.python-version }}
+            bash
+            coreutils
+            sed
+            sqlite
+            shellcheck
+            sqlite
+            pygraphviz
 
       - name: Patch DNS
         uses: cylc/release-actions/patch-dns@v1
@@ -111,38 +123,16 @@ jobs:
       - name: Brew Install
         if: startsWith(matrix.os, 'macos')
         run: |
-          # install system deps
-          brew install \
-            bash \
-            coreutils \
-            gnu-sed \
-            sqlite3 \
-            subversion
+          brew install subversion
 
-          # add GNU coreutils and sed to the user PATH (for actions steps)
-          # (see instructions in brew install output)
-          echo "$(brew --prefix)/opt/coreutils/libexec/gnubin" >> "${GITHUB_PATH}"
-          echo "$(brew --prefix)/opt/gnu-sed/libexec/gnubin" >> "${GITHUB_PATH}"
-
-          # add GNU coreutils and sed to the user PATH (for Cylc jobs)
-          cat >> "$HOME/.bashrc" <<__HERE__
-          PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$PATH"
-          PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH"
-          PATH="$pythonLocation:\$PATH"
-          export PATH
+          # supress a mac os error
           # see NOTE in t/rosie-lookup/00-basic.t
+          cat >> "$HOME/.bashrc" <<__HERE__
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
           __HERE__
-          cat "$HOME/.bashrc"
 
       - name: Configure git  # Configure Git for Git dependent tests.
         uses: cylc/release-actions/configure-git@v1
-
-      - name: Apt-Get Install
-        if: startsWith(matrix.os, 'ubuntu')
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y shellcheck sqlite3 at graphviz graphviz-dev
 
       - name: Install Rose
         working-directory: rose
@@ -174,6 +164,7 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu')
         run: |
           # install FCM deps
+          sudo apt-get update
           sudo apt-get install -y \
             subversion \
             build-essential \
@@ -203,7 +194,7 @@ jobs:
           pytest
 
       - name: Functional Tests
-        timeout-minutes: 30
+        timeout-minutes: ${{ contains(matrix.os, 'macos') && 20 || 10 }}
         id: functest
         working-directory: rose
         env:
@@ -214,6 +205,7 @@ jobs:
 
       - name: Re-Run Fails
         if: failure() && steps.functest.outcome == 'failure'
+        timeout-minutes: ${{ contains(matrix.os, 'macos') && 10 || 5 }}
         working-directory: rose
         env:
           OBJC_DISABLE_INITIALIZE_FORK_SAFETY: YES
@@ -230,9 +222,11 @@ jobs:
           path: ~/cylc-run/
 
   docs:
-    needs: lint
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        python-version: ['3.9']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -240,18 +234,19 @@ jobs:
           ref: ${{ inputs.rose_ref || github.sha }}
 
       - name: Configure Python
-        uses: actions/setup-python@v5
+        uses: mamba-org/setup-micromamba@v2
         with:
-          python-version: 3.9
-
-      - name: install graphviz
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y graphviz pkg-config libgraphviz-dev
+          cache-environment: true
+          post-cleanup: 'all'
+          environment-name: rose-docs
+          create-args: >-
+            python=${{ matrix.python-version }}
+            bash
+            pygraphviz
 
       - name: Install Rose
         run: |
-          pip install -e .[docs,graph]
+          pip install -e .[docs,graph] --upgrade-strategy='only-if-needed'
 
       - name: Install Cylc
         uses: cylc/release-actions/install-cylc-components@v1
