@@ -1,0 +1,62 @@
+name: Build
+
+# build the project whenever the configuration is changed
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'README.md'       # check markdown is valid
+      - 'MANIFEST.in'     # check packaging
+      - 'pyproject.toml'  # check deps and project config
+      - '.gitignore'
+      - '.github/workflows/build.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash -leo pipefail {0}
+
+env:
+  FORCE_COLOR: 2
+  PIP_PROGRESS_BAR: off
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest', 'macos-latest']
+        python: ['3.7', '3.8', '3.9', '3']
+        exclude:
+          - os: 'macos-latest'
+            python: '3.7'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Python
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          cache-environment: true
+          post-cleanup: 'all'
+          environment-name: rose-build
+          create-args: >-
+            python=${{ matrix.python }}
+
+      - name: Build
+        uses: cylc/release-actions/build-python-package@v1
+
+      - name: Inspect
+        run: |
+          unzip -l dist/*.whl | tee files
+          grep 'metomi_rose.*.dist-info/COPYING' files
+          grep 'metomi/rose/etc' files
+          grep 'metomi/rosie/lib' files
+          grep 'metomi/rose/scripts' files
+          # grep 'metomi/rose/py.typed' files  # TODO
