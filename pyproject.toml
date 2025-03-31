@@ -99,7 +99,7 @@ rosa = []
 #     tornado
 # ]
 rose-edit = [
-    "pygobject>=3.48.2",
+    "pygobject>=3.50.0",
     "pycairo>=1.27.0"
 ]
 all = [
