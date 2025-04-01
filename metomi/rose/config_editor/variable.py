@@ -370,7 +370,6 @@ class VariableWidget(object):
             )
         return False
 
-
     def remove_from(self, container):
         """Removes the child widgets of an instance from the 'container'."""
         container.num_removes += 1
@@ -578,10 +577,10 @@ class VariableWidget(object):
             widget = widget_list.pop()
             # Convert from Gdk RGBA to Gdk Color
             normal_text_color = Gdk.Color(
-                                          int(normal_text.red * 255),
-                                          int(normal_text.green * 255),
-                                          int(normal_text.blue * 255)
-                                          )
+                int(normal_text.red * 255),
+                int(normal_text.green * 255),
+                int(normal_text.blue * 255),
+            )
             widget.modify_text(Gtk.StateType.NORMAL, normal_text_color)
             # widget.override_color(Gtk.StateType.NORMAL)
             if hasattr(widget, "set_inconsistent"):
@@ -622,7 +621,7 @@ class VariableWidget(object):
             self._set_consistent(self.valuewidget, variable)
         self.variable = variable
         self.errors = list(variable.error.keys())
-        if (hasattr(self.valuewidget, "needs_type_error_refresh")):
+        if hasattr(self.valuewidget, "needs_type_error_refresh"):
             self.valuewidget.handle_type_error(
                 metomi.rose.META_PROP_TYPE in self.errors
             )
