@@ -68,7 +68,6 @@ def cli(fcn):
     """Launcher for the CLI functions."""
 
     def _inner(argv):
-        nonlocal fcn
         add_meta_paths()
         return fcn()
 
