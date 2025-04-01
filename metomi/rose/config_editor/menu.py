@@ -637,10 +637,6 @@ class MainMenuHandler(object):
         self.reporter.report(info_text, kind=kind)
         return error_count
 
-    def clear_page_menu(self, menubar, add_menuitem):
-        """Clear all page add variable items."""
-        add_menuitem.remove_submenu()
-
     def load_page_menu(self, menubar, add_menuitem, current_page):
         """Load the page add variable items, if any."""
         if current_page is None:
