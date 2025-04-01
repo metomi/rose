@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - 'conda-environment.yml'
-      - '.github/workflows/test_conda-build.yml'
+      - '.github/workflows/test-conda-builds.yml'
   schedule:
     - cron: '17 22 * * 6'  # Every Saturday at 22:17
   workflow_dispatch:
@@ -31,7 +31,7 @@ jobs:
     env:
       ENV_FILE: conda-environment.yml
     steps:
-      - name: checkout cylc-flow
+      - name: checkout
         uses: actions/checkout@v4
 
       - name: modify conda env file
