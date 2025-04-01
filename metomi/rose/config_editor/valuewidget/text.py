@@ -21,7 +21,7 @@
 import gi
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 
 import metomi.rose.config_editor
 import metomi.rose.config_editor.valuewidget
@@ -30,6 +30,12 @@ import metomi.rose.gtk.util
 
 ENV_COLOUR = metomi.rose.gtk.util.color_parse(
     metomi.rose.config_editor.COLOUR_VARIABLE_TEXT_VAL_ENV
+)
+ENV_COLOUR_RGBA = Gdk.RGBA(
+    ENV_COLOUR.red / 65535,
+    ENV_COLOUR.green / 65535,
+    ENV_COLOUR.blue / 65535,
+    65535,
 )
 
 
@@ -44,7 +50,7 @@ class RawValueWidget(Gtk.Box):
         self.hook = hook
         self.entry = Gtk.Entry()
         if metomi.rose.env.contains_env_var(self.value):
-            self.entry.modify_text(Gtk.StateType.NORMAL, ENV_COLOUR)
+            self.entry.override_color(Gtk.StateType.NORMAL, ENV_COLOUR_RGBA)
             self.entry.set_tooltip_text(
                 metomi.rose.config_editor.VAR_WIDGET_ENV_INFO
             )
@@ -79,11 +85,12 @@ class RawValueWidget(Gtk.Box):
         self.entry.set_width_chars(self.chars_width)
         self.entry.set_max_length(self.chars_width)
         if metomi.rose.env.contains_env_var(self.value):
-            self.entry.modify_text(Gtk.StateType.NORMAL, ENV_COLOUR)
+            self.entry.override_color(Gtk.StateType.NORMAL, ENV_COLOUR_RGBA)
             self.entry.set_tooltip_text(
                 metomi.rose.config_editor.VAR_WIDGET_ENV_INFO
             )
         else:
+            self.entry.override_color(Gtk.StateType.NORMAL, None)
             self.entry.set_tooltip_text(None)
         return False
 
@@ -147,11 +154,8 @@ class TextMultilineValueWidget(Gtk.Box):
 
     def setter(self, widget):
         text = Gtk.TextBuffer.get_text(
-            widget,
-            widget.get_start_iter(),
-            widget.get_end_iter(),
-            False
-            )
+            widget, widget.get_start_iter(), widget.get_end_iter(), False
+        )
         if text != self.value:
             self.value = text
             self.set_value(self.value)
