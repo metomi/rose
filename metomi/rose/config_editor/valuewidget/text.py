@@ -49,6 +49,10 @@ class RawValueWidget(Gtk.Box):
                 metomi.rose.config_editor.VAR_WIDGET_ENV_INFO
             )
         self.entry.set_text(self.value)
+        # Set the size of the entry box
+        self.chars_width = len(self.value) + 1
+        self.entry.set_width_chars(self.chars_width)
+        self.entry.set_max_length(self.chars_width)
         self.entry.connect(
             "button-release-event", self._handle_middle_click_paste
         )
@@ -60,7 +64,7 @@ class RawValueWidget(Gtk.Box):
             "button-release-event", lambda e, v: self.setter(e)
         )
         self.entry.show()
-        self.pack_start(self.entry, expand=True, fill=True, padding=0)
+        self.pack_start(self.entry, expand=False, fill=False, padding=0)
         self.entry.connect("focus-in-event", self.hook.trigger_scroll)
         self.grab_focus = lambda: self.hook.get_focus(self.entry)
 
@@ -70,6 +74,10 @@ class RawValueWidget(Gtk.Box):
             return False
         self.value = new_value
         self.set_value(self.value)
+        # Set the size of the entry box
+        self.chars_width = len(self.value) + 1
+        self.entry.set_width_chars(self.chars_width)
+        self.entry.set_max_length(self.chars_width)
         if metomi.rose.env.contains_env_var(self.value):
             self.entry.modify_text(Gtk.StateType.NORMAL, ENV_COLOUR)
             self.entry.set_tooltip_text(
@@ -109,7 +117,8 @@ class TextMultilineValueWidget(Gtk.Box):
         self.entrybuffer = Gtk.TextBuffer()
         self.entrybuffer.set_text(self.value)
         self.entry = Gtk.TextView(buffer=self.entrybuffer)
-        self.entry.set_wrap_mode(Gtk.WrapMode.WORD)
+        # Don't wrap multiline text unless there is a line break
+        self.entry.set_wrap_mode(Gtk.WrapMode.NONE)
         self.entry.set_left_margin(metomi.rose.config_editor.SPACING_SUB_PAGE)
         self.entry.set_right_margin(metomi.rose.config_editor.SPACING_SUB_PAGE)
         self.entry.connect("focus-in-event", self.hook.trigger_scroll)
@@ -121,7 +130,7 @@ class TextMultilineValueWidget(Gtk.Box):
 
         self.grab_focus = lambda: self.hook.get_focus(self.entry)
         self.entrybuffer.connect("changed", self.setter)
-        self.pack_start(viewport, expand=True, fill=True, padding=0)
+        self.pack_start(viewport, expand=False, fill=False, padding=0)
 
     def get_focus_index(self):
         """Return the cursor position within the variable value."""
