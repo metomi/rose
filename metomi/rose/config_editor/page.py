@@ -594,8 +594,7 @@ class ConfigPage(Gtk.Box):
             custom_widget = metomi.rose.resource.import_object(
                 widget_path,
                 metadata_files,
-                self.handle_bad_custom_sub_widget,
-                module_prefix=prefix,
+                self.handle_bad_custom_sub_widget
             )
             if custom_widget is None:
                 text = metomi.rose.config_editor.ERROR_IMPORT_CLASS.format(
