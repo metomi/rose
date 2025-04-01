@@ -159,7 +159,7 @@ class VariableWidget(object):
             self.valuewidget, expand=False, fill=False, padding=0
         )
         self.contentwidget.pack_start(
-            content_event_box, expand=True, fill=True, padding=0
+            content_event_box, expand=True, fill=False, padding=0
         )
 
     def _valuewidget_set_value(self, value):
