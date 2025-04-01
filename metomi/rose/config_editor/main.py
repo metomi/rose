@@ -734,12 +734,6 @@ class MainController(object):
                 self.menubar, add_menuitem, self._get_current_page()
             ),
         )
-        page_menu.get_submenu().connect(
-            "deactivate",
-            lambda m: self.main_handle.clear_page_menu(
-                self.menubar, add_menuitem
-            ),
-        )
         self.main_handle.load_macro_menu(self.menubar)
         self.update_bar_widgets()
         self.top_menu = self.menubar.uimanager.get_widget("/TopMenuBar")
