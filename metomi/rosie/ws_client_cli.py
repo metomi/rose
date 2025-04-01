@@ -47,7 +47,6 @@ def cli(fcn):
     """Launcher for the utility functions."""
 
     def _inner():
-        nonlocal fcn
         try:
             sys.exit(fcn())
         except KeyboardInterrupt:
