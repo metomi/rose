@@ -815,8 +815,8 @@ class BaseSummaryDataPanel(Gtk.Box):
                 menuitem.add_accelerator(
                     "activate", accel, key, mod, Gtk.AccelFlags.VISIBLE
                 )
-        menu.popup_at_pointer(event)
         menu.show_all()
+        menu.popup_at_pointer(event)
         return False
 
     def add_section(self, section=None, opt_map=None):
