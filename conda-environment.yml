@@ -17,3 +17,8 @@ dependencies:
 
   # output: metomi-rose
   - pygraphviz >1.0,!=1.8
+  - pygobject >=3.50.0
+  - gtk3 >=3.24.43
+  - libgirepository >=1.84.0
+  - gobject-introspection >=1.84.0
+  - cairo >=1.18.4
