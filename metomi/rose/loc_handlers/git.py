@@ -20,6 +20,7 @@ import errno
 import os
 import re
 import tempfile
+from textwrap import indent
 from typing import TYPE_CHECKING, Optional, Tuple
 from urllib.parse import urlparse
 
@@ -178,11 +179,14 @@ class GitLocHandler:
         rev-parse functionality.
 
         """
-        ret_code, info, _ = self.manager.popen.run(
+        ret_code, info, fail = self.manager.popen.run(
             self.GIT, "ls-remote", "--exit-code", remote, ref)
         if ret_code and ret_code != 2:
             # repo not found
-            raise ValueError(f"ls-remote: could not locate '{remote}'")
+            raise ValueError(
+                f"ls-remote: could not locate '{remote}':"
+                f"\n{indent(fail, ' ' * 4)}"
+            )
         if ret_code:
             err = f"ls-remote: could not find ref '{ref}' in '{remote}'"
             if REC_COMMIT_HASH.match(ref):

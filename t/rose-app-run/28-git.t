@@ -241,7 +241,12 @@ source=git:$TEST_DIR/zz9+zα/::earth/::v1
 __CONFIG__
 run_fail "$TEST_KEY" rose app-run --config=../config
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
-[FAIL] file:hello/fruit_main=source=git:$TEST_DIR/zz9+zα/::earth/::v1: ls-remote: could not locate '$TEST_DIR/zz9+zα/'
+[FAIL] file:hello/fruit_main=source=git:$TEST_DIR/zz9+zα/::earth/::v1: ls-remote: could not locate '$TEST_DIR/zz9+zα/':
+[FAIL]     fatal: '$TEST_DIR/zz9+zα/' does not appear to be a git repository
+[FAIL]     fatal: Could not read from remote repository.
+[FAIL] 
+[FAIL]     Please make sure you have the correct access rights
+[FAIL]     and the repository exists.
 __ERROR__
 test_teardown
 #-------------------------------------------------------------------------------
