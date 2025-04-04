@@ -1586,9 +1586,11 @@ def apply_macro_to_config_map(
             # Always the first item.
             new_config_map[conf_key] = new_config
         else:
+            # the diff between the modified config and the modified base config
             diff = new_config - new_config_map[None]
-            new_opt_config = diff.get_as_opt_config()
+            new_opt_config = diff.get_as_opt_config(base_config=new_config)
             new_config_map[conf_key] = new_opt_config
+
     return new_config_map, changes_map
 
 

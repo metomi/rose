@@ -771,25 +771,62 @@ class ConfigNodeDiff:
                     keys, settings_1[keys], settings_2[keys]
                 )
 
-    def get_as_opt_config(self):
+    def get_as_opt_config(self, base_config=None):
         """Return a ConfigNode such that main + new_node = main + diff.
 
         Add all the added settings, add all the modified settings,
         add all the removed settings as user-ignored.
 
+        Args:
+            base_config: If a setting is present in the diff, but the parent
+                of the setting is not, then the state and keys of the parent
+                will revert to default. If "base_config" is provided, then
+                the state and comments will be transferred from this config
+                into the generated opt conf.
+
         Returns:
             ConfigNode: A new ConfigNode instance.
 
         Example:
-            >>> config_node_diff = ConfigNodeDiff()
-            >>> config_node_diff.set_added_setting(['foo'],
-            ...                                    ('Foo', None, None,))
-            >>> config_node_diff.set_removed_setting(['bar'],
-            ...                                      ('Bar', None, None,))
-            >>> config_node = config_node_diff.get_as_opt_config()
-            >>> list(config_node.walk()) # doctest: +NORMALIZE_WHITESPACE
-            [(['', 'bar'], {'value': 'Bar', 'state': '!', 'comments': []}),
-             (['', 'foo'], {'value': 'Foo', 'state': '', 'comments': []})]
+            >>> # create a config
+            >>> a = (
+            ...     ConfigNode()
+            ...     .set(('x'), state='!!', comments=['foo'])
+            ...     .set(('x', 'a'), '1')
+            ...     .set(('x', 'b'), '3')
+            ... )
+
+            >>> # create another config
+            >>> b = (
+            ...     ConfigNode()
+            ...     .set(('x'), state='!!', comments=['foo'])
+            ...     .set(('x', 'a'), '2')
+            ... )
+
+            >>> # calculate the diff between them
+            >>> diff = a - b
+
+            >>> # inspect the diff
+            >>> diff.get_added()
+            [(('x', 'b'), ('3', '', []))]
+            >>> diff.get_modified()
+            [(('x', 'a'), (('2', '', []), ('1', '', [])))]
+
+            # generate the diff as an optional config
+            # (note the state of "[x]" has been lost as it is not present in
+            # the diff)
+            >>> dump(diff.get_as_opt_config(), sys.stdout)
+            [x]
+            a=1
+            b=3
+
+            # generate the diff as an optional config supplying the base_config
+            # (note the state of "[x]" has been extracted from config "a")
+            >>> dump(diff.get_as_opt_config(a), sys.stdout)
+            #foo
+            [!!x]
+            a=1
+            b=3
 
         """
         node = ConfigNode()
@@ -808,6 +845,26 @@ class ConfigNodeDiff:
                 state=node.STATE_USER_IGNORED,
                 comments=comments,
             )
+
+        if base_config:
+            all_keys = {
+                *(keys for keys, _ in self.get_added()),
+                *(keys for keys, _ in self.get_modified())
+            }
+            all_parent_keys = set()
+            for keys in all_keys:
+                keys = tuple(keys)
+                while len(keys) > 1:
+                    keys = keys[:-1]
+                    all_parent_keys.add(keys)
+
+            for keys in all_parent_keys - all_keys:
+                parent = base_config.get(keys)
+                if parent:
+                    ret = node.get(keys)
+                    ret.state = parent.state
+                    ret.comments = parent.comments
+
         return node
 
     def set_added_setting(self, keys, data):

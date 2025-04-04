@@ -274,7 +274,6 @@ def make(ns):
     lines = []
 
     def _write(text):
-        nonlocal lines
         lines.extend(text.splitlines())
 
     main(ns, text, _write)
