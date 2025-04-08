@@ -55,7 +55,7 @@ jobs:
       - name: Inspect
         run: |
           unzip -l dist/*.whl | tee files
-          grep 'metomi_rose.*.dist-info/COPYING' files
+          grep -E 'metomi_rose.*.dist-info/.*COPYING' files
           grep 'metomi/rose/etc' files
           grep 'metomi/rosie/lib' files
           grep 'metomi/rose/scripts' files
