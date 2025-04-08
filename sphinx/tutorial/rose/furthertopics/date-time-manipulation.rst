@@ -11,9 +11,9 @@ present cycle using::
    cylc cyclepoint --offset-hours=-3
 
 The `isodatetime`_ command provides functionality
-beyond ``cylc cyclepoint``. Rose also provides the :envvar:`ROSE_DATAC` environment
-variable which provides an easy way to get the path of the ``share/cycle``
-directory.
+beyond ``cylc cyclepoint``. Cylc also provides the ``CYLC_TASK_SHARE_CYCLE_DIR``
+environment variable which provides an easy way to get the path of the
+``share/cycle/<point>`` directory.
 
 
 The ``isodatetime`` Command
@@ -72,6 +72,11 @@ which allows you to use the special ``ref`` argument:
 The ``ROSE_DATAC`` Environment Variable
 ---------------------------------------
 
+.. note::
+
+   From Cylc 8.5.0 the variable ``CYLC_TASK_SHARE_CYCLE_DIR`` should be preferred
+   to ``ROSE_DATAC``.
+
 There are two locations where task output is likely to be located:
 
 The work directory
@@ -96,22 +101,28 @@ The share directory
       <run directory>/share/cycle/<cycle>
 
    These are called the ``share/cycle`` directories.
-
-   The path to the root of the share directory is provided by the
-   ``CYLC_WORKFLOW_SHARE_DIR`` environment variable so the path to the cycle
-   subdirectory would be::
+   ``CYLC_TASK_SHARE_CYCLE_DIR`` provides the path to::
 
       "$CYLC_WORKFLOW_SHARE_DIR/cycle/$CYLC_TASK_CYCLE_POINT"
 
-The :ref:`command-rose-task-env` command provides the environment variable
-:envvar:`ROSE_DATAC` which is a more convenient way to obtain the path of the
-``share/cycle`` directory.
 
 To get the path to a previous (or a future) ``share/cycle`` directory we can
-provide an offset to :ref:`command-rose-task-env` e.g::
+provide an offset to isodatetime:
 
-   rose task-env --cycle-offset=PT1H
+.. code-block:: bash
 
-The path is then made available as the ``ROSE_DATACPT1H`` environment variable.
+   isodatetime "${CYLC_TASK_CYCLE_POINT} --offset -P1D
+
+Which can be used to provide custom offset directory locations:
+
+.. code-block:: bash
+
+   # Cylc task script
+   CYCLE_POINT_MINUS_P1D=$(isodatetime "${CYLC_TASK_CYCLE_POINT} --offset -P1D)"
+
+   TODAYS_DATA="${CYLC_WORKFLOW_SHARE_DIR}/cycle/${CYLC_TASK_CYCLE_POINT}/output.data"
+   YESTERDAYS_DATA="${CYLC_WORKFLOW_SHARE_DIR}/cycle/${CYCLE_POINT_MINUS_P1D}/output.data"
+
+   # Do something with "${YESTERDAYS_DATA}" and "${TODAYS_DATA}"
 
 .. TODO - Write a short practical using ROSE_DATAC and isodatetime.

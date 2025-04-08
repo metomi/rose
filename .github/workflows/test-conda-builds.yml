@@ -1,0 +1,71 @@
+name: conda builds
+
+on:
+  pull_request:
+    paths:
+      - 'conda-environment.yml'
+      - '.github/workflows/test-conda-builds.yml'
+  schedule:
+    - cron: '17 22 * * 6'  # Every Saturday at 22:17
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  FORCE_COLOR: 2
+
+jobs:
+  test_conda_install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.8', '3']
+    env:
+      ENV_FILE: conda-environment.yml
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: modify conda env file
+        run: |
+          # write environment file
+          echo "  - pip"  >> "$ENV_FILE"  # list pip as a dependency
+          echo "  - pip:" >> "$ENV_FILE"  # add a pip section
+          echo "    - ."  >> "$ENV_FILE"  # install metomi-rose (pip install .)
+          cat "$ENV_FILE"
+
+      - name: build conda env
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+          environment-file: ${{ env.ENV_FILE }}
+
+      - name: check rose installation
+        shell: bash -el {0}
+        run: |
+          conda run -n test rose version --long
+          pip check
+
+      - name: check for activate scripts
+        shell : bash -el {0}
+        run: |
+          # https://github.com/cylc/cylc-flow/issues/3704#issuecomment-897442365
+          # locate all activate scripts
+          find "$CONDA_PREFIX" -name "activate.d" | tee > activates.txt
+          # ignore the conda activate script itself
+          sed -i "\|$CONDA_PREFIX/etc/conda/activate.d|d" activates.txt
+          # check to make sure no packages have contributed new activate scripts
+          # (we rely on having a conda activate-less environment)
+          if [[ $(wc -l < activates.txt) -ne 0 ]]; then
+              echo '::error::Found activate scripts in installation.'
+              cat activates.txt >&2
+              exit 1
+          fi
