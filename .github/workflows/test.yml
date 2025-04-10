@@ -32,9 +32,16 @@ on:
   schedule:
     - cron: '37 04 * * 1-5' # 04:37, Monday-Friday
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 defaults:
   run:
     shell: bash -c "exec $CONDA_PREFIX/bin/bash -elo pipefail {0}"
+
+env:
+  PIP_PROGRESS_BAR: off
 
 jobs:
   lint:
@@ -78,6 +85,8 @@ jobs:
         run: |
           mypy
 
+      - name: Towncrier - draft changelog
+        uses: cylc/release-actions/towncrier-draft@v1
 
   test:
     runs-on: ${{ matrix.os }}

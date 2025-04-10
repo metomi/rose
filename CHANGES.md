@@ -3,28 +3,29 @@
 Go to https://github.com/metomi/rose/milestones?state=closed
 for a full listing of issues for each release.
 
-<!-- The topmost release date is automatically updated by GitHub Actions. When
-creating a new release entry be sure to copy & paste the span tag with the
-`actions:bind` attribute, which is used by a regex to find the text to be
-updated. Only the first match gets replaced, so it's fine to leave the old
-ones in. -->
+<!--
+NOTE: Do not add entries here, use towncrier fragments instead:
+$ towncrier create <PR-number>.<break|feat|fix>.md --content "Short description"
+-->
 
-## 2.4.2 (<span actions:bind='release-date'>Released 2025-04-07</span>)
+<!-- towncrier release notes start -->
+
+## 2.4.2 (Released 2025-04-07)
 
 [#2867](https://github.com/metomi/rose/pull/2867) - Fix issue that could cause `rose app-upgrade` to insert nodes into optional configurations in the wrong state.
 
 [#2869](https://github.com/metomi/rose/pull/2869) - Improve error messages from `git` command failures.
 
-## 2.4.1 (<span actions:bind='release-date'>Released 2025-02-25</span>)
+## 2.4.1 (Released 2025-02-25)
 
 [#2855](https://github.com/metomi/rose/pull/2855) -
 Make Rose compatible with sqlite3 versions 3.46.0+.
 
-## 2.4.0 (<span actions:bind='release-date'>Released 2025-01-08</span>)
+## 2.4.0 (Released 2025-01-08)
 
 No significant changes. Released for consistency with Cylc release cycle.
 
-## 2.3.2 (<span actions:bind='release-date'>Released 2024-11-11</span>)
+## 2.3.2 (Released 2024-11-11)
 
 ### Fixes
 
@@ -32,14 +33,14 @@ No significant changes. Released for consistency with Cylc release cycle.
 Fixed `rose app-run` and `rose task-run` crashing if git is not installed.
 
 
-## 2.3.1 (<span actions:bind='release-date'>Released 2024-07-18</span>)
+## 2.3.1 (Released 2024-07-18)
 
 ### Fixes
 
 [#2783](https://github.com/metomi/rose/pull/2783) -
 Fixes an issue where the `[template variables]` section in the `rose-suite.conf` file didn't work with Rose metadata.
 
-## 2.3.0 (<span actions:bind='release-date'>Released 2024-06-18</span>)
+## 2.3.0 (Released 2024-06-18)
 
 Minor changes required for compatibility with cylc-flow 8.3.0 (via cylc-rose).
 
@@ -48,7 +49,7 @@ Minor changes required for compatibility with cylc-flow 8.3.0 (via cylc-rose).
 [#2754](https://github.com/metomi/rose/pull/2754) - support for file creation from Git repositories
 
 
-## 2.2.0 (<span actions:bind='release-date'>Released 2024-01-18</span>)
+## 2.2.0 (Released 2024-01-18)
 
 ### Breaking Changes
 
@@ -57,7 +58,7 @@ Rose now ignores `PYTHONPATH` to make it more robust to task environments
 which set this value. If you want to add to the Rose environment itself,
 e.g. to write a rose-ana test, use `ROSE_PYTHONPATH`.
 
-## 2.1.0 (<span actions:bind='release-date'>Released 2023-07-21</span>)
+## 2.1.0 (Released 2023-07-21)
 
 ### Fixes
 
@@ -71,7 +72,7 @@ later flow
 Fix rosie password caching.
 
 
-## 2.0.4 (<span actions:bind='release-date'>Released 2023-04-27</span>)
+## 2.0.4 (Released 2023-04-27)
 
 ### Fixes
 
@@ -79,7 +80,7 @@ Fix rosie password caching.
 Fix an issue where file installation could fail due to high concurrency.
 
 
-## 2.0.3 (<span actions:bind='release-date'>Released 2023-02-13</span>)
+## 2.0.3 (Released 2023-02-13)
 
 ### Fixes
 
@@ -91,7 +92,7 @@ follow Python 2 type comparison rules.
 
 
 
-## 2.0.2 (<span actions:bind='release-date'>Released 2022-11-08</span>)
+## 2.0.2 (Released 2022-11-08)
 
 ### Fixes
 
@@ -99,7 +100,7 @@ follow Python 2 type comparison rules.
 tutorials.
 
 
-## 2.0.1 (<span actions:bind='release-date'>Released 2022-09-14</span>)
+## 2.0.1 (Released 2022-09-14)
 
 ### Fixes
 
@@ -107,14 +108,14 @@ tutorials.
 remote install checks to use any Python version >= 2.7.
 
 
-## 2.0.0 (<span actions:bind='release-date'>Released 2022-07-28</span>)
+## 2.0.0 (Released 2022-07-28)
 
 For use with Cylc, see [Cylc-Rose](https://github.com/cylc/cylc-rose).
 
 Minor internal changes since 2.0rc3.
 
 
-## 2.0rc3 (<span actions:bind='release-date'>Released 2022-05-20</span>)
+## 2.0rc3 (Released 2022-05-20)
 
 ### Fixes
 
@@ -123,7 +124,7 @@ fix bug in rose mpi-launch that caused it to fail if the configured command
 contained spaces.
 
 
-## 2.0rc2 (<span actions:bind='release-date'>Released 2022-03-24</span>)
+## 2.0rc2 (Released 2022-03-24)
 
 ### Enhancements
 
@@ -141,7 +142,7 @@ as a subshell.
 `rose-conf.vim` syntax highlighting file for ViM that was accidentally removed.
 
 
-## 2.0rc1 (<span actions:bind='release-date'>Released 2022-02-17</span>)
+## 2.0rc1 (Released 2022-02-17)
 
 [#2510](https://github.com/metomi/rose/pull/2510) -
 Re-enable Rosie ID to work with Cylc 8 Version control recording
@@ -163,7 +164,7 @@ Rose Date only emits a warning if running in interactive mode.
 
 
 
-## 2.0b3 (<span actions:bind='release-date'>Released 2021-11-10</span>)
+## 2.0b3 (Released 2021-11-10)
 
 For use with Cylc see [Cylc-Rose](https://github.com/cylc/cylc-rose).
 
@@ -174,7 +175,7 @@ Disable the `rosie disco` web service pending a fix to the tornado version
 conflict with cylc-uiserver, see https://github.com/metomi/rose/pull/2493
 
 
-## 2.0b2 (<span actions:bind='release-date'>Released 2021-07-28</span>)
+## 2.0b2 (Released 2021-07-28)
 
 Rose release 61. This is a __beta pre-release__.
 
