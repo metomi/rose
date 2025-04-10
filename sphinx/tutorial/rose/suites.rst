@@ -67,7 +67,7 @@ A Rose suite configuration is a Cylc :term:`source directory` containing a
 
       * ``rose-suite.conf[empy:suite.rc]`` is no longer supported
         and should not be used. Cylc no longer uses the Empy templating
-        language.
+        language as of 8.4.0.
 
 .. ifslides::
 
