@@ -10,7 +10,6 @@
 .. _Cylc Workflow Design Guide: https://cylc.github.io/cylc-doc/stable/html/workflow-design-guide/index.html
 .. _isodatetime: https://github.com/metomi/isodatetime
 
-.. _EmPy: https://pypi.org/project/empy/
 .. _extglob pattern matching: https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html#Pattern-Matching
 .. _FCM: https://metomi.github.io/fcm/doc/
 .. _FCM User Guide: http://metomi.github.io/fcm/doc/user_guide/

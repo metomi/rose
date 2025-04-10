@@ -95,21 +95,6 @@ A suite directory may contain the following:
             :rose:conf:`rose-suite.conf[template variables]`
             are preferred at Rose 2.
 
-   .. rose:conf:: empy:suite.rc
-
-      .. rose:conf:: KEY=VALUE
-
-         Define a `EmPy`_ variable ``KEY`` with the value ``VALUE`` for use
-         in the ``flow.cylc`` file.
-
-         The assignment will be inserted after the ``#!empy`` line of the
-         installed ``flow.cylc`` file.
-
-         .. versionchanged:: 2.0.0
-
-            :rose:conf:`rose-suite.conf[template variables]`
-            are preferred at Rose 2.
-
    .. rose:conf:: [file:NAME]
 
       Specify a file/directory to be installed. ``NAME`` should be a path
