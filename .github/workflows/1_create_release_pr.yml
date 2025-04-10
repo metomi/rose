@@ -11,6 +11,19 @@ on:
         required: false
         default: 'master'
 
+concurrency:
+  # Only let this run 1 at a time
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  FORCE_COLOR: 2
+  PIP_PROGRESS_BAR: off
+
 jobs:
   create-release-pr:
     runs-on: ubuntu-latest
@@ -31,8 +44,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          # return to 3.x once cylc-flow is compatible with 3.10+ (pyuv)
-          python-version: '3.9'
+          python-version: '3.x'
 
       - name: Create & checkout PR branch
         uses: cylc/release-actions/stage-1/checkout-pr-branch@v1
@@ -43,14 +55,13 @@ jobs:
           init-file: 'metomi/rose/__init__.py'
           pypi-package-name: 'metomi-rose'
 
-      - name: Update "released on" date in changelog
-        continue-on-error: true
-        uses: cylc/release-actions/stage-1/update-changelog-release-date@v1
-        with:
-          changelog-file: 'CHANGES.md'
-
       - name: Test build
         uses: cylc/release-actions/build-python-package@v1
+
+      - name: Generate changelog
+        run: |
+          python3 -m pip install -q towncrier
+          towncrier build --yes
 
       - name: Create pull request
         uses: cylc/release-actions/stage-1/create-release-pr@v1
