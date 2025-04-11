@@ -81,7 +81,8 @@ graph = [
 ]
 tests = [
     "aiosmtpd",
-    "pytest"
+    "pytest",
+    "towncrier>=24.7.0; python_version > '3.7'"
     # Note: some tests also depend on cylc-rose which has to be the
     # development version installed manually (because the latest production
     # version is pinned to the previous rose release)
@@ -153,3 +154,29 @@ include-package-data = true
 
 [tool.setuptools.dynamic]
 version = { attr = "metomi.rose.__version__" }
+
+
+[tool.towncrier]
+directory = "changes.d"
+name = "Rose"
+package = "metomi.rose"
+filename = "CHANGES.md"
+template = "changes.d/changelog-template.jinja"
+underlines = ["", "", ""]
+title_format = "## {version} (Released {project_date})"
+issue_format = "[#{issue}](https://github.com/cylc/cylc-flow/pull/{issue})"
+ignore = ["changelog-template.jinja"]
+
+# These changelog sections will be shown in the defined order:
+[[tool.towncrier.type]]
+directory = "break" # NB this is just the filename not directory e.g. 123.break.md
+name = "⚠ Breaking Changes"
+showcontent = true
+[[tool.towncrier.type]]
+directory = "feat"
+name = "🚀 Enhancements"
+showcontent = true
+[[tool.towncrier.type]]
+directory = "fix"
+name = "🔧 Fixes"
+showcontent = true

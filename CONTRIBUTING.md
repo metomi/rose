@@ -7,15 +7,31 @@ Report bugs and request enhancement by opening an issue on
 bug, add a recipe for repeating it. If requesting an enhancement,
 describe the use case in detail.
 
+## New Contributors
+
+Please read the [CLA](#contributor-licence-agreement-and-certificate-of-origin).
+
+Please add your name to the
+[Code Contributors](#code-contributors) section of this file as part of your
+first Pull Request (for each Cylc repository you contribute to).
+
 ## Contribute Code
 
-All contributions to Rose are made via pull requests against the *master*
-branch of [metomi/rose](https://github.com/metomi/rose). New contributors
-should add their details to the [Code Contributors](#code-contributors)
-section of this file as part of their first request. The developer who
-reviews each pull request is responsible for checking that the
-contributor's name is listed in this file before merging the pull request
-into *master*.
+We use [semver](https://semver.org/) to separate riskier changes (e.g. new features
+& code refactors) from bugfixes to provide more stable releases for production environments.
+
+**Enhancements** are made on the `master` branch and released in the next minor version
+(e.g. 2.1, 2.2, 2.3).
+
+**Bugfixes** and minor usability enhancements are made on bugfix branches and
+released as the next maintenance version (e.g. 2.0.1, 2.0.2, 2.0.3). E.G. if the issue is on a `2.0` milestone, branch off of `2.0.x` to
+develop your bugfix, then raise the pull request against the `2.0.x` branch. We will later merge the `2.0.x` branch into `master`.
+
+We use [towncrier](https://towncrier.readthedocs.io/en/stable/index.html) for
+generating the changelog. Changelog entries are added by running
+```
+towncrier create <PR-number>.<break|feat|fix>.md --content "Short description"
+```
 
 ## Code Contributors
 
