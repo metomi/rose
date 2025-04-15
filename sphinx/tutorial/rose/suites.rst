@@ -60,10 +60,14 @@ A Rose suite configuration is a Cylc :term:`source directory` containing a
       file.
 
       At Rose 2019/Cylc 7, these variables were instead set in sections called
-      :rose:conf:`rose-suite.conf[jinja2:suite.rc]` and
-      :rose:conf:`rose-suite.conf[empy:suite.rc]`. These are still supported
-      to ease the transition to Rose 2, but should not be used for new
-      suite configurations.
+
+      * :rose:conf:`rose-suite.conf[jinja2:suite.rc]` is still supported
+        to ease the transition to Rose 2, but should not be used for new
+        suite configurations.
+
+      * ``rose-suite.conf[empy:suite.rc]`` is no longer supported
+        and should not be used. Cylc no longer uses the Empy templating
+        language as of 8.4.0.
 
 .. ifslides::
 

@@ -28,7 +28,7 @@ rule_evaluator = RuleEvaluator()
 
 @pytest.mark.parametrize(
     'section',
-    (('template variables'), ('namelist'), ('empy:suite.rc')))
+    (('template variables'), ('namelist')))
 @pytest.mark.parametrize(
     'rule_in, id_in, rule_out, this, this_out', [
         param(
