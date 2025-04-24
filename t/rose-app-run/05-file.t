@@ -70,7 +70,8 @@ run_fail "$TEST_KEY" rose app-run --config=../config -q \
     --define='[file:hello4]source=stuff:ing'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
-[FAIL] file:hello4=source=stuff:ing: don't know how to process stuff:ing
+[FAIL] Rose tried all other file install handlers and decided this must be an Rsync handler.
+[FAIL] 	If it is then host "stuff" is uncontactable (ssh 255 error).
 __CONTENT__
 test_teardown
 #-------------------------------------------------------------------------------
