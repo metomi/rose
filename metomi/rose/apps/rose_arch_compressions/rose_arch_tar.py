@@ -25,8 +25,12 @@ class RoseArchTarGzip:
 
     """Compress archive sources in tar."""
 
-    SCHEMES = ["pax", "pax.gz", "pax.zst", "pax.xz", "tar", "tar.gz", "tgz", "tar.zst", "tar.xz", "txz"]
-    SCHEME_FORMATS = {"pax": tarfile.PAX_FORMAT, "pax.gz": tarfile.PAX_FORMAT, "pax.zst": tarfile.PAX_FORMAT, "pax.xz": tarfile.PAX_FORMAT} 
+    SCHEMES = ["pax", "pax.gz", "pax.zst", "pax.xz",
+               "tar", "tar.gz", "tgz", "tar.zst", "tar.xz", "txz"]
+    SCHEME_FORMATS = {"pax": tarfile.PAX_FORMAT,
+                      "pax.gz": tarfile.PAX_FORMAT,
+                      "pax.zst": tarfile.PAX_FORMAT,
+                      "pax.xz": tarfile.PAX_FORMAT}
     GZIP_EXTS = ["pax.gz", "tar.gz", "tgz"]
     ZSTD_EXTS = ["pax.zst", "tar.zst"]
     XZ_EXTS = ["pax.xz", "tar.xz", "txz"]
