@@ -53,5 +53,7 @@ file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<'__FIND__'
 ./archive.d/2016.txt.zst
 ./archive.d/whatever.tar.zst
 __FIND__
-
+TEST_KEY="${TEST_KEY_BASE}-zstd-command"
+#-------------------------------------------------------------------------------
+purge
 exit 0

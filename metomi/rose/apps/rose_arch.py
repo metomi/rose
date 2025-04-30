@@ -314,6 +314,15 @@ class RoseArchApp(BuiltinApp):
                 )
             )
             target.status = target.ST_BAD
+
+        target.compress_cores = self._get_conf(config, t_node, "compress-cores", default="1")
+        if not target.compress_cores.isdigit() or int(target.compress_cores) < 0:
+            raise ConfigValueError(
+                [t_key, "compress-cores"],
+                target.compress_cores,
+                ValueError("compress-cores must be a 0 (automatic) or a positive integer"),
+            )
+
         rename_format = self._get_conf(config, t_node, "rename-format")
         if rename_format:
             rename_parser_str = self._get_conf(config, t_node, "rename-parser")
@@ -398,7 +407,8 @@ class RoseArchApp(BuiltinApp):
             # Compress sources
             if target.compress_scheme:
                 handler = compress_manager.get_handler(target.compress_scheme)
-                handler.compress_sources(target, work_dir)
+                compress_args = {"cores": target.compress_cores}
+                handler.compress_sources(target, work_dir, **compress_args)
             times[1] = time()  # transformed time
             # Run archive command
             sources = []
