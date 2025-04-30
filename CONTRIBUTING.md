@@ -73,6 +73,8 @@ below:
  - Dimitrios Theodorakis (Met Office, UK)
  - Joseph Abram (Met Office, UK)
  - James Frost (Met Office, UK)
+ - David Rundle (Met Office, UK)
+
 <!-- end-shortlog -->
 
 (All contributors are identifiable with email addresses in the version control

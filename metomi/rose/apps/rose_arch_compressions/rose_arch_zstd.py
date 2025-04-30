@@ -44,6 +44,6 @@ class RoseArchZstd:
                 self.app_runner.fs_util.dirname(work_path_zst)
             )
 
-            command = "zstd -c '%s' >'%s'" % (source.path, work_path_zst)
+            command = "zstd --rm -c '%s' >'%s'" % (source.path, work_path_zst)
             self.app_runner.popen.run_simple(command, shell=True)
             source.path = work_path_zst
