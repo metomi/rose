@@ -1,0 +1,21 @@
+#!jinja2
+[cylc]
+    UTC mode=True
+    [[events]]
+        timeout=PT1M
+        abort on timeout=True
+[scheduling]
+    [[dependencies]]
+        graph=archive
+
+[runtime]
+    [[archive]]
+        script="""
+zstd -f - <<<'MMXVI' >'2016.txt.zst'
+mkdir 'whatever'
+echo "I don't care." >'whatever/idontcare.txt'
+echo "You may be right." >'whatever/youmayberight.txt'
+tar -I zstd -cf 'whatever.tar.zst' 'whatever'
+rm -fr 'whatever'
+rose task-run --debug
+"""

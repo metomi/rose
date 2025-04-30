@@ -25,9 +25,11 @@ class RoseArchTarGzip:
 
     """Compress archive sources in tar."""
 
-    SCHEMES = ["pax", "pax.gz", "tar", "tar.gz", "tgz"]
-    SCHEME_FORMATS = {"pax": tarfile.PAX_FORMAT, "pax.gz": tarfile.PAX_FORMAT}
+    SCHEMES = ["pax", "pax.gz", "pax.zst", "pax.xz", "tar", "tar.gz", "tgz", "tar.zst", "tar.xz", "txz"]
+    SCHEME_FORMATS = {"pax": tarfile.PAX_FORMAT, "pax.gz": tarfile.PAX_FORMAT, "pax.zst": tarfile.PAX_FORMAT, "pax.xz": tarfile.PAX_FORMAT} 
     GZIP_EXTS = ["pax.gz", "tar.gz", "tgz"]
+    ZSTD_EXTS = ["pax.zst", "tar.zst"]
+    XZ_EXTS = ["pax.xz", "tar.xz", "txz"]
 
     def __init__(self, app_runner, *args, **kwargs):
         self.app_runner = app_runner
@@ -68,5 +70,25 @@ class RoseArchTarGzip:
             os.close(fdsec)
             target.work_source_path = gz_name
             command = "gzip -c '%s' >'%s'" % (tar_name, gz_name)
+            self.app_runner.popen.run_simple(command, shell=True)
+            self.app_runner.fs_util.delete(tar_name)
+
+        if target.compress_scheme in self.ZSTD_EXTS:
+            fdsec, zst_name = mkstemp(
+                suffix="." + target.compress_scheme, dir=work_dir
+            )
+            os.close(fdsec)
+            target.work_source_path = zst_name
+            command = "zstd -c '%s' >'%s'" % (tar_name, zst_name)
+            self.app_runner.popen.run_simple(command, shell=True)
+            self.app_runner.fs_util.delete(tar_name)
+
+        if target.compress_scheme in self.XZ_EXTS:
+            fdsec, xz_name = mkstemp(
+                suffix="." + target.compress_scheme, dir=work_dir
+            )
+            os.close(fdsec)
+            target.work_source_path = xz_name
+            command = "xz -c '%s' >'%s'" % (tar_name, xz_name)
             self.app_runner.popen.run_simple(command, shell=True)
             self.app_runner.fs_util.delete(tar_name)
