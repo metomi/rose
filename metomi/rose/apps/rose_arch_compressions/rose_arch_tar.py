@@ -83,7 +83,8 @@ class RoseArchTarGzip:
             )
             os.close(fdsec)
             target.work_source_path = zst_name
-            command = "zstd --rm -T%s -c '%s' >'%s'" % (cores, tar_name, zst_name)
+            command = "zstd --rm -T%s -c '%s' >'%s'" % 
+                               (cores, tar_name, zst_name)
             self.app_runner.popen.run_simple(command, shell=True)
             self.app_runner.fs_util.delete(tar_name)
 

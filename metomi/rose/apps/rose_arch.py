@@ -315,12 +315,15 @@ class RoseArchApp(BuiltinApp):
             )
             target.status = target.ST_BAD
 
-        target.compress_cores = self._get_conf(config, t_node, "compress-cores", default="1")
-        if not target.compress_cores.isdigit() or int(target.compress_cores) < 0:
+        target.compress_cores = self._get_conf(config, t_node, 
+                                               "compress-cores", default="1")
+        if not target.compress_cores.isdigit() or 
+               int(target.compress_cores) < 0:
             raise ConfigValueError(
                 [t_key, "compress-cores"],
                 target.compress_cores,
-                ValueError("compress-cores must be a 0 (automatic) or a positive integer"),
+                ValueError("compress-cores must be a 0 (automatic) or 
+                            a positive integer")
             )
 
         rename_format = self._get_conf(config, t_node, "rename-format")
