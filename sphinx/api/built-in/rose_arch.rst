@@ -32,7 +32,7 @@ The application provides some useful functionalities:
   source files and the return code of archive command. In a retry, it
   would only redo targets that did not succeed in the previous attempts.
 * Rename source files.
-* Tar-Gzip or Gzip source files before sending them to the archive.
+* Tar and/or compress source files before sending them to the archive.
 
 
 Invocation
@@ -124,8 +124,8 @@ on:
    [arch:(black-box/)]
    source=cats.txt dogs.txt
 
-Zipping files
-^^^^^^^^^^^^^
+Compressing files
+^^^^^^^^^^^^^^^^^
 There are multiple ways of specifying that you want your archive to be
 compressed:
 
@@ -147,9 +147,9 @@ not recognized by rose arch as an extension to be compressed.)
 
 For more details see :rose:conf:`rose_arch[arch]compress`
 
-Zipping directories
-^^^^^^^^^^^^^^^^^^^
-You can tar and zip entire directories - as with single files Rose Arch will
+Compressing directories
+^^^^^^^^^^^^^^^^^^^^^^^
+You can tar and compress entire directories - as with single files Rose Arch will
 attempt to infer archive and compression from ``[arch:TARGET.extension]`` if it
 can:
 
@@ -206,6 +206,22 @@ with names in the form ``data_001.txt``:
    rename-parser=^//some//path//data_(?P<serial_number>[0-9]{3})(?P<name_tail>.*)$
    rename-format=hello/%(cycle)s-%(name_head)s%(name_tail)s
 
+Using Multiple Cores for Compression (zstd only)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When using `zstd`, the number of CPU cores to use for compression is controlled using the
+`compress-cores` keyword. This is useful for large files 
+where multi-threaded compression can significantly improve throughput.
+
+.. code-block:: rose
+
+   [arch:large-data.tar.zst]
+   compress=zst
+   compress-cores=8
+   source=large-data/*
+
+In this example, the `zstd` will use 8 CPU cores.
+
 Output
 ------
 
@@ -245,7 +261,6 @@ taken to run the archive command and the return code of the archive
 command. For a source line, the third column contains the original name of
 the source.
 
-
 Configuration
 -------------
 
@@ -262,7 +277,7 @@ Configuration
          and ``%(target)s`` for substitution of the sources and the target
          respectively.
 
-      .. rose:conf:: compress=pax|tar|pax.gz|tar.gz|tgz|gz
+      .. rose:conf:: compress=pax|tar|pax.gz|tar.gz|tgz|gz|pax.xz|tar.xz|txz|xz|pax.zst|tar.zst|zst
 
          If specified, compress source files scheme before sending them to the
          archive. If not set Rose Arch will attempt to set a compression scheme
@@ -272,19 +287,46 @@ Configuration
 
          Each compression scheme works slightly differently:
 
-         +------------------+-----------------------------------------------+
-         |Compression Scheme|Behaviour                                      |
-         +------------------+-----------------------------------------------+
-         |``pax`` or ``tar``|Sources will be placed in a TAR archive before |
-         |                  |being sent to the target.                      |
-         +------------------+-----------------------------------------------+
-         |``pax.gz``,       |Sources will be placed in a TAR-GZIP file      |
-         |``tar.gz`` or     |before being sent to the target.               |
-         |``tgz``           |                                               |
-         +------------------+-----------------------------------------------+
-         |``gz``            |Each source file will be compressed by GZIP    |
-         |                  |before being sent to the target.               |
-         +------------------+-----------------------------------------------+
+         +-----------------------+-----------------------------------------------+
+         |Compression Scheme     |Behaviour                                      |
+         +-----------------------+-----------------------------------------------+
+         |``pax`` or ``tar``     |Sources will be placed in a TAR archive before |
+         |                       |being sent to the target.                      |
+         +-----------------------+-----------------------------------------------+
+         |``pax.{gz,xz,zst}`` or |Sources will be placed in a TAR archive and be |
+         |``tar.{gz,xz,zst}`` or |compressed using the corresponding compressor  |
+         |or ``tgz`` or ``txz``  |before being sent to the target.               |
+         +-----------------------+-----------------------------------------------+
+         |``gz``                 |Each source file will be compressed by gzip    |
+         |                       |before being sent to the target.               |
+         +-----------------------+-----------------------------------------------+
+         |``xz``                 |Each source file will be compressed by xz      |
+         |                       |before being sent to the target.               |
+         +-----------------------+-----------------------------------------------+         
+         |``zstd``               |Each source file will be compressed by zstd    |
+         |                       |before being sent to the target.               |
+         +-----------------------+-----------------------------------------------+
+
+      .. rose:conf:: compress-cores=0|1|2|...
+
+         Specify the number of CPU cores to use for compression. This setting
+         is optional and defaults to `1` (single-threaded compression).
+
+         * `0`: Let the compression tool automatically determine the number of
+           cores to use.
+         * A positive integer: Specifies the exact number of cores to use for
+           compression.
+
+         This setting is currently only supported by `zstd`.
+
+         Example:
+
+         .. code-block:: rose
+
+            [arch:example.tar.zst]
+            compress=tar.zst
+            compress-cores=4
+            source=example/*
 
       .. rose:conf:: rename-format
 
