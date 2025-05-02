@@ -43,8 +43,6 @@ class RoseArchZstd:
             self.app_runner.fs_util.makedirs(
                 self.app_runner.fs_util.dirname(work_path_zst)
             )
-
-            command = "zstd --rm -T%s -c '%s' >'%s'" % 
-                            (cores, source.path, work_path_zst)
+            command = f"zstd --rm -T{cores} -c {source.path} > {work_path_zst}"
             self.app_runner.popen.run_simple(command, shell=True)
             source.path = work_path_zst
