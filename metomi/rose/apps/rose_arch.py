@@ -315,14 +315,15 @@ class RoseArchApp(BuiltinApp):
             )
             target.status = target.ST_BAD
 
-        target.compress_cores = self._get_conf(config, t_node,
-                                               "compress-cores", default="1")
-        if not target.compress_cores.isdigit() or \
-           int(target.compress_cores) < 0:
+        target.compress_threads = self._get_conf(config, t_node,
+                                                 "compress-threads",
+                                                 default="1")
+        if not target.compress_threads.isdigit() or \
+           int(target.compress_threads) < 0:
             raise ConfigValueError(
-                [t_key, "compress-cores"],
-                target.compress_cores,
-                ValueError("compress-cores must be a 0 (automatic) or \
+                [t_key, "compress-threads"],
+                target.compress_threads,
+                ValueError("compress-threads must be a 0 (automatic) or \
                             a positive integer")
             )
 
@@ -410,7 +411,7 @@ class RoseArchApp(BuiltinApp):
             # Compress sources
             if target.compress_scheme:
                 handler = compress_manager.get_handler(target.compress_scheme)
-                compress_args = {"cores": target.compress_cores}
+                compress_args = {"threads": target.compress_threads}
                 handler.compress_sources(target, work_dir, **compress_args)
             times[1] = time()  # transformed time
             # Run archive command

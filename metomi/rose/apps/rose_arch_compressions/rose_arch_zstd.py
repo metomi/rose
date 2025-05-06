@@ -29,7 +29,7 @@ class RoseArchZstd:
     def __init__(self, app_runner, *args, **kwargs):
         self.app_runner = app_runner
 
-    def compress_sources(self, target, work_dir, cores="1"):
+    def compress_sources(self, target, work_dir, threads="1"):
         """zstd each source in target.
 
         Use work_dir to dump results.
@@ -43,6 +43,8 @@ class RoseArchZstd:
             self.app_runner.fs_util.makedirs(
                 self.app_runner.fs_util.dirname(work_path_zst)
             )
-            command = f"zstd --rm -T{cores} -c {source.path} > {work_path_zst}"
+            command = \
+                f"zstd --rm -T{threads} -c {source.path} > {work_path_zst}"
+
             self.app_runner.popen.run_simple(command, shell=True)
             source.path = work_path_zst

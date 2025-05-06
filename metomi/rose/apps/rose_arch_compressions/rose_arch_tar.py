@@ -38,7 +38,7 @@ class RoseArchTarGzip:
     def __init__(self, app_runner, *args, **kwargs):
         self.app_runner = app_runner
 
-    def compress_sources(self, target, work_dir, cores="1"):
+    def compress_sources(self, target, work_dir, threads="1"):
         """Create a tar archive of all files in target.
 
         Use work_dir to dump results.
@@ -83,7 +83,7 @@ class RoseArchTarGzip:
             )
             os.close(fdsec)
             target.work_source_path = zst_name
-            command = f"zstd --rm -T{cores} -c '{tar_name}' >'{zst_name}'"
+            command = f"zstd --rm -T{threads} -c '{tar_name}' >'{zst_name}'"
             self.app_runner.popen.run_simple(command, shell=True)
             self.app_runner.fs_util.delete(tar_name)
 
