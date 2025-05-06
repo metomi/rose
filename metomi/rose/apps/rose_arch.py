@@ -291,6 +291,7 @@ class RoseArchApp(BuiltinApp):
                         target.sources[checksum] = RoseArchSource(
                             checksum, name, path
                         )
+
         if not target.sources:
             if is_compulsory_target:
                 target.status = target.ST_BAD
@@ -318,13 +319,17 @@ class RoseArchApp(BuiltinApp):
         target.compress_threads = self._get_conf(config, t_node,
                                                  "compress-threads",
                                                  default="1")
-        if not target.compress_threads.isdigit() or \
-           int(target.compress_threads) < 0:
+        if (
+            not target.compress_threads.isdigit()
+            or int(target.compress_threads) < 0
+        ):
             raise ConfigValueError(
                 [t_key, "compress-threads"],
                 target.compress_threads,
-                ValueError("compress-threads must be a 0 (automatic) or \
-                            a positive integer")
+                ValueError(
+                    "compress-threads must be a 0 (automatic) or"
+                    " a positive integer"
+                )
             )
 
         rename_format = self._get_conf(config, t_node, "rename-format")

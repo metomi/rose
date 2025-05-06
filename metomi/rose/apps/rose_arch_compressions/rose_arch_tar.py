@@ -44,6 +44,9 @@ class RoseArchTarGzip:
         Use work_dir to dump results.
 
         """
+        if threads != "1":
+            raise NotImplementedError("xz does not support multi-threading")
+
         sources = list(target.sources.values())
         if len(sources) == 1 and sources[0].path.endswith(
             "." + target.compress_scheme

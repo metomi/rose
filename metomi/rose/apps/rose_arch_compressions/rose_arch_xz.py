@@ -35,6 +35,10 @@ class RoseArchXz:
         Use work_dir to dump results.
 
         """
+
+        if threads != "1":
+            raise NotImplementedError("xz does not support multi-threading")
+
         for source in target.sources.values():
             if source.path.endswith("." + target.compress_scheme):
                 continue  # assume already done
