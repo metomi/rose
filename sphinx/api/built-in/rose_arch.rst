@@ -206,21 +206,21 @@ with names in the form ``data_001.txt``:
    rename-parser=^//some//path//data_(?P<serial_number>[0-9]{3})(?P<name_tail>.*)$
    rename-format=hello/%(cycle)s-%(name_head)s%(name_tail)s
 
-Using Multiple Cores for Compression (zstd only)
+Using Multiple threads for Compression (zstd only)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When using `zstd`, the number of CPU cores to use for compression is controlled using the
-`compress-cores` keyword. This is useful for large files 
+When using `zstd`, the number of threads to use for compression is controlled using the
+`compress-threads` keyword. This is useful for large files 
 where multi-threaded compression can significantly improve throughput.
 
 .. code-block:: rose
 
    [arch:large-data.tar.zst]
    compress=zst
-   compress-cores=8
+   compress-threads=8
    source=large-data/*
 
-In this example, the `zstd` will use 8 CPU cores.
+In this example, the `zstd` will use 8 threads.
 
 Output
 ------
@@ -307,15 +307,17 @@ Configuration
          |                       |before being sent to the target.               |
          +-----------------------+-----------------------------------------------+
 
-      .. rose:conf:: compress-cores=0|1|2|...
+      .. rose:conf:: compress-threads=0|1|2|...
 
-         Specify the number of CPU cores to use for compression. This setting
+         Specify the number of threads to use for compression. This setting
          is optional and defaults to `1` (single-threaded compression).
 
          * `0`: Let the compression tool automatically determine the number of
-           cores to use.
-         * A positive integer: Specifies the exact number of cores to use for
-           compression.
+           threads to use which is typically equal to the number of detected physical CPU cores 
+           (and should be used with caution on shared resources).
+
+         * A positive integer: Specifies the exact number of threads to use for compression.
+           It is not recommended to exceed the number of physical CPU cores on the target resource.
 
          This setting is currently only supported by `zstd`.
 
@@ -325,7 +327,7 @@ Configuration
 
             [arch:example.tar.zst]
             compress=tar.zst
-            compress-cores=4
+            compress-threads=4
             source=example/*
 
       .. rose:conf:: rename-format
