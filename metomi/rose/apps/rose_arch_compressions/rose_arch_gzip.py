@@ -29,12 +29,15 @@ class RoseArchGzip:
     def __init__(self, app_runner, *args, **kwargs):
         self.app_runner = app_runner
 
-    def compress_sources(self, target, work_dir):
+    def compress_sources(self, target, work_dir, threads="1"):
         """Gzip each source in target.
 
         Use work_dir to dump results.
 
         """
+        if threads != "1":
+            raise NotImplementedError("Gzip does not support multi-threading")
+
         for source in target.sources.values():
             if source.path.endswith("." + target.compress_scheme):
                 continue  # assume already done

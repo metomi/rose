@@ -29,7 +29,7 @@ class RoseArchXz:
     def __init__(self, app_runner, *args, **kwargs):
         self.app_runner = app_runner
 
-    def compress_sources(self, target, work_dir):
+    def compress_sources(self, target, work_dir, threads="1"):
         """xz each source in target.
 
         Use work_dir to dump results.
