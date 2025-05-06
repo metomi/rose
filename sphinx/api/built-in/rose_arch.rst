@@ -206,8 +206,8 @@ with names in the form ``data_001.txt``:
    rename-parser=^//some//path//data_(?P<serial_number>[0-9]{3})(?P<name_tail>.*)$
    rename-format=hello/%(cycle)s-%(name_head)s%(name_tail)s
 
-Using Multiple threads for Compression (zstd only)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Using multiple threads for compression (zstd only)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 When using `zstd`, the number of threads to use for compression is controlled using the
 `compress-threads` keyword. This is useful for large files 

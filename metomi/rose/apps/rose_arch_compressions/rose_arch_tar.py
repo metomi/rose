@@ -77,7 +77,7 @@ class RoseArchTarGzip:
             self.app_runner.popen.run_simple(command, shell=True)
             self.app_runner.fs_util.delete(tar_name)
 
-        if target.compress_scheme in self.ZSTD_EXTS:
+        elif target.compress_scheme in self.ZSTD_EXTS:
             fdsec, zst_name = mkstemp(
                 suffix="." + target.compress_scheme, dir=work_dir
             )
@@ -87,7 +87,7 @@ class RoseArchTarGzip:
             self.app_runner.popen.run_simple(command, shell=True)
             self.app_runner.fs_util.delete(tar_name)
 
-        if target.compress_scheme in self.XZ_EXTS:
+        elif target.compress_scheme in self.XZ_EXTS:
             fdsec, xz_name = mkstemp(
                 suffix="." + target.compress_scheme, dir=work_dir
             )
