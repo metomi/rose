@@ -41,14 +41,17 @@ def setup_rose_arch_env(monkeypatch, tmp_path):
     """Mock the environment variables needed for a rose_arch task.
     """
     tmp_path_str = str(tmp_path)
+    # Avoids leaving rose database and rose-app-run.conf files in your CWD.
+    monkeypatch.chdir(tmp_path_str)
     monkeypatch.setenv("CYLC_WORKFLOW_ID", "foo")
-    monkeypatch.setenv("CYLC_TASK_ID", "bar")
+    monkeypatch.setenv("CYLC_TASK_ID", "test_rose_arch")
     monkeypatch.setenv("CYLC_TASK_NAME", "baz")
     monkeypatch.setenv("CYLC_TASK_CYCLE_POINT", "qux")
     monkeypatch.setenv("CYLC_TASK_LOG_ROOT", tmp_path_str)
     monkeypatch.setenv("ROSE_SUITE_NAME", tmp_path_str)
     monkeypatch.setenv("ROSE_SUITE_DIR", tmp_path_str)
     monkeypatch.setenv("CYLC_RUN_DIR", tmp_path_str)
+    yield
 
 
 @pytest.fixture
