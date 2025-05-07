@@ -224,6 +224,9 @@ texinfo_documents = [
 linkcheck_ignore = [
     # linux.die.net doesn't like our request headers
     'https?://linux.die.net/man/1/rsync',
+    # ... nor does stackoverflow
+    'https?://stackoverflow.com',
+    'https?://www.gnu.org',
 ]
 
 
