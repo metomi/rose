@@ -108,7 +108,7 @@ DEAD_ENDS = {
     ('rose', 'suite-clean'):
         'This command has been replaced by: "cylc clean".',
     ('rose', 'suite-cmp-vc'):
-        'This command is awaiting re-implementation in Cylc 8',
+        'See ~/cylc-run/<workflow>/log/version',
     ('rose', 'suite-gcontrol'):
         'This command has been removed: use the Cylc GUI.',
     ('rose', 'sgc'):
@@ -138,7 +138,7 @@ DEAD_ENDS = {
     ('rosie', 'disco'):
         'Rosie Disco has been disabled pending fixes at a later release.',
     ('rosie', 'go'):
-        'This command has been removed pending re-implementation',
+        'This command has been removed.',
 }
 
 
