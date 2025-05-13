@@ -460,7 +460,7 @@ __PYTHON__
 
 get_reg () {
     local FLOW_UID
-    FLOW_UID="$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c6)"
+    FLOW_UID="$(uuidgen | head -n6)"
     FLOW="rtb.$ROSE_TEST_TIME_INIT/${TEST_KEY_BASE}/${FLOW_UID}"
     FLOW_RUN_DIR="$HOME/cylc-run/$FLOW"
     echo "${FLOW}"
