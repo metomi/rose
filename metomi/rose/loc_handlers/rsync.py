@@ -58,14 +58,14 @@ class PreRsyncCheckError(Exception):
 
         if self.returncode == 255:
             host = dict_['args'][dict_['args'].index('-n') + 1]
-            self.message = (
+            self.mod_msg = (
                 self.BASE_MESSAGE
                 + 'If it is then host'
                 f' "{host}"'
                 ' is uncontactable (ssh 255 error).'
             )
         else:
-            self.message = (
+            self.mod_msg = (
                 self.BASE_MESSAGE
                 + f'`{self.cmd}` failed with:'
                 + indent(
@@ -75,7 +75,9 @@ class PreRsyncCheckError(Exception):
                     prefix='    ',
                 )
             )
-        super().__init__(self.message)
+
+    def __str__(self):
+        return self.mod_msg
 
 
 class RsyncLocHandler:
