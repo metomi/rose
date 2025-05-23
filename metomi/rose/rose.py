@@ -249,13 +249,19 @@ def load_entry_point(entry_point: 'EntryPoint'):
 
 
 def _get_sub_cmds(ns):
-    for ns_, sub_cmd in set(PYTHON_SUB_CMDS) | BASH_SUB_CMDS:
+    for ns_, sub_cmd in (
+        set(PYTHON_SUB_CMDS) | BASH_SUB_CMDS
+    ) - set(DEAD_ENDS):
         if ns_ == ns:
             yield sub_cmd
 
 
 def get_arg_parser(description, sub_cmds, ns):
+    # Add alias names in brackets to sub commands in the help text.
+    aliases = {v[1]: f'({k[1]})' for k, v in ALIASES.items()}
+    sub_cmds = [f'{i} {aliases.get(i, "")}' for i in sub_cmds]
     epilog = f'Commands:\n  {ns} ' + f'\n  {ns} '.join(sorted(sub_cmds))
+
     parser = argparse.ArgumentParser(
         add_help=False,
         description=description,
