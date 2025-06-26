@@ -23,8 +23,8 @@ import time
 import traceback
 
 from metomi.rose.opt_parse import RoseOptionParser
-from metomi.rose.popen import RosePopenError
 from metomi.rose.reporter import Event, Reporter
+from metomi.rosie.cli_utils import get_terminal_cols, table
 from metomi.rosie.suite_id import SuiteId
 from metomi.rosie.ws_client import (
     RosieWSClient,
@@ -265,6 +265,9 @@ Examples:
 
   # list all suites in projects starting with "ocean" that are owned by "bob"
   $ rosie lookup -Q project like ocean% and owner eq bob
+
+  # turn off the table formatting
+  $ rosie lookup --no-pretty
         ''',
     ).add_my_options(
         "address_mode",
@@ -277,6 +280,7 @@ Examples:
         "reverse",
         "search_mode",
         "sort",
+        "no_pretty_mode",
     )
     opts, args = opt_parser.parse_args()
     if not args:
@@ -346,13 +350,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None):
     """Display returned suite details."""
     report = ws_client.event_handler
 
-    try:
-        terminal_cols = int(ws_client.popen("stty", "size")[0].split()[1])
-    except (IndexError, RosePopenError, ValueError):
-        terminal_cols = None
-
-    if terminal_cols == 0:
-        terminal_cols = None
+    terminal_cols = get_terminal_cols()
 
     if opts.quietness and not opts.print_format:
         opts.print_format = PRINT_FORMAT_QUIET
@@ -399,16 +397,28 @@ def _display_maps(opts, ws_client, dict_rows, url=None):
 
     dict_rows = _align(dict_rows, keylist)
 
-    for dict_row in dict_rows:
-        out = opts.print_format
-        for key, value in dict_row.items():
-            if "%" + key in out:
-                out = str(out).replace("%" + str(key), str(value), 1)
-        out = str(out.replace("%%", "%").expandtabs().rstrip())
+    if opts.no_pretty_mode:
+        for dict_row in dict_rows:
+            out = opts.print_format
+            for key, value in dict_row.items():
+                if "%" + key in out:
+                    out = str(out).replace("%" + str(key), str(value), 1)
+            out = str(out.replace("%%", "%").expandtabs().rstrip())
 
-        report(
-            SuiteEvent(out.expandtabs() + "\n"), prefix="", clip=terminal_cols
-        )
-        report(SuiteInfo(dict_row), prefix="")
-    if url is not None:
-        report(URLEvent(url + "\n"), prefix="")
+            report(
+                SuiteEvent(out.expandtabs() + "\n"),
+                prefix="",
+                clip=terminal_cols,
+            )
+            report(SuiteInfo(dict_row), prefix="")
+        if url is not None:
+            report(URLEvent(url + "\n"), prefix="")
+    else:
+        cols = [x.replace('%', '') for x in opts.print_format.split()]
+        _rows = [[_dict[col] for col in cols] for _dict in dict_rows[2:]]
+        try:
+            print(table(_rows, header=cols, max_width=terminal_cols))
+        except UnicodeDecodeError:
+            print(table(
+                _rows, header=cols, max_width=terminal_cols, unicode=False
+            ))
