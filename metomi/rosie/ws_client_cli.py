@@ -183,7 +183,7 @@ A blank field means there is no related suite checked out.
 def lookup():
     """CLI command to run the various search types"""
     opt_parser = RoseOptionParser(
-        usage='rosie lookup [OPTIONS] LOOKUP-TEXT ...',
+        usage='rosie lookup [OPTIONS] SEARCH-STRING ...',
         description='''
 Find suites in the suite discovery database.
 
@@ -196,24 +196,75 @@ is interpreted as follows:
 * A string beginning with "http": an address
 * A string not beginning with "http": search words
 
-An address URL may contain shell meta characters, so remember to put it
-in quotes.
+Search Strings:
+  Search strings may contain SQL wildcard characters. E.g:
 
-The default output format includes a local working copy status field
-(`%local`) in the first column.
+  * `%` (percent) is a substitute for zero or more characters.
+  * `_` (underscore) is a substitute for a single character.
 
-* A blank field means there is no related suite checked out.
-* `=` means that the suite is checked out at this branch and revision.
-* `<` means that the suite is checked out but at an older revision.
-* `>` means that the suite is checked out but at a newer revision.
-* `S` means that the suite is checked out but on a different branch.
-* `M` means that the suite is checked out and modified.
-* `X` means that the suite is checked out but is corrupted.
+Addresses:
+  An address URL may contain shell meta characters, so remember to put it
+  in quotes.
 
-Search strings may contain SQL wildcard characters. E.g:
+Output:
+  The default output format includes a local working copy status field
+  (`%local`) in the first column.
 
-* `%` (percent) is a substitute for zero or more characters.
-* `_` (underscore) is a substitute for a single character.
+  * A blank field means there is no related suite checked out.
+  * `=` means that the suite is checked out at this branch and revision.
+  * `<` means that the suite is checked out but at an older revision.
+  * `>` means that the suite is checked out but at a newer revision.
+  * `S` means that the suite is checked out but on a different branch.
+  * `M` means that the suite is checked out and modified.
+  * `X` means that the suite is checked out but is corrupted.
+
+Queries:
+  The SEARCH-STRING provides an easy way to search all fields.
+
+  Queries, supplied using the `-Q` argument allow for more targetted searching.
+  The format is:
+
+    FIELD OPERATOR VALUE [CONJUNCTION FIELD OPERATOR VALUE ...]
+
+  FIELD:
+    * access-list
+    * author
+    * branch
+    * date
+    * description
+    * from_idx
+    * idx
+    * issue-list
+    * owner
+    * project
+    * revision
+    * status
+    * suite
+    * title
+
+  OPERATOR:
+    * eq - equals
+    * ne - not equal to
+    * contains - the given string exists somewhere within this field
+    * like - Similar to the SQL "like" operator, `_` matches one character,
+      `%` matches one or more characters.
+
+  CONJUNCTION:
+    Queries can be joined together using `and` or `or`, you may use parenthesis
+    for logical grouping.
+
+Examples:
+  # list all suites with "expieriment" in any field
+  $ rosie lookup experiment
+
+  # list all suites owned by "alice"
+  $ rosie lookup -Q owner eq alice
+
+  # list all suites from the "u" repository that are owned by "alice"
+  $ rosie lookup --prefix=u -Q owner eq alice
+
+  # list all suites in projects starting with "ocean" that are owned by "bob"
+  $ rosie lookup -Q project like ocean% and owner eq bob
         ''',
     ).add_my_options(
         "address_mode",
