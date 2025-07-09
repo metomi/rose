@@ -189,15 +189,6 @@ Using a Rose workflow configuration with Cylc 8
 
       Note that template variable strings must be quoted.
 
-   #. **Tell the workflow what language to use when templating**
-
-      Add a hashbang line to the flow.cylc file to tell it to use Jinja2 to
-      process template variables:
-
-      .. code-block:: diff
-
-         + #!jinja2
-
    #. **Write suite metadata**
 
       Create a ``meta/rose-meta.conf`` file and write some metadata for the
