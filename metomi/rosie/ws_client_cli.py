@@ -18,13 +18,14 @@
 
 
 import re
+from shutil import get_terminal_size
 import sys
 import time
 import traceback
 
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.reporter import Event, Reporter
-from metomi.rosie.cli_utils import get_terminal_cols, table
+from metomi.rosie.cli_utils import table
 from metomi.rosie.suite_id import SuiteId
 from metomi.rosie.ws_client import (
     RosieWSClient,
@@ -349,8 +350,8 @@ def _align(rows, keys):
 def _display_maps(opts, ws_client, dict_rows, url=None):
     """Display returned suite details."""
     report = ws_client.event_handler
-
-    terminal_cols = get_terminal_cols()
+    # NOTE: don't use the "fallback" size argument until Python 3.11
+    terminal_cols = get_terminal_size().columns or 80
 
     if opts.quietness and not opts.print_format:
         opts.print_format = PRINT_FORMAT_QUIET

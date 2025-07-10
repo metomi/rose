@@ -15,7 +15,6 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-from subprocess import Popen, PIPE
 import textwrap
 from typing import Optional, List
 
@@ -49,18 +48,6 @@ A_RX = '+'
 A_TX = '+'
 A_BX = '+'
 A_XX = '+'
-
-
-def get_terminal_cols(default=80):
-    """Return the width of the terminal in columns.
-
-    If the check fails, this will fallback to the default value.
-    """
-    proc = Popen(['stty', 'size'], stdout=PIPE, stderr=PIPE, text=True)
-    try:
-        return int(proc.communicate()[0].split()[1]) or default
-    except Exception:
-        return default
 
 
 def table(
