@@ -456,10 +456,12 @@ Rose Applications In Rose Suite Configurations
       specified if necessary. Remove the lines from the ``flow.cylc`` file
       when you are done.
 
-      Remember, in Rose configuration files:
+      .. important::
 
-      * Spaces are not used around the equals (``=``) operator.
-      * Ensure the environment variables are not quoted.
+         Remember, in Rose configuration files:
+
+         * Spaces are not used around the equals (``=``) operator.
+         * Ensure the environment variables are not quoted.
 
       The ``[env]`` section of your :rose:file:`rose-app.conf` file should now
       look like this:
@@ -469,7 +471,6 @@ Rose Applications In Rose Suite Configurations
          [env]
          INTERVAL=60
          N_FORECASTS=5
-         WEIGHTING=1
          MAP_TEMPLATE=map-template.html
          SPLINE_LEVEL=0
          WIND_FILE_TEMPLATE=$CYLC_WORKFLOW_WORK_DIR/{cycle}/consolidate_observations/wind_{xy}.csv
