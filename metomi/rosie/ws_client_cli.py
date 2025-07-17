@@ -18,13 +18,14 @@
 
 
 import re
+from shutil import get_terminal_size
 import sys
 import time
 import traceback
 
 from metomi.rose.opt_parse import RoseOptionParser
-from metomi.rose.popen import RosePopenError
 from metomi.rose.reporter import Event, Reporter
+from metomi.rosie.cli_utils import table
 from metomi.rosie.suite_id import SuiteId
 from metomi.rosie.ws_client import (
     RosieWSClient,
@@ -183,7 +184,7 @@ A blank field means there is no related suite checked out.
 def lookup():
     """CLI command to run the various search types"""
     opt_parser = RoseOptionParser(
-        usage='rosie lookup [OPTIONS] LOOKUP-TEXT ...',
+        usage='rosie lookup [OPTIONS] SEARCH-STRING ...',
         description='''
 Find suites in the suite discovery database.
 
@@ -196,24 +197,78 @@ is interpreted as follows:
 * A string beginning with "http": an address
 * A string not beginning with "http": search words
 
-An address URL may contain shell meta characters, so remember to put it
-in quotes.
+Search Strings:
+  Search strings may contain SQL wildcard characters. E.g:
 
-The default output format includes a local working copy status field
-(`%local`) in the first column.
+  * `%` (percent) is a substitute for zero or more characters.
+  * `_` (underscore) is a substitute for a single character.
 
-* A blank field means there is no related suite checked out.
-* `=` means that the suite is checked out at this branch and revision.
-* `<` means that the suite is checked out but at an older revision.
-* `>` means that the suite is checked out but at a newer revision.
-* `S` means that the suite is checked out but on a different branch.
-* `M` means that the suite is checked out and modified.
-* `X` means that the suite is checked out but is corrupted.
+Addresses:
+  An address URL may contain shell meta characters, so remember to put it
+  in quotes.
 
-Search strings may contain SQL wildcard characters. E.g:
+Output:
+  The default output format includes a local working copy status field
+  (`%local`) in the first column.
 
-* `%` (percent) is a substitute for zero or more characters.
-* `_` (underscore) is a substitute for a single character.
+  * A blank field means there is no related suite checked out.
+  * `=` means that the suite is checked out at this branch and revision.
+  * `<` means that the suite is checked out but at an older revision.
+  * `>` means that the suite is checked out but at a newer revision.
+  * `S` means that the suite is checked out but on a different branch.
+  * `M` means that the suite is checked out and modified.
+  * `X` means that the suite is checked out but is corrupted.
+
+Queries:
+  The SEARCH-STRING provides an easy way to search all fields.
+
+  Queries, supplied using the `-Q` argument allow for more targetted searching.
+  The format is:
+
+    FIELD OPERATOR VALUE [CONJUNCTION FIELD OPERATOR VALUE ...]
+
+  FIELD:
+    * access-list
+    * author
+    * branch
+    * date
+    * description
+    * from_idx
+    * idx
+    * issue-list
+    * owner
+    * project
+    * revision
+    * status
+    * suite
+    * title
+
+  OPERATOR:
+    * eq - equals
+    * ne - not equal to
+    * contains - the given string exists somewhere within this field
+    * like - Similar to the SQL "like" operator, `_` matches one character,
+      `%` matches one or more characters.
+
+  CONJUNCTION:
+    Queries can be joined together using `and` or `or`, you may use parenthesis
+    for logical grouping.
+
+Examples:
+  # list all suites with "expieriment" in any field
+  $ rosie lookup experiment
+
+  # list all suites owned by "alice"
+  $ rosie lookup -Q owner eq alice
+
+  # list all suites from the "u" repository that are owned by "alice"
+  $ rosie lookup --prefix=u -Q owner eq alice
+
+  # list all suites in projects starting with "ocean" that are owned by "bob"
+  $ rosie lookup -Q project like ocean% and owner eq bob
+
+  # turn off the table formatting
+  $ rosie lookup --no-pretty
         ''',
     ).add_my_options(
         "address_mode",
@@ -226,6 +281,7 @@ Search strings may contain SQL wildcard characters. E.g:
         "reverse",
         "search_mode",
         "sort",
+        "no_pretty_mode",
     )
     opts, args = opt_parser.parse_args()
     if not args:
@@ -294,14 +350,8 @@ def _align(rows, keys):
 def _display_maps(opts, ws_client, dict_rows, url=None):
     """Display returned suite details."""
     report = ws_client.event_handler
-
-    try:
-        terminal_cols = int(ws_client.popen("stty", "size")[0].split()[1])
-    except (IndexError, RosePopenError, ValueError):
-        terminal_cols = None
-
-    if terminal_cols == 0:
-        terminal_cols = None
+    # NOTE: don't use the "fallback" size argument until Python 3.11
+    terminal_cols = get_terminal_size().columns or 80
 
     if opts.quietness and not opts.print_format:
         opts.print_format = PRINT_FORMAT_QUIET
@@ -348,16 +398,28 @@ def _display_maps(opts, ws_client, dict_rows, url=None):
 
     dict_rows = _align(dict_rows, keylist)
 
-    for dict_row in dict_rows:
-        out = opts.print_format
-        for key, value in dict_row.items():
-            if "%" + key in out:
-                out = str(out).replace("%" + str(key), str(value), 1)
-        out = str(out.replace("%%", "%").expandtabs().rstrip())
+    if opts.no_pretty_mode:
+        for dict_row in dict_rows:
+            out = opts.print_format
+            for key, value in dict_row.items():
+                if "%" + key in out:
+                    out = str(out).replace("%" + str(key), str(value), 1)
+            out = str(out.replace("%%", "%").expandtabs().rstrip())
 
-        report(
-            SuiteEvent(out.expandtabs() + "\n"), prefix="", clip=terminal_cols
-        )
-        report(SuiteInfo(dict_row), prefix="")
-    if url is not None:
-        report(URLEvent(url + "\n"), prefix="")
+            report(
+                SuiteEvent(out.expandtabs() + "\n"),
+                prefix="",
+                clip=terminal_cols,
+            )
+            report(SuiteInfo(dict_row), prefix="")
+        if url is not None:
+            report(URLEvent(url + "\n"), prefix="")
+    else:
+        cols = [x.replace('%', '') for x in opts.print_format.split()]
+        _rows = [[_dict[col] for col in cols] for _dict in dict_rows[2:]]
+        try:
+            print(table(_rows, header=cols, max_width=terminal_cols))
+        except UnicodeDecodeError:
+            print(table(
+                _rows, header=cols, max_width=terminal_cols, unicode=False
+            ))
