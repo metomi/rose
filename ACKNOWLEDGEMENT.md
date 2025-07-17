@@ -3,15 +3,15 @@
 Licences for non-Rose works included in this distribution can be
 found in the licences/ directory.
 
-etc/images/rose-icon.png,
-etc/images/rose-icon.svg,
-etc/images/rose-icon-trim.png,
-etc/images/rose-icon-trim.svg,
-etc/images/rose-logo.png,
-etc/images/rosie-icon.png,
-etc/images/rosie-icon.svg,
-etc/images/rosie-icon-trim.png,
-etc/images/rosie-icon-trim.svg,
+metomi/rose/etc/images/rose-icon.png,
+metomi/rose/etc/images/rose-icon.svg,
+metomi/rose/etc/images/rose-icon-trim.png,
+metomi/rose/etc/images/rose-icon-trim.svg,
+metomi/rose/etc/images/rose-logo.png,
+metomi/rose/etc/images/rosie-icon.png,
+metomi/rose/etc/images/rosie-icon.svg,
+metomi/rose/etc/images/rosie-icon-trim.png,
+metomi/rose/etc/images/rosie-icon-trim.svg,
 metomi/rose/etc/rose-all/etc/images/icon.png,
 metomi/rose/etc/rose-meta/rose-all/etc/images/icon.png
 * These icons are all derived from the public domain image at
