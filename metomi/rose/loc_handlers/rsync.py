@@ -34,7 +34,7 @@ class PreRsyncCheckError(Exception):
         ' decided this must be an Rsync handler.\n\t'
     )
 
-    def __init__(self, dict_, cmd=None):
+    def __init__(self, dict_, cmd=None, loc=None):
         for key, value in dict_.items():
             if isinstance(value, TextIOWrapper):
                 setattr(self, key, value.read())
@@ -49,6 +49,12 @@ class PreRsyncCheckError(Exception):
 
         # Handle ``test -e nonexistant`` where no useful error is
         # provided:
+        message = ''
+        for used_by in loc.used_by_names:
+            message += (
+                f'file:{used_by}={loc.action_key}={loc.name}'
+                ': don\'t know how to process stuff:ing\n'
+            )
         if (
             self.returncode == 1
             and self.stderr == ''
@@ -59,14 +65,16 @@ class PreRsyncCheckError(Exception):
         if self.returncode == 255:
             host = dict_['args'][dict_['args'].index('-n') + 1]
             self.mod_msg = (
-                self.BASE_MESSAGE
+                message
+                + self.BASE_MESSAGE
                 + 'If it is then host'
                 f' "{host}"'
                 ' is uncontactable (ssh 255 error).'
             )
         else:
             self.mod_msg = (
-                self.BASE_MESSAGE
+                message
+                + self.BASE_MESSAGE
                 + f'`{self.cmd}` failed with:'
                 + indent(
                     f'\nreturncode: {self.returncode}'
@@ -112,7 +120,7 @@ class RsyncLocHandler:
             if proc.wait() == 0:
                 return True
             else:
-                raise PreRsyncCheckError(proc.__dict__, cmd=cmd)
+                raise PreRsyncCheckError(proc.__dict__, cmd=cmd, loc=loc)
 
     def parse(self, loc, _):
         """Set loc.scheme, loc.loc_type, loc.paths."""
