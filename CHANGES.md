@@ -12,6 +12,11 @@ $ towncrier create <PR-number>.<break|feat|fix>.md --content "Short description"
 
 ## 2.5.0 (Released 2025-07-24)
 
+### Enhancements
+
+[#2903](https://github.com/metomi/rose/pull/2903) - Improve `rosie lookup`
+docs and output format.
+
 ### 🔧 Fixes
 
 [#2889](https://github.com/cylc/cylc-flow/pull/2889) - Remove references to Empy, which is no longer available as a templating language for `flow.cylc` files as of Cylc 8.4.0.
