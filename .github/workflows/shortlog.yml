@@ -5,6 +5,8 @@ on:
   pull_request:
     paths:
       - 'CONTRIBUTING.md'
+  schedule:
+    - cron: '37 06 * * 1' # 06:37, Monday
 
 jobs:
   test:
