@@ -1,0 +1,434 @@
+
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rose_prune &mdash; Rose Documentation 2.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=47202671" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/diff_selector.css?v=9704a72b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/grid_table.css?v=0285b42e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/hieroglyph_theme_addons.css?v=814c2015" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/tutorial.css?v=b869d33c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/addons.css?v=d1f804c3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=466af0f7" />
+
+  
+    <link rel="shortcut icon" href="../../_static/rose-favicon.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3c4615cf"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/js/diff_selector.js?v=3109bfa4"></script>
+      <script src="../../_static/js/minicylc.js?v=ddc882fd"></script>
+      <script src="../../_static/js/spoiler.js?v=12631137"></script>
+      <script src="../../_static/js/addons.js?v=39bd7dee"></script>
+      <script src="../../_static/js/versioning.js?v=df0214e8"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Rose Macro API" href="../rose-macro.html" />
+    <link rel="prev" title="rose_bunch" href="rose_bunch.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/rose-logo-crop.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/rose/index.html">Rose Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rose API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Rose Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../other.html">Other Python API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../rose-built-in-applications.html">Rose Built-In Applications</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="fcm_make.html"><code class="docutils literal notranslate"><span class="pre">fcm_make</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rose_ana.html"><code class="docutils literal notranslate"><span class="pre">rose_ana</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rose_arch.html"><code class="docutils literal notranslate"><span class="pre">rose_arch</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rose_bunch.html"><code class="docutils literal notranslate"><span class="pre">rose_bunch</span></code></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">rose_prune</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#local-vs-remote-hosts">Local Vs Remote Hosts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#invocation">Invocation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../terms.html">Rose Terms Of Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../course/um-ut.html">UM User Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Rose Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../rose-built-in-applications.html">Rose Built-In Applications</a></li>
+      <li class="breadcrumb-item active"><code class="docutils literal notranslate"><span class="pre">rose_prune</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/metomi/rose/blob/master/sphinx/api/built-in/rose_prune.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rose-prune">
+<span id="builtin-rose-prune"></span><h1><code class="docutils literal notranslate"><span class="pre">rose_prune</span></code><a class="headerlink" href="#rose-prune" title="Link to this heading"></a></h1>
+<p>A framework for housekeeping files and directories created by tasks in a
+cycling Cylc workflow.</p>
+<p>When Cylc workflows run, jobs may create files and logs in multiple different
+locations on the network. After a few cycles of the workflow, these files
+can build up, however, older files might not be needed any more.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">rose_prune</span></code> app can be used to remove files from older cycles from
+wherever they are stored on the network in order to free up space for
+later cycles.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">rose_prune</span></code> app should be run on a “local” host (e.g. the Cylc
+server), it uses <code class="docutils literal notranslate"><span class="pre">ssh</span></code> to remove files on any “remote” hosts where tasks
+ran.</p>
+</div>
+<section id="local-vs-remote-hosts">
+<h2>Local Vs Remote Hosts<a class="headerlink" href="#local-vs-remote-hosts" title="Link to this heading"></a></h2>
+<p class="rubric">Local hosts</p>
+<p>When you start a Cylc workflow, a <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-scheduler" title="(in Cylc v8.4)"><span class="xref std std-term">scheduler</span></a> is launched.</p>
+<p>The host where the scheduler starts is the “local” host. Any other hosts which
+share the same filesystem (i.e. which see the same <code class="docutils literal notranslate"><span class="pre">$HOME</span></code> directory) are
+also “local”.</p>
+<p>The Cylc scheduler manages some files on the “local” filesystem, e.g. the
+scheduler log. Cylc may be configured to copy remote job logs back to the
+local filesystem.</p>
+<p class="rubric">Remote hosts</p>
+<p>Jobs are often configured to run on “remote” hosts which do not share the same
+filesystem as the Cylc server (e.g. some HPC systems). The job logs and any
+files these jobs create will be on the “remote” filesystem.</p>
+</section>
+<section id="invocation">
+<h2>Invocation<a class="headerlink" href="#invocation" title="Link to this heading"></a></h2>
+<p>To write a <code class="docutils literal notranslate"><span class="pre">rose_prune</span></code> app, add these lines at the top of a
+<code class="docutils literal notranslate"><span class="pre">rose-app.conf</span></code> file:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">meta</span><span class="o">=</span><span class="s">rose_prune</span>
+<span class="nv">mode</span><span class="o">=</span><span class="s">rose_prune</span>
+</pre></div>
+</div>
+<p>Then run in a task in a Cylc workflow using <code class="docutils literal notranslate"><span class="pre">rose</span> <span class="pre">task-run</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the <code class="docutils literal notranslate"><span class="pre">mode</span></code> is not specified, the <code class="docutils literal notranslate"><span class="pre">rose_prune</span></code> mode will be
+automatically selected if the app is run by a Cylc task with a name that
+starts with <code class="docutils literal notranslate"><span class="pre">rose_prune</span></code>.</p>
+</div>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="nv">meta</span><span class="o">=</span><span class="s">rose_prune</span>
+<span class="nv">mode</span><span class="o">=</span><span class="s">rose_prune</span>
+
+<span class="nt">[prune]</span>
+<span class="c1"># remove log files on remote filesystems from cycles which are 6 hours or</span>
+<span class="c1"># more before the current cycle</span>
+<span class="c1"># i.e. ssh &lt;remote-host&gt; rm -r ~/cylc-run/&lt;workflow&gt;/&lt;log&gt;/&lt;job&gt;/&lt;cycle&gt;</span>
+<span class="nv">prune-remote-logs-at</span><span class="o">=</span><span class="s">-PT6H</span>
+
+<span class="c1"># archive (e.g. &quot;tar&quot;) local log files from cycles one day or more before</span>
+<span class="c1"># the current cycle</span>
+<span class="c1"># i.e. gzip cylc-run/&lt;workflow&gt;/&lt;log&gt;/&lt;job&gt;/&lt;cycle&gt;</span>
+<span class="nv">archive-logs-at</span><span class="o">=</span><span class="s">-P1D</span>
+
+<span class="c1"># remove local log files from cycles 7 days or more before the current cycle</span>
+<span class="c1"># i.e. ssh &lt;remote-host&gt; rm -r ~/cylc-run/&lt;workflow&gt;/&lt;log&gt;/&lt;job&gt;/&lt;cycle&gt;</span>
+<span class="nv">prune-server-logs-at</span><span class="o">=</span><span class="s">-P7D</span>
+
+<span class="c1"># remove files matching the globs from the Cylc work directory</span>
+<span class="c1"># i.e. ssh &lt;local/remote-host&gt; rm -r ~/cylc-run/&lt;workflow&gt;/work/&lt;cycle&gt;/&lt;glob&gt;</span>
+<span class="nv">prune{work}</span><span class="o">=</span><span class="s">-PT6H:task_x* -PT12H:*/other*.dat -PT18H:task_y* -PT24H</span>
+
+<span class="c1"># remove selected items from the share/cycle directory</span>
+<span class="c1"># ssh &lt;local/remote-host&gt; rm -r ~/cylc-run/&lt;workflow&gt;/share/cycle/&lt;cycle&gt;/&lt;glob&gt;</span>
+<span class="nv">prune{share/cycle}</span><span class="o">=</span><span class="s">-PT6H:foo* -PT12H:&#39;bar* *.baz*&#39; -P1D</span>
+
+<span class="c1"># remove selected paths from the share directory</span>
+<span class="c1"># i.e. ssh &lt;local/remote-host&gt; rm ~/cylc-run/&lt;workflow&gt;/share/hello-*-at-&lt;cycle&gt;.txt</span>
+<span class="nv">prune{share}</span><span class="o">=</span><span class="s">-P1D:hello-*-at-%(cycle)s.txt</span>
+</pre></div>
+</div>
+</section>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h2>
+<p>The application is configured in the <a class="reference internal" href="#rose:conf:rose_prune[prune]" title="rose:conf:rose_prune[prune]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose_prune[prune]</span></code></a>
+section in the <a class="reference internal" href="../configuration/application.html#rose:file:rose-app.conf" title="rose:file:rose-app.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-app.conf</span></code></a> file.</p>
+<p>All settings are expressed as a space delimited list of cycles, normally as
+<a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-cycle-point" title="(in Cylc v8.4)"><span class="xref std std-term">cycle points</span></a> or <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-ISO8601-duration" title="(in Cylc v8.4)"><span class="xref std std-term">offsets</span></a> relative to the current cycle.</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>Workflow Cycling Type</p></td>
+<td><p><a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-datetime-cycling" title="(in Cylc v8.4)"><span class="xref std std-term">Datetime Cycling</span></a></p></td>
+<td><p><a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-integer-cycling" title="(in Cylc v8.4)"><span class="xref std std-term">Integer Cycling</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-cycle-point" title="(in Cylc v8.4)"><span class="xref std std-term">Cycle Point</span></a> format</p></td>
+<td><p><a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-ISO8601-datetime" title="(in Cylc v8.4)"><span class="xref std std-term">ISO8601 datetime</span></a> (e.g. <code class="docutils literal notranslate"><span class="pre">20000101T00Z</span></code> - the 1st of Jan 2000)</p></td>
+<td><p>Integer (e.g. <code class="docutils literal notranslate"><span class="pre">2</span></code> - the second cycle)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Cycle offset format</p></td>
+<td><p><a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-ISO8601-duration" title="(in Cylc v8.4)"><span class="xref std std-term">ISO8601 duration</span></a> (e.g. <code class="docutils literal notranslate"><span class="pre">-P1DT6H</span></code> - one day and 6 hours before
+the current cycle point).</p></td>
+<td><p>Integer duration (e.g. <code class="docutils literal notranslate"><span class="pre">-P2</span></code> - two cycles before the current cycle
+point)</p></td>
+</tr>
+</tbody>
+</table>
+<p>The cycles of some settings also accept an optional argument followed
+by a colon. In these, the argument should be globs for matching items
+in the directory. If two or more globs are required, they should be
+separated by a space. In which case, either the argument should be
+quoted or the space should be escaped by a backslash.</p>
+<div class="admonition note" id="rose-prune-globs">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">rose_prune</span></code> uses Bash <a class="reference external" href="https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html#Pattern-Matching">extglob pattern matching</a> which supports simple
+(e.g. <code class="docutils literal notranslate"><span class="pre">*</span></code>) and extended (e.g. <code class="docutils literal notranslate"><span class="pre">!(foo)</span></code>) pattern matching.</p>
+<p>For more information see the <code class="docutils literal notranslate"><span class="pre">shopt</span></code> documentation for the version
+of bash you have installed (<code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">man</span> <span class="pre">shopt</span></code>).</p>
+</div>
+<dl class="rose app">
+<dt class="sig sig-object rose" id="rose:app:rose_prune">
+<em class="property"><span class="pre">Rose</span> <span class="pre">App</span> </em><span class="sig-name descname"><span class="pre">rose_prune</span></span><a class="headerlink" href="#rose:app:rose_prune" title="Link to this definition"></a></dt>
+<dd><dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_prune[prune]">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">[prune]</span></span><a class="headerlink" href="#rose:conf:rose_prune[prune]" title="Link to this definition"></a></dt>
+<dd><dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_prune[prune]cycle-format{key}">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">cycle-format{key}</span></span><em class="property"><span class="pre">=</span> <span class="pre">format</span></em><a class="headerlink" href="#rose:conf:rose_prune[prune]cycle-format{key}" title="Link to this definition"></a></dt>
+<dd><p>Specify a key to a format string for use in conjunction with a
+<a class="reference internal" href="#rose:conf:rose_prune[prune]prune{item-root}" title="rose:conf:rose_prune[prune]prune{item-root}"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">prune{item-root}=cycle:globs</span></code></a> setting.</p>
+<p>For example, we may
+have something like <code class="docutils literal notranslate"><span class="pre">cycle-format{cycle_year}=CCYY</span></code> and
+<code class="docutils literal notranslate"><span class="pre">prune{share}=-P1Y:xmas-present-%(cycle_year)s/</span></code>. If the
+current cycle point is <code class="docutils literal notranslate"><span class="pre">20151201T0000Z</span></code>, it will clear out the
+directory <code class="docutils literal notranslate"><span class="pre">share/xmas-present-2014/</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">key</span></code> can be any string that can be used in a <code class="docutils literal notranslate"><span class="pre">%(key)s</span></code>
+substitution, and format should be a a valid <a class="reference internal" href="../command-reference.html#command-rose-date"><span class="std std-ref">rose date</span></a>
+print format.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_prune[prune]prune-remote-logs-at">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">prune-remote-logs-at</span></span><em class="property"><span class="pre">=</span> <span class="pre">cycle</span> <span class="pre">...</span></em><a class="headerlink" href="#rose:conf:rose_prune[prune]prune-remote-logs-at" title="Link to this definition"></a></dt>
+<dd><p>Remove remote job logs at these cycles.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_prune[prune]prune-server-logs-at">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">prune-server-logs-at</span></span><em class="property"><span class="pre">=</span> <span class="pre">cycle</span> <span class="pre">...</span></em><a class="headerlink" href="#rose:conf:rose_prune[prune]prune-server-logs-at" title="Link to this definition"></a></dt>
+<dd><p>Remove logs on the suite server. Removes both log directories
+and archived logs.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_prune[prune]archive-logs-at">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">archive-logs-at</span></span><em class="property"><span class="pre">=</span> <span class="pre">cycle</span> <span class="pre">...</span></em><a class="headerlink" href="#rose:conf:rose_prune[prune]archive-logs-at" title="Link to this definition"></a></dt>
+<dd><p>Archive all job logs at these cycles. Remove remote job logs on
+success.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_prune[prune]prune{item-root}">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">prune{item-root}</span></span><em class="property"><span class="pre">=</span> <span class="pre">cycle[:glob]</span> <span class="pre">...</span></em><a class="headerlink" href="#rose:conf:rose_prune[prune]prune{item-root}" title="Link to this definition"></a></dt>
+<dd><p>Remove items from within a specified directory.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">item-root</span></code></dt><dd><p>A path within the workflow’s <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-run-directory" title="(in Cylc v8.4)"><span class="xref std std-term">run directory</span></a> e.g. <code class="docutils literal notranslate"><span class="pre">work</span></code> or
+<code class="docutils literal notranslate"><span class="pre">share/cycle</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">cycle</span></code></dt><dd><p>The cycle to remove items from or an offset from the current cycle.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">glob</span></code></dt><dd><p>Remove only files matching a <a class="reference internal" href="#rose-prune-globs"><span class="std std-ref">glob pattern</span></a>.</p>
+</dd>
+</dl>
+<p>By default <code class="docutils literal notranslate"><span class="pre">rose_prune</span></code> will remove files within a cycle
+subdirectory under <code class="docutils literal notranslate"><span class="pre">item-root</span></code>,
+E.g. If current cycle is <code class="docutils literal notranslate"><span class="pre">20141225T1200Z</span></code>,
+<code class="docutils literal notranslate"><span class="pre">prune{work}=-PT12H</span></code> will remove the <code class="docutils literal notranslate"><span class="pre">work/20141225T0000Z/</span></code>
+directory.</p>
+<p>If you want to clear out paths that include a cycle, rather than a
+cycle subdirectory, you can template the path using the <code class="docutils literal notranslate"><span class="pre">%(cycle)s</span></code>
+substitution,
+E.g. If current cycle is <code class="docutils literal notranslate"><span class="pre">20141225T1200Z</span></code>, then
+<code class="docutils literal notranslate"><span class="pre">prune{share}=-PT12H:%(cycle)s.txt</span></code> will remove
+<code class="docutils literal notranslate"><span class="pre">share/20141225T0000Z.txt</span></code>.</p>
+<p>To use different date-time formats, add custom subsitutions using
+<a class="reference internal" href="#rose:conf:rose_prune[prune]cycle-format{key}" title="rose:conf:rose_prune[prune]cycle-format{key}"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">cycle-format{key}=format</span></code></a>, E.g.
+<code class="docutils literal notranslate"><span class="pre">cycle-format{cycle_year_month}=CCYYMM</span></code>.</p>
+<p class="rubric">Examples:</p>
+<p>If the current cycle is <code class="docutils literal notranslate"><span class="pre">20141225T1200Z</span></code>:</p>
+<div class="highlight-rose notranslate"><div class="highlight"><pre><span></span><span class="c1"># remove work/20141225T0000Z/</span>
+<span class="nv">prune{work}</span><span class="o">=</span><span class="s">-PT12H</span>
+
+<span class="c1"># remove work/20141225T0000Z/glob*</span>
+<span class="nv">prune{work}</span><span class="o">=</span><span class="s">-PT12H:glob*</span>
+
+<span class="c1"># remove share/hello-*-at-20141225T0000Z.txt</span>
+<span class="nv">prune{share}</span><span class="o">=</span><span class="s">-PT12H:hello-*-at-%(cycle)s.txt</span>
+
+<span class="c1"># remove share/hello-*-at-201412.txt</span>
+<span class="nv">cycle-format{cycle_year_month}</span><span class="o">=</span><span class="s">CCYYMM</span>
+<span class="nv">prune{share}</span><span class="o">=</span><span class="s">-PT12H:hello-*-at-%(cycle_year_month)s.txt</span>
+
+<span class="c1"># remove share/hello-*-at-2014.txt</span>
+<span class="nv">cycle-format{cycle_year}</span><span class="o">=</span><span class="s">CCYY</span>
+<span class="nv">prune{share}</span><span class="o">=</span><span class="s">-PT12H:hello-*-at-%(cycle_year)s.txt</span>
+
+<span class="c1"># remove share/cycle/&lt;cycle&gt;/&lt;glob&gt;</span>
+<span class="nv">prune{share/cycle}</span><span class="o">=</span><span class="s">-PT6H:foo* -PT12H:&#39;bar* *.baz*&#39; -P1D</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_prune[prune]prune-work-at">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">prune-work-at</span></span><em class="property"><span class="pre">=</span> <span class="pre">cycle[:globs]</span> <span class="pre">...</span></em><a class="headerlink" href="#rose:conf:rose_prune[prune]prune-work-at" title="Link to this definition"></a></dt>
+<dd><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 2015.04.0: </span>Equivalent to <code class="docutils literal notranslate"><span class="pre">prune{work}=cycle[:globs]</span> <span class="pre">...</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose_prune[prune]prune-datac-at">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">prune-datac-at</span></span><em class="property"><span class="pre">=</span> <span class="pre">cycle[:globs]</span> <span class="pre">...</span></em><a class="headerlink" href="#rose:conf:rose_prune[prune]prune-datac-at" title="Link to this definition"></a></dt>
+<dd><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 2015.04.0: </span>Equivalent to <code class="docutils literal notranslate"><span class="pre">prune{share/cycle}=cycle[:globs]</span> <span class="pre">...</span></code>.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rose_bunch.html" class="btn btn-neutral float-left" title="rose_bunch" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../rose-macro.html" class="btn btn-neutral float-right" title="Rose Macro API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright : Copyright (C) British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2.5.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2.5.0";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "api/built-in/rose_prune";
+    </script>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+
+
+</body>
+</html>

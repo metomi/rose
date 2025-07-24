@@ -1,0 +1,455 @@
+
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rose Upgrade Macro API &mdash; Rose Documentation 2.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=47202671" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/diff_selector.css?v=9704a72b" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/grid_table.css?v=0285b42e" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/hieroglyph_theme_addons.css?v=814c2015" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tutorial.css?v=b869d33c" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/addons.css?v=d1f804c3" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=466af0f7" />
+
+  
+    <link rel="shortcut icon" href="../_static/rose-favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=3c4615cf"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/js/diff_selector.js?v=3109bfa4"></script>
+      <script src="../_static/js/minicylc.js?v=ddc882fd"></script>
+      <script src="../_static/js/spoiler.js?v=12631137"></script>
+      <script src="../_static/js/addons.js?v=39bd7dee"></script>
+      <script src="../_static/js/versioning.js?v=df0214e8"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Rosie Web API" href="rosie-web.html" />
+    <link rel="prev" title="Rose Macro API" href="rose-macro.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/rose-logo-crop.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/rose/index.html">Rose Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rose API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="configuration/index.html">Rose Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="other.html">Other Python API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rose-built-in-applications.html">Rose Built-In Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Rose Upgrade Macro API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#metomi.rose.upgrade.MacroUpgrade"><code class="docutils literal notranslate"><span class="pre">MacroUpgrade</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.upgrade.MacroUpgrade.act_from_files"><code class="docutils literal notranslate"><span class="pre">MacroUpgrade.act_from_files()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.upgrade.MacroUpgrade.add_setting"><code class="docutils literal notranslate"><span class="pre">MacroUpgrade.add_setting()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.upgrade.MacroUpgrade.change_setting_value"><code class="docutils literal notranslate"><span class="pre">MacroUpgrade.change_setting_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.upgrade.MacroUpgrade.enable_setting"><code class="docutils literal notranslate"><span class="pre">MacroUpgrade.enable_setting()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.upgrade.MacroUpgrade.get_setting_value"><code class="docutils literal notranslate"><span class="pre">MacroUpgrade.get_setting_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.upgrade.MacroUpgrade.ignore_setting"><code class="docutils literal notranslate"><span class="pre">MacroUpgrade.ignore_setting()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.upgrade.MacroUpgrade.remove_setting"><code class="docutils literal notranslate"><span class="pre">MacroUpgrade.remove_setting()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metomi.rose.upgrade.MacroUpgrade.rename_setting"><code class="docutils literal notranslate"><span class="pre">MacroUpgrade.rename_setting()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../terms.html">Rose Terms Of Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../course/um-ut.html">UM User Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Rose Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Rose Upgrade Macro API</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/metomi/rose/blob/master/sphinx/api/rose-upgrader-macros.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rose-upgrade-macro-api">
+<span id="rose-upgr-macros"></span><h1>Rose Upgrade Macro API<a class="headerlink" href="#rose-upgrade-macro-api" title="Link to this heading"></a></h1>
+<p>Rose upgrade macros are used to upgrade application configurations between
+metadata versions. They are classes, very similar to
+<a class="reference internal" href="rose-macro.html#api-rose-macro"><span class="std std-ref">transformer macros</span></a>, but with a few differences:</p>
+<ul class="simple">
+<li><p>An <code class="docutils literal notranslate"><span class="pre">upgrade</span></code> method instead of a <code class="docutils literal notranslate"><span class="pre">transform</span></code> method</p></li>
+<li><p>An optional <code class="docutils literal notranslate"><span class="pre">downgrade</span></code> method, identical in API to the <code class="docutils literal notranslate"><span class="pre">upgrade</span></code>
+method, but intended for performing the reverse operation</p></li>
+<li><p>A more helpful API via <a class="reference internal" href="#metomi.rose.upgrade.MacroUpgrade" title="metomi.rose.upgrade.MacroUpgrade"><code class="xref py py-class docutils literal notranslate"><span class="pre">metomi.rose.upgrade.MacroUpgrade</span></code></a> methods</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BEFORE_TAG</span></code> and <code class="docutils literal notranslate"><span class="pre">AFTER_TAG</span></code> attributes - the version of metadata they
+apply to (<code class="docutils literal notranslate"><span class="pre">BEFORE_TAG</span></code>) and the version they upgrade to (<code class="docutils literal notranslate"><span class="pre">AFTER_TAG</span></code>)</p></li>
+</ul>
+<p>An example upgrade macro might look like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Upgrade272to273</span><span class="p">(</span><span class="n">rose</span><span class="o">.</span><span class="n">upgrade</span><span class="o">.</span><span class="n">MacroUpgrade</span><span class="p">):</span>
+
+<span class="sd">&quot;&quot;&quot;Upgrade from 27.2 to 27.3.&quot;&quot;&quot;</span>
+
+<span class="n">BEFORE_TAG</span> <span class="o">=</span> <span class="s2">&quot;27.2&quot;</span>
+<span class="n">AFTER_TAG</span> <span class="o">=</span> <span class="s2">&quot;27.3&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">upgrade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">meta_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;env&quot;</span><span class="p">,</span> <span class="s2">&quot;NEW_VARIABLE&quot;</span><span class="p">],</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">remove_setting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;namelist:old_things&quot;</span><span class="p">,</span> <span class="s2">&quot;OLD_VARIABLE&quot;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The class name is unimportant - the <code class="docutils literal notranslate"><span class="pre">BEFORE_TAG</span></code> and <code class="docutils literal notranslate"><span class="pre">AFTER_TAG</span></code>
+identify the macro.</p>
+</div>
+<p>Metadata versions are usually structured in a <code class="docutils literal notranslate"><span class="pre">rose-meta/CATEGORY/VERSION/</span></code>
+hierarchy - where <code class="docutils literal notranslate"><span class="pre">CATEGORY</span></code> denotes the type or family of application
+(sometimes it is the command used), and <code class="docutils literal notranslate"><span class="pre">VERSION</span></code> is the particular version
+e.g. <code class="docutils literal notranslate"><span class="pre">27.2</span></code> or <code class="docutils literal notranslate"><span class="pre">HEAD</span></code>.</p>
+<p>Upgrade macros live under the <code class="docutils literal notranslate"><span class="pre">CATEGORY</span></code> directory in a <code class="docutils literal notranslate"><span class="pre">versions.py</span></code>
+file - <code class="docutils literal notranslate"><span class="pre">rose-meta/CATEGORY/versions.py</span></code>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you have many upgrade macros, you may want to separate them into
+different modules in the same directory. You can then import from those
+in <code class="docutils literal notranslate"><span class="pre">versions.py</span></code>, so that they are still exposed in that module. You’ll
+need to make your directory a package by creating an <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> file,
+which should contain the line <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">versions</span></code>. To avoid conflict with
+other <code class="docutils literal notranslate"><span class="pre">CATEGORY</span></code> upgrade modules (or other Python modules), please name
+these very modules carefully or use absolute or package level imports like
+this: <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">.versionXX_YY</span> <span class="pre">import</span> <span class="pre">FooBar</span></code>.</p>
+</div>
+<p>Upgrade macros are subclasses of <a class="reference internal" href="#metomi.rose.upgrade.MacroUpgrade" title="metomi.rose.upgrade.MacroUpgrade"><code class="xref py py-class docutils literal notranslate"><span class="pre">metomi.rose.upgrade.MacroUpgrade</span></code></a>.
+They have all the functionality of the
+<a class="reference internal" href="rose-macro.html#api-rose-macro"><span class="std std-ref">transformer macros</span></a>.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="metomi.rose.upgrade.MacroUpgrade">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metomi.rose.upgrade.</span></span><span class="sig-name descname"><span class="pre">MacroUpgrade</span></span><a class="reference internal" href="../_modules/metomi/rose/upgrade.html#MacroUpgrade"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.upgrade.MacroUpgrade" title="Link to this definition"></a></dt>
+<dd><p>Class derived from MacroBase to aid upgrade functionality.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.upgrade.MacroUpgrade.act_from_files">
+<span class="sig-name descname"><span class="pre">act_from_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">downgrade</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/upgrade.html#MacroUpgrade.act_from_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.upgrade.MacroUpgrade.act_from_files" title="Link to this definition"></a></dt>
+<dd><p>Parse a change configuration into actions.</p>
+<p>Searches for:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">etc/VERSION/rose-macro-add.conf</span></code> (settings to be added)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">etc/VERSION/rose-macro-remove.conf</span></code> (settings to be removed)</p></li>
+</ul>
+<p>Where <code class="docutils literal notranslate"><span class="pre">VERSION</span></code> is equal to <code class="docutils literal notranslate"><span class="pre">self.BEFORE_TAG</span></code>.</p>
+<p>If settings are defined in either file, and changes can be made, the
+<code class="docutils literal notranslate"><span class="pre">self.reports</span></code> will be updated automatically.</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">act_from_files</span></code> can be used in combination with other
+methods as part of the same upgrade.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference internal" href="configuration/api.html#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><em>metomi.rose.config.ConfigNode</em></a>) – The application
+configuration.</p></li>
+<li><p><strong>downgrade</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True if downgrading.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.upgrade.MacroUpgrade.add_setting">
+<span class="sig-name descname"><span class="pre">add_setting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forced</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/upgrade.html#MacroUpgrade.add_setting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.upgrade.MacroUpgrade.add_setting" title="Link to this definition"></a></dt>
+<dd><p>Add a setting to the configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference internal" href="configuration/api.html#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><em>metomi.rose.config.ConfigNode</em></a>) – The application
+configuration.</p></li>
+<li><p><strong>keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – A list defining a hierarchy of node.value ‘keys’.
+A section will be a list of one keys, an option will have two.</p></li>
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – String denoting the new setting value.
+Required for options but not for settings.</p></li>
+<li><p><strong>forced</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – If True override value if the setting already exists.</p></li>
+<li><p><strong>state</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The state of the new setting - should be one of the
+<a class="reference internal" href="configuration/api.html#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">metomi.rose.config.ConfigNode</span></code></a> states e.g.
+<a class="reference internal" href="configuration/api.html#metomi.rose.config.ConfigNode.STATE_USER_IGNORED" title="metomi.rose.config.ConfigNode.STATE_USER_IGNORED"><code class="xref py py-data docutils literal notranslate"><span class="pre">metomi.rose.config.ConfigNode.STATE_USER_IGNORED</span></code></a>.
+Defaults to
+<a class="reference internal" href="configuration/api.html#metomi.rose.config.ConfigNode.STATE_NORMAL" title="metomi.rose.config.ConfigNode.STATE_NORMAL"><code class="xref py py-data docutils literal notranslate"><span class="pre">metomi.rose.config.ConfigNode.STATE_NORMAL</span></code></a>.</p></li>
+<li><p><strong>comments</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – List of comment lines (strings) for
+the new setting or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>info</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – A short string containing no new lines,
+describing the addition of the setting.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.upgrade.MacroUpgrade.change_setting_value">
+<span class="sig-name descname"><span class="pre">change_setting_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forced</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/upgrade.html#MacroUpgrade.change_setting_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.upgrade.MacroUpgrade.change_setting_value" title="Link to this definition"></a></dt>
+<dd><p>Change a setting (option) value in the configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference internal" href="configuration/api.html#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><em>metomi.rose.config.ConfigNode</em></a>) – The application
+configuration.</p></li>
+<li><p><strong>keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – A list defining a hierarchy of node.value ‘keys’.
+A section will be a list of one keys, an option will have two.</p></li>
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The new value. Required for options, can be
+<code class="docutils literal notranslate"><span class="pre">None</span></code> for sections.</p></li>
+<li><p><strong>forced</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – Create the setting if it is not present in config.</p></li>
+<li><p><strong>comments</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – List of comment lines (strings) for
+the new setting or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>info</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – A short string containing no new lines,
+describing the addition of the setting.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.upgrade.MacroUpgrade.enable_setting">
+<span class="sig-name descname"><span class="pre">enable_setting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/upgrade.html#MacroUpgrade.enable_setting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.upgrade.MacroUpgrade.enable_setting" title="Link to this definition"></a></dt>
+<dd><p>Enable a setting in the configuration.</p>
+<p>This will reset ignored and trigger ignored settings back to the
+default state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference internal" href="configuration/api.html#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><em>metomi.rose.config.ConfigNode</em></a>) – The application
+configuration.</p></li>
+<li><p><strong>keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – A list defining a hierarchy of node.value ‘keys’.
+A section will be a list of one keys, an option will have two.</p></li>
+<li><p><strong>info</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – A short string containing no new lines,
+describing the addition of the setting.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>False - if the setting’s state is not changed else <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.upgrade.MacroUpgrade.get_setting_value">
+<span class="sig-name descname"><span class="pre">get_setting_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/upgrade.html#MacroUpgrade.get_setting_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.upgrade.MacroUpgrade.get_setting_value" title="Link to this definition"></a></dt>
+<dd><p>Return the value of a setting or <code class="docutils literal notranslate"><span class="pre">None</span></code> if not set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference internal" href="configuration/api.html#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><em>metomi.rose.config.ConfigNode</em></a>) – The application
+configuration.</p></li>
+<li><p><strong>keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – A list defining a hierarchy of node.value ‘keys’.
+A section will be a list of one keys, an option will have two.</p></li>
+<li><p><strong>no_ignore</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> return <code class="docutils literal notranslate"><span class="pre">None</span></code> if the
+setting is ignored (else return the value).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>object - The setting value or <code class="docutils literal notranslate"><span class="pre">None</span></code> if not defined.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.upgrade.MacroUpgrade.ignore_setting">
+<span class="sig-name descname"><span class="pre">ignore_setting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'!'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/upgrade.html#MacroUpgrade.ignore_setting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.upgrade.MacroUpgrade.ignore_setting" title="Link to this definition"></a></dt>
+<dd><p>User-ignore a setting in the configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference internal" href="configuration/api.html#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><em>metomi.rose.config.ConfigNode</em></a>) – The application configuration.</p></li>
+<li><p><strong>keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – A list defining a hierarchy of node.value ‘keys’.
+A section will be a list of one keys, an option will have two.</p></li>
+<li><p><strong>info</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – A short string containing no new lines, describing the addition
+of the setting.</p></li>
+<li><p><strong>state</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – A <a class="reference internal" href="configuration/api.html#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">metomi.rose.config.ConfigNode</span></code></a> state.
+<a class="reference internal" href="configuration/api.html#metomi.rose.config.ConfigNode.STATE_USER_IGNORED" title="metomi.rose.config.ConfigNode.STATE_USER_IGNORED"><code class="xref py py-data docutils literal notranslate"><span class="pre">metomi.rose.config.ConfigNode.STATE_USER_IGNORED</span></code></a> by
+default.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>False - if the setting’s state is not changed else <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.upgrade.MacroUpgrade.remove_setting">
+<span class="sig-name descname"><span class="pre">remove_setting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/upgrade.html#MacroUpgrade.remove_setting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.upgrade.MacroUpgrade.remove_setting" title="Link to this definition"></a></dt>
+<dd><p>Remove a setting from the configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference internal" href="configuration/api.html#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><em>metomi.rose.config.ConfigNode</em></a>) – The application
+configuration.</p></li>
+<li><p><strong>keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – A list defining a hierarchy of node.value ‘keys’.
+A section will be a list of one keys, an option will have two.</p></li>
+<li><p><strong>info</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – A short string containing no new lines,
+describing the addition of the setting.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metomi.rose.upgrade.MacroUpgrade.rename_setting">
+<span class="sig-name descname"><span class="pre">rename_setting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metomi/rose/upgrade.html#MacroUpgrade.rename_setting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metomi.rose.upgrade.MacroUpgrade.rename_setting" title="Link to this definition"></a></dt>
+<dd><p>Rename a setting in the configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference internal" href="configuration/api.html#metomi.rose.config.ConfigNode" title="metomi.rose.config.ConfigNode"><em>metomi.rose.config.ConfigNode</em></a>) – The application
+configuration.</p></li>
+<li><p><strong>keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – A list defining a hierarchy of node.value ‘keys’.
+A section will be a list of one keys, an option will have two.</p></li>
+<li><p><strong>new_keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – The new hierarchy of node.value ‘keys’.</p></li>
+<li><p><strong>info</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – A short string containing no new lines,
+describing the addition of the setting.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rose-macro.html" class="btn btn-neutral float-left" title="Rose Macro API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rosie-web.html" class="btn btn-neutral float-right" title="Rosie Web API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright : Copyright (C) British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2.5.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2.5.0";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "api/rose-upgrader-macros";
+    </script>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+
+
+</body>
+</html>
