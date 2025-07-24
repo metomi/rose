@@ -97,6 +97,11 @@ class SchemeHandlersManager:
                             if handler is None:
                                 handler = class_(*args, **kwargs)
                             self.handlers[scheme] = handler
+
+                if 'rsync' in self.handlers:
+                    # rsync handler should always be at the end of the list:
+                    self.handlers['rsync'] = self.handlers.pop('rsync')
+
             finally:
                 os.chdir(cwd)
                 sys.path.pop(0)
