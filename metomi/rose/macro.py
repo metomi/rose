@@ -399,11 +399,10 @@ class MacroBaseRoseEdit(MacroBase):
             if "" not in sections:
                 sections.append("")
         else:
-            for key in set(
-                config_data["sections"].keys()
-                + config_data["variables"].keys()
-            ):
-                sections.append(key)
+            sections = list(set(
+                list(config_data["sections"].keys())
+                + list(config_data["variables"].keys())
+            ))
         return sections
 
     def _get_config_section_options(self, config_data, section):
