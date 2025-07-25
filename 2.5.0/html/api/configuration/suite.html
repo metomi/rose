@@ -1,0 +1,384 @@
+
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Suite Configuration &mdash; Rose Documentation 2.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=47202671" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/diff_selector.css?v=9704a72b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/grid_table.css?v=0285b42e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/hieroglyph_theme_addons.css?v=814c2015" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/tutorial.css?v=b869d33c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/addons.css?v=d1f804c3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=466af0f7" />
+
+  
+    <link rel="shortcut icon" href="../../_static/rose-favicon.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3c4615cf"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/js/diff_selector.js?v=3109bfa4"></script>
+      <script src="../../_static/js/minicylc.js?v=ddc882fd"></script>
+      <script src="../../_static/js/spoiler.js?v=12631137"></script>
+      <script src="../../_static/js/addons.js?v=39bd7dee"></script>
+      <script src="../../_static/js/versioning.js?v=df0214e8"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Site And User Configuration" href="site-and-user.html" />
+    <link rel="prev" title="Application Configuration" href="application.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/rose-logo-crop.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/rose/index.html">Rose Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rose API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Rose Configuration</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="application.html">Application Configuration</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Suite Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="site-and-user.html">Site And User Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metadata.html">Configuration Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rose-configuration-format.html">Rose Configuration Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file-creation.html">File Creation Mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html">Rose Configuration API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../other.html">Other Python API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-built-in-applications.html">Rose Built-In Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../terms.html">Rose Terms Of Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../course/um-ut.html">UM User Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Rose Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Rose Configuration</a></li>
+      <li class="breadcrumb-item active">Suite Configuration</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/metomi/rose/blob/master/sphinx/api/configuration/suite.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="suite-configuration">
+<span id="rose-suites"></span><h1>Suite Configuration<a class="headerlink" href="#suite-configuration" title="Link to this heading"></a></h1>
+<p>The configuration and functionality of a suite will usually be covered by
+the use of <a class="reference external" href="https://cylc.github.io/">Cylc</a>. In which case, most of the suite configuration will live
+in the Cylc <code class="docutils literal notranslate"><span class="pre">flow.cylc</span></code> file. Otherwise, a suite is just a directory of
+files.</p>
+<p>A suite directory may contain the following:</p>
+<ul class="simple">
+<li><p>A file called <a class="reference internal" href="#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a>, a configuration file in the
+modified INI format described above. It stores the information on how to
+install the suite. See <a class="reference internal" href="#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> for detail.</p></li>
+<li><p>A file called <a class="reference internal" href="#rose:file:rose-suite.info" title="rose:file:rose-suite.info"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.info</span></code></a>, a configuration file in the
+modified INI format described above. It describes the suite’s purpose and
+identity, e.g. the title, the description, the owner, the access control
+list, and other information. Apart from a few standard fields, a suite is
+free to store any information in this file. See <a class="reference internal" href="#rose:file:rose-suite.info" title="rose:file:rose-suite.info"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.info</span></code></a>
+for detail.</p></li>
+<li><p>An <code class="docutils literal notranslate"><span class="pre">app/</span></code> directory of application configurations used by the suite.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">bin/</span></code> directory of scripts and utilities used by the suite.</p></li>
+<li><p>An <code class="docutils literal notranslate"><span class="pre">etc/</span></code> directory of other configurations and resources used the suite.
+E.g. <a class="reference internal" href="../built-in/fcm_make.html#rose:app:fcm_make" title="rose:app:fcm_make"><code class="xref rose rose-app docutils literal notranslate"><span class="pre">fcm_make</span></code></a> configurations.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">meta/</span></code> directory containing the suite’s configuration metadata.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">opt/</span></code> directory. For detail, see <a class="reference internal" href="rose-configuration-format.html#optional-configuration"><span class="std std-ref">Optional Configuration</span></a>.</p></li>
+<li><p>Other items, as long as they do not clash with the scheduler’s working
+directories. E.g. for a Cylc workflow, <code class="docutils literal notranslate"><span class="pre">log*/</span></code>, <code class="docutils literal notranslate"><span class="pre">share/</span></code>, <code class="docutils literal notranslate"><span class="pre">state/</span></code> and
+<code class="docutils literal notranslate"><span class="pre">work/</span></code> should be avoided.</p></li>
+</ul>
+<dl class="rose file">
+<dt class="sig sig-object rose" id="rose:file:rose-suite.conf">
+<em class="property"><span class="pre">Rose</span> <span class="pre">Configuration</span> </em><span class="sig-name descname"><span class="pre">rose-suite.conf</span></span><a class="headerlink" href="#rose:file:rose-suite.conf" title="Link to this definition"></a></dt>
+<dd><p>The suite install configuration file <a class="reference internal" href="#rose:file:rose-suite.conf" title="rose:file:rose-suite.conf"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.conf</span></code></a> should
+contain the information on how to install the suite.</p>
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose-suite.conf|opts">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">opts</span></span><a class="headerlink" href="#rose:conf:rose-suite.conf|opts" title="Link to this definition"></a></dt>
+<dd><p>Hardcode an optional configuration to be used by the suite. It is
+generally better to specify optional configurations using the
+<span class="target" id="index-0"></span><a class="reference internal" href="../environment-variables.html#envvar-ROSE_SUITE_OPT_CONF_KEYS"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">ROSE_SUITE_OPT_CONF_KEYS</span></code></a> environment variable or
+<code class="docutils literal notranslate"><span class="pre">--opt-conf-key</span></code> argument both of which work with
+<a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/plugins/cylc-rose.html#cylc-rose" title="(in Cylc v8.4)"><span>Cylc Rose</span></a> and <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/user-guide/installing-workflows.html#install-workflow" title="(in Cylc v8.4)"><span class="xref std std-ref">cylc install</span></a>.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose-suite.conf[env]">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">[env]</span></span><a class="headerlink" href="#rose:conf:rose-suite.conf[env]" title="Link to this definition"></a></dt>
+<dd><p>Specify the environment variables to export to the workflow <a class="reference external" href="https://cylc.github.io/cylc-doc/stable/html/glossary.html#term-scheduler" title="(in Cylc v8.4)"><span class="xref std std-term">scheduler</span></a>. The
+usual <code class="docutils literal notranslate"><span class="pre">$NAME</span></code> or <code class="docutils literal notranslate"><span class="pre">${NAME}</span></code> syntax can be used in values to reference
+environment variables that are already defined before the suite runner is
+invoked. However, it is unsafe to reference other environment variables
+defined in this section. If the value of an environment variable setting
+begins with a  tilde <code class="docutils literal notranslate"><span class="pre">~</span></code>, all of the characters preceding the first
+slash <code class="docutils literal notranslate"><span class="pre">/</span></code> are considered a <em>tilde-prefix</em>. Where possible, a
+tilde-prefix is replaced with the home  directory associated with the
+specified login name at run time.</p>
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose-suite.conf[env]KEY">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">KEY</span></span><em class="property"><span class="pre">=</span> <span class="pre">VALUE</span></em><a class="headerlink" href="#rose:conf:rose-suite.conf[env]KEY" title="Link to this definition"></a></dt>
+<dd><p>Define an environment variable <code class="docutils literal notranslate"><span class="pre">KEY</span></code> with the value <code class="docutils literal notranslate"><span class="pre">VALUE</span></code>.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose-suite.conf[env]ROSE_VERSION">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">ROSE_VERSION</span></span><em class="property"><span class="pre">=</span> <span class="pre">ROSE_VERSION_NUMBER</span></em><a class="headerlink" href="#rose:conf:rose-suite.conf[env]ROSE_VERSION" title="Link to this definition"></a></dt>
+<dd><p>If specified, the version of Rose that starts the suite
+run must match the specified version.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose-suite.conf[env]CYLC_VERSION">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">CYLC_VERSION</span></span><em class="property"><span class="pre">=</span> <span class="pre">CYLC_VERSION_NUMBER</span></em><a class="headerlink" href="#rose:conf:rose-suite.conf[env]CYLC_VERSION" title="Link to this definition"></a></dt>
+<dd><p>If specified for a Cylc workflow, the Rose suite runner
+will attempt to use this version of Cylc.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose-suite.conf[template variables]">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">[template</span> <span class="pre">variables]</span></span><a class="headerlink" href="#rose:conf:rose-suite.conf[template variables]" title="Link to this definition"></a></dt>
+<dd><dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose-suite.conf[template variables]KEY">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">KEY</span></span><em class="property"><span class="pre">=</span> <span class="pre">VALUE</span></em><a class="headerlink" href="#rose:conf:rose-suite.conf[template variables]KEY" title="Link to this definition"></a></dt>
+<dd><p>Define a variable <code class="docutils literal notranslate"><span class="pre">KEY</span></code> with the value <code class="docutils literal notranslate"><span class="pre">VALUE</span></code> for use
+in the <code class="docutils literal notranslate"><span class="pre">flow.cylc</span></code> file.</p>
+<p>The assignment will be inserted after the hashbang line of the
+installed <code class="docutils literal notranslate"><span class="pre">flow.cylc</span></code> file.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 2.0.0.</span></p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose-suite.conf[jinja2:suite.rc]">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">[jinja2:suite.rc]</span></span><a class="headerlink" href="#rose:conf:rose-suite.conf[jinja2:suite.rc]" title="Link to this definition"></a></dt>
+<dd><dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose-suite.conf[jinja2:suite.rc]KEY">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">KEY</span></span><em class="property"><span class="pre">=</span> <span class="pre">VALUE</span></em><a class="headerlink" href="#rose:conf:rose-suite.conf[jinja2:suite.rc]KEY" title="Link to this definition"></a></dt>
+<dd><p>Define a <a class="reference external" href="https://jinja.palletsprojects.com/en/2.11.x/">Jinja2</a> variable <code class="docutils literal notranslate"><span class="pre">KEY</span></code> with the value <code class="docutils literal notranslate"><span class="pre">VALUE</span></code> for use
+in the <code class="docutils literal notranslate"><span class="pre">flow.cylc</span></code> file.</p>
+<p>The assignment will be inserted after the <code class="docutils literal notranslate"><span class="pre">#!jinja2</span></code> line of the
+installed <code class="docutils literal notranslate"><span class="pre">flow.cylc</span></code> file.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.0.0: </span><a class="reference internal" href="#rose:conf:rose-suite.conf[template variables]" title="rose:conf:rose-suite.conf[template variables]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">rose-suite.conf[template</span> <span class="pre">variables]</span></code></a>
+are preferred at Rose 2.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose-suite.conf[file:NAME]">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">[file:NAME]</span></span><a class="headerlink" href="#rose:conf:rose-suite.conf[file:NAME]" title="Link to this definition"></a></dt>
+<dd><p>Specify a file/directory to be installed. <code class="docutils literal notranslate"><span class="pre">NAME</span></code> should be a path
+relative to the run time <code class="docutils literal notranslate"><span class="pre">$PWD</span></code>.</p>
+<p>E.g. <code class="docutils literal notranslate"><span class="pre">file:app/APP=source=LOCATION</span></code>.</p>
+<p>For a list of configuration options and details on each see
+<a class="reference internal" href="file-creation.html#rose:conf:*[file:TARGET]" title="rose:conf:*[file:TARGET]"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">*[file:TARGET]</span></code></a>.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose-suite.conf|meta">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">meta</span></span><a class="headerlink" href="#rose:conf:rose-suite.conf|meta" title="Link to this definition"></a></dt>
+<dd><p>Specify the configuration metadata for the suite. The section may be
+used by various Rose utilities, such as the config editor GUI. It can be
+used to specify the suite type.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="rose file">
+<dt class="sig sig-object rose" id="rose:file:rose-suite.info">
+<em class="property"><span class="pre">Rose</span> <span class="pre">Configuration</span> </em><span class="sig-name descname"><span class="pre">rose-suite.info</span></span><a class="headerlink" href="#rose:file:rose-suite.info" title="Link to this definition"></a></dt>
+<dd><p>The suite information file <a class="reference internal" href="#rose:file:rose-suite.info" title="rose:file:rose-suite.info"><code class="xref rose rose-file docutils literal notranslate"><span class="pre">rose-suite.info</span></code></a> should contain the
+information on the identity and the purpose of the suite. It has no sections,
+only <code class="docutils literal notranslate"><span class="pre">KEY=VALUE</span></code> pairs. The <code class="docutils literal notranslate"><span class="pre">owner</span></code>, <code class="docutils literal notranslate"><span class="pre">project</span></code> and <code class="docutils literal notranslate"><span class="pre">title</span></code> settings
+are compulsory. Otherwise, any <code class="docutils literal notranslate"><span class="pre">KEY=VALUE</span></code> pairs can appear in this
+file. If the name of a <code class="docutils literal notranslate"><span class="pre">KEY</span></code> ends with <code class="docutils literal notranslate"><span class="pre">-list</span></code>, the value is expected
+to be a space-delimited list. The following keys are known to have special
+meanings:</p>
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose-suite.info|owner">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">owner</span></span><a class="headerlink" href="#rose:conf:rose-suite.info|owner" title="Link to this definition"></a></dt>
+<dd><p>Specify the user ID of the owner of the suite. The owner has full commit
+access to the suite. Only the owner can delete the suite, pass the suite’s
+ownership to someone else or change the <a class="reference internal" href="#rose:conf:rose-suite.info|access-list" title="rose:conf:rose-suite.info|access-list"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">access-list</span></code></a>.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose-suite.info|project">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">project</span></span><a class="headerlink" href="#rose:conf:rose-suite.info|project" title="Link to this definition"></a></dt>
+<dd><p>Specify the name of the project associated with the suite.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose-suite.info|title">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#rose:conf:rose-suite.info|title" title="Link to this definition"></a></dt>
+<dd><p>Specify a short title of the suite.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose-suite.info|access-list">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">access-list</span></span><a class="headerlink" href="#rose:conf:rose-suite.info|access-list" title="Link to this definition"></a></dt>
+<dd><p>Specify a list of users with commit access to trunk of the suite. A
+<code class="docutils literal notranslate"><span class="pre">*</span></code> in the list means that anyone can commit to the trunk of the
+suite. Setting this blank or omitting the setting means that nobody
+apart from the owner can commit to the trunk. Only the suite owner can
+change the access list.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose-suite.info|description">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#rose:conf:rose-suite.info|description" title="Link to this definition"></a></dt>
+<dd><p>Specify a long description of the suite.</p>
+</dd></dl>
+
+<dl class="rose conf">
+<dt class="sig sig-object rose" id="rose:conf:rose-suite.info|sub-project">
+<em class="property"><span class="pre">Config</span> </em><span class="sig-name descname"><span class="pre">sub-project</span></span><a class="headerlink" href="#rose:conf:rose-suite.info|sub-project" title="Link to this definition"></a></dt>
+<dd><p>Specify a sub-division of <a class="reference internal" href="#rose:conf:rose-suite.info|project" title="rose:conf:rose-suite.info|project"><code class="xref rose rose-conf docutils literal notranslate"><span class="pre">project</span></code></a>, if applicable.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="application.html" class="btn btn-neutral float-left" title="Application Configuration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="site-and-user.html" class="btn btn-neutral float-right" title="Site And User Configuration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright : Copyright (C) British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2.5.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2.5.0";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "api/configuration/suite";
+    </script>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+
+
+</body>
+</html>
