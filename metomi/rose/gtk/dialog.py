@@ -589,7 +589,7 @@ def get_naming_dialog(label, checker, ok_tip=None, err_tip=None):
     dialog = Gtk.Dialog(buttons=button_list)
     dialog.set_transient_for(parent_window)
     dialog.set_modal(True)
-    ok_button = dialog.action_area.get_children()[0]
+    ok_button = dialog.action_area.get_children()[1]
     main_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
     name_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
     name_label = Gtk.Label()
@@ -625,17 +625,20 @@ def get_naming_dialog(label, checker, ok_tip=None, err_tip=None):
 
 
 def _name_checker(entry, checker, ok_button, ok_tip, err_tip):
-    good_colour = ok_button.style.text[Gtk.StateType.NORMAL]
-    bad_colour = metomi.rose.gtk.util.color_parse(
+    bad_colour_spec = metomi.rose.gtk.util.color_parse(
         metomi.rose.config_editor.COLOUR_VARIABLE_TEXT_ERROR
     )
+    bad_colour = Gdk.RGBA(red=bad_colour_spec.red,
+                          green=bad_colour_spec.green,
+                          blue=bad_colour_spec.blue,
+                          alpha=1)
     name = entry.get_text()
     if checker(name):
-        entry.modify_text(Gtk.StateType.NORMAL, good_colour)
+        entry.override_color(Gtk.StateType.NORMAL, None)
         entry.set_tooltip_text(ok_tip)
         ok_button.set_sensitive(True)
     else:
-        entry.modify_text(Gtk.StateType.NORMAL, bad_colour)
+        entry.override_color(Gtk.StateType.NORMAL, bad_colour)
         entry.set_tooltip_text(err_tip)
         ok_button.set_sensitive(False)
     return False

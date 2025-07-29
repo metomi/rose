@@ -51,7 +51,7 @@ class UpgradeController(object):
             Gtk.ResponseType.ACCEPT,
         )
         self.window = Gtk.Dialog(buttons=buttons)
-        self.set_transient_for(parent_window)
+        self.window.set_transient_for(parent_window)
         self.window.set_title(metomi.rose.config_editor.DIALOG_TITLE_UPGRADE)
         self.config_dict = {}
         self.config_directory_dict = {}
@@ -112,9 +112,9 @@ class UpgradeController(object):
             else:
                 cell = Gtk.CellRendererText()
             if i == len(columns) - 1:
-                column.pack_start(cell, True, True, 0)
+                column.pack_start(cell, expand=True)
             else:
-                column.pack_start(cell, False, True, 0)
+                column.pack_start(cell, expand=False)
             column.set_cell_data_func(cell, self._set_cell_data, i)
             self.treeview.append_column(column)
         self.treeview.connect("cursor-changed", self._handle_change_cursor)
@@ -158,8 +158,8 @@ class UpgradeController(object):
         my_size = self.window.size_request()
         new_size = [-1, -1]
         extra = 2 * metomi.rose.config_editor.SPACING_PAGE
-        for i in [0, 1]:
-            new_size[i] = min([my_size[i] + extra, max_size[i]])
+        for index, req_size in enumerate([my_size.width, my_size.height]):
+            new_size[index] = min([req_size, max_size[index]])
         self.treewindow.set_policy(
             Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC
         )
@@ -246,6 +246,8 @@ class UpgradeController(object):
 
     def _handle_change_cursor(self, view):
         path = self.treeview.get_cursor()[0]
+        if path is None:
+            return
         iter_ = self.treemodel.get_iter(path)
         config_name = self.treemodel.get_value(iter_, 0)
         listmodel = self._config_version_model_dict[config_name]
