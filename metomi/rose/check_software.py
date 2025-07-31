@@ -29,30 +29,14 @@ OPTIONS
 
 import re
 from subprocess import Popen, PIPE
+from shutil import get_terminal_size
 import sys
 
 
 TARGET_REGEX = r'\<(.*)\>'
 
-
-def get_terminal_width(default_width, min_width):
-    """Return the terminal width.
-
-    Return:
-        int - terminal width OR min_width if width < min_width ELSE min_width.
-    """
-    proc = Popen(['stty', 'size'], stdout=PIPE)
-    if proc.wait():
-        return default_width
-    else:
-        try:
-            return max(
-                min_width, int(proc.communicate()[0].split()[1]))
-        except IndexError:
-            return default_width
-
-
-TERM_WIDTH = get_terminal_width(80, 60)
+# NOTE: don't use the "fallback" size argument until Python 3.11
+TERM_WIDTH = get_terminal_size().columns or 80
 DEP_NOT_FOUND = 'DEP_NOT_FOUND'
 
 
