@@ -891,12 +891,15 @@ class PullableLocHandlersManager(SchemeHandlersManager):
             if handler is None:
                 raise ValueError(f"don't support scheme {loc.scheme}")
         else:
-            # Scheme not specified in the configuration.
+            # Try to get the scheme by parsing loc name, e.g. git:some-url
             scheme = urlparse(loc.name).scheme
             if scheme:
                 handler = self.get_handler(scheme)
                 if handler is None:
+                    # Try to guess the scheme using the ``can_handle`` method
+                    # from each handler in turn:
                     handler = self.guess_handler(loc)
+
                 if handler is None:
                     raise ValueError(f"don't know how to process {loc.name}")
             else:
