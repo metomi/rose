@@ -16,7 +16,7 @@ Rose: a framework for managing and running meteorological suites.
 #### Rose 2
 
 - Python 3
-- No GUIs
+- PyGObject GUI
 - Web-based GUIs will follow in later Rose 2 releases
 - `master` branch in the source code
 
