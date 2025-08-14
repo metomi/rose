@@ -53,7 +53,7 @@ class PreRsyncCheckError(Exception):
         for used_by in loc.used_by_names:
             message += (
                 f'file:{used_by}={loc.action_key}={loc.name}'
-                ': don\'t know how to process stuff:ing\n'
+                ': don\'t know how to process this file location.\n'
             )
         if (
             self.returncode == 1
