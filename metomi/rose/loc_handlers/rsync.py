@@ -27,8 +27,13 @@ from metomi.rose.popen import RosePopenError
 
 
 class PreRsyncCheckError(Exception):
-    """Error to raise if we assume the loc is for use with rsync,
-    but attempting to use it as an rsync loc fails."""
+    """Error to raise if we:
+    * Can't work out which loc handler to use.
+    * Fall back to assuming that the loc is for use with rsync.
+    * Attempting to use it as an rsync loc fails.
+
+    """
+
     BASE_MESSAGE = (
         'Rose tried all other file install handlers and'
         ' decided this must be an Rsync handler.\n\t'
