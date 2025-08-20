@@ -17,4 +17,5 @@ jobs:
     uses: cylc/release-actions/.github/workflows/branch-sync.yml@v1
     with:
       head_branch: ${{ inputs.head_branch }}
+      ignore_branches: 2019.01.x
     secrets: inherit
