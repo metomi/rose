@@ -30,6 +30,7 @@ sys.path.append(os.path.abspath('ext'))
 # Register extensions.
 extensions = [
     # sphinx built-in extensions
+    'sphinx_copybutton',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.doctest',
