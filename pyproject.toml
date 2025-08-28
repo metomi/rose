@@ -44,10 +44,10 @@ classifiers = [
     "Intended Audience :: System Administrators",
     "Intended Audience :: Science/Research",
     "Operating System :: POSIX :: Linux",
-    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering :: Atmospheric Science"
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.12"
 dynamic = ["version"]
 dependencies = [
     "aiofiles",
@@ -58,8 +58,6 @@ dependencies = [
     "psutil>=5.6.0",
     "requests",
     "sqlalchemy==1.*",
-    "importlib_metadata>=5.0; python_version < '3.12'",
-    "importlib_resources>=2.0; python_version < '3.9'"
 ]
 
 [project.urls]
@@ -82,16 +80,15 @@ graph = [
 tests = [
     "aiosmtpd",
     "pytest",
-    "towncrier>=24.7.0; python_version > '3.7'"
+    "towncrier>=24.7.0"
     # Note: some tests also depend on cylc-rose which has to be the
     # development version installed manually (because the latest production
     # version is pinned to the previous rose release)
 ]
 lint = [
-    "flake8>=6.0.0; python_version > '3.7'",
-    "flake8-type-checking; python_version > '3.7'",
-    # Upper-pin to last py-3.7-compatible version:
-    "mypy>=0.800,<1.9",
+    "flake8>=6.0.0",
+    "flake8-type-checking",
+    "mypy>=0.800",
     "types-aiofiles"
 ]
 rosa = []
