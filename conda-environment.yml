@@ -4,7 +4,7 @@ channels:
 dependencies:
   # outut: metomi-rose-base
   - __unix
-  - python >= 3.7.0
+  - python >= 3.12.0
   - aiofiles
   - jinja2 >=2.10.1
   - keyring >=23
@@ -13,8 +13,6 @@ dependencies:
   - psutil >=5.6.0
   - requests
   - sqlalchemy >=1,<2
-  - importlib_metadata >=5.0  # py<3.12 TODO: selectors don't work for noarch packages
-  - importlib_resources >=2.0  # py<3.9 TODO: selectors don't work for noarch packages
   # - tornado (rosie disco is temporally disabled)
 
   # output: metomi-rose

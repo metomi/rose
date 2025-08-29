@@ -17,6 +17,7 @@
 """Write version control information of sources used in run time."""
 
 import os
+import shlex
 import sys
 
 from metomi.rose.popen import RosePopener
@@ -67,7 +68,7 @@ def write_source_vc_info(run_source_dir, output=None, popen=None):
                 if out:
                     write_safely(("#" * 80 + "\n"), handle)
                     write_safely(
-                        ("# %s\n" % popen.shlex_join(cmd)), handle
+                        ("# %s\n" % shlex.join(cmd)), handle
                     )
                     write_safely(("#" * 80 + "\n"), handle)
                     write_safely(out, handle)

@@ -61,24 +61,12 @@ from metomi.rose.scripts import (
 )
 
 if TYPE_CHECKING:
-    try:
-        from importlib_metadata import EntryPoint
-    except ImportError:
-        from importlib.metadata import EntryPoint  # type: ignore
+    from importlib.metadata import EntryPoint
 
 
 def iter_entry_points(name: str):
     """Iterate over all entry points for a given group name"""
-    if sys.version_info[:2] >= (3, 12):
-        from importlib.metadata import entry_points
-    else:
-        # BACK_COMPAT: importlib_metadata
-        #   importlib.metadata was added in Python 3.8. The required interfaces
-        #   were completed by 3.12. For lower versions we must use the
-        #   importlib_metadata backport.
-        # FROM: Python 3.7
-        # TO: Python: 3.12
-        from importlib_metadata import entry_points
+    from importlib.metadata import entry_points
     yield from entry_points().select(group=name)
 
 

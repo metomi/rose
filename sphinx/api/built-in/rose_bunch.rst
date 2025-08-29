@@ -137,7 +137,7 @@ sections of the :rose:file:`rose-app.conf` file, but
 
          :default: Default
 
-         .. _documentation: https://docs.python.org/3.7/library/itertools.html
+         .. _documentation: https://docs.python.org/3.12/library/itertools.html
 
          If set to a value other than ``Default`` then the values for each
          bunch-arg will be manipulated:
