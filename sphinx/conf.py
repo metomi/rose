@@ -236,3 +236,4 @@ def setup(app):
 
 # Turn off copybutton for diffs
 copybutton_selector = "div:not(.highlight-diff) > div.highlight > pre"
+
