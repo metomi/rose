@@ -234,6 +234,6 @@ def setup(app):
     # cylc.sphinx_ext extensions
     app.config.html_static_path.append('_static')
 
+
 # Turn off copybutton for diffs
 copybutton_selector = "div:not(.highlight-diff) > div.highlight > pre"
-
