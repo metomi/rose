@@ -35,7 +35,7 @@ jobs:
 
       - name: Configure Python
         id: configure-py
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         continue-on-error: true
         with:
           python-version: ${{ matrix.python-version }}
