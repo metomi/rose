@@ -98,7 +98,7 @@ rosa = []
 #     Tornado 6.
 #     tornado
 # ]
-rose-edit = [
+edit = [
     "pygobject>=3.50.0",
     "pycairo>=1.27.0"
 ]
