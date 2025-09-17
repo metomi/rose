@@ -157,7 +157,6 @@ class UpgradeController(object):
         max_size = metomi.rose.config_editor.SIZE_MACRO_DIALOG_MAX
         my_size = self.window.size_request()
         new_size = [-1, -1]
-        extra = 2 * metomi.rose.config_editor.SPACING_PAGE
         for index, req_size in enumerate([my_size.width, my_size.height]):
             new_size[index] = min([req_size, max_size[index]])
         self.treewindow.set_policy(
