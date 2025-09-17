@@ -226,6 +226,8 @@ linkcheck_ignore = [
     # linux.die.net doesn't like our request headers
     'https?://linux.die.net/man/1/rsync',
     'https?://stackoverflow.com.*',
+    # Seems to be too slow, thus causing test failures:
+    'https?://www.gnu.org*',
 ]
 
 
