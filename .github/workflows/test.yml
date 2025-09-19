@@ -253,10 +253,12 @@ jobs:
             python=${{ matrix.python-version }}
             bash
             pygraphviz
+            pygobject>=3.50.0
+            gtk3>=3.24.43
 
       - name: Install Rose
         run: |
-          pip install -e .[docs,graph] --upgrade-strategy='only-if-needed'
+          pip install -e .[docs,graph,edit] --upgrade-strategy='only-if-needed'
 
       - name: Install Cylc
         uses: cylc/release-actions/install-cylc-components@v1
