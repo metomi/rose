@@ -10,6 +10,10 @@ $ towncrier create <PR-number>.<break|feat|fix>.md --content "Short description"
 
 <!-- towncrier release notes start -->
 
+## 2.5.1 (Released 2025-09-29)
+
+No significant changes.
+
 ## 2.5.0 (Released 2025-07-24)
 
 ### Enhancements
