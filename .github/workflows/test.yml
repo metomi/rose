@@ -48,12 +48,12 @@ jobs:
   lint:
     strategy:
       matrix:
-        python-version: ['3.9']
+        python-version: ['3.12']
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ inputs.rose_ref || github.sha }}
 
@@ -96,14 +96,14 @@ jobs:
       fail-fast: false
       matrix:
         os: ['ubuntu-latest']
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12', '3']
+        python-version: ['3.12', '3']
         include:
           - os: 'macos-latest'
-            python-version: '3.8'  # oldest arm64 build on conda-forge
+            python-version: '3.12'
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ inputs.rose_ref || github.sha }}
           path: rose
@@ -161,7 +161,7 @@ jobs:
 
       - name: Checkout FCM
         if: startsWith(matrix.os, 'ubuntu')
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ inputs.fcm_repo || 'metomi/fcm' }}
           ref: ${{ inputs.fcm_ref || 'master' }}
@@ -233,10 +233,10 @@ jobs:
     timeout-minutes: 5
     strategy:
       matrix:
-        python-version: ['3.9']
+        python-version: ['3']
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ inputs.rose_ref || github.sha }}
 

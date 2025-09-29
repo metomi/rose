@@ -21,13 +21,13 @@ jobs:
       CYLC_REF: ${{ inputs.cylc_ref || 'master' }}
     steps:
       - name: Checkout rose
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ env.ROSE_REF }}
           path: rose
 
       - name: Checkout cylc-flow
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: cylc/cylc-flow
           ref: ${{ env.CYLC_REF }}

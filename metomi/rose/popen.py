@@ -79,7 +79,7 @@ class RosePopenEvent(Event):
         if isinstance(command, str):
             ret = command
         else:
-            ret = RosePopener.shlex_join(self.command)
+            ret = shlex.join(self.command)
 
         try:
             # real file or real stream
@@ -139,25 +139,6 @@ class RosePopener:
         "terminal": ["xterm"],
     }
     ENVS_OF_CMDS = {"editor": ["VISUAL", "EDITOR"]}
-
-    @staticmethod
-    def shlex_join(args: Iterable[str]) -> str:
-        """Convert a list of strings into a shell command, safely quoting
-        when the strings contain whitespace and special chars.
-
-        Basically a back-port of shlex.join(), needed for py 3.7.
-
-        Examples:
-        >>> RosePopener.shlex_join([])
-        ''
-        >>> RosePopener.shlex_join(["echo", "-n", "Multiple words"])
-        "echo -n 'Multiple words'"
-        >>> RosePopener.shlex_join(["ls", "my_dir;foiled_injection"])
-        "ls 'my_dir;foiled_injection'"
-        >>> RosePopener.shlex_join(["what", "about", "globs*"])
-        "what about 'globs*'"
-        """
-        return " ".join(shlex.quote(arg) for arg in args)
 
     @staticmethod
     def list_to_shell_str(args: Iterable[str]) -> str:

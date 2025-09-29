@@ -31,6 +31,7 @@ Sub-classes, for handling API points by inheriting from RosieDiscoService:
 """
 
 from glob import glob
+from importlib.resources import files
 import json
 import logging
 import os
@@ -38,15 +39,6 @@ from pathlib import Path
 import pwd
 import signal
 from time import sleep
-import sys
-
-if sys.version_info[:2] >= (3, 9):
-    from importlib.resources import files
-else:
-    # BACK_COMPAT: importlib_resources
-    # FROM: Python 3.7
-    # TO: Python: 3.9
-    from importlib_resources import files
 
 import jinja2
 from tornado.ioloop import IOLoop, PeriodicCallback

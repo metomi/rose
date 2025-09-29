@@ -30,6 +30,7 @@ sys.path.append(os.path.abspath('ext'))
 # Register extensions.
 extensions = [
     # sphinx built-in extensions
+    'sphinx_copybutton',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.doctest',
@@ -225,6 +226,8 @@ linkcheck_ignore = [
     # linux.die.net doesn't like our request headers
     'https?://linux.die.net/man/1/rsync',
     'https?://stackoverflow.com.*',
+    # Seems to be too slow, thus causing test failures:
+    'https?://www.gnu.org*',
 ]
 
 
@@ -232,3 +235,7 @@ def setup(app):
     # set the html_static_path in an extension so as not to conflict with
     # cylc.sphinx_ext extensions
     app.config.html_static_path.append('_static')
+
+
+# Turn off copybutton for diffs
+copybutton_selector = "div:not(.highlight-diff) > div.highlight > pre"

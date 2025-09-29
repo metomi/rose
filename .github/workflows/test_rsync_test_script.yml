@@ -22,20 +22,20 @@ jobs:
         os: ['ubuntu-latest']
         python-version: [
           '2.7',
-          '3.5', '3.6',
-          '3.7', '3.8', '3.9', '3.12'
+          '3.5', '3.6', '3.7', '3.8', '3.9',
+          '3.12', '3'
         ]
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.event.inputs.rose_ref || github.sha }}
           path: rose
 
       - name: Configure Python
         id: configure-py
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         continue-on-error: true
         with:
           python-version: ${{ matrix.python-version }}

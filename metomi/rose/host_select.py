@@ -292,7 +292,7 @@ class HostSelector:
         >>> HostSelector._bash_login_cmd(["echo", "-n", "Multiple words"])
         ['bash', '-l', '-c', "echo -n 'Multiple words'"]
         """
-        return ['bash', '-l', '-c', RosePopener.shlex_join(cmd)]
+        return ['bash', '-l', '-c', shlex.join(cmd)]
 
     def select(
         self,
@@ -442,7 +442,7 @@ class HostSelector:
             if not self.is_local_host(host_name):
                 command = [
                     *self.popen.get_cmd('ssh', host_name),
-                    RosePopener.shlex_join(command)
+                    shlex.join(command)
                 ]
             # fire off host-select-client processes
             proc = self.popen.run_bg(
