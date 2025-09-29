@@ -10,6 +10,12 @@ $ towncrier create <PR-number>.<break|feat|fix>.md --content "Short description"
 
 <!-- towncrier release notes start -->
 
+## 2.5.1 (Released 2025-09-29)
+
+### 🔧 Fixes
+
+[#2925](https://github.com/metomi/rose/pull/2925) - fix a bug which caused `rosie ls` to fail.
+
 ## 2.5.0 (Released 2025-07-24)
 
 ### Enhancements
