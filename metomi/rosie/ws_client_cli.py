@@ -398,7 +398,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None):
 
     dict_rows = _align(dict_rows, keylist)
 
-    if opts.no_pretty_mode:
+    if getattr(opts, 'no_pretty_mode', True):
         for dict_row in dict_rows:
             out = opts.print_format
             for key, value in dict_row.items():
