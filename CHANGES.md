@@ -10,6 +10,12 @@ $ towncrier create <PR-number>.<break|feat|fix>.md --content "Short description"
 
 <!-- towncrier release notes start -->
 
+## 2.6.0 (Released 2025-10-01)
+
+### ⚠ Breaking Changes
+
+[#2922](https://github.com/cylc/cylc-flow/pull/2922) - Dropped support for Python 3.7-3.11. The minimum supported version is now 3.12.
+
 ## 2.5.1 (Released 2025-09-29)
 
 ### 🔧 Fixes
