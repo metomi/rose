@@ -83,16 +83,6 @@ DEAD_ENDS = {
     # (ns, sub_cmd): message
     ('rosa', 'rpmbuild'):
         'Rosa RPM Builder has been removed.',
-    ('rose', 'config-edit'): (
-        'The Rose configuration editor has been removed. The old '
-        'Rose 2019 GUI remains compatible with Rose 2 configurations.'
-    ),
-    ('rose', 'edit'): (
-        'The Rose configuration editor has been removed. The old '
-        'Rose 2019 GUI remains compatible with Rose 2 configurations.'
-    ),
-    ('rose', 'metadata-graph'):
-        'This command has been removed pending re-implementation',
     ('rose', 'suite-clean'):
         'This command has been replaced by: "cylc clean".',
     ('rose', 'suite-cmp-vc'):
@@ -136,7 +126,9 @@ ALIASES = {
     ('rosie', 'co'):
         ('rosie', 'checkout'),
     ('rosie', 'copy'):
-        ('rosie', 'create')
+        ('rosie', 'create'),
+    ('rose', 'edit'):
+        ('rose', 'config-edit')
 }
 # fmt: on
 
@@ -241,6 +233,8 @@ def _get_sub_cmds(ns):
         set(PYTHON_SUB_CMDS) | BASH_SUB_CMDS
     ) - set(DEAD_ENDS):
         if ns_ == ns:
+            if (ns == 'rose') and (sub_cmd == 'launch-splash-screen'):
+                continue
             yield sub_cmd
 
 
@@ -320,6 +314,8 @@ def _doc(ns):
         if ns_ != ns:
             continue
         if (ns, sub_cmd) in DEAD_ENDS:
+            continue
+        if (ns == 'rose') and (sub_cmd == 'launch-splash-screen'):
             continue
         print('\n==================================================')
         print(f'{ns} {sub_cmd}')

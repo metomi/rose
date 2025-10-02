@@ -153,7 +153,7 @@ class MacroUpgrade(metomi.rose.macro.MacroBase):
         file_map = {}
         file_map[MACRO_UPGRADE_RESOURCE_FILE_ADD] = add_path
         file_map[MACRO_UPGRADE_RESOURCE_FILE_REMOVE] = rem_path
-        for key, path in file_map.items():
+        for key, path in file_map.copy().items():
             if os.path.isfile(path):
                 file_map[key] = metomi.rose.config.load(path)
             else:
