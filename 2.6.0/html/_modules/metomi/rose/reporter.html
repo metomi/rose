@@ -1,0 +1,491 @@
+
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>metomi.rose.reporter &mdash; Rose Documentation 2.6.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=47202671" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/diff_selector.css?v=9704a72b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/grid_table.css?v=0285b42e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/hieroglyph_theme_addons.css?v=814c2015" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/tutorial.css?v=b869d33c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/addons.css?v=d1f804c3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=466af0f7" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/rose-favicon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=7c20c939"></script>
+      <script src="../../../_static/js/diff_selector.js?v=3109bfa4"></script>
+      <script src="../../../_static/js/minicylc.js?v=ddc882fd"></script>
+      <script src="../../../_static/js/spoiler.js?v=12631137"></script>
+      <script src="../../../_static/js/addons.js?v=39bd7dee"></script>
+      <script src="../../../_static/js/versioning.js?v=df0214e8"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/rose-logo-crop.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial/rose/index.html">Rose Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rose API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/configuration/index.html">Rose Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/other.html">Other Python API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-built-in-applications.html">Rose Built-In Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../terms.html">Rose Terms Of Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../course/um-ut.html">UM User Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Rose Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">metomi.rose.reporter</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for metomi.rose.reporter</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) British Crown (Met Office) &amp; Contributors.</span>
+<span class="c1"># This file is part of Rose, a framework for meteorological suites.</span>
+<span class="c1">#</span>
+<span class="c1"># Rose is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Rose is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Rose. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;Reporter for diagnostic messages.&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">doctest</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+
+<div class="viewcode-block" id="Reporter">
+<a class="viewcode-back" href="../../../api/other.html#metomi.rose.reporter.Reporter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Reporter</span><span class="p">:</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Report diagnostic messages.</span>
+
+<span class="sd">    Note: How about the &quot;logging&quot; module in the standard library? It needs a</span>
+<span class="sd">    lot of fiddling to get it working in our reporting model. We want:</span>
+<span class="sd">    * [FAIL] in any verbosity to stderr.</span>
+<span class="sd">    * [WARN] in default verbosity to stderr.</span>
+<span class="sd">    * Raw output to stdout in any verbosity.</span>
+<span class="sd">    * [INFO] in default verbosity to stdout.</span>
+<span class="sd">    * [INFO] in -v verbosity to stdout.</span>
+<span class="sd">    * [INFO] in -vv verbosity to stdout.</span>
+<span class="sd">    * and everything goes to the log file with -vv verbosity by default.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_INST</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">VV</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">V</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">DEFAULT</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">WARN</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">FAIL</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">PREFIX_FAIL</span> <span class="o">=</span> <span class="s2">&quot;[FAIL] &quot;</span>
+    <span class="n">PREFIX_INFO</span> <span class="o">=</span> <span class="s2">&quot;[INFO] &quot;</span>
+    <span class="n">PREFIX_WARN</span> <span class="o">=</span> <span class="s2">&quot;[WARN] &quot;</span>
+    <span class="n">KIND_ERR</span> <span class="o">=</span> <span class="s2">&quot;KIND_ERR&quot;</span>
+    <span class="n">KIND_OUT</span> <span class="o">=</span> <span class="s2">&quot;KIND_OUT&quot;</span>
+
+<div class="viewcode-block" id="Reporter.default">
+<a class="viewcode-back" href="../../../api/other.html#metomi.rose.reporter.Reporter.default">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">default</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the default reporter.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_INST</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">reset</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_INST</span> <span class="o">=</span> <span class="n">Reporter</span><span class="p">(</span><span class="n">verbosity</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_INST</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="n">DEFAULT</span><span class="p">,</span> <span class="n">contexts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raise_on_exc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a reporter with contexts at a given verbosity.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contexts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">verbosity</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">verbosity</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">contexts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contexts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">contexts</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contexts</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
+            <span class="s2">&quot;stderr&quot;</span><span class="p">,</span> <span class="n">ReporterContext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">KIND_ERR</span><span class="p">,</span> <span class="n">verbosity</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contexts</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
+            <span class="s2">&quot;stdout&quot;</span><span class="p">,</span> <span class="n">ReporterContext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">KIND_OUT</span><span class="p">,</span> <span class="n">verbosity</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_handler</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">raise_on_exc</span> <span class="o">=</span> <span class="n">raise_on_exc</span>
+
+<div class="viewcode-block" id="Reporter.format_msg">
+<a class="viewcode-back" href="../../../api/other.html#metomi.rose.reporter.Reporter.format_msg">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">format_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">verbosity</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Format a message for reporting.&quot;&quot;&quot;</span>
+
+        <span class="n">msg_lines</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">verbosity</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VV</span><span class="p">:</span>
+            <span class="n">stamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S%z &quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">stamp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">prefix</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">msg</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+                <span class="n">msg_line</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">stamp</span> <span class="o">+</span> <span class="n">line</span>
+                <span class="k">if</span> <span class="n">clip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">msg_line</span> <span class="o">=</span> <span class="n">msg_line</span><span class="p">[:</span><span class="n">clip</span><span class="p">]</span>
+                <span class="n">msg_line</span> <span class="o">=</span> <span class="n">msg_line</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="n">msg_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg_line</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg_line</span> <span class="o">=</span> <span class="n">stamp</span>
+            <span class="n">should_insert_newline</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">clip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">clip</span><span class="p">:</span>
+                    <span class="n">should_insert_newline</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">msg_line</span> <span class="o">=</span> <span class="n">msg_line</span> <span class="o">+</span> <span class="n">msg</span><span class="p">[:</span><span class="n">clip</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">should_insert_newline</span><span class="p">:</span>
+                <span class="n">msg_line</span> <span class="o">=</span> <span class="n">msg_line</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg_line</span> <span class="o">=</span> <span class="n">msg</span>
+            <span class="n">msg_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg_line</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">msg_lines</span></div>
+
+
+<div class="viewcode-block" id="Reporter.report">
+<a class="viewcode-back" href="../../../api/other.html#metomi.rose.reporter.Reporter.report">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Report a message, if relevant for the reporter contexts.</span>
+
+<span class="sd">        message:</span>
+<span class="sd">            The message to report. An Event, an Exception, an object</span>
+<span class="sd">            with a __str__ method, or a callable that returns an object</span>
+<span class="sd">            with a __str__ method.</span>
+<span class="sd">        kind:</span>
+<span class="sd">            The message kind. The default is determined by message.</span>
+<span class="sd">            If it is an Event, the default is message.kind. If it is an</span>
+<span class="sd">            Exception, the default is KIND_ERR. Otherwise, the default</span>
+<span class="sd">            is KIND_OUT.</span>
+<span class="sd">        level:</span>
+<span class="sd">            The level of the message. The default is determined by</span>
+<span class="sd">            message. If it is an Event, the default is message.level.</span>
+<span class="sd">            If it is an Exception, the default is FAIL. Otherwise, the</span>
+<span class="sd">            default is DEFAULT.</span>
+<span class="sd">        prefix:</span>
+<span class="sd">            Prefix each line of the message with this prefix.</span>
+<span class="sd">            Default is context dependent.</span>
+<span class="sd">        clip:</span>
+<span class="sd">            The maximum length of the message to print.</span>
+
+<span class="sd">        If self.event_handler is defined, self.event_handler with all the</span>
+<span class="sd">        arguments and return its result instead.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_handler</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_handler</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">clip</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">Event</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">kind</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">kind</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">kind</span>
+            <span class="k">if</span> <span class="n">level</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">level</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">level</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">kind</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">kind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">KIND_ERR</span>
+            <span class="k">if</span> <span class="n">level</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">FAIL</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">KIND_OUT</span>
+        <span class="k">if</span> <span class="n">level</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">context</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contexts</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">is_closed</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">contexts</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>  <span class="c1"># remove contexts with closed handles</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">kind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">context</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="n">kind</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">level</span> <span class="o">&gt;</span> <span class="n">context</span><span class="o">.</span><span class="n">verbosity</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">prefix</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get_prefix</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">callable</span><span class="p">(</span><span class="n">prefix</span><span class="p">):</span>
+                <span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">msg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="n">message</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="n">message</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="n">msg_lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_msg</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">verbosity</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">clip</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">msg_lines</span><span class="p">:</span>
+                <span class="n">context</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">raise_on_exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">message</span></div>
+
+
+    <span class="fm">__call__</span> <span class="o">=</span> <span class="n">report</span></div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ReporterContext</span><span class="p">:</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A context for the reporter object.</span>
+
+<span class="sd">    It has the following attributes:</span>
+<span class="sd">    kind:</span>
+<span class="sd">        The message type to report to this context.</span>
+<span class="sd">        (Reporter.KIND_ERR, Reporter.KIND_ERR or None.)</span>
+<span class="sd">    verbosity:</span>
+<span class="sd">        The verbosity of this context.</span>
+<span class="sd">    handle:</span>
+<span class="sd">        The file handle to write to.</span>
+<span class="sd">    prefix:</span>
+<span class="sd">        The default message prefix (str or callable).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">TTY_COLOUR_ERR</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[1;31m&quot;</span>
+    <span class="n">TTY_COLOUR_NORM</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[0m&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="n">Reporter</span><span class="o">.</span><span class="n">DEFAULT</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="n">Reporter</span><span class="o">.</span><span class="n">KIND_ERR</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">handle</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span>
+        <span class="k">elif</span> <span class="n">kind</span> <span class="o">==</span> <span class="n">Reporter</span><span class="o">.</span><span class="n">KIND_OUT</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">handle</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="o">=</span> <span class="n">kind</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">handle</span> <span class="o">=</span> <span class="n">handle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">=</span> <span class="n">verbosity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the prefix suitable for the message kind and level.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="n">Reporter</span><span class="o">.</span><span class="n">KIND_OUT</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">level</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">Reporter</span><span class="o">.</span><span class="n">PREFIX_INFO</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">elif</span> <span class="n">level</span> <span class="o">&gt;</span> <span class="n">Reporter</span><span class="o">.</span><span class="n">FAIL</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tty_colour_err</span><span class="p">(</span><span class="n">Reporter</span><span class="o">.</span><span class="n">PREFIX_WARN</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tty_colour_err</span><span class="p">(</span><span class="n">Reporter</span><span class="o">.</span><span class="n">PREFIX_FAIL</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_closed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True if the context&#39;s handle is closed.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="o">.</span><span class="n">closed</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the message to the context&#39;s handle.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">doctest</span><span class="o">.</span><span class="n">_SpoofOut</span><span class="p">):</span>
+            <span class="c1"># If context is a doctest:</span>
+            <span class="n">ret_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ret_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">ret_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="n">ret_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;UTF-8&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">ret_code</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_tty_colour_err</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">str_</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Colour error string for terminal.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="o">.</span><span class="n">isatty</span><span class="p">():</span>
+                <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">TTY_COLOUR_ERR</span><span class="p">,</span>
+                    <span class="n">str_</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">TTY_COLOUR_NORM</span><span class="p">,</span>
+                <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">str_</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Event</span><span class="p">:</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A base class for events suitable for feeding into a Reporter.&quot;&quot;&quot;</span>
+
+    <span class="n">VV</span> <span class="o">=</span> <span class="n">Reporter</span><span class="o">.</span><span class="n">VV</span>
+    <span class="n">V</span> <span class="o">=</span> <span class="n">Reporter</span><span class="o">.</span><span class="n">V</span>
+    <span class="n">DEFAULT</span> <span class="o">=</span> <span class="n">Reporter</span><span class="o">.</span><span class="n">DEFAULT</span>
+    <span class="n">WARN</span> <span class="o">=</span> <span class="n">Reporter</span><span class="o">.</span><span class="n">WARN</span>
+    <span class="n">FAIL</span> <span class="o">=</span> <span class="n">Reporter</span><span class="o">.</span><span class="n">FAIL</span>
+    <span class="n">KIND_ERR</span> <span class="o">=</span> <span class="n">Reporter</span><span class="o">.</span><span class="n">KIND_ERR</span>
+    <span class="n">KIND_OUT</span> <span class="o">=</span> <span class="n">Reporter</span><span class="o">.</span><span class="n">KIND_OUT</span>
+
+    <span class="n">LEVEL</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">KIND</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;level&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">LEVEL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;kind&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">KIND</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright : Copyright (C) British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2.6.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../../../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2.6.0";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "_modules/metomi/rose/reporter";
+    </script>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+
+
+</body>
+</html>

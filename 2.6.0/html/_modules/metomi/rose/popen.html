@@ -1,0 +1,613 @@
+
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>metomi.rose.popen &mdash; Rose Documentation 2.6.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=47202671" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/diff_selector.css?v=9704a72b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/grid_table.css?v=0285b42e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/hieroglyph_theme_addons.css?v=814c2015" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/tutorial.css?v=b869d33c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/addons.css?v=d1f804c3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=466af0f7" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/rose-favicon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=ae39cb24"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=7c20c939"></script>
+      <script src="../../../_static/js/diff_selector.js?v=3109bfa4"></script>
+      <script src="../../../_static/js/minicylc.js?v=ddc882fd"></script>
+      <script src="../../../_static/js/spoiler.js?v=12631137"></script>
+      <script src="../../../_static/js/addons.js?v=39bd7dee"></script>
+      <script src="../../../_static/js/versioning.js?v=df0214e8"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/rose-logo-crop.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial/rose/index.html">Rose Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rose API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/configuration/index.html">Rose Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/command-reference.html">Command Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/environment-variables.html">Rose Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/other.html">Other Python API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-bash-library.html">Rose Bash Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-built-in-applications.html">Rose Built-In Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-macro.html">Rose Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rose-upgrader-macros.html">Rose Upgrade Macro API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/rosie-web.html">Rosie Web API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../terms.html">Rose Terms Of Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../course/um-ut.html">UM User Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Rose Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">metomi.rose.popen</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for metomi.rose.popen</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) British Crown (Met Office) &amp; Contributors.</span>
+<span class="c1"># This file is part of Rose, a framework for meteorological suites.</span>
+<span class="c1">#</span>
+<span class="c1"># Rose is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Rose is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Rose. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="sd">&quot;&quot;&quot;Wraps Python&#39;s subprocess.Popen.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">select</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shlex</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">subprocess</span><span class="w"> </span><span class="kn">import</span> <span class="n">PIPE</span><span class="p">,</span> <span class="n">Popen</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">metomi.rose.reporter</span><span class="w"> </span><span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">metomi.rose.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceLocator</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">WorkflowFileNotFoundError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Error: Workflow file not found.</span>
+
+<span class="sd">    Expected error for fcm_make remote where the flow.cylc is</span>
+<span class="sd">    not included in the file installation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;No workflow file found.&quot;</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">RosePopenError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An error raised when a shell command call fails.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">ret_code</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="n">command</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ret_code</span> <span class="o">=</span> <span class="n">ret_code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">stdout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">stderr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdin</span> <span class="o">=</span> <span class="n">stdin</span>
+        <span class="ne">Exception</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">ret_code</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cmd_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">RosePopenEvent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdin</span><span class="p">))</span>
+        <span class="n">tail</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stderr</span><span class="p">:</span>
+            <span class="n">tail</span> <span class="o">=</span> <span class="s2">&quot;, stderr=</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">stderr</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> # return-code=</span><span class="si">%d%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmd_str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ret_code</span><span class="p">,</span> <span class="n">tail</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">RosePopenEvent</span><span class="p">(</span><span class="n">Event</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An event raised before a shell command call.&quot;&quot;&quot;</span>
+
+    <span class="n">LEVEL</span> <span class="o">=</span> <span class="n">Event</span><span class="o">.</span><span class="n">VV</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">stdin</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="n">command</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdin</span> <span class="o">=</span> <span class="n">stdin</span>
+        <span class="n">Event</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">stdin</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">command</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">command</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">command</span> <span class="o">=</span> <span class="n">command</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">command</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># real file or real stream</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">fileno</span><span class="p">()</span>
+            <span class="c1"># ask select if it is readable (real files can hang)</span>
+            <span class="n">readable</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">select</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">stdin</span><span class="p">],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="mf">0.0</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">IOError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="c1"># file like</span>
+            <span class="n">readable</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdin</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stdin</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="c1"># string</span>
+                <span class="n">stdin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdin</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stdin</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+                <span class="c1"># byte string</span>
+                <span class="n">stdin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">readable</span><span class="p">:</span>
+                <span class="c1"># file like</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+                    <span class="n">stdin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stdin</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="n">stdin</span> <span class="o">=</span> <span class="n">stdin</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="c1"># purposefully vague for safety (catch any exception)</span>
+                    <span class="n">stdin</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">stdin</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+            <span class="k">if</span> <span class="n">stdin</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; &lt;&lt;&#39;__STDIN__&#39;</span><span class="se">\n</span><span class="si">{</span><span class="n">stdin</span><span class="si">}</span><span class="se">\n</span><span class="s2">__STDIN__&quot;</span>
+
+        <span class="k">return</span> <span class="n">ret</span>
+
+
+<div class="viewcode-block" id="RosePopener">
+<a class="viewcode-back" href="../../../api/other.html#metomi.rose.popen.RosePopener">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RosePopener</span><span class="p">:</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrap Python&#39;s subprocess.Popen.&quot;&quot;&quot;</span>
+
+    <span class="n">CMDS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;diff_tool&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;diff&quot;</span><span class="p">,</span> <span class="s2">&quot;-u&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;editor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;vi&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;fs_browser&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;nautilus&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;gdiff_tool&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;gvimdiff&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;geditor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;gedit&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;image_viewer&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;eog&quot;</span><span class="p">,</span> <span class="s2">&quot;--new-instance&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;rsync&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;rsync&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-a&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--exclude=.*&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--timeout=1800&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--rsh=ssh -oBatchMode=yes -oConnectTimeout=10&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;ssh&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="s2">&quot;-oBatchMode=yes&quot;</span><span class="p">,</span> <span class="s2">&quot;-oConnectTimeout=10&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;terminal&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;xterm&quot;</span><span class="p">],</span>
+    <span class="p">}</span>
+    <span class="n">ENVS_OF_CMDS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;editor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;VISUAL&quot;</span><span class="p">,</span> <span class="s2">&quot;EDITOR&quot;</span><span class="p">]}</span>
+
+<div class="viewcode-block" id="RosePopener.list_to_shell_str">
+<a class="viewcode-back" href="../../../api/other.html#metomi.rose.popen.RosePopener.list_to_shell_str">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_to_shell_str</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert a list of strings into a shell command, escaping whitespace</span>
+<span class="sd">        and quotes, but otherwise allowing special chars so user defined</span>
+<span class="sd">        commands can run without sanitisation.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">        &gt;&gt;&gt; RosePopener.list_to_shell_str([])</span>
+<span class="sd">        &#39;&#39;</span>
+<span class="sd">        &gt;&gt;&gt; _ = RosePopener.list_to_shell_str([&quot;it&#39;s&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; print(_)</span>
+<span class="sd">        it\\&#39;s</span>
+<span class="sd">        &gt;&gt;&gt; _</span>
+<span class="sd">        &quot;it\\\\&#39;s&quot;</span>
+<span class="sd">        &gt;&gt;&gt; RosePopener.list_to_shell_str([&quot;echo&quot;, &quot;-n&quot;, &quot;Multiple words&quot;])</span>
+<span class="sd">        &#39;echo -n Multiple\\\\ words&#39;</span>
+<span class="sd">        &gt;&gt;&gt; RosePopener.list_to_shell_str([&quot;ls&quot;, &quot;my_dir;allow_this&quot;])</span>
+<span class="sd">        &#39;ls my_dir;allow_this&#39;</span>
+<span class="sd">        &gt;&gt;&gt; RosePopener.list_to_shell_str([&quot;what&quot;, &quot;about&quot;, &quot;globs*&quot;])</span>
+<span class="sd">        &#39;what about globs*&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;([</span><span class="se">\&quot;</span><span class="s2">&#39;\s])&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">\1&quot;</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_handler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_handler</span> <span class="o">=</span> <span class="n">event_handler</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmds</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="RosePopener.handle_event">
+<a class="viewcode-back" href="../../../api/other.html#metomi.rose.popen.RosePopener.handle_event">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle an event using the runner&#39;s event handler.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_handler</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_handler</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RosePopener.get_cmd">
+<a class="viewcode-back" href="../../../api/other.html#metomi.rose.popen.RosePopener.get_cmd">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return default options and arguments of a known command as a list.</span>
+
+<span class="sd">        If a setting [external] &lt;key&gt; is defined in the site/user</span>
+<span class="sd">        configuration, use the setting.</span>
+
+<span class="sd">        Otherwise, if RosePopener.ENVS_OF_CMDS[key] exists, it looks for each</span>
+<span class="sd">        environment variable in the list in RosePopener.ENVS_OF_CMDS[key] in</span>
+<span class="sd">        order. If the environment variable is defined and is not a null string,</span>
+<span class="sd">        use the value of the environment variable.</span>
+
+<span class="sd">        Otherwise, return RosePopener.CMDS[key]</span>
+
+<span class="sd">        key: must be a key of RosePopener.CMDS</span>
+<span class="sd">        args: if specified, will be added to the returned list</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmds</span><span class="p">:</span>
+            <span class="n">root_node</span> <span class="o">=</span> <span class="n">ResourceLocator</span><span class="o">.</span><span class="n">default</span><span class="p">()</span><span class="o">.</span><span class="n">get_conf</span><span class="p">()</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">root_node</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="s2">&quot;external&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">],</span> <span class="n">no_ignore</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cmds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmds</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ENVS_OF_CMDS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="n">env_var</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">env_var</span><span class="p">:</span>  <span class="c1"># not None, not null str</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cmds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">env_var</span><span class="p">)</span>
+                    <span class="k">break</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmds</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cmds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">CMDS</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RosePopener.run">
+<a class="viewcode-back" href="../../../api/other.html#metomi.rose.popen.RosePopener.run">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Provide a Rose-friendly interface to subprocess.Popen.</span>
+
+<span class="sd">        Return ret_code, out, err.</span>
+
+<span class="sd">        If kwargs[&quot;stdin&quot;] is a str, communicate it to the command via a pipe.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">proc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_bg</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">stdin</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stdin&quot;</span><span class="p">),</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">stdin</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stdin&quot;</span><span class="p">)</span>
+        <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">stdin</span><span class="p">)</span>
+        <span class="n">retcode</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">retcode</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span></div>
+
+
+<div class="viewcode-block" id="RosePopener.run_bg">
+<a class="viewcode-back" href="../../../api/other.html#metomi.rose.popen.RosePopener.run_bg">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_bg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Provide a Rose-friendly interface to subprocess.Popen.</span>
+
+<span class="sd">        Return a subprocess.Popen object.</span>
+
+<span class="sd">        If kwargs[&quot;stdin&quot;] is a str, turn it into subprocess.PIPE.</span>
+<span class="sd">        However, it cannot communicate stdin to the Popen object,</span>
+<span class="sd">        because the Popen.communicate() method implies a wait().</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;stdout&quot;</span><span class="p">,</span> <span class="s2">&quot;stderr&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">PIPE</span>
+        <span class="n">stdin</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stdin&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stdin</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;stdin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">PIPE</span>
+        <span class="k">elif</span> <span class="n">stdin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;stdin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">handle_event</span><span class="p">(</span><span class="n">RosePopenEvent</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">stdin</span><span class="p">))</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;shell&quot;</span><span class="p">):</span>
+                <span class="n">proc</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">proc</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">args</span><span class="p">:</span>
+                <span class="n">exc</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">raise</span> <span class="n">RosePopenError</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">exc</span><span class="o">.</span><span class="n">errno</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+        <span class="k">return</span> <span class="n">proc</span></div>
+
+
+<div class="viewcode-block" id="RosePopener.run_nohup_gui">
+<a class="viewcode-back" href="../../../api/other.html#metomi.rose.popen.RosePopener.run_nohup_gui">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_nohup_gui</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Launch+detach a GUI command with nohup.</span>
+
+<span class="sd">        Launch the GUI command with `nohup bash -c &#39;exec ...&#39;` redirecting</span>
+<span class="sd">        standard input and outputs from and to `/dev/null`, and setting it to</span>
+<span class="sd">        become a process group leader. Equivalent to a double fork.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            cmd (str): command string of the GUI.</span>
+
+<span class="sd">        Return (subprocess.Popen):</span>
+<span class="sd">            Return the process object for the &quot;nohup&quot; command.</span>
+<span class="sd">            Return None if no DISPLAY is set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;DISPLAY&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_bg</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;nohup&#39;</span><span class="p">,</span>
+            <span class="sa">r</span><span class="s1">&#39;bash&#39;</span><span class="p">,</span>
+            <span class="sa">r</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span>
+            <span class="sa">r</span><span class="s1">&#39;exec &#39;</span> <span class="o">+</span> <span class="n">cmd</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39; &lt;&quot;/dev/null&quot; &gt;&quot;/dev/null&quot; 2&gt;&amp;1&#39;</span><span class="p">,</span>
+            <span class="n">preexec_fn</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">setpgrp</span><span class="p">,</span>
+            <span class="n">stdin</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">),</span>
+            <span class="n">stdout</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">),</span>
+            <span class="n">stderr</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RosePopener.run_ok">
+<a class="viewcode-back" href="../../../api/other.html#metomi.rose.popen.RosePopener.run_ok">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_ok</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Same as RosePopener.run, but raise RosePopenError if ret_code != 1.</span>
+
+<span class="sd">        Return out, err.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ret_code</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret_code</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RosePopenError</span><span class="p">(</span>
+                <span class="n">args</span><span class="p">,</span> <span class="n">ret_code</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stdin&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span></div>
+
+
+<div class="viewcode-block" id="RosePopener.run_simple">
+<a class="viewcode-back" href="../../../api/other.html#metomi.rose.popen.RosePopener.run_simple">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_simple</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Similar to RosePopener.run_ok, but event handle stdout and stderr.</span>
+
+<span class="sd">        kwargs[&quot;stderr_level&quot;] -- set event level of stderr</span>
+<span class="sd">        kwargs[&quot;stdout_level&quot;] -- set event level of stdout</span>
+
+<span class="sd">        Return None.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stderr_level</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;stderr_level&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">stdout_level</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;stdout_level&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">ret_code</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stdout</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">handle_event</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">stdout_level</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret_code</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RosePopenError</span><span class="p">(</span>
+                <span class="n">args</span><span class="p">,</span> <span class="n">ret_code</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stdin&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">stderr</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">handle_event</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">stderr_level</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RosePopener.which">
+<a class="viewcode-back" href="../../../api/other.html#metomi.rose.popen.RosePopener.which">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">which</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Search an executable file name in PATH, and return its full path.</span>
+
+<span class="sd">        If name is an absolute path and is an executable file, return name.</span>
+<span class="sd">        If name is not found in PATH, return None.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">F_OK</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">X_OK</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">name</span>
+        <span class="k">for</span> <span class="n">dir_</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PATH&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">pathsep</span><span class="p">):</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">F_OK</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">X_OK</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">file_name</span></div>
+
+
+<div class="viewcode-block" id="RosePopener.run_bg_async">
+<a class="viewcode-back" href="../../../api/other.html#metomi.rose.popen.RosePopener.run_bg_async">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_bg_async</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Provide a Rose-friendly interface to subprocess.Popen.</span>
+
+<span class="sd">        Return a subprocess.Popen object.</span>
+
+<span class="sd">        If kwargs[&quot;stdin&quot;] is a str, turn it into subprocess.PIPE.</span>
+<span class="sd">        However, it cannot communicate stdin to the Popen object,</span>
+<span class="sd">        because the Popen.communicate() method implies a wait().</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;stdout&quot;</span><span class="p">,</span> <span class="s2">&quot;stderr&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span>
+        <span class="n">stdin</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stdin&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stdin</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;stdin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span>
+        <span class="k">elif</span> <span class="n">stdin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;stdin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">handle_event</span><span class="p">(</span><span class="n">RosePopenEvent</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">stdin</span><span class="p">))</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;shell&quot;</span><span class="p">):</span>
+                <span class="n">proc</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">command</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">shlex</span><span class="o">.</span><span class="n">quote</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span>
+                <span class="n">proc</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_subprocess_shell</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">args</span><span class="p">:</span>
+                <span class="n">exc</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">raise</span> <span class="n">RosePopenError</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">proc</span></div>
+
+
+<div class="viewcode-block" id="RosePopener.run_async">
+<a class="viewcode-back" href="../../../api/other.html#metomi.rose.popen.RosePopener.run_async">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_async</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Provide a Rose-friendly interface to subprocess.Popen.</span>
+
+<span class="sd">        Return ret_code, out, err.</span>
+
+<span class="sd">        If kwargs[&quot;stdin&quot;] is a str, communicate it to the command via a pipe.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">proc</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_bg_async</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">stdin</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stdin&quot;</span><span class="p">),</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">stdin</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stdin&quot;</span><span class="p">)</span>
+        <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="k">await</span> <span class="n">proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">stdin</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">proc</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_ok_async</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">ret_code</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_async</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret_code</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">stderr</span><span class="p">:</span>
+                <span class="n">stderr</span> <span class="o">=</span> <span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">stderr</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">raise</span> <span class="n">RosePopenError</span><span class="p">(</span>
+                <span class="n">args</span><span class="p">,</span> <span class="n">ret_code</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stdin&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span>
+
+    <span class="fm">__call__</span> <span class="o">=</span> <span class="n">run_ok</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright : Copyright (C) British Crown (Met Office) &amp; Contributors. See Terms of Use. This document is released under the Open Government Licence.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note"
+     aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Read the Docs</span>
+    v: 2.6.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions" id="version-selector">
+    <script type="text/javascript">
+        // NOTE: temporary variables not initiated so that they can be deleted
+
+        // path to a root file in the current version of the documentation
+        version_path = "../../../.html".split('/');
+        // dirname of the root dir
+        version_dir = version_path
+            .splice(0, version_path.length - 1)
+            .join('/');
+        delete version_path;
+        // relative path from the current version to the documentation root
+        rel_path = '../../';
+        // relative path from the current document to the documentation root
+        var root_dir;
+        if (version_dir) {
+            root_dir = version_dir + '/' + rel_path;
+        } else {
+            root_dir = rel_path;
+        }
+        delete version_dir;
+        delete rel_path;
+        // the name of the current version of the documentation
+        const current_version = "2.6.0";
+        // the name of the builder (i.e. html)
+        const current_builder = "html";
+        // the name of the current page
+        const current_page_name = "_modules/metomi/rose/popen";
+    </script>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+<style>
+/* make sidebar header off-white. NB: only very light colours work given image
+   edge transparency issues, but white itself clashes with the main pages.  */
+.wy-side-nav-search, .wy-nav-top {
+    background: #f9f9eb;
+}
+/* make sidebar header version text the dark blue of the Rose logo */
+.wy-side-nav-search div.version {
+    color: #2B2663;
+}
+</style>
+
+
+</body>
+</html>
