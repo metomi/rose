@@ -16,12 +16,81 @@
 # -----------------------------------------------------------------------------
 """A handler of locations on remote hosts."""
 
+from io import TextIOWrapper
+from textwrap import indent
 from time import sleep, time
 
 from metomi.rose.loc_handlers.rsync_remote_check import (
     __file__ as rsync_remote_check_file,
 )
 from metomi.rose.popen import RosePopenError
+
+
+class PreRsyncCheckError(Exception):
+    """Error to raise if we:
+    * Can't work out which loc handler to use.
+    * Fall back to assuming that the loc is for use with rsync.
+    * Attempting to use it as an rsync loc fails.
+
+    """
+
+    BASE_MESSAGE = (
+        'Rose tried all other file install handlers and'
+        ' decided this must be an Rsync handler.\n\t'
+    )
+
+    def __init__(self, dict_, cmd=None, loc=None):
+        for key, value in dict_.items():
+            if isinstance(value, TextIOWrapper):
+                setattr(self, key, value.read())
+            else:
+                setattr(self, key, value)
+
+        # Convert command into something the debugger can try:
+        try:
+            self.cmd = ' '.join(cmd)
+        except TypeError:
+            self.cmd = cmd
+
+        # Handle ``test -e nonexistant`` where no useful error is
+        # provided:
+        message = ''
+        for used_by in loc.used_by_names:
+            message += (
+                f'file:{used_by}={loc.action_key}={loc.name}'
+                ': don\'t know how to process this file location.\n'
+            )
+        if (
+            self.returncode == 1
+            and self.stderr == ''
+            and self.stdout == ''
+        ):
+            self.stderr = f'File "{cmd[-1]}" does not exist.'
+
+        if self.returncode == 255:
+            host = dict_['args'][dict_['args'].index('-n') + 1]
+            self.mod_msg = (
+                message
+                + self.BASE_MESSAGE
+                + 'If it is then host'
+                f' "{host}"'
+                ' is uncontactable (ssh 255 error).'
+            )
+        else:
+            self.mod_msg = (
+                message
+                + self.BASE_MESSAGE
+                + f'`{self.cmd}` failed with:'
+                + indent(
+                    f'\nreturncode: {self.returncode}'
+                    f'\nstdout:     {self.stdout}'
+                    f'\nstderr:     {self.stderr}',
+                    prefix='    ',
+                )
+            )
+
+    def __str__(self):
+        return self.mod_msg
 
 
 class RsyncLocHandler:
@@ -53,7 +122,10 @@ class RsyncLocHandler:
         except RosePopenError:
             return False
         else:
-            return proc.wait() == 0
+            if proc.wait() == 0:
+                return True
+            else:
+                raise PreRsyncCheckError(proc.__dict__, cmd=cmd, loc=loc)
 
     def parse(self, loc, _):
         """Set loc.scheme, loc.loc_type, loc.paths."""
