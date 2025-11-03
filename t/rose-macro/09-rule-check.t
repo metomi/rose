@@ -389,7 +389,12 @@ __META_CONFIG__
 run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 # Update Python error messages to match latest version:
-sed -i 's/(float modulo)/(float modulo by zero)/g' "$TEST_KEY.err"
+PYTHON_VERSION=$(python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+if [[ "${PYTHON_VERSION}" == '3.14' ]]; then
+    sed -i 's/(division by zero)/(float modulo by zero)/g' "$TEST_KEY.err"
+else
+    sed -i 's/(float modulo)/(float modulo by zero)/g' "$TEST_KEY.err"
+fi
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [V] metomi.rose.macros.DefaultValidators: issues: 23
     =top_level_model_subset_fail='ofo_001'
