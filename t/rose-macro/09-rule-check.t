@@ -389,12 +389,7 @@ __META_CONFIG__
 run_fail "$TEST_KEY" rose macro --config=../config metomi.rose.macros.DefaultValidators
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 # Update Python error messages to match latest version:
-PYTHON_VERSION=$(python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
-if [[ "${PYTHON_VERSION}" == '3.14' ]]; then
-    sed -i 's/(division by zero)/(float modulo by zero)/g' "$TEST_KEY.err"
-else
-    sed -i 's/(float modulo)/(float modulo by zero)/g' "$TEST_KEY.err"
-fi
+sed -i 's/.*failed because: 24 % this == 0/        failed because: 24 % this == 0/g' "$TEST_KEY.err"
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
 [V] metomi.rose.macros.DefaultValidators: issues: 23
     =top_level_model_subset_fail='ofo_001'
@@ -434,7 +429,7 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__CONTENT__'
     simple:scalar_test=test_substring_fail="ABCDEFG"
         failed because: "D" in this
     simple:scalar_test=test_var_div_zero_fail=0
-        (float modulo by zero) failed because: 24 % this == 0
+        failed because: 24 % this == 0
     simple:scalar_test=test_var_lt_control_fail=3
         failed because: this < simple:scalar_test=control_lt
     simple:scalar_test=test_var_mult_fail=5
