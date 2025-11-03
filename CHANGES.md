@@ -10,6 +10,12 @@ $ towncrier create <PR-number>.<break|feat|fix>.md --content "Short description"
 
 <!-- towncrier release notes start -->
 
+## 2.6.1 (Released 2025-11-03)
+
+### 🔧 Fixes
+
+[#2892](https://github.com/cylc/cylc-flow/pull/2892) - Give the user more information about rsync file handler failure.
+
 ## 2.6.0 (Released 2025-10-01)
 
 ### ⚠ Breaking Changes
