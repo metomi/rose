@@ -161,7 +161,7 @@ filename = "CHANGES.md"
 template = "changes.d/changelog-template.jinja"
 underlines = ["", "", ""]
 title_format = "## {version} (Released {project_date})"
-issue_format = "[#{issue}](https://github.com/cylc/cylc-flow/pull/{issue})"
+issue_format = "[#{issue}](https://github.com/metomi/rose/pull/{issue})"
 ignore = ["changelog-template.jinja"]
 
 # These changelog sections will be shown in the defined order:

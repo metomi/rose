@@ -343,14 +343,16 @@ Rose Environment Variables
 .. envvar:: ROSE_TASK_PREFIX
 
    Description
-      The prefix in the task name.
+      The prefix in the task name. This is delimited by `_` by default (unless
+      overridden by `rose task-env --prefix-delim`).
    Provided By
       * :ref:`command-rose-task-env`
 
 .. envvar:: ROSE_TASK_SUFFIX
 
    Description
-      The suffix in the task name.
+      The suffix in the task name. This is delimited by `_` by default (unless
+      overridden by `rose task-env --suffix-delim`).
    Provided By
       * :ref:`command-rose-task-env`
 

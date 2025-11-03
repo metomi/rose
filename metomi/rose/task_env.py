@@ -186,9 +186,11 @@ Print `KEY=VALUE` of the following to the STDOUT:
 `ROSE_ETC`
     The path to the etc directory of the running suite.
 `ROSE_TASK_PREFIX`
-    The prefix in the task name.
+    The prefix in the task name. This is delimited by `_` by default (unless
+    overriden by `--prefix-delim`).
 `ROSE_TASK_SUFFIX`
-    The suffix in the task name.
+    The suffix in the task name. This is delimited by `_` by default (unless
+    overriden by `--suffix-delim`).
         ''',
         epilog='''
 USAGE IN SUITES
