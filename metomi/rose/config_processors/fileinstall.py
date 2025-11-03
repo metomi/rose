@@ -97,7 +97,11 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         if not nodes:
             return
 
-        loop = asyncio.get_event_loop()
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+
         loop.set_exception_handler(self.handle_event)
         coro = self.__process(conf_tree, nodes, **kwargs)
 
