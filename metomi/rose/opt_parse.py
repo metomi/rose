@@ -260,7 +260,7 @@ class RoseOptionParser(OptionParser):
                     "Specify one or more cycle offsets to determine what"
                     " `ROSE_DATAC????` environment variables to export."
                     "\nThe `TIME-DELTA` argument uses the syntax explained"
-                    "in the `ROSE_DATAC????` environment variable."
+                    " in the `ROSE_DATAC????` environment variable."
                     "\nE.g. `--cycle-offset=PT3H --cycle-offset=PT6H` will"
                     " tell `rose task-env` to export `ROSE_DATACPT3H` and"
                     " `ROSE_DATACPT6H`."
