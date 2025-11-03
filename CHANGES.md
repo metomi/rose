@@ -14,6 +14,8 @@ $ towncrier create <PR-number>.<break|feat|fix>.md --content "Short description"
 
 ### 🔧 Fixes
 
+[#2953](https://github.com/metomi/rose/pull/2953) - Fix an incompatibility with Python 3.14.
+
 [#2892](https://github.com/cylc/cylc-flow/pull/2892) - Give the user more information about rsync file handler failure.
 
 ## 2.6.0 (Released 2025-10-01)
