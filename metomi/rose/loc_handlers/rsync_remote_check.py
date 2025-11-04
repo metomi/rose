@@ -62,7 +62,10 @@ def main(path, str_blob, str_tree):
                 if filename.startswith("."):
                     continue
                 name = os.path.join(dirpath, filename)
-                stat = os.stat(name)
+                if os.path.islink(name) and not os.path.exists(name):
+                    stat = os.lstat(name)
+                else:
+                    stat = os.stat(name)
                 print(stat.st_mode, stat.st_mtime, stat.st_size, name)
     elif os.path.isfile(path):
         print(str_blob)
