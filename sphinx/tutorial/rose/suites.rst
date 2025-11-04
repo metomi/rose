@@ -403,7 +403,6 @@ Rose Applications In Rose Suite Configurations
       ``app/forecast/rose-app.conf`` file into an ``[env]``
       section in the ``app/forecast/opt/rose-app-test.conf`` file:
 
-      * ``WEIGHTING``
       * ``WIND_CYCLES``
       * ``WIND_FILE_TEMPLATE``
       * ``RAINFALL_FILE``
@@ -421,7 +420,6 @@ Rose Applications In Rose Suite Configurations
          .. code-block:: rose
 
             [env]
-            WEIGHTING=1
             WIND_CYCLES=0
             WIND_FILE_TEMPLATE=test-data/wind_{cycle}_{xy}.csv
             RAINFALL_FILE=test-data/rainfall.csv
@@ -471,6 +469,7 @@ Rose Applications In Rose Suite Configurations
          [env]
          INTERVAL=60
          N_FORECASTS=5
+         WEIGHTING=1
          MAP_TEMPLATE=map-template.html
          SPLINE_LEVEL=0
          WIND_FILE_TEMPLATE=$CYLC_WORKFLOW_WORK_DIR/{cycle}/consolidate_observations/wind_{xy}.csv
