@@ -218,7 +218,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
       For now we will run the ``forecast`` application using some sample data
       so that we can run it outside of the weather forecasting workflow.
 
-      The test data was gathered in November 2017.
+      The test data was gathered in November 2025.
 
       Copy the test data files into the ``file/`` directory by running::
 
@@ -272,11 +272,11 @@ An application can be run using the :ref:`command-rose-app-run` command:
       .. code-block:: rose
 
          # The date when the test data was gathered.
-         CYLC_TASK_CYCLE_POINT=20171101T0000Z
+         CYLC_TASK_CYCLE_POINT=20251105T1100Z
          # The dimensions of each grid cell in degrees.
          RESOLUTION=0.2
          # The area to generate forecasts for (lng1, lat1, lng2, lat2).
-         DOMAIN=-12,48,5,61
+         DOMAIN=-12,46,12,61
 
    #. **Run the application.**
 
