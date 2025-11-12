@@ -30,9 +30,7 @@ class RadioButtonsValueWidget(Gtk.Box):
     """This is a class to represent a value as radio buttons."""
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
-        super(RadioButtonsValueWidget, self).__init__(
-            homogeneous=False, spacing=0
-        )
+        super(RadioButtonsValueWidget, self).__init__(spacing=0)
         self.value = value
         self.metadata = metadata
         self.set_value = set_value

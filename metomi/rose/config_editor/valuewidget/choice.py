@@ -130,8 +130,8 @@ class ChoicesValueWidget(Gtk.Box):
         list_frame = Gtk.Frame()
         list_frame.show()
         list_frame.add(self._listview)
-        list_vbox.pack_start(list_frame, expand=False, fill=False, padding=0)
-        self.pack_start(list_vbox, expand=True, fill=True)
+        list_vbox.pack_start(list_frame, expand=True, fill=True, padding=0)
+        self.pack_start(list_vbox, expand=True, fill=True, padding=0)
         tree_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         tree_vbox.show()
         self._treeview = metomi.rose.gtk.choice.ChoicesTreeView(
@@ -149,7 +149,7 @@ class ChoicesValueWidget(Gtk.Box):
         if self.should_edit:
             add_widget = self._get_add_widget()
             tree_vbox.pack_end(add_widget, expand=False, fill=False, padding=0)
-        self.pack_start(tree_vbox, expand=True, fill=True)
+        self.pack_start(tree_vbox, expand=True, fill=True, padding=0)
         self._listview.connect("focus-in-event", self.hook.trigger_scroll)
         self._treeview.connect("focus-in-event", self.hook.trigger_scroll)
         self.grab_focus = lambda: self.hook.get_focus(self._listview)
@@ -159,8 +159,8 @@ class ChoicesValueWidget(Gtk.Box):
 
     def _get_add_widget(self):
         add_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        add_entry = Gtk.ComboBoxEntry()
-        add_entry.connect("changed", self._handle_combo_choice)
+        add_entry = Gtk.ComboBoxText.new_with_entry()
+        add_entry.connect("changed", self._handle_combo_changed)
         add_entry.get_child().connect(
             "key-press-event",
             lambda w, e: self._handle_text_choice(add_entry, e),
@@ -169,35 +169,29 @@ class ChoicesValueWidget(Gtk.Box):
             metomi.rose.config_editor.CHOICE_TIP_ENTER_CUSTOM
         )
         add_entry.show()
-        self._set_available_hints(add_entry)
+        for hint in self.hints:
+            add_entry.append_text(hint)
         add_hbox.pack_end(add_entry, expand=True, fill=True, padding=0)
         add_hbox.show()
         return add_hbox
 
-    def _set_available_hints(self, comboboxentry):
-        model = Gtk.ListStore(str)
-        values = self._get_value_values()
-        for hint in self.hints:
-            if hint not in values:
-                model.append([hint])
-        comboboxentry.set_model(model)
-        comboboxentry.set_text_column(0)
-
-    def _handle_combo_choice(self, comboboxentry):
-        iter_ = comboboxentry.get_active_iter()
-        if iter_ is None:
+    def _handle_combo_changed(self, comboboxtext):
+        text = comboboxtext.get_active_text()
+        if text is None or text not in self.hints:
             return False
-        self._add_custom_choice(comboboxentry, comboboxentry.get_active_text())
+        if comboboxtext.get_child().is_focus():
+            # Probably typing. Wait for positive activation.
+            return False
+        self._add_custom_choice(comboboxtext, text)
 
-    def _handle_text_choice(self, comboboxentry, event):
+    def _handle_text_choice(self, comboboxtext, event):
         if Gdk.keyval_name(event.keyval) in ["Return", "KP_Enter"]:
             self._add_custom_choice(
-                comboboxentry, comboboxentry.get_child().get_text()
+                comboboxtext, comboboxtext.get_active_text()
             )
         return False
 
-    def _add_custom_choice(self, comboboxentry, new_name):
-        entry = comboboxentry.get_child()
+    def _add_custom_choice(self, comboboxtext, new_name):
         if not new_name:
             text = metomi.rose.config_editor.ERROR_BAD_NAME.format("''")
             title = metomi.rose.config_editor.DIALOG_TITLE_ERROR
@@ -205,10 +199,8 @@ class ChoicesValueWidget(Gtk.Box):
                 metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR, text, title
             )
             return False
-        new_values = self._get_value_values() + [entry.get_text()]
-        entry.set_text("")
+        new_values = self._get_value_values() + [comboboxtext.get_active_text()]
         self._format_and_set_value(" ".join(new_values))
-        self._set_available_hints(comboboxentry)
         self._listview.refresh()
         self._treeview.refresh()
 
@@ -278,6 +270,6 @@ class ChoicesValueWidget(Gtk.Box):
         if self.value_format == "python":
             new_value = repr(shlex.split(new_value))
         else:
-            new_value = metomi.rose.variable.array_join(shlex.split(new_value))
+            new_value = metomi.rose.variable.array_join(metomi.rose.variable.array_split(new_value))
         self.value = new_value
         self.set_value(new_value)

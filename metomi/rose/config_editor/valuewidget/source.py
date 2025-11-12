@@ -91,7 +91,7 @@ class SourceValueWidget(Gtk.Box):
         frame.add(self._listview)
         value_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         value_vbox.show()
-        value_vbox.pack_start(frame, expand=False, fill=False, padding=0)
+        value_vbox.pack_start(frame, expand=True, fill=True, padding=0)
         value_eb = Gtk.EventBox()
         value_eb.show()
         value_vbox.pack_start(value_eb, expand=True, fill=True, padding=0)

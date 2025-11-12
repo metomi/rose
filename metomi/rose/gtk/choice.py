@@ -110,7 +110,7 @@ class ChoicesListView(Gtk.TreeView):
         """Handle an outgoing drag request."""
         model, iter_ = treeview.get_selection().get_selected()
         text = model.get_value(iter_, 0)
-        sel.set_text(text)
+        sel.set_text(text, -1)
         model.remove(iter_)  # Triggers the 'row-deleted' signal, sets value
         if not model.iter_n_children(None):
             model.append([metomi.rose.config_editor.CHOICE_LABEL_EMPTY])
@@ -119,7 +119,7 @@ class ChoicesListView(Gtk.TreeView):
         self, treeview, drag, xpos, ypos, sel, info, time
     ):
         """Handle an incoming drag request."""
-        if sel.data is None:
+        if sel.get_text() is None:
             return False
         drop_info = treeview.get_dest_row_at_pos(xpos, ypos)
         model = treeview.get_model()
@@ -129,11 +129,11 @@ class ChoicesListView(Gtk.TreeView):
                 position == Gtk.TreeViewDropPosition.BEFORE
                 or position == Gtk.TreeViewDropPosition.INTO_OR_BEFORE
             ):
-                model.insert(path[0], [sel.data])
+                model.insert(path[0], [sel.get_text()])
             else:
-                model.insert(path[0] + 1, [sel.data])
+                model.insert(path[0] + 1, [sel.get_text()])
         else:
-            model.append([sel.data])
+            model.append([sel.get_text()])
             path = None
         self._handle_reordering(model, path)
 
@@ -198,8 +198,8 @@ class ChoicesListView(Gtk.TreeView):
                 "button-press-event", lambda b, e: self._handle_reordering()
             )
             menu.append(menuitem)
-        menu.popup_at_widget(
-            event.button, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, event
+        menu.popup_at_pointer(
+            event
         )
         return False
 
@@ -270,7 +270,7 @@ class ChoicesTreeView(Gtk.TreeView):
             [("text/plain", 0, 0)],
             Gdk.DragAction.MOVE,
         )
-        self.connect_after("button-release-event", self._handle_button)
+        self.connect("row-activated", self._handle_row_activate)
         self.connect("drag-begin", self._handle_drag_begin)
         self.connect("drag-data-get", self._handle_drag_get)
         self.connect("drag-end", self._handle_drag_end)
@@ -395,7 +395,7 @@ class ChoicesTreeView(Gtk.TreeView):
         if not self._check_can_add(iter_):
             return False
         name = model.get_value(iter_, 0)
-        sel.set("text/plain", 8, name)
+        sel.set_text(name, -1)
 
     def _check_can_add(self, iter_):
         """Check whether a name can be added to the data."""
@@ -411,15 +411,9 @@ class ChoicesTreeView(Gtk.TreeView):
             child_iter = model.iter_next(child_iter)
         return True
 
-    def _handle_button(self, treeview, event):
-        """Connect a left click on the available section to a toggle."""
-        if event.button != 1 or self._is_dragging:
-            return False
-        pathinfo = treeview.get_path_at_pos(int(event.x), int(event.y))
-        if pathinfo is None:
-            return False
-        path, col = pathinfo[0:2]
-        if treeview.get_columns().index(col) == 1:
+    def _handle_row_activate(self, treeview, path, column):
+        """Connect a double click on the available section to a toggle."""
+        if treeview.get_columns().index(column) == 1:
             self._handle_cell_toggle(None, path)
 
     def _handle_cell_toggle(self, cell, path, should_turn_off=None):

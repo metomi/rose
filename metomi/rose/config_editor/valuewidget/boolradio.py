@@ -24,14 +24,13 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 import metomi.rose.config_editor
-from . import radiobuttons
 
 
-class BoolValueWidget(radiobuttons.RadioButtonsValueWidget):
+class BoolValueWidget(Gtk.Box):
     """Produces 'true' and 'false' labelled radio buttons."""
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
-        super(BoolValueWidget, self).__init__(homogeneous=False, spacing=0)
+        super(BoolValueWidget, self).__init__(spacing=0)
         self.value = value
         self.metadata = metadata
         self.set_value = set_value
