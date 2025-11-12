@@ -295,7 +295,9 @@ class UpgradeController(object):
         if model.get_column_type(col_index) == GObject.TYPE_BOOLEAN:
             cell.set_property("active", model.get_value(r_iter, col_index))
             if model.get_value(r_iter, 1) == model.get_value(r_iter, 2):
-                model.set_value(r_iter, col_index, False)
+                # Destination version is the same as current version.
+                if model.get_value(r_iter, col_index):
+                    model.set_value(r_iter, col_index, False)
                 cell.set_property("inconsistent", True)
                 cell.set_property("sensitive", False)
             else:
