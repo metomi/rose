@@ -432,7 +432,7 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
                 return True
         child_iter = model.iter_children(iter_)
         while child_iter is not None:
-            if self._filter_visible(model, child_iter):
+            if self._filter_visible(model, child_iter, _):
                 return True
             child_iter = model.iter_next(child_iter)
         return False
