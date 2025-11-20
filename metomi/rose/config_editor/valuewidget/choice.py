@@ -199,7 +199,8 @@ class ChoicesValueWidget(Gtk.Box):
                 metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR, text, title
             )
             return False
-        new_values = self._get_value_values() + [comboboxtext.get_active_text()]
+        new_values = (
+            self._get_value_values() + [comboboxtext.get_active_text()])
         self._format_and_set_value(" ".join(new_values))
         self._listview.refresh()
         self._treeview.refresh()
@@ -270,6 +271,7 @@ class ChoicesValueWidget(Gtk.Box):
         if self.value_format == "python":
             new_value = repr(shlex.split(new_value))
         else:
-            new_value = metomi.rose.variable.array_join(metomi.rose.variable.array_split(new_value))
+            new_value = metomi.rose.variable.array_join(
+                metomi.rose.variable.array_split(new_value))
         self.value = new_value
         self.set_value(new_value)
