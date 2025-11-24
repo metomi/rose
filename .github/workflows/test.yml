@@ -152,8 +152,7 @@ jobs:
       - name: Install Rose
         working-directory: rose
         run: |
-          pip install ."[tests,docs${{ (startsWith(matrix.os, 'ubuntu') && ',graph,rosa') || '' }}]"
-          yarn install
+          pip install .
 
       - name: Install Cylc-Rose
         uses: cylc/release-actions/install-cylc-components@v1
@@ -162,6 +161,12 @@ jobs:
           cylc_rose_opts: ''
           cylc_rose_repo: ${{ inputs.cylc_rose_repo || 'cylc/cylc-rose' }}
           cylc_rose_tag: ${{ inputs.cylc_rose_tag }}
+
+      - name: Install Rose
+        working-directory: rose
+        run: |
+          pip install ."[tests,docs${{ (startsWith(matrix.os, 'ubuntu') && ',graph,rosa') || '' }}]"
+          yarn install
 
       - name: Checkout FCM
         if: startsWith(matrix.os, 'ubuntu')
