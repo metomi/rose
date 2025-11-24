@@ -141,12 +141,6 @@ jobs:
       - name: Configure git  # Configure Git for Git dependent tests.
         uses: cylc/release-actions/configure-git@v1
 
-      - name: Install Rose
-        working-directory: rose
-        run: |
-          pip install ."[tests,docs${{ (startsWith(matrix.os, 'ubuntu') && ',graph,rosa') || '' }}]"
-          yarn install
-
       - name: Install Cylc
         uses: cylc/release-actions/install-cylc-components@v1
         with:
@@ -154,6 +148,16 @@ jobs:
           cylc_flow_opts: ''
           cylc_flow_repo: ${{ inputs.cylc_flow_repo || 'cylc/cylc-flow' }}
           cylc_flow_tag: ${{ inputs.cylc_flow_tag }}
+
+      - name: Install Rose
+        working-directory: rose
+        run: |
+          pip install ."[tests,docs${{ (startsWith(matrix.os, 'ubuntu') && ',graph,rosa') || '' }}]"
+          yarn install
+
+      - name: Install Cylc-Rose
+        uses: cylc/release-actions/install-cylc-components@v1
+        with:
           cylc_rose: true
           cylc_rose_opts: ''
           cylc_rose_repo: ${{ inputs.cylc_rose_repo || 'cylc/cylc-rose' }}
