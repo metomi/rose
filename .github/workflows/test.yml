@@ -150,6 +150,7 @@ jobs:
       - name: Install Cylc
         uses: cylc/release-actions/install-cylc-components@v1
         with:
+          branch: ${{ inputs.rose_ref || '' }}
           cylc_flow: true
           cylc_flow_opts: ''
           cylc_flow_repo: ${{ inputs.cylc_flow_repo || 'cylc/cylc-flow' }}
@@ -258,6 +259,7 @@ jobs:
       - name: Install Cylc
         uses: cylc/release-actions/install-cylc-components@v1
         with:
+          branch: ${{ inputs.rose_ref || '' }}
           cylc_flow: true
           cylc_flow_opts: ''
           cylc_flow_repo: ${{ inputs.cylc_flow_repo || 'cylc/cylc-flow' }}
