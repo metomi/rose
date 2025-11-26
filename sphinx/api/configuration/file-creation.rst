@@ -116,6 +116,11 @@ root directory to install file targets with a relative path:
          ``~/.ssh/config`` to specify the user ID for logging into ``HOST``
          if required.
 
+      .. note::
+
+         * When installing files, broken symbolic links are rejected.
+         * When installing directories containing broken symlinks
+           they will be copied.
 
    .. rose:conf:: file:TARGET
 
