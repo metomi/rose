@@ -40,19 +40,14 @@ fi
 
 mkdir -p "$HOME/cylc-run"
 
-API_KEYS="$(rose resource tutorial/api-keys)"
-TUT_DIR="$(dirname "${API_KEYS}")"
+TDIR="$(rose resource tutorial/rose-weather-forecasting-suite/flow.cylc)"
+TUT_DIR="$(dirname "$(dirname "${TDIR}")")"
 
 usage () {
     echo 'rose tutorial SUITE [DIR]'
     echo
     echo 'Available tutorial suites:'
-    rose resource tutorial | sed -n 's/^  tutorial\/\(.*\)/\1/p; s/api-keys/api-key/'
-}
-
-api-key () {
-    # Pick a Datapoint API key at random from the api-keys file.
-    sort -R "${API_KEYS}" | head -n 1
+    rose resource tutorial | sed -n 's/^  tutorial\/\(.*\)/\1/p'
 }
 
 if [[ $# == 1 ]]; then
@@ -61,12 +56,6 @@ elif [[ $# == 2 ]]; then
     DIRECTORY="$2"
 else
     usage
-    exit 0
-fi
-
-# If api-key generate key and exit.
-if [[ $1 == 'api-key' ]]; then
-    api-key
     exit 0
 fi
 
@@ -99,8 +88,6 @@ echo -n "Copying tutorial files to ${DIRECTORY} ... "
 mkdir -p "$(dirname "${DIRECTORY}")"
 if rsync -rLptgoD "${TUT_DIR}/$1/" "${DIRECTORY}" \
     --exclude='.validate'; then
-    find "${DIRECTORY}" -type f \
-        -exec sed -i "s/DATAPOINT_API_KEY/$(api-key)/" {} \;
     echo 'done'
 else
     echo
