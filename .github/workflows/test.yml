@@ -123,6 +123,8 @@ jobs:
             shellcheck
             sqlite
             pygraphviz
+            pygobject>=3.50.0
+            gtk3>=3.24.43
 
       - name: Patch DNS
         uses: cylc/release-actions/patch-dns@v1
@@ -130,6 +132,7 @@ jobs:
       - name: Brew Install
         if: startsWith(matrix.os, 'macos')
         run: |
+          # install system deps
           brew install subversion
 
           # supress a mac os error
@@ -144,7 +147,7 @@ jobs:
       - name: Install Rose
         working-directory: rose
         run: |
-          pip install ."[tests,docs${{ (startsWith(matrix.os, 'ubuntu') && ',graph,rosa') || '' }}]"
+          pip install ."[tests,docs,rose-edit${{ (startsWith(matrix.os, 'ubuntu') && ',graph,rosa') || '' }}]"
           yarn install
 
       - name: Install Cylc
@@ -251,10 +254,12 @@ jobs:
             python=${{ matrix.python-version }}
             bash
             pygraphviz
+            pygobject>=3.50.0
+            gtk3>=3.24.43
 
       - name: Install Rose
         run: |
-          pip install -e .[docs,graph] --upgrade-strategy='only-if-needed'
+          pip install -e .[docs,graph,edit] --upgrade-strategy='only-if-needed'
 
       - name: Install Cylc
         uses: cylc/release-actions/install-cylc-components@v1
