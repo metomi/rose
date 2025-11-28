@@ -10,6 +10,13 @@ $ towncrier create <PR-number>.<break|feat|fix>.md --content "Short description"
 
 <!-- towncrier release notes start -->
 
+## 2.6.2 (Released 2025-11-28)
+
+### 🔧 Fixes
+
+Updated the Rose tutorial to reflect changes in the Cylc tutorial.
+This switches its data source allowing it to function once Met Office DataPoint is retired.
+
 ## 2.6.1 (Released 2025-11-03)
 
 ### 🔧 Fixes
