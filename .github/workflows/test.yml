@@ -53,7 +53,7 @@ jobs:
     timeout-minutes: 3
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.rose_ref || github.sha }}
 
@@ -103,7 +103,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.rose_ref || github.sha }}
           path: rose
@@ -150,6 +150,7 @@ jobs:
       - name: Install Cylc
         uses: cylc/release-actions/install-cylc-components@v1
         with:
+          branch: ${{ inputs.rose_ref || '' }}
           cylc_flow: true
           cylc_flow_opts: ''
           cylc_flow_repo: ${{ inputs.cylc_flow_repo || 'cylc/cylc-flow' }}
@@ -161,7 +162,7 @@ jobs:
 
       - name: Checkout FCM
         if: startsWith(matrix.os, 'ubuntu')
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: ${{ inputs.fcm_repo || 'metomi/fcm' }}
           ref: ${{ inputs.fcm_ref || 'master' }}
@@ -223,7 +224,7 @@ jobs:
 
       - name: Upload cylc-run artifact
         if: failure() && steps.functest.outcome == 'failure'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: cylc-run ${{ matrix.os }} py-${{ matrix.python-version }}
           path: ~/cylc-run/
@@ -236,7 +237,7 @@ jobs:
         python-version: ['3']
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.rose_ref || github.sha }}
 
@@ -258,6 +259,7 @@ jobs:
       - name: Install Cylc
         uses: cylc/release-actions/install-cylc-components@v1
         with:
+          branch: ${{ inputs.rose_ref || '' }}
           cylc_flow: true
           cylc_flow_opts: ''
           cylc_flow_repo: ${{ inputs.cylc_flow_repo || 'cylc/cylc-flow' }}
