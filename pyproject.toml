@@ -92,6 +92,9 @@ lint = [
     "mypy>=0.800",
     "types-aiofiles"
 ]
+tutorials = [
+    "cylc-flow[tutorials]>=8.6.1"
+]
 rosa = []
 # disco = [
 #     TODO: rosie disco has been disabled due to the removal of WSGI support at
@@ -103,7 +106,8 @@ all = [
     "metomi-rose[docs]",
     "metomi-rose[graph]",
     "metomi-rose[tests]",
-    "metomi-rose[rosa]"
+    "metomi-rose[rosa]",
+    "metomi-rose[tutorials]"
 ]
 
 [project.scripts]
