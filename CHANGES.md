@@ -10,6 +10,12 @@ $ towncrier create <PR-number>.<break|feat|fix>.md --content "Short description"
 
 <!-- towncrier release notes start -->
 
+## 2.6.3 (Released 2026-01-07)
+
+### 🚀 Enhancements
+
+[#2979](https://github.com/metomi/rose/pull/2979) - Allow Rose fileinstall to install folders containing broken Symlinks.
+
 ## 2.6.2 (Released 2025-11-28)
 
 ### 🔧 Fixes
