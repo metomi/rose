@@ -113,8 +113,6 @@ DEAD_ENDS = {
         'This command has been replaced by: "cylc stop".',
     ('rose', 'suite-stop'):
         'This command has been replaced by: "cylc stop".',
-    ('rosie', 'disco'):
-        'Rosie Disco has been disabled pending fixes at a later release.',
     ('rosie', 'go'):
         'This command has been removed.',
 }

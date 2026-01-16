@@ -147,7 +147,7 @@ jobs:
       - name: Install Rose
         working-directory: rose
         run: |
-          pip install ."[tests,docs,rose-edit${{ (startsWith(matrix.os, 'ubuntu') && ',graph,rosa') || '' }}]"
+          pip install ."[tests,docs,rose-edit${{ (startsWith(matrix.os, 'ubuntu') && ',graph,rosa,disco') || '' }}]"
           yarn install
 
       - name: Install Cylc
@@ -259,7 +259,7 @@ jobs:
 
       - name: Install Rose
         run: |
-          pip install -e .[docs,graph,edit] --upgrade-strategy='only-if-needed'
+          pip install -e .[docs,graph,edit,disco] --upgrade-strategy='only-if-needed'
 
       - name: Install Cylc
         uses: cylc/release-actions/install-cylc-components@v1

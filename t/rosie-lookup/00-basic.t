@@ -145,7 +145,7 @@ while port_is_busy "${PORT}"; do
 done
 cat >conf/opt/rose-port.conf <<__ROSE_CONF__
 [rosie-id]
-prefix-ws.foo=http://${HOSTNAME}:${PORT}/foo
+prefix-ws.foo=http://$(hostname -f):${PORT}/foo
 __ROSE_CONF__
 rosie disco 'start' "${PORT}" \
     0<'/dev/null' 1>'rosie-disco.out' 2>'rosie-disco.err' &
@@ -160,79 +160,79 @@ fi
 
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-bad-prefix
-run_fail "$TEST_KEY" timeout 10 rosie lookup --prefix=bar poetry
+run_fail "$TEST_KEY" timeout 10 rosie lookup --no-pretty --prefix=bar poetry
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<'__ERR__'
 [rosie-id]prefix-ws.bar: configuration not defined
 __ERR__
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-search-no-results
-run_pass "$TEST_KEY" timeout 10 rosie lookup dodo
+run_pass "$TEST_KEY" timeout 10 rosie lookup --no-pretty dodo
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite owner project title
-url: http://$HOSTNAME:$PORT/foo/search?s=dodo
+url: http://$(hostname -f):$PORT/foo/search?s=dodo
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-search-no-results-prefix
-run_pass "$TEST_KEY" timeout 10 rosie lookup --prefix=foo dodo
+run_pass "$TEST_KEY" timeout 10 rosie lookup --no-pretty --prefix=foo dodo
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite owner project title
-url: http://$HOSTNAME:$PORT/foo/search?s=dodo
+url: http://$(hostname -f):$PORT/foo/search?s=dodo
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-search-results-specific
-run_pass "$TEST_KEY" timeout 10 rosie lookup poetry
+run_pass "$TEST_KEY" timeout 10 rosie lookup --no-pretty poetry
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner project title
 =     foo-aa001/trunk@3 roses poetry  Roses are Red, Violets are Blue,...
-url: http://$HOSTNAME:$PORT/foo/search?s=poetry
+url: http://$(hostname -f):$PORT/foo/search?s=poetry
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-search-results-general
-run_pass "$TEST_KEY" timeout 10 rosie lookup a
+run_pass "$TEST_KEY" timeout 10 rosie lookup --no-pretty a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
 =     foo-aa001/trunk@3 roses  poetry    Roses are Red, Violets are Blue,...
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
 =     foo-aa003/trunk@6 bill   sonnet 54 The rose looks fair...
-url: http://$HOSTNAME:$PORT/foo/search?s=a
+url: http://$(hostname -f):$PORT/foo/search?s=a
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-search-results-general-2
-run_pass "$TEST_KEY" timeout 10 rosie lookup 'a%'
+run_pass "$TEST_KEY" timeout 10 rosie lookup --no-pretty 'a%'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
 =     foo-aa001/trunk@3 roses  poetry    Roses are Red, Violets are Blue,...
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
 =     foo-aa003/trunk@6 bill   sonnet 54 The rose looks fair...
-url: http://$HOSTNAME:$PORT/foo/search?s=a%25
+url: http://$(hostname -f):$PORT/foo/search?s=a%25
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-search-results-general-3
-run_pass "$TEST_KEY" timeout 10 rosie lookup 't a'
+run_pass "$TEST_KEY" timeout 10 rosie lookup --no-pretty 't a'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
-url: http://$HOSTNAME:$PORT/foo/search?s=t+a
+url: http://$(hostname -f):$PORT/foo/search?s=t+a
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-search-results-general-4
-run_pass "$TEST_KEY" timeout 10 rosie lookup 't a_l the'
+run_pass "$TEST_KEY" timeout 10 rosie lookup --no-pretty 't a_l the'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
-url: http://$HOSTNAME:$PORT/foo/search?s=t+a_l+the
+url: http://$(hostname -f):$PORT/foo/search?s=t+a_l+the
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-search-results-all-revs
-run_pass "$TEST_KEY" timeout 10 rosie lookup --all-revs a
+run_pass "$TEST_KEY" timeout 10 rosie lookup --no-pretty --all-revs a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
       foo-aa000/trunk@1 iris   eye pad   Should have gone to ...
@@ -241,50 +241,50 @@ local suite             owner  project   title
       foo-aa000/trunk@4 iris   eye pad   Should have gone to ...
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
 =     foo-aa003/trunk@6 bill   sonnet 54 The rose looks fair...
-url: http://$HOSTNAME:$PORT/foo/search?s=a&all_revs=1
+url: http://$(hostname -f):$PORT/foo/search?s=a&all_revs=1
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-no-results
-run_pass "$TEST_KEY" timeout 10 rosie lookup -Q owner eq violets
+run_pass "$TEST_KEY" timeout 10 rosie lookup --no-pretty -Q owner eq violets
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite owner project title
-url: http://$HOSTNAME:$PORT/foo/query?q=and+owner+eq+violets
+url: http://$(hostname -f):$PORT/foo/query?q=and+owner+eq+violets
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-results-specific
-run_pass "$TEST_KEY" timeout 10 rosie lookup --query project contains poe
+run_pass "$TEST_KEY" timeout 10 rosie lookup --no-pretty --query project contains poe
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner project title
 =     foo-aa001/trunk@3 roses poetry  Roses are Red, Violets are Blue,...
-url: http://$HOSTNAME:$PORT/foo/query?q=and+project+contains+poe
+url: http://$(hostname -f):$PORT/foo/query?q=and+project+contains+poe
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-results-description
-run_pass "$TEST_KEY" timeout 10 rosie lookup -Q description contains nom
+run_pass "$TEST_KEY" timeout 10 rosie lookup --no-pretty -Q description contains nom
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
-url: http://$HOSTNAME:$PORT/foo/query?q=and+description+contains+nom
+url: http://$(hostname -f):$PORT/foo/query?q=and+description+contains+nom
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-results-revision
 run_pass "$TEST_KEY" timeout 10 \
-    rosie lookup -Q revision gt 3
+    rosie lookup --no-pretty -Q revision gt 3
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
 =     foo-aa003/trunk@6 bill   sonnet 54 The rose looks fair...
-url: http://$HOSTNAME:$PORT/foo/query?q=and+revision+gt+3
+url: http://$(hostname -f):$PORT/foo/query?q=and+revision+gt+3
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-results-all-revs
 run_pass "$TEST_KEY" timeout 10 \
-    rosie lookup --all-revs --query title contains a
+    rosie lookup --no-pretty --all-revs --query title contains a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
       foo-aa000/trunk@1 iris   eye pad   Should have gone to ...
@@ -293,60 +293,60 @@ local suite             owner  project   title
       foo-aa000/trunk@4 iris   eye pad   Should have gone to ...
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
 =     foo-aa003/trunk@6 bill   sonnet 54 The rose looks fair...
-url: http://$HOSTNAME:$PORT/foo/query?q=and+title+contains+a&all_revs=1
+url: http://$(hostname -f):$PORT/foo/query?q=and+title+contains+a&all_revs=1
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-results-all-revs-description
 run_pass "$TEST_KEY" timeout 10 \
-    rosie lookup --all-revs --query description contains a
+    rosie lookup --no-pretty --all-revs --query description contains a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner project title
       foo-aa000/trunk@1 iris  eye pad Should have gone to ...
 >     foo-aa001/trunk@2 roses poetry  Roses are Red,...
       foo-aa000/trunk@4 iris  eye pad Should have gone to ...
-url: http://$HOSTNAME:$PORT/foo/query?q=and+description+contains+a&all_revs=1
+url: http://$(hostname -f):$PORT/foo/query?q=and+description+contains+a&all_revs=1
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-results-all-revs-revision
 run_pass "$TEST_KEY" timeout 10 \
-    rosie lookup --all-revs -Q revision gt 3
+    rosie lookup --no-pretty --all-revs -Q revision gt 3
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
       foo-aa000/trunk@4 iris   eye pad   Should have gone to ...
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
 =     foo-aa003/trunk@6 bill   sonnet 54 The rose looks fair...
-url: http://$HOSTNAME:$PORT/foo/query?q=and+revision+gt+3&all_revs=1
+url: http://$(hostname -f):$PORT/foo/query?q=and+revision+gt+3&all_revs=1
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-results-all-revs-multiple-and
 run_pass "$TEST_KEY" timeout 10 \
-    rosie lookup --all-revs --query title contains a and project eq poetry
+    rosie lookup --no-pretty --all-revs --query title contains a and project eq poetry
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner project title
 >     foo-aa001/trunk@2 roses poetry  Roses are Red,...
 =     foo-aa001/trunk@3 roses poetry  Roses are Red, Violets are Blue,...
-url: http://$HOSTNAME:$PORT/foo/query?q=and+title+contains+a&q=and+project+eq+poetry&all_revs=1
+url: http://$(hostname -f):$PORT/foo/query?q=and+title+contains+a&q=and+project+eq+poetry&all_revs=1
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-results-all-revs-multiple-or-0
 run_pass "$TEST_KEY" timeout 10 \
-    rosie lookup --all-revs --query title contains Roses or owner eq roses
+    rosie lookup --no-pretty --all-revs --query title contains Roses or owner eq roses
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
 >     foo-aa001/trunk@2 roses  poetry    Roses are Red,...
 =     foo-aa001/trunk@3 roses  poetry    Roses are Red, Violets are Blue,...
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
-url: http://$HOSTNAME:$PORT/foo/query?q=and+title+contains+Roses&q=or+owner+eq+roses&all_revs=1
+url: http://$(hostname -f):$PORT/foo/query?q=and+title+contains+Roses&q=or+owner+eq+roses&all_revs=1
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-query-results-all-revs-multiple-or-1
 run_pass "$TEST_KEY" timeout 10 \
-    rosie lookup --all-revs --query title contains Roses or owner eq iris
+    rosie lookup --no-pretty --all-revs --query title contains Roses or owner eq iris
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 local suite             owner  project   title
       foo-aa000/trunk@1 iris   eye pad   Should have gone to ...
@@ -354,12 +354,12 @@ local suite             owner  project   title
 =     foo-aa001/trunk@3 roses  poetry    Roses are Red, Violets are Blue,...
       foo-aa000/trunk@4 iris   eye pad   Should have gone to ...
 =     foo-aa002/trunk@5 aphids eat roses Eat all the roses!
-url: http://$HOSTNAME:$PORT/foo/query?q=and+title+contains+Roses&q=or+owner+eq+iris&all_revs=1
+url: http://$(hostname -f):$PORT/foo/query?q=and+title+contains+Roses&q=or+owner+eq+iris&all_revs=1
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-verbosity-quiet
-run_pass "$TEST_KEY" timeout 10 rosie lookup -q a
+run_pass "$TEST_KEY" timeout 10 rosie lookup --no-pretty -q a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite
 foo-aa001/trunk@3
@@ -369,30 +369,30 @@ __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-custom-format-main-props
-run_pass "$TEST_KEY" timeout 10 rosie lookup --format="%suite with %status" a
+run_pass "$TEST_KEY" timeout 10 rosie lookup --no-pretty --format="%suite with %status" a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite             with status
 foo-aa001/trunk@3 with  M
 foo-aa002/trunk@5 with A
 foo-aa003/trunk@6 with A
-url: http://$HOSTNAME:$PORT/foo/search?s=a
+url: http://$(hostname -f):$PORT/foo/search?s=a
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-custom-format-other-props
-run_pass "$TEST_KEY" timeout 10 rosie lookup \
+run_pass "$TEST_KEY" timeout 10 rosie lookup --no-pretty \
     --format="%suite %local %description %access-list" a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite             local description       access-list
 foo-aa001/trunk@3 =     %description      ['roses', 'violets']
 foo-aa002/trunk@5 =     Nom nom nom roses ['allthebugs']
 foo-aa003/trunk@6 =     %description      %access-list
-url: http://$HOSTNAME:$PORT/foo/search?s=a
+url: http://$(hostname -f):$PORT/foo/search?s=a
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-custom-format-other-props-all-revs
-run_pass "$TEST_KEY" timeout 10 rosie lookup --all-revs \
+run_pass "$TEST_KEY" timeout 10 rosie lookup --no-pretty --all-revs \
     --format="%suite %local %description %access-list" a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite             local description               access-list
@@ -402,25 +402,25 @@ foo-aa001/trunk@3 =     %description              ['roses', 'violets']
 foo-aa000/trunk@4       Bad corn ear and pew pull ['*']
 foo-aa002/trunk@5 =     Nom nom nom roses         ['allthebugs']
 foo-aa003/trunk@6 =     %description              %access-list
-url: http://$HOSTNAME:$PORT/foo/search?s=a&all_revs=1
+url: http://$(hostname -f):$PORT/foo/search?s=a&all_revs=1
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-custom-format-with-date
 run_pass "$TEST_KEY" timeout 10 \
-    rosie lookup --format="%suite by %owner at %date" a
+    rosie lookup --no-pretty --format="%suite by %owner at %date" a
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite             by owner  at date
 foo-aa001/trunk@3 by roses  at 2009-02-13T23:31:32Z
 foo-aa002/trunk@5 by aphids at 2009-02-13T23:31:34Z
 foo-aa003/trunk@6 by bill   at 2009-02-13T23:31:35Z
-url: http://$HOSTNAME:$PORT/foo/search?s=a
+url: http://$(hostname -f):$PORT/foo/search?s=a
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY=$TEST_KEY_BASE-custom-format-with-quiet-mode
 run_pass "$TEST_KEY" timeout 10 \
-    rosie lookup a -q --format="%suite by %owner at %date"
+    rosie lookup --no-pretty a -q --format="%suite by %owner at %date"
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 suite             by owner  at date
 foo-aa001/trunk@3 by roses  at 2009-02-13T23:31:32Z
@@ -431,5 +431,5 @@ file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
 #-------------------------------------------------------------------------------
 kill "${ROSA_WS_PID}"
 wait 2>'/dev/null'
-rm -f ~/.metomi/rosie-disco-${HOSTNAME:-0.0.0.0}-${PORT}*
+rm -f ~/.metomi/rosie-disco-$(hostname -f)-${PORT}*
 exit

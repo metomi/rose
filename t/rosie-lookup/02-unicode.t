@@ -79,7 +79,7 @@ while port_is_busy "${PORT}"; do
 done
 cat >'conf/opt/rose-port.conf' <<__ROSE_CONF__
 [rosie-id]
-prefix-ws.foo=http://${HOSTNAME}:${PORT}/foo
+prefix-ws.foo=http://$(hostname -f):${PORT}/foo
 __ROSE_CONF__
 rosie disco 'start' "${PORT}" \
     0<'/dev/null' 1>'rosie-disco.out' 2>'rosie-disco.err' &
@@ -96,15 +96,15 @@ set +e
 
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}"
-run_pass "${TEST_KEY}" rosie lookup 'euro'
+run_pass "${TEST_KEY}" rosie lookup --no-pretty 'euro'
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<__OUT__
 local suite             owner project title
       foo-aa000/trunk@1 billy euro    The euro symbol € requires unicode
-url: http://${HOSTNAME}:${PORT}/foo/search?s=euro
+url: http://$(hostname -f):${PORT}/foo/search?s=euro
 __OUT__
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" <'/dev/null'
 #-------------------------------------------------------------------------------
 kill "${ROSA_WS_PID}"
 wait 2>'/dev/null'
-rm -f ~/.metomi/rosie-disco-${HOSTNAME:-0.0.0.0}-${PORT}*
+rm -f "~/.metomi/rosie-disco-$(hostname -f)-${PORT}"*
 exit
