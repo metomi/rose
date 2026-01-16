@@ -44,7 +44,6 @@ import jinja2
 from tornado.ioloop import IOLoop, PeriodicCallback
 import tornado.log
 import tornado.web
-import tornado.wsgi
 
 from metomi.isodatetime.data import get_timepoint_from_seconds_since_unix_epoch
 from metomi.rose import __version__ as ROSE_VERSION
