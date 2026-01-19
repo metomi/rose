@@ -26,7 +26,7 @@
 if ! python3 -c 'import tornado, sqlalchemy' 2>/dev/null; then
     skip_all '"tornado" or "sqlalchemy" not installed'
 fi
-tests 75
+tests 91
 #-------------------------------------------------------------------------------
 # Setup Rose site/user configuration for the tests.
 export TZ='UTC'
@@ -428,6 +428,121 @@ foo-aa002/trunk@5 by aphids at 2009-02-13T23:31:34Z
 foo-aa003/trunk@6 by bill   at 2009-02-13T23:31:35Z
 __OUT__
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# test without --no-pretty
+TEST_KEY=$TEST_KEY_BASE-pretty
+run_pass "$TEST_KEY" timeout 10 rosie lookup a
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+┌───────┬───────────────────┬────────┬───────────┬─────────────────────────────┐
+│ local │ suite             │ owner  │ project   │ title                       │
+├───────┼───────────────────┼────────┼───────────┼─────────────────────────────┤
+├───────┼───────────────────┼────────┼───────────┼─────────────────────────────┤
+│ =     │ foo-aa001/trunk@3 │ roses  │ poetry    │ Roses are Red, Violets are  │
+│       │                   │        │           │ Blue,...                    │
+├───────┼───────────────────┼────────┼───────────┼─────────────────────────────┤
+│ =     │ foo-aa002/trunk@5 │ aphids │ eat roses │ Eat all the roses!          │
+├───────┼───────────────────┼────────┼───────────┼─────────────────────────────┤
+│ =     │ foo-aa003/trunk@6 │ bill   │ sonnet 54 │ The rose looks fair...      │
+└───────┴───────────────────┴────────┴───────────┴─────────────────────────────┘
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# test pretty output with "-q" (quiet, omits cols)
+TEST_KEY=$TEST_KEY_BASE-pretty-q
+run_pass "$TEST_KEY" timeout 10 rosie lookup a -q
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ suite                                                                        │
+├──────────────────────────────────────────────────────────────────────────────┤
+├──────────────────────────────────────────────────────────────────────────────┤
+│ foo-aa001/trunk@3                                                            │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ foo-aa002/trunk@5                                                            │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ foo-aa003/trunk@6                                                            │
+└──────────────────────────────────────────────────────────────────────────────┘
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# test pretty output with "-r" (reverse) and "-H" (no header)
+TEST_KEY=$TEST_KEY_BASE-pretty-r-H
+run_pass "$TEST_KEY" timeout 10 rosie lookup a -r -H
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+┌───┬───────────────────┬────────┬───────────┬─────────────────────────────────┐
+│ = │ foo-aa003/trunk@6 │ bill   │ sonnet 54 │ The rose looks fair...          │
+├───┼───────────────────┼────────┼───────────┼─────────────────────────────────┤
+│ = │ foo-aa002/trunk@5 │ aphids │ eat roses │ Eat all the roses!              │
+├───┼───────────────────┼────────┼───────────┼─────────────────────────────────┤
+│ = │ foo-aa001/trunk@3 │ roses  │ poetry    │ Roses are Red, Violets are      │
+│   │                   │        │           │ Blue,...                        │
+└───┴───────────────────┴────────┴───────────┴─────────────────────────────────┘
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# test pretty output with "--all-revs" (all revisions) and "-s" (sort by field)
+TEST_KEY=$TEST_KEY_BASE-pretty--all-revs-s
+run_pass "$TEST_KEY" timeout 10 rosie lookup a --all-revs -s owner
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+┌───────┬───────────────────┬────────┬───────────┬─────────────────────────────┐
+│ local │ suite             │ owner  │ project   │ title                       │
+├───────┼───────────────────┼────────┼───────────┼─────────────────────────────┤
+├───────┼───────────────────┼────────┼───────────┼─────────────────────────────┤
+│ =     │ foo-aa002/trunk@5 │ aphids │ eat roses │ Eat all the roses!          │
+├───────┼───────────────────┼────────┼───────────┼─────────────────────────────┤
+│ =     │ foo-aa003/trunk@6 │ bill   │ sonnet 54 │ The rose looks fair...      │
+├───────┼───────────────────┼────────┼───────────┼─────────────────────────────┤
+│       │ foo-aa000/trunk@1 │ iris   │ eye pad   │ Should have gone to ...     │
+├───────┼───────────────────┼────────┼───────────┼─────────────────────────────┤
+│       │ foo-aa000/trunk@4 │ iris   │ eye pad   │ Should have gone to ...     │
+├───────┼───────────────────┼────────┼───────────┼─────────────────────────────┤
+│ >     │ foo-aa001/trunk@2 │ roses  │ poetry    │ Roses are Red,...           │
+├───────┼───────────────────┼────────┼───────────┼─────────────────────────────┤
+│ =     │ foo-aa001/trunk@3 │ roses  │ poetry    │ Roses are Red, Violets are  │
+│       │                   │        │           │ Blue,...                    │
+└───────┴───────────────────┴────────┴───────────┴─────────────────────────────┘
+__OUT__
+file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+#-------------------------------------------------------------------------------
+# test pretty output with "--format"
+# NOTE: things in "--format" which are not valid fields should be stripped out
+# NOTE: fields might not be defined, they default to the column format if so
+TEST_KEY=$TEST_KEY_BASE-pretty--format
+run_pass "$TEST_KEY" timeout 10 \
+    rosie lookup a --format='%local foo %local bar %access-list'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+┌───────┬───────┬──────────────────────────────────────────────────────────────┐
+│ local │ local │ access-list                                                  │
+├───────┼───────┼──────────────────────────────────────────────────────────────┤
+├───────┼───────┼──────────────────────────────────────────────────────────────┤
+│ =     │ =     │ ['roses', 'violets']                                         │
+├───────┼───────┼──────────────────────────────────────────────────────────────┤
+│ =     │ =     │ ['allthebugs']                                               │
+├───────┼───────┼──────────────────────────────────────────────────────────────┤
+│ =     │ =     │ %access-list                                                 │
+└───────┴───────┴──────────────────────────────────────────────────────────────┘
+__OUT__
+#-------------------------------------------------------------------------------
+# test the fields not included in the standard format (except author)
+# NOTE: fields might not be defined, they default to the column format if so
+TEST_KEY=$TEST_KEY_BASE-pretty-alternative-fields
+run_pass "$TEST_KEY" timeout 10 \
+    rosie lookup a \
+      --format='%access-list %branch %date %from_idx %idx %issue-list'
+file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
+┌────────────┬────────┬───────────────────┬──────────┬───────────┬─────────────┐
+│ access-list │ branch │ date              │ from_idx │ idx       │ issue-list  │
+├────────────┼────────┼───────────────────┼──────────┼───────────┼─────────────┤
+├────────────┼────────┼───────────────────┼──────────┼───────────┼─────────────┤
+│ ['roses',  │ trunk  │ 2009-02-          │ None     │ foo-aa001 │ %issue-list │
+│ 'violets'] │        │ 13T23:31:32Z      │          │           │             │
+├────────────┼────────┼───────────────────┼──────────┼───────────┼─────────────┤
+│ ['allthebu │ trunk  │ 2009-02-          │ None     │ foo-aa002 │ %issue-list │
+│ gs']       │        │ 13T23:31:34Z      │          │           │             │
+├────────────┼────────┼───────────────────┼──────────┼───────────┼─────────────┤
+│ %access-   │ trunk  │ 2009-02-          │ None     │ foo-aa003 │ %issue-list │
+│ list       │        │ 13T23:31:35Z      │          │           │             │
+└────────────┴────────┴───────────────────┴──────────┴───────────┴─────────────┘
+__OUT__
 #-------------------------------------------------------------------------------
 kill "${ROSA_WS_PID}"
 wait 2>'/dev/null'
