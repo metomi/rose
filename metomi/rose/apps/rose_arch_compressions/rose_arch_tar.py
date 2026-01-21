@@ -25,19 +25,28 @@ class RoseArchTarGzip:
 
     """Compress archive sources in tar."""
 
-    SCHEMES = ["pax", "pax.gz", "tar", "tar.gz", "tgz"]
-    SCHEME_FORMATS = {"pax": tarfile.PAX_FORMAT, "pax.gz": tarfile.PAX_FORMAT}
+    SCHEMES = ["pax", "pax.gz", "pax.zst", "pax.xz",
+               "tar", "tar.gz", "tgz", "tar.zst", "tar.xz", "txz"]
+    SCHEME_FORMATS = {"pax": tarfile.PAX_FORMAT,
+                      "pax.gz": tarfile.PAX_FORMAT,
+                      "pax.zst": tarfile.PAX_FORMAT,
+                      "pax.xz": tarfile.PAX_FORMAT}
     GZIP_EXTS = ["pax.gz", "tar.gz", "tgz"]
+    ZSTD_EXTS = ["pax.zst", "tar.zst"]
+    XZ_EXTS = ["pax.xz", "tar.xz", "txz"]
 
     def __init__(self, app_runner, *args, **kwargs):
         self.app_runner = app_runner
 
-    def compress_sources(self, target, work_dir):
+    def compress_sources(self, target, work_dir, threads="1"):
         """Create a tar archive of all files in target.
 
         Use work_dir to dump results.
 
         """
+        if threads != "1":
+            raise NotImplementedError("xz does not support multi-threading")
+
         sources = list(target.sources.values())
         if len(sources) == 1 and sources[0].path.endswith(
             "." + target.compress_scheme
@@ -68,5 +77,25 @@ class RoseArchTarGzip:
             os.close(fdsec)
             target.work_source_path = gz_name
             command = "gzip -c '%s' >'%s'" % (tar_name, gz_name)
+            self.app_runner.popen.run_simple(command, shell=True)
+            self.app_runner.fs_util.delete(tar_name)
+
+        elif target.compress_scheme in self.ZSTD_EXTS:
+            fdsec, zst_name = mkstemp(
+                suffix="." + target.compress_scheme, dir=work_dir
+            )
+            os.close(fdsec)
+            target.work_source_path = zst_name
+            command = f"zstd --rm -T{threads} -c '{tar_name}' >'{zst_name}'"
+            self.app_runner.popen.run_simple(command, shell=True)
+            self.app_runner.fs_util.delete(tar_name)
+
+        elif target.compress_scheme in self.XZ_EXTS:
+            fdsec, xz_name = mkstemp(
+                suffix="." + target.compress_scheme, dir=work_dir
+            )
+            os.close(fdsec)
+            target.work_source_path = xz_name
+            command = "xz -c '%s' >'%s'" % (tar_name, xz_name)
             self.app_runner.popen.run_simple(command, shell=True)
             self.app_runner.fs_util.delete(tar_name)
