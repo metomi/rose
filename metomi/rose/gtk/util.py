@@ -21,7 +21,6 @@
 import multiprocessing
 import queue
 import re
-import sys
 import threading
 import webbrowser
 
@@ -666,13 +665,13 @@ def get_hyperlink_label(text, search_func=lambda i: False):
 
 def get_icon(system="rose"):
     """Return a GdkPixbuf.Pixbuf for the system icon."""
-    locator = metomi.rose.resource.ResourceLocator(paths=sys.path)
-    icon_path = locator.locate("etc/images/{0}-icon-trim.svg".format(system))
+    locator = metomi.rose.resource.ResourceLocator()
+    icon_path = locator.locate("images/{0}-icon-trim.svg".format(system))
     try:
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(str(icon_path))
     except Exception:
         icon_path = locator.locate(
-            "etc/images/{0}-icon-trim.png".format(system)
+            "images/{0}-icon-trim.png".format(system)
         )
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(str(icon_path))
     return pixbuf
@@ -715,7 +714,7 @@ def rc_setup(rc_resource):
 def setup_scheduler_icon(ipath=None):
     """Setup a 'stock' icon for the scheduler"""
     theme = Gtk.IconTheme.get_default()
-    locator = metomi.rose.resource.ResourceLocator(paths=sys.path)
+    locator = metomi.rose.resource.ResourceLocator()
     if ipath is None:
         theme.load_icon("image-missing", 64, 0)
     else:
@@ -727,7 +726,7 @@ def setup_scheduler_icon(ipath=None):
 def setup_stock_icons():
     """Setup any additional 'stock' icons."""
     new_icon_factory = Gtk.IconFactory()
-    locator = metomi.rose.resource.ResourceLocator(paths=sys.path)
+    locator = metomi.rose.resource.ResourceLocator()
     for png_icon_name in [
         "gnome_add",
         "gnome_add_errors",
@@ -738,7 +737,7 @@ def setup_stock_icons():
     ]:
         ifile = png_icon_name + ".png"
         istring = png_icon_name.replace("_", "-")
-        path = locator.locate("etc/images/rose-config-edit/" + ifile)
+        path = locator.locate("images/rose-config-edit/" + ifile)
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(str(path))
         new_icon_factory.add("rose-gtk-" + istring, Gtk.IconSet(pixbuf))
     exp_icon_pixbuf = get_icon()

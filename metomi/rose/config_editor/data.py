@@ -212,7 +212,7 @@ class ConfigDataManager(object):
             "ignored": {},
         }  # Caches ns statuses
         self._config_section_namespace_map = {}  # Store section namespaces
-        self.locator = metomi.rose.resource.ResourceLocator(paths=sys.path)
+        self.locator = metomi.rose.resource.ResourceLocator()
         if opt_meta_paths is None:
             self.opt_meta_paths = []
         else:

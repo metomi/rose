@@ -19,7 +19,6 @@
 # -----------------------------------------------------------------------------
 
 import datetime
-import sys
 import time
 
 import gi
@@ -130,9 +129,8 @@ class StatusBar(Gtk.Box):
                 kind = message.kind
             if level is None:
                 level = message.level
-        if level is not None:
-            if level > self.verbosity:
-                return
+        if level is not None and level > self.verbosity:
+            return
         if isinstance(message, Exception):
             kind = metomi.rose.reporter.Reporter.KIND_ERR
             level = metomi.rose.reporter.Reporter.FAIL
@@ -159,10 +157,8 @@ class StatusBar(Gtk.Box):
         # Generate the error display widget.
         self._error_widget = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         self._error_widget.show()
-        locator = metomi.rose.resource.ResourceLocator(paths=sys.path)
-        icon_path = locator.locate(
-            "etc/images/rose-config-edit/error_icon.png"
-        )
+        locator = metomi.rose.resource.ResourceLocator()
+        icon_path = locator.locate("images/rose-config-edit/error_icon.png")
         image = Gtk.Image.new_from_file(str(icon_path))
         image.show()
         self._error_widget.pack_start(

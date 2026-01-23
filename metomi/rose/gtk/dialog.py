@@ -303,7 +303,7 @@ def run_about_dialog(
     about_dialog.set_transient_for(parent_window)
     about_dialog.set_program_name(name)
     about_dialog.set_copyright(copyright_)
-    resource_loc = metomi.rose.resource.ResourceLocator(paths=sys.path)
+    resource_loc = metomi.rose.resource.ResourceLocator()
     logo_path = resource_loc.locate(logo_path)
     about_dialog.set_logo(GdkPixbuf.Pixbuf.new_from_file(str(logo_path)))
     about_dialog.set_website(website)

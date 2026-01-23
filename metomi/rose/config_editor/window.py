@@ -28,9 +28,9 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 import metomi.rose.config
+import metomi.rose.config_editor
 import metomi.rose.gtk.dialog
 import metomi.rose.gtk.util
-import metomi.rose.resource
 
 from functools import cmp_to_key
 
@@ -177,7 +177,7 @@ class MainWindow(object):
         metomi.rose.gtk.dialog.run_about_dialog(
             name=metomi.rose.config_editor.PROGRAM_NAME,
             copyright_=metomi.rose.config_editor.COPYRIGHT,
-            logo_path="etc/images/rose-logo.png",
+            logo_path="images/rose-logo.png",
             website=metomi.rose.config_editor.PROJECT_URL,
             website_label=metomi.rose.config_editor.PROJECT_URL,
         )

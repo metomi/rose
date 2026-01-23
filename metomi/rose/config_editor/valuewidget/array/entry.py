@@ -106,11 +106,10 @@ class EntryArrayValueWidget(Gtk.Box):
             lambda w, e: self.hook.get_focus(self.get_focus_entry()),
         )
 
-    def force_scroll(self, widget=None):
+    def force_scroll(self, widget):
         """Adjusts a scrolled window to display the correct widget."""
         y_coordinate = None
-        if widget is not None:
-            y_coordinate = widget.get_allocation().y
+        y_coordinate = widget.get_allocation().y
         scroll_container = widget.get_parent()
         if scroll_container is None:
             return False

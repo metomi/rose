@@ -2090,12 +2090,12 @@ def spawn_window(
         opt_meta_paths = []
     if not debug_mode:
         warnings.filterwarnings("ignore")
-    resourcer = metomi.rose.resource.ResourceLocator(paths=sys.path)
+    resourcer = metomi.rose.resource.ResourceLocator()
     metomi.rose.gtk.util.rc_setup(
-        str(resourcer.locate("etc/rose-config-edit/.gtkrc-2.0"))
+        str(resourcer.locate("rose-config-edit/.gtkrc-2.0"))
     )
     metomi.rose.gtk.util.setup_stock_icons()
-    logo = resourcer.locate("etc/images/rose-splash-logo.png")
+    logo = resourcer.locate("images/rose-splash-logo.png")
     if metomi.rose.config_editor.ICON_PATH_SCHEDULER is None:
         gcontrol_icon = None
     else:
@@ -2258,8 +2258,8 @@ def main():
     style_context.add_provider_for_screen(
         screen, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
     )
-    locator = metomi.rose.resource.ResourceLocator(paths=sys.path)
-    css_path = locator.locate("etc/rose-config-edit/style.css")
+    locator = metomi.rose.resource.ResourceLocator()
+    css_path = locator.locate("rose-config-edit/style.css")
     provider.load_from_path(str(css_path))
 
     if opts.profile_mode:

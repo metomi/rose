@@ -19,7 +19,6 @@
 # -----------------------------------------------------------------------------
 
 import re
-import sys
 
 import gi
 
@@ -116,8 +115,8 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
             str,
             str,
         )
-        resource_loc = metomi.rose.resource.ResourceLocator(paths=sys.path)
-        image_path = str(resource_loc.locate("etc/images/rose-config-edit"))
+        resource_loc = metomi.rose.resource.ResourceLocator()
+        image_path = str(resource_loc.locate("images/rose-config-edit"))
         self.null_icon = GdkPixbuf.Pixbuf.new_from_file(
             image_path + "/null_icon.png"
         )

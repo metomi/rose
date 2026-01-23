@@ -18,7 +18,7 @@
 Convenient functions for searching resource files.
 """
 
-import importlib
+from importlib.machinery import SourceFileLoader
 import inspect
 import os
 from pathlib import Path
@@ -32,7 +32,7 @@ from metomi.rose.reporter import Reporter
 
 ERROR_LOCATE_OBJECT = "Could not locate {0}"
 
-MODULES = {}
+MODULES: dict = {}
 
 
 class ResourceError(Exception):
@@ -209,20 +209,7 @@ def import_object(
         for filename in module_files:
             sys.path.insert(0, os.path.dirname(filename))
             try:
-                spec = (
-                    importlib.util.spec_from_file_location(filename, filename)
-                )
-                if filename not in MODULES:
-                    spec = (
-                        importlib.util
-                        .spec_from_file_location(filename, filename)
-                    )
-                    module = importlib.util.module_from_spec(spec)
-                    spec.loader.exec_module(module)
-                    MODULES[filename] = module
-                else:
-                    module = MODULES[filename]
-                sys.path.pop(0)
+                module = SourceFileLoader(module_name, filename).load_module()
             except ImportError as exc:
                 error_handler(exc)
             sys.path.pop(0)

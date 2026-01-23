@@ -330,7 +330,7 @@ class VariableWidget(object):
 
         return container
 
-    def force_scroll(self, widget=None, container=None):
+    def force_scroll(self, widget, container):
         """Adjusts a scrolled window to display the correct widget."""
         y_coordinate = None
         if widget is not None:
