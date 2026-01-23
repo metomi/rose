@@ -38,7 +38,7 @@ jobs:
             python: '3.12'
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       # NOTE: Need to install these deps with "apt-get" as the build will
       # proceed with "pip" and pygobject doesn't seem to locate Conda

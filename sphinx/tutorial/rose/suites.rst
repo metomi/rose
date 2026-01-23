@@ -185,7 +185,7 @@ Using a Rose workflow configuration with Cylc 8
          [template variables]
          station="camborne", "heathrow", "shetland", "aldergrove"
          RESOLUTION=0.2
-         DOMAIN=-12,48,5,61
+         DOMAIN=-12,46,12,61
 
       Note that template variable strings must be quoted.
 
@@ -239,7 +239,7 @@ Using a Rose workflow configuration with Cylc 8
          -            RESOLUTION = 0.2
          +            RESOLUTION = {{ RESOLUTION }}
                       # The area to generate forecasts for (lng1, lat1, lng2, lat2).
-         -            DOMAIN = -12,48,5,61  # Do not change!
+         -            DOMAIN = -12,46,12,61  # Do not change!
          +            DOMAIN = {{ DOMAIN | join(", ") }}
 
       We have written out the ``DOMAIN`` list using the `Jinja2`_ ``join``
@@ -403,7 +403,6 @@ Rose Applications In Rose Suite Configurations
       ``app/forecast/rose-app.conf`` file into an ``[env]``
       section in the ``app/forecast/opt/rose-app-test.conf`` file:
 
-      * ``WEIGHTING``
       * ``WIND_CYCLES``
       * ``WIND_FILE_TEMPLATE``
       * ``RAINFALL_FILE``
@@ -421,14 +420,13 @@ Rose Applications In Rose Suite Configurations
          .. code-block:: rose
 
             [env]
-            WEIGHTING=1
             WIND_CYCLES=0
             WIND_FILE_TEMPLATE=test-data/wind_{cycle}_{xy}.csv
             RAINFALL_FILE=test-data/rainfall.csv
             MAP_FILE=map.html
-            CYLC_TASK_CYCLE_POINT=20171101T0000Z
+            CYLC_TASK_CYCLE_POINT=20251105T1100Z
             RESOLUTION=0.2
-            DOMAIN=-12,48,5,61
+            DOMAIN=-12,46,12,61
 
       Run the application in "test mode" by providing the option
       ``--opt-conf-key=test`` to the :ref:`command-rose-app-run` command::
@@ -471,6 +469,7 @@ Rose Applications In Rose Suite Configurations
          [env]
          INTERVAL=60
          N_FORECASTS=5
+         WEIGHTING=1
          MAP_TEMPLATE=map-template.html
          SPLINE_LEVEL=0
          WIND_FILE_TEMPLATE=$CYLC_WORKFLOW_WORK_DIR/{cycle}/consolidate_observations/wind_{xy}.csv
@@ -520,16 +519,18 @@ Rose Applications In Rose Suite Configurations
 
    #. **View output in Cylc Review.**
 
-      .. note::
+      Navigate to your site's Cylc Review page (ask your local expert if
+      one has been set up).
 
-         ``cylc review`` replaces the Rose Bush utility. It is a Cylc 7
-         command that can view Cylc 7 and Cylc 8 workflows.
+      .. note:: Manually starting Cylc Review
 
-      Either navigate to your site's Cylc Review page if one has been set up, or
-      start a Cylc Review server by running the following command and open
-      the printed URL::
+         ``cylc review`` is a Cylc 7 utility which can view Cylc 8 workflows.
 
-         cylc review start
+         If you have Cylc 7 installed you can start a Cylc Review server by
+         running the following command and opening the printed URL::
+
+            CYLC_VERSION=7 cylc review start
+
 
       Navigate to your latest rose-suite-tutorial run and click
       the "task jobs list".

@@ -92,6 +92,9 @@ lint = [
     "mypy>=0.800",
     "types-aiofiles"
 ]
+tutorials = [
+    "cylc-flow[tutorials]>=8.6.1"
+]
 rosa = []
 # disco = [
 #     TODO: rosie disco has been disabled due to the removal of WSGI support at
@@ -107,7 +110,8 @@ all = [
     "metomi-rose[graph]",
     "metomi-rose[tests]",
     "metomi-rose[rosa]",
-    "metomi-rose[edit]"
+    "metomi-rose[edit]",
+    "metomi-rose[tutorials]",
 ]
 
 [project.scripts]
@@ -167,7 +171,7 @@ filename = "CHANGES.md"
 template = "changes.d/changelog-template.jinja"
 underlines = ["", "", ""]
 title_format = "## {version} (Released {project_date})"
-issue_format = "[#{issue}](https://github.com/cylc/cylc-flow/pull/{issue})"
+issue_format = "[#{issue}](https://github.com/metomi/rose/pull/{issue})"
 ignore = ["changelog-template.jinja"]
 
 # These changelog sections will be shown in the defined order:

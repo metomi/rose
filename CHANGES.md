@@ -10,6 +10,39 @@ $ towncrier create <PR-number>.<break|feat|fix>.md --content "Short description"
 
 <!-- towncrier release notes start -->
 
+## 2.6.3 (Released 2026-01-08)
+
+### 🚀 Enhancements
+
+[#2979](https://github.com/metomi/rose/pull/2979) - Allow Rose fileinstall to install folders containing broken Symlinks.
+
+## 2.6.2 (Released 2025-11-28)
+
+### 🔧 Fixes
+
+Updated the Rose tutorial to reflect changes in the Cylc tutorial.
+This switches its data source allowing it to function once Met Office DataPoint is retired.
+
+## 2.6.1 (Released 2025-11-03)
+
+### 🔧 Fixes
+
+[#2953](https://github.com/metomi/rose/pull/2953) - Fix an incompatibility with Python 3.14.
+
+[#2892](https://github.com/metomi/rose/pull/2892) - Give the user more information about rsync file handler failure.
+
+## 2.6.0 (Released 2025-10-01)
+
+### ⚠ Breaking Changes
+
+[#2922](https://github.com/metomi/rose/pull/2922) - Dropped support for Python 3.7-3.11. The minimum supported version is now 3.12.
+
+## 2.5.1 (Released 2025-09-29)
+
+### 🔧 Fixes
+
+[#2925](https://github.com/metomi/rose/pull/2925) - fix a bug which caused `rosie ls` to fail.
+
 ## 2.5.0 (Released 2025-07-24)
 
 ### Enhancements
@@ -19,7 +52,7 @@ docs and output format.
 
 ### 🔧 Fixes
 
-[#2889](https://github.com/cylc/cylc-flow/pull/2889) - Remove references to Empy, which is no longer available as a templating language for `flow.cylc` files as of Cylc 8.4.0.
+[#2889](https://github.com/metomi/rose/pull/2889) - Remove references to Empy, which is no longer available as a templating language for `flow.cylc` files as of Cylc 8.4.0.
 
 ## 2.4.2 (Released 2025-04-07)
 

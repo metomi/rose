@@ -70,8 +70,16 @@ def get_checksum(name, checksum_func=None):
             for filename in filenames:
                 filepath = os.path.join(path, filename)
                 source = os.path.join(name, filepath)
-                checksum = checksum_func(source, name)
-                mode = os.stat(os.path.realpath(source)).st_mode
+
+                if os.path.islink(source) and not os.path.exists(source):
+                    # If the source is a broken link within a directory
+                    # install without failing (unlike a single file)
+                    checksum = os.path.realpath(source)
+                    mode = os.lstat(source).st_mode
+                else:
+                    checksum = checksum_func(source, name)
+                    mode = os.stat(os.path.realpath(source)).st_mode
+
                 path_and_checksum_list.append((filepath, checksum, mode))
     return path_and_checksum_list
 
