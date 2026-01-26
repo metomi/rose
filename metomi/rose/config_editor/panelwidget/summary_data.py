@@ -522,7 +522,7 @@ class BaseSummaryDataPanel(Gtk.Box):
         # Remove all.
         rem_menuitem_box = Gtk.Box()
         rem_menuitem_icon = Gtk.Image.new_from_icon_name(
-            Gtk.STOCK_REMOVE, Gtk.IconSize.MENU
+            "list-remove", Gtk.IconSize.MENU
         )
         rem_menuitem_label = Gtk.Label(
             label=(
@@ -572,7 +572,7 @@ class BaseSummaryDataPanel(Gtk.Box):
             )
             menuitem_box = Gtk.Box()
             menuitem_icon = Gtk.Image.new_from_icon_name(
-                Gtk.STOCK_JUMP_TO, Gtk.IconSize.MENU
+                'go-jump', Gtk.IconSize.MENU
             )
             menuitem_label = Gtk.Label(label=label)
             menuitem = Gtk.MenuItem()
@@ -602,7 +602,7 @@ class BaseSummaryDataPanel(Gtk.Box):
                 # Add section.
                 add_menuitem_box = Gtk.Box()
                 add_menuitem_icon = Gtk.Image.new_from_icon_name(
-                    Gtk.STOCK_ADD, Gtk.IconSize.MENU
+                    "list-add", Gtk.IconSize.MENU
                 )
                 add_menuitem_label = Gtk.Label(
                     label=metomi.rose.config_editor.SUMMARY_DATA_PANEL_MENU_ADD
@@ -619,7 +619,7 @@ class BaseSummaryDataPanel(Gtk.Box):
                 # Copy section.
                 copy_menuitem_box = Gtk.Box()
                 copy_menuitem_icon = Gtk.Image.new_from_icon_name(
-                    Gtk.STOCK_COPY, Gtk.IconSize.MENU
+                    'edit-copy', Gtk.IconSize.MENU
                 )
                 copy_menuitem_label = Gtk.Label(
                     label=(
@@ -708,7 +708,7 @@ class BaseSummaryDataPanel(Gtk.Box):
                 # Remove section.
                 rem_menuitem_box = Gtk.Box()
                 rem_menuitem_icon = Gtk.Image.new_from_icon_name(
-                    Gtk.STOCK_REMOVE, Gtk.IconSize.MENU
+                    "list-remove", Gtk.IconSize.MENU
                 )
                 rem_menuitem_label = Gtk.Label(
                     label=(
@@ -784,7 +784,7 @@ class BaseSummaryDataPanel(Gtk.Box):
                 # Delete all.
                 rem_menuitem_box = Gtk.Box()
                 rem_menuitem_icon = Gtk.Image.new_from_icon_name(
-                    Gtk.STOCK_REMOVE, Gtk.IconSize.MENU
+                    "list-remove", Gtk.IconSize.MENU
                 )
                 rem_menuitem_label = Gtk.Label(
                     label=(
