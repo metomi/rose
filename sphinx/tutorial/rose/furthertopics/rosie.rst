@@ -280,7 +280,7 @@ Rosie provides commands for managing suites, including:
 
          fcm sw configuration-change
 
-      Next, either using the Rose 2019 :ref:`command-rose-config-edit` GUI or
+      Next, either using :ref:`command-rose-config-edit` or
       a text editor, change the ``RESOLUTION`` setting in the
       :rose:file:`rose-suite.conf` file to ``0.1``.
 
