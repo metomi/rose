@@ -16,9 +16,6 @@
 # -----------------------------------------------------------------------------
 """Reporter for diagnostic messages."""
 
-import queue
-import multiprocessing
-
 import doctest
 import sys
 import time
