@@ -101,13 +101,17 @@ rosa = []
 #     Tornado 6.
 #     tornado
 # ]
+edit = [
+    "pygobject>=3.50.0",
+]
 all = [
     "metomi-rose[lint]",
     "metomi-rose[docs]",
     "metomi-rose[graph]",
     "metomi-rose[tests]",
     "metomi-rose[rosa]",
-    "metomi-rose[tutorials]"
+    "metomi-rose[edit]",
+    "metomi-rose[tutorials]",
 ]
 
 [project.scripts]
@@ -122,10 +126,12 @@ rosa = "metomi.rose.rose:rosa"
 "config" = "metomi.rose.config_cli:main"
 "config-diff" = "metomi.rose.config_diff:main"
 "config-dump" = "metomi.rose.config_dump:main"
+"config-edit" = "metomi.rose.config_editor.main:main [edit]"
 "date" = "metomi.rose.date_cli:main"
 "env-cat" = "metomi.rose.env_cat:main"
 "host-select" = "metomi.rose.host_select:main"
 "host-select-client" = "metomi.rose.host_select_client:main"
+"launch-splash-screen" = "metomi.rose.gtk.splash:main"
 "macro" = "metomi.rose.macro:main"
 "metadata-check" = "metomi.rose.metadata_check:main"
 "metadata-gen" = "metomi.rose.metadata_gen:main"

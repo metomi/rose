@@ -32,9 +32,10 @@ from metomi.rose.reporter import Reporter
 
 ERROR_LOCATE_OBJECT = "Could not locate {0}"
 
+MODULES: dict = {}
+
 
 class ResourceError(Exception):
-
     """A named resource not found."""
 
     def __init__(self, key):
@@ -172,7 +173,7 @@ class ResourceLocator:
 
 
 def import_object(
-    import_string, from_files, error_handler, module_prefix=None
+    import_string, from_files, error_handler
 ):
     """Import a Python callable.
 
@@ -182,18 +183,14 @@ def import_object(
     from_files is a list of available Python file paths to search in
     error_handler is a function that accepts an Exception instance
     or string and does something appropriate with it.
-    module_prefix is an optional string to prepend to the module
-    as an alias - this avoids any clashing between same-name modules.
 
     """
     is_builtin = False
     module_name = ".".join(import_string.split(".")[:-1])
     if module_name.startswith("rose."):
+        module_name = "metomi." + module_name
+    if module_name.startswith("metomi.rose."):
         is_builtin = True
-    if module_prefix is None:
-        as_name = module_name
-    else:
-        as_name = module_prefix + module_name
     class_name = import_string.split(".")[-1]
     module_fpath = "/".join(import_string.rsplit(".")[:-1]) + ".py"
     if module_fpath == ".py":
@@ -212,7 +209,7 @@ def import_object(
         for filename in module_files:
             sys.path.insert(0, os.path.dirname(filename))
             try:
-                module = SourceFileLoader(as_name, filename).load_module()
+                module = SourceFileLoader(module_name, filename).load_module()
             except ImportError as exc:
                 error_handler(exc)
             sys.path.pop(0)

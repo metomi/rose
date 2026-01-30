@@ -5,6 +5,7 @@ etc/opt
 doc
 venv
 metomi_rose.egg-info
+build
 dist
 node_modules
 
