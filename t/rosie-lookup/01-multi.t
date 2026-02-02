@@ -24,6 +24,11 @@
 if ! python3 -c 'import tornado, sqlalchemy' 2>/dev/null; then
     skip_all '"tornado" or "sqlalchemy" not installed'
 fi
+if [[ "$OSTYPE" == darwin* ]]; then
+    # tests not yet passing on GH Mac OS runner
+    # see: https://github.com/metomi/rose/pull/2985
+    skip_all 'Does not work on MacOS'
+fi
 tests 18
 #-------------------------------------------------------------------------------
 # Setup Rose site/user configuration for the tests.
