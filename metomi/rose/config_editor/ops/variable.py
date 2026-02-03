@@ -30,7 +30,7 @@ import metomi.rose.config_editor
 import metomi.rose.config_editor.stack
 
 
-class VariableOperations(object):
+class VariableOperations:
     """A class to hold functions that act on variables and their storage."""
 
     def __init__(

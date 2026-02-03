@@ -36,7 +36,7 @@ import metomi.rose.reporter
 import metomi.rose.resource
 
 
-class VariableWidget(object):
+class VariableWidget:
     """This class generates a set of widgets representing the variable.
 
     The set of widgets generated depends on the variable metadata, if any.

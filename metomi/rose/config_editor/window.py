@@ -39,7 +39,7 @@ REC_SPLIT_MACRO_TEXT = re.compile(
 )
 
 
-class MetadataTable(object):
+class MetadataTable:
     """
     Creates a table from the provided list of paths appending it to the
     provided parent.
@@ -101,7 +101,7 @@ class MetadataTable(object):
         self.draw_table()
 
 
-class MainWindow(object):
+class MainWindow:
     """Generate the main window and dialog handling for this example."""
 
     def load(

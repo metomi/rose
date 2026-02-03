@@ -32,7 +32,7 @@ import metomi.rose.config
 import metomi.rose.config_editor
 
 
-class GroupOperations(object):
+class GroupOperations:
     """Class to perform actions on groups of sections and/or options."""
 
     def __init__(
@@ -509,7 +509,7 @@ class GroupOperations(object):
         )
 
 
-class SubDataOperations(object):
+class SubDataOperations:
     """Class to hold a selected set of functions."""
 
     def __init__(

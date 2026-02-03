@@ -18,7 +18,7 @@
 import metomi.rose.config_editor
 
 
-class Updater(object):
+class Updater:
     """This handles the updating of various statuses and displays."""
 
     def __init__(

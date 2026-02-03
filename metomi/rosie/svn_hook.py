@@ -84,7 +84,7 @@ class BadChanges(Exception):
         return "\n".join(str(bad_change) for bad_change in bad_changes)
 
 
-class RosieSvnHook(object):
+class RosieSvnHook:
     """A parent class for hooks on a Rosie Subversion repository."""
 
     DATE_FMT = "%Y-%m-%d %H:%M:%S %Z"

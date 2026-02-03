@@ -31,7 +31,7 @@ import metomi.rose.upgrade
 from metomi.rose.macros.trigger import TriggerMacro
 
 
-class UpgradeController(object):
+class UpgradeController:
     """Configure the upgrade of configurations."""
 
     def __init__(

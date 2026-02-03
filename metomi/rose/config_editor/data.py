@@ -48,7 +48,7 @@ REC_NS_SECTION = re.compile(
 )
 
 
-class VarData(object):
+class VarData:
     """Stores past, present, and missing variables."""
 
     def __init__(self, v_map, latent_v_map, save_v_map, latent_save_v_map):
@@ -102,7 +102,7 @@ class VarData(object):
         return None
 
 
-class SectData(object):
+class SectData:
     """Stores past, present, and missing sections."""
 
     def __init__(
@@ -142,7 +142,7 @@ class SectData(object):
         return None
 
 
-class ConfigData(object):
+class ConfigData:
     """Stores information about a configuration."""
 
     def __init__(
@@ -174,7 +174,7 @@ class ConfigData(object):
         self.is_preview = is_preview
 
 
-class ConfigDataManager(object):
+class ConfigDataManager:
     """Loads the information from the various configurations."""
 
     def __init__(

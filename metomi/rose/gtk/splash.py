@@ -150,7 +150,7 @@ class SplashScreen(Gtk.Window):
         return False
 
 
-class NullSplashScreenProcess(object):
+class NullSplashScreenProcess:
     """Implement a null interface similar to SplashScreenProcess."""
 
     def __init__(self, *args):
@@ -166,7 +166,7 @@ class NullSplashScreenProcess(object):
         pass
 
 
-class SplashScreenProcess(object):
+class SplashScreenProcess:
     """Run a separate process that launches a splash screen.
 
     Communicate via the update method.

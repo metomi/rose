@@ -45,7 +45,7 @@ NON_TEXT_TYPES = (
 )
 
 
-class ValueWidgetHook(object):
+class ValueWidgetHook:
     """Provides hook functions for valuewidgets."""
 
     def __init__(self, scroll_func=None, focus_func=None):

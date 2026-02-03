@@ -75,7 +75,7 @@ import metomi.rose.resource
 import metomi.rose.macros
 
 
-class MainController(object):
+class MainController:
     """The main controller class.
 
     Call with a configuration directory and/or a dict of

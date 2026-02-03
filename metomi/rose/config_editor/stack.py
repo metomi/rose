@@ -25,7 +25,7 @@ from gi.repository import Gtk
 import metomi.rose.config_editor
 
 
-class StackItem(object):
+class StackItem:
     """A dictionary containing stack information."""
 
     def __init__(

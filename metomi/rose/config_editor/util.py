@@ -32,7 +32,7 @@ import metomi.rose.gtk.dialog
 import metomi.rose.gtk.util
 
 
-class Lookup(object):
+class Lookup:
     """Collection of data lookup functions used by multiple modules."""
 
     def __init__(self):

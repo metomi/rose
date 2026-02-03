@@ -535,7 +535,7 @@ class TooltipTreeView(Gtk.TreeView):
         return self.get_tooltip(view, row_iter, col_index, tip)
 
 
-class TreeModelSortUtil(object):
+class TreeModelSortUtil:
     """This class contains useful sorting methods for TreeModelSort.
 
     Arguments:

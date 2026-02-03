@@ -57,7 +57,7 @@ DIALOG_TYPE_INFO = Gtk.MessageType.INFO
 DIALOG_TYPE_WARNING = Gtk.MessageType.WARNING
 
 
-class DialogProcess(object):
+class DialogProcess:
     """Run a forked process and display a dialog while it runs.
 
     cmd_args can either be a list of shell command components

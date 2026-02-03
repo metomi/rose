@@ -167,7 +167,7 @@ class KGODatabase:
         self.statement_buffer = []
 
 
-class AnalysisTask(object, metaclass=abc.ABCMeta):
+class AnalysisTask(metaclass=abc.ABCMeta):
     """Base class for an analysis task.
 
     All custom user tasks should inherit from this class and override

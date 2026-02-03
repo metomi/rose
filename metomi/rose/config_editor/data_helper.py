@@ -24,7 +24,7 @@ import metomi.rose.config
 REC_ELEMENT_SECTION = re.compile(r"^(.*)\((.+)\)$")
 
 
-class ConfigDataHelper(object):
+class ConfigDataHelper:
 
     def __init__(self, data, util):
         self.data = data

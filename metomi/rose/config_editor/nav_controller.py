@@ -20,7 +20,7 @@ from functools import cmp_to_key
 import metomi.rose.config_editor
 
 
-class NavTreeManager(object):
+class NavTreeManager:
     """This controls the navigation namespace tree structure."""
 
     def __init__(self, data, util, reporter, tree_trigger_update):

@@ -428,7 +428,7 @@ class MixedArrayValueWidget(Gtk.Box):
             self.set_value(new_val)
 
 
-class ArrayElementSetter(object):
+class ArrayElementSetter:
     """Element widget setter class."""
 
     def __init__(self, setter_function, index):

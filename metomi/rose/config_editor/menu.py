@@ -39,7 +39,7 @@ import metomi.rose.popen
 from functools import cmp_to_key
 
 
-class MenuBar(object):
+class MenuBar:
     """Generate the menu bar, using the GTK UIManager.
 
     Parses the settings in 'ui_config_string'. Connection of buttons is done
@@ -488,7 +488,7 @@ class MenuBar(object):
             config_item.get_submenu().prepend(all_item)
 
 
-class MainMenuHandler(object):
+class MainMenuHandler:
     """Handles signals from the main menu and tool bar."""
 
     def __init__(

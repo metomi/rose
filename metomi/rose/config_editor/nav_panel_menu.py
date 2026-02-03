@@ -31,7 +31,7 @@ import metomi.rose.gtk.dialog
 from functools import cmp_to_key
 
 
-class NavPanelHandler(object):
+class NavPanelHandler:
     """Handles the navigation panel menu."""
 
     def __init__(

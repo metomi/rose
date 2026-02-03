@@ -32,7 +32,7 @@ import metomi.rose.gtk.dialog
 import metomi.rose.gtk.util
 
 
-class SectionOperations(object):
+class SectionOperations:
     """A class to hold functions that act on sections and their storage."""
 
     def __init__(
