@@ -81,7 +81,7 @@ class VariableWidget:
         self.force_signal_ids = []
         self.is_modified = False
         for child_widget in self.get_children():
-            setattr(child_widget, "get_parent", lambda: self)
+            child_widget.get_parent = lambda: self
         self.trigger_ignored = lambda v, b: b
         self.get_parent = lambda: None
         self.is_ignored = False
@@ -284,7 +284,7 @@ class VariableWidget:
 
         """
         if not hasattr(container, "num_removes"):
-            setattr(container, "num_removes", 0)
+            container.num_removes = 0
         if isinstance(container, Gtk.Table):
             row_index = y_info
             key_col = 0
@@ -310,7 +310,7 @@ class VariableWidget:
             self.valuewidget.trigger_scroll = lambda b, e: self.force_scroll(
                 b, container
             )
-            setattr(self, "get_parent", lambda: container)
+            self.get_parent = lambda: container
         elif isinstance(
             container, Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         ):
@@ -323,7 +323,7 @@ class VariableWidget:
             self.valuewidget.trigger_scroll = lambda b, e: self.force_scroll(
                 b, container
             )
-            setattr(self, "get_parent", lambda: container)
+            self.get_parent = lambda: container
 
         return container
 
