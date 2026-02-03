@@ -169,14 +169,13 @@ class EntryArrayValueWidget(Gtk.Box):
             if (
                 len(text + prefix + val) >= focus_index
                 or i == len(value_array) - 1
-            ):
-                if len(self.entries) > i:
-                    self.entries[i].grab_focus()
-                    val_offset = focus_index - len(text + prefix)
-                    if self.is_char_array or self.is_quoted_array:
-                        val_offset = max([0, val_offset - 1])
-                    self.entries[i].set_position(val_offset)
-                    return
+            ) and len(self.entries) > i:
+                self.entries[i].grab_focus()
+                val_offset = focus_index - len(text + prefix)
+                if self.is_char_array or self.is_quoted_array:
+                    val_offset = max([0, val_offset - 1])
+                self.entries[i].set_position(val_offset)
+                return
             text += prefix + val
 
     def generate_entries(self, value_array=None):

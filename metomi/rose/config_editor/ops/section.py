@@ -280,9 +280,8 @@ class SectionOperations:
         ns_list = [namespace]
         for ns, values in list(self.__data.namespace_meta_lookup.items()):
             sections = values.get("sections")
-            if sections == [section]:
-                if ns not in ns_list:
-                    ns_list.append(ns)
+            if sections == [section] and ns not in ns_list:
+                ns_list.append(ns)
         if not skip_undo:
             stack_item = metomi.rose.config_editor.stack.StackItem(
                 namespace,

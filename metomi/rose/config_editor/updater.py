@@ -344,9 +344,8 @@ class Updater:
                 continue
             variables = config_data.vars.now.get(section, [])
             sect_data.options = []
-            if not variables:
-                if section in config_data.vars.now:
-                    config_data.vars.now.pop(section)
+            if not variables and section in config_data.vars.now:
+                config_data.vars.now.pop(section)
             for variable in variables:
                 var_id = variable.metadata["id"]
                 option = self.util.get_section_option_from_id(var_id)[1]

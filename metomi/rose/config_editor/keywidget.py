@@ -443,13 +443,12 @@ class KeyWidget(Gtk.Box):
         """Set the display of a variable title instead of the name."""
         if not self.my_variable.name:
             return False
-        if should_show_title:
-            if metomi.rose.META_PROP_TITLE in self.meta:
-                title_string = self._get_metadata_formatting(
-                    metomi.rose.META_PROP_TITLE
-                )
-                if title_string != self.entry.get_text():
-                    return self.entry.set_text(title_string)
+        if should_show_title and metomi.rose.META_PROP_TITLE in self.meta:
+            title_string = self._get_metadata_formatting(
+                metomi.rose.META_PROP_TITLE
+            )
+            if title_string != self.entry.get_text():
+                return self.entry.set_text(title_string)
         if self.entry.get_text() != self.my_variable.name:
             self.entry.set_text(self.my_variable.name)
 
@@ -540,9 +539,8 @@ class KeyWidget(Gtk.Box):
         if (
             metomi.rose.META_PROP_HELP in self.meta
             or metomi.rose.META_PROP_URL in self.meta
-        ):
-            if isinstance(self.entry, Gtk.Label):
-                self._set_underline(self.entry, underline=True)
+        ) and isinstance(self.entry, Gtk.Label):
+            self._set_underline(self.entry, underline=True)
         return False
 
     def _set_underline(self, label, underline=False):

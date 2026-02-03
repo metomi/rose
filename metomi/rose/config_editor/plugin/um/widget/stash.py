@@ -993,19 +993,18 @@ class BaseStashSummaryDataPanelv1(
         sections_for_changing = []
         for vars_ in list(self.variables.values()):
             for var in vars_:
-                if var.name == self.STREQ_NL_PACKAGE_OPT:
-                    if (
-                        only_this_package is None
-                        or var.value == only_this_package
-                    ):
-                        sect = self.util.get_section_option_from_id(
-                            var.metadata["id"]
-                        )[0]
-                        if sect not in sections_for_changing:
-                            is_ignored = (
-                                metomi.rose.variable.IGNORED_BY_USER
-                                in self.sections[sect].ignored_reason
-                            )
-                            if is_ignored != disable:
-                                sections_for_changing.append(sect)
+                if var.name == self.STREQ_NL_PACKAGE_OPT and (
+                    only_this_package is None
+                    or var.value == only_this_package
+                ):
+                    sect = self.util.get_section_option_from_id(
+                        var.metadata["id"]
+                    )[0]
+                    if sect not in sections_for_changing:
+                        is_ignored = (
+                            metomi.rose.variable.IGNORED_BY_USER
+                            in self.sections[sect].ignored_reason
+                        )
+                        if is_ignored != disable:
+                            sections_for_changing.append(sect)
         self.sub_ops.ignore_sections(sections_for_changing, disable)

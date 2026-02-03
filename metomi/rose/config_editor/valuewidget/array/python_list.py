@@ -136,12 +136,11 @@ class PythonListValueWidget(Gtk.Box):
             if (
                 len(text + prefix + val) >= focus_index
                 or i == len(value_array) - 1
-            ):
-                if len(self.entries) > i:
-                    self.entries[i].grab_focus()
-                    val_offset = focus_index - len(text + prefix)
-                    self.entries[i].set_position(val_offset)
-                    return
+            ) and len(self.entries) > i:
+                self.entries[i].grab_focus()
+                val_offset = focus_index - len(text + prefix)
+                self.entries[i].set_position(val_offset)
+                return
             text += prefix + val
 
     def generate_entries(self, value_array=None):

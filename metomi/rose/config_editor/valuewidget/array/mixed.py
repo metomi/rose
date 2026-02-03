@@ -199,13 +199,12 @@ class MixedArrayValueWidget(Gtk.Box):
             prefix = entry.get_next_delimiter(self.value[len(text) :], val)
             if prefix is None:
                 return
-            if len(text + prefix + val) >= focus_index:
-                if len(widgets) > i:
-                    widgets[i].grab_focus()
-                    val_offset = focus_index - len(text + prefix)
-                    if hasattr(widgets[i], "set_focus_index"):
-                        widgets[i].set_focus_index(val_offset)
-                    return
+            if len(text + prefix + val) >= focus_index and len(widgets) > i:
+                widgets[i].grab_focus()
+                val_offset = focus_index - len(text + prefix)
+                if hasattr(widgets[i], "set_focus_index"):
+                    widgets[i].set_focus_index(val_offset)
+                return
             text += prefix + val
 
     def del_row(self, *args):

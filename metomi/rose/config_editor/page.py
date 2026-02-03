@@ -1072,14 +1072,13 @@ class ConfigPage(Gtk.Box):
             else:
                 if hasattr(target, "is_ignored") and target.is_ignored:
                     self._set_widget_ignored(target, "", enabled=True)
-            if any(e in target.errors for e in relevant_errs) or any(
+            if (any(e in target.errors for e in relevant_errs) or any(
                 e in target.variable.error for e in relevant_errs
-            ):
-                if [e in target.errors for e in relevant_errs] != [
-                    e in target.variable.error for e in relevant_errs
-                ]:
-                    refresh_list.append(target.variable.metadata["id"])
-                    target.errors = list(target.variable.error.keys())
+            )) and [e in target.errors for e in relevant_errs] != [
+                e in target.variable.error for e in relevant_errs
+            ]:
+                refresh_list.append(target.variable.metadata["id"])
+                target.errors = list(target.variable.error.keys())
             target_widgets_done.append(target)
         if hasattr(self.main_container, "update_ignored"):
             self.main_container.update_ignored()

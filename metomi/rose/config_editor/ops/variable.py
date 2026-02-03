@@ -246,14 +246,13 @@ class VariableOperations:
             not override
             and metomi.rose.variable.IGNORED_BY_SYSTEM in old_reason
             and metomi.rose.variable.IGNORED_BY_SYSTEM not in new_reason_dict
+        ) and (
+            metomi.rose.config_editor.WARNING_TYPE_NOT_TRIGGER
+            in variable.error
         ):
-            if (
+            variable.error.pop(
                 metomi.rose.config_editor.WARNING_TYPE_NOT_TRIGGER
-                in variable.error
-            ):
-                variable.error.pop(
-                    metomi.rose.config_editor.WARNING_TYPE_NOT_TRIGGER
-                )
+            )
         my_ignored_keys = list(variable.ignored_reason.keys())
         if metomi.rose.variable.IGNORED_BY_SECTION in my_ignored_keys:
             my_ignored_keys.remove(metomi.rose.variable.IGNORED_BY_SECTION)

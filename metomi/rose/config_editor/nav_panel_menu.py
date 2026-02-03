@@ -171,9 +171,8 @@ class NavPanelHandler:
                 sect_and_data.append((v_sect, sect_data))
             for section, sect_data in sect_and_data:
                 if section not in config_sect_dict[config_name]:
-                    if sect_data.ignored_reason:
-                        if is_ignored:
-                            continue
+                    if sect_data.ignored_reason and is_ignored:
+                        continue
                     if not is_ignored:
                         mode = sect_data.metadata.get(
                             metomi.rose.META_PROP_COMPULSORY
@@ -648,10 +647,9 @@ class NavPanelHandler:
         show_latent = self.data.page_ns_show_modes[
             metomi.rose.config_editor.SHOW_MODE_LATENT
         ]
-        if latent_status:
-            if not show_latent:
-                # Latent page, no latent pages allowed.
-                return False
+        if latent_status and not show_latent:
+            # Latent page, no latent pages allowed.
+            return False
             # Latent page, latent pages allowed (but may be ignored...).
         if ignored_status:
             if (
