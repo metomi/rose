@@ -52,7 +52,7 @@ class SourceValueWidget(Gtk.Box):
         ]
         self.formats = formats
         self.formats_ok = None
-        self._ok_content_sections = set([None])
+        self._ok_content_sections = {None}
         if self.formats_ok is None:
             content_sections = self._get_available_sections()
             self.formats_ok = bool(content_sections)

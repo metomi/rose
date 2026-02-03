@@ -2233,7 +2233,7 @@ def main():
     if opts.conf_dir:
         os.chdir(opts.conf_dir)
     path = os.getcwd()
-    name_set = set([metomi.rose.SUB_CONFIG_NAME, metomi.rose.TOP_CONFIG_NAME])
+    name_set = {metomi.rose.SUB_CONFIG_NAME, metomi.rose.TOP_CONFIG_NAME}
     while True:
         if set(os.listdir(path)) & name_set:
             break
