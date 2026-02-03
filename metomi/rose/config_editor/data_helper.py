@@ -39,10 +39,10 @@ class ConfigDataHelper:
         save_sections = config_data.sections.get_all(
             save=True, skip_latent=True
         )
-        now_set = set([v.to_hashable() for v in variables])
-        save_set = set([v.to_hashable() for v in save_vars])
-        now_sect_set = set([s.to_hashable() for s in sections])
-        save_sect_set = set([s.to_hashable() for s in save_sections])
+        now_set = {v.to_hashable() for v in variables}
+        save_set = {v.to_hashable() for v in save_vars}
+        now_sect_set = {s.to_hashable() for s in sections}
+        save_sect_set = {s.to_hashable() for s in save_sections}
         return (
             config_name not in self.data.saved_config_names
             or now_set ^ save_set
