@@ -975,7 +975,7 @@ class BaseStashSummaryDataPanelv1(
         streq_remove_list = list(sections_for_removing)
         for profile_type in profile_streqs:
             for name, streq_list in list(profile_streqs[profile_type].items()):
-                if all([s in streq_remove_list for s in streq_list]):
+                if all(s in streq_remove_list for s in streq_list):
                     # This is only referenced by sections about to be removed.
                     profile_id = self._profile_location_map.get(
                         profile_type, {}

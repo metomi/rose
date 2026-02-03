@@ -211,7 +211,7 @@ class SectionOperations:
                     metomi.rose.variable.IGNORED_BY_SYSTEM
                     in sect_data.ignored_reason
                 )
-                and all([e not in my_errors for e in ign_errors])
+                and all(e not in my_errors for e in ign_errors)
                 and self.check_cannot_enable_setting(config_name, section)
             ):
                 metomi.rose.gtk.dialog.run_dialog(
