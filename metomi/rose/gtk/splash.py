@@ -1,4 +1,3 @@
-#!/usr/bin/env python2
 # Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
