@@ -73,6 +73,7 @@ import metomi.rose.macro
 import metomi.rose.opt_parse
 import metomi.rose.resource
 import metomi.rose.macros
+import contextlib
 
 
 class MainController:
@@ -1965,10 +1966,8 @@ class MainController:
             action = stack_item.action
             node = stack_item.node
             node_id = None
-            try:
+            with contextlib.suppress(AttributeError, KeyError):
                 node_id = node.metadata["id"]
-            except (AttributeError, KeyError):
-                pass
             # We need to handle namespace and metadata changes
             if node_id is None:
                 # Not a variable or section
