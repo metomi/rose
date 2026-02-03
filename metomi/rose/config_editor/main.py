@@ -913,7 +913,7 @@ class MainController:
         )
         # Related pages
         see_also = ""
-        sections = [s for s in ns_metadata.get("sections", [])]
+        sections = list(ns_metadata.get("sections", []))
         for section_name in [s for s in sections if s.startswith("namelist")]:
             no_num_name = metomi.rose.macro.REC_ID_STRIP_DUPL.sub(
                 "", section_name
@@ -1995,7 +1995,7 @@ class MainController:
                 and not node_is_section
             ):
                 page = self.view_page(namespace, node_id)
-            redo_items = [x for x in self.redo_stack]
+            redo_items = list(self.redo_stack)
             if stack_item.undo_args:
                 args = list(stack_item.undo_args)
                 for i, arg_item in enumerate(args):

@@ -669,7 +669,7 @@ class ConfigPage(Gtk.Box):
             if len(section_choices) > 1:
                 text = metomi.rose.config_editor.ADD_MENU_BLANK_MULTIPLE
             actions.insert(0, ("Add blank", Gtk.STOCK_NEW, text))
-        ghost_list = [v for v in self.ghost_data]
+        ghost_list = list(self.ghost_data)
         sorter = metomi.rose.config.sort_settings
         ghost_list.sort(
             key=cmp_to_key(
@@ -1064,7 +1064,7 @@ class ConfigPage(Gtk.Box):
                 continue
             if target in target_widgets_done:
                 continue
-            for var_id, help_text in [x for x in new_tuples]:
+            for var_id, help_text in list(new_tuples):
                 if target.variable.metadata.get("id") == var_id:
                     self._set_widget_ignored(target, help_text)
                     new_tuples.remove((var_id, help_text))
@@ -1115,13 +1115,13 @@ class ConfigPage(Gtk.Box):
 
     def reload_from_data(self, new_config_data, new_ghost_data):
         """Load the new data into the page as gracefully as possible."""
-        for variable in [v for v in self.panel_data]:
+        for variable in list(self.panel_data):
             # Remove redundant existing variables
             var_id = variable.metadata.get("id")
             new_id_list = [x.metadata["id"] for x in new_config_data]
             if var_id not in new_id_list or var_id is None:
                 self.variable_ops.remove_var(variable)
-        for variable in [v for v in self.ghost_data]:
+        for variable in list(self.ghost_data):
             # Remove redundant metadata variables.
             var_id = variable.metadata.get("id")
             new_id_list = [x.metadata["id"] for x in new_ghost_data]

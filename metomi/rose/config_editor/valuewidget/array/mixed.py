@@ -69,7 +69,7 @@ class MixedArrayValueWidget(Gtk.Box):
         else:
             self.array_length = metadata.get(metomi.rose.META_PROP_LENGTH, 1)
         self.num_cols = len(metadata[metomi.rose.META_PROP_TYPE])
-        self.types_row = [t for t in metadata[metomi.rose.META_PROP_TYPE]]
+        self.types_row = list(metadata[metomi.rose.META_PROP_TYPE])
         log_imgs = [
             (Gtk.STOCK_MEDIA_STOP, Gtk.IconSize.MENU),
             (Gtk.STOCK_APPLY, Gtk.IconSize.MENU),

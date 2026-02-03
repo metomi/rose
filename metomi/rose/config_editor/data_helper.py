@@ -246,7 +246,7 @@ class ConfigDataHelper:
         ns_metadata = self.data.namespace_meta_lookup.get(namespace, {})
         sections = ns_metadata.get("sections", [])
         if sections:
-            return [s for s in sections]
+            return list(sections)
         base, subsp = self.util.split_full_ns(self.data, namespace)
         ns_section = subsp.replace("/", ":")
         if ns_section in self.data.config[base].sections.now:
