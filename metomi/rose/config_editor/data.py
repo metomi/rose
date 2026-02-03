@@ -1193,10 +1193,9 @@ class ConfigDataManager:
                                 metomi.rose.config_editor
                                 .WARNING_TYPE_USER_IGNORED
                             )
-                            val = getattr(
-                                metomi.rose.config_editor,
-                                "WARNING_USER_NOT_TRIGGER_IGNORED",
-                            )
+                            val = (
+                                metomi.rose.config_editor
+                            ).WARNING_USER_NOT_TRIGGER_IGNORED
                             node_inst.warning.update({key: val})
                         else:
                             # Doc table: I_u -> I_t -> optional

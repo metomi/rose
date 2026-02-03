@@ -1026,7 +1026,7 @@ class ConfigPage(Gtk.Box):
         self.show_modes[mode_key] = is_mode_on
         if hasattr(self.main_container, "show_mode_change"):
             self.update_ignored()
-            react_func = getattr(self.main_container, "show_mode_change")
+            react_func = self.main_container.show_mode_change
             react_func(mode_key, is_mode_on)
         elif mode_key in [
             metomi.rose.config_editor.SHOW_MODE_IGNORED,

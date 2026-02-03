@@ -378,7 +378,7 @@ class PageLatentTable(Gtk.Table):
             ):
                 if "index" not in focus_dict:
                     focus_dict["index"] = variable_widget.get_focus_index()
-                if getattr(self, "focus_child") == child:
+                if self.focus_child == child:
                     focus_dict["had_focus"] = True
                 top_row = self.child_get(child, "top_attach")[0]
                 variable_row = top_row
