@@ -373,7 +373,7 @@ class MainWindow:
         section_label = Gtk.Label(label=section_title)
         section_label.show()
         config_name_box = Gtk.ComboBoxText()
-        name_keys = sorted(list(name_section_dict.keys()))
+        name_keys = sorted(name_section_dict.keys())
         for k, name in enumerate(name_keys):
             config_name_box.append_text(name)
             if name in prefs:

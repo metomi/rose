@@ -1864,7 +1864,7 @@ class MainController:
             current_name = self.util.split_full_ns(self.data, current_ns)[0]
             ns_cmp = lambda x, y: (y == current_ns) - (x == current_ns)
             name_cmp = lambda x, y: (y == current_name) - (x == current_name)
-        config_keys = sorted(list(self.data.config.keys()))
+        config_keys = sorted(self.data.config.keys())
         config_keys.sort(key=cmp_to_key(name_cmp))
         for config_name in config_keys:
             config_data = self.data.config[config_name]
@@ -1887,7 +1887,7 @@ class MainController:
                 if reg_find(variable.name) or reg_find(variable.value):
                     found_ns_vars.setdefault(ns, [])
                     found_ns_vars[ns].append(variable)
-            ns_list = sorted(list(found_ns_vars.keys()))
+            ns_list = sorted(found_ns_vars.keys())
             ns_list.sort(key=cmp_to_key(ns_cmp))
             for ns in ns_list:
                 variables = found_ns_vars[ns]

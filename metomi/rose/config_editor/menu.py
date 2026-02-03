@@ -648,7 +648,7 @@ class MainMenuHandler:
     def load_macro_menu(self, menubar):
         """Refresh the menu dealing with custom macro launches."""
         menubar.clear_macros()
-        config_keys = sorted(list(self.data.config.keys()))
+        config_keys = sorted(self.data.config.keys())
         for config_name in config_keys:
             image = self.data.helper.get_icon_path_for_config(config_name)
             macros = self.data.config[config_name].macros
