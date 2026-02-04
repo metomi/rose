@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -55,7 +52,7 @@ class SourceValueWidget(Gtk.Box):
         ]
         self.formats = formats
         self.formats_ok = None
-        self._ok_content_sections = set([None])
+        self._ok_content_sections = {None}
         if self.formats_ok is None:
             content_sections = self._get_available_sections()
             self.formats_ok = bool(content_sections)

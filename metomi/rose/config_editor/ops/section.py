@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -35,7 +32,7 @@ import metomi.rose.gtk.dialog
 import metomi.rose.gtk.util
 
 
-class SectionOperations(object):
+class SectionOperations:
     """A class to hold functions that act on sections and their storage."""
 
     def __init__(
@@ -214,7 +211,7 @@ class SectionOperations(object):
                     metomi.rose.variable.IGNORED_BY_SYSTEM
                     in sect_data.ignored_reason
                 )
-                and all([e not in my_errors for e in ign_errors])
+                and all(e not in my_errors for e in ign_errors)
                 and self.check_cannot_enable_setting(config_name, section)
             ):
                 metomi.rose.gtk.dialog.run_dialog(
@@ -283,9 +280,8 @@ class SectionOperations(object):
         ns_list = [namespace]
         for ns, values in list(self.__data.namespace_meta_lookup.items()):
             sections = values.get("sections")
-            if sections == [section]:
-                if ns not in ns_list:
-                    ns_list.append(ns)
+            if sections == [section] and ns not in ns_list:
+                ns_list.append(ns)
         if not skip_undo:
             stack_item = metomi.rose.config_editor.stack.StackItem(
                 namespace,

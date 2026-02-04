@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -219,9 +216,8 @@ class MenuWidget(Gtk.Box):
             for err, err_info in list(variable.error.items()):
                 hover_string += "(" + err + "): " + err_info + "\n"
             hover_string = hover_string.rstrip("\n")
-        if self.is_ghost:
-            if not variable.error:
-                hover_string = metomi.rose.config_editor.VAR_MENU_TIP_LATENT
+        if self.is_ghost and not variable.error:
+            hover_string = metomi.rose.config_editor.VAR_MENU_TIP_LATENT
         self.hover_text = hover_string
         self.button.set_tooltip_text(self.hover_text)
         self.button.show()

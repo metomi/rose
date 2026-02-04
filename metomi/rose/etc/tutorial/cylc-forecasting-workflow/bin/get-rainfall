@@ -51,7 +51,7 @@ DEBUG=os.environ['CYLC_DEBUG']=='true'
 CYLC_TASK_LOG_DIR=os.environ['CYLC_TASK_LOG_DIR']
 
 
-class Rainfall(object):
+class Rainfall:
     """Class for holding rainfall data.
 
     Args:

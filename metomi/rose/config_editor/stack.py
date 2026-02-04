@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -28,7 +25,7 @@ from gi.repository import Gtk
 import metomi.rose.config_editor
 
 
-class StackItem(object):
+class StackItem:
     """A dictionary containing stack information."""
 
     def __init__(

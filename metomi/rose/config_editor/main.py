@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -76,9 +73,10 @@ import metomi.rose.macro
 import metomi.rose.opt_parse
 import metomi.rose.resource
 import metomi.rose.macros
+import contextlib
 
 
-class MainController(object):
+class MainController:
     """The main controller class.
 
     Call with a configuration directory and/or a dict of
@@ -916,7 +914,7 @@ class MainController(object):
         )
         # Related pages
         see_also = ""
-        sections = [s for s in ns_metadata.get("sections", [])]
+        sections = list(ns_metadata.get("sections", []))
         for section_name in [s for s in sections if s.startswith("namelist")]:
             no_num_name = metomi.rose.macro.REC_ID_STRIP_DUPL.sub(
                 "", section_name
@@ -1867,7 +1865,7 @@ class MainController(object):
             current_name = self.util.split_full_ns(self.data, current_ns)[0]
             ns_cmp = lambda x, y: (y == current_ns) - (x == current_ns)
             name_cmp = lambda x, y: (y == current_name) - (x == current_name)
-        config_keys = sorted(list(self.data.config.keys()))
+        config_keys = sorted(self.data.config.keys())
         config_keys.sort(key=cmp_to_key(name_cmp))
         for config_name in config_keys:
             config_data = self.data.config[config_name]
@@ -1890,7 +1888,7 @@ class MainController(object):
                 if reg_find(variable.name) or reg_find(variable.value):
                     found_ns_vars.setdefault(ns, [])
                     found_ns_vars[ns].append(variable)
-            ns_list = sorted(list(found_ns_vars.keys()))
+            ns_list = sorted(found_ns_vars.keys())
             ns_list.sort(key=cmp_to_key(ns_cmp))
             for ns in ns_list:
                 variables = found_ns_vars[ns]
@@ -1968,10 +1966,8 @@ class MainController(object):
             action = stack_item.action
             node = stack_item.node
             node_id = None
-            try:
+            with contextlib.suppress(AttributeError, KeyError):
                 node_id = node.metadata["id"]
-            except (AttributeError, KeyError):
-                pass
             # We need to handle namespace and metadata changes
             if node_id is None:
                 # Not a variable or section
@@ -1998,7 +1994,7 @@ class MainController(object):
                 and not node_is_section
             ):
                 page = self.view_page(namespace, node_id)
-            redo_items = [x for x in self.redo_stack]
+            redo_items = list(self.redo_stack)
             if stack_item.undo_args:
                 args = list(stack_item.undo_args)
                 for i, arg_item in enumerate(args):
@@ -2237,7 +2233,7 @@ def main():
     if opts.conf_dir:
         os.chdir(opts.conf_dir)
     path = os.getcwd()
-    name_set = set([metomi.rose.SUB_CONFIG_NAME, metomi.rose.TOP_CONFIG_NAME])
+    name_set = {metomi.rose.SUB_CONFIG_NAME, metomi.rose.TOP_CONFIG_NAME}
     while True:
         if set(os.listdir(path)) & name_set:
             break

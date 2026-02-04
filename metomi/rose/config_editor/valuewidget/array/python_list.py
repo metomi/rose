@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -139,12 +136,11 @@ class PythonListValueWidget(Gtk.Box):
             if (
                 len(text + prefix + val) >= focus_index
                 or i == len(value_array) - 1
-            ):
-                if len(self.entries) > i:
-                    self.entries[i].grab_focus()
-                    val_offset = focus_index - len(text + prefix)
-                    self.entries[i].set_position(val_offset)
-                    return
+            ) and len(self.entries) > i:
+                self.entries[i].grab_focus()
+                val_offset = focus_index - len(text + prefix)
+                self.entries[i].set_position(val_offset)
+                return
             text += prefix + val
 
     def generate_entries(self, value_array=None):

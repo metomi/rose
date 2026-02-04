@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -34,7 +31,7 @@ import metomi.rose.gtk.dialog
 from functools import cmp_to_key
 
 
-class NavPanelHandler(object):
+class NavPanelHandler:
     """Handles the navigation panel menu."""
 
     def __init__(
@@ -174,9 +171,8 @@ class NavPanelHandler(object):
                 sect_and_data.append((v_sect, sect_data))
             for section, sect_data in sect_and_data:
                 if section not in config_sect_dict[config_name]:
-                    if sect_data.ignored_reason:
-                        if is_ignored:
-                            continue
+                    if sect_data.ignored_reason and is_ignored:
+                        continue
                     if not is_ignored:
                         mode = sect_data.metadata.get(
                             metomi.rose.META_PROP_COMPULSORY
@@ -651,10 +647,9 @@ class NavPanelHandler(object):
         show_latent = self.data.page_ns_show_modes[
             metomi.rose.config_editor.SHOW_MODE_LATENT
         ]
-        if latent_status:
-            if not show_latent:
-                # Latent page, no latent pages allowed.
-                return False
+        if latent_status and not show_latent:
+            # Latent page, no latent pages allowed.
+            return False
             # Latent page, latent pages allowed (but may be ignored...).
         if ignored_status:
             if (

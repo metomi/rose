@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -42,7 +39,7 @@ import metomi.rose.popen
 from functools import cmp_to_key
 
 
-class MenuBar(object):
+class MenuBar:
     """Generate the menu bar, using the GTK UIManager.
 
     Parses the settings in 'ui_config_string'. Connection of buttons is done
@@ -491,7 +488,7 @@ class MenuBar(object):
             config_item.get_submenu().prepend(all_item)
 
 
-class MainMenuHandler(object):
+class MainMenuHandler:
     """Handles signals from the main menu and tool bar."""
 
     def __init__(
@@ -651,7 +648,7 @@ class MainMenuHandler(object):
     def load_macro_menu(self, menubar):
         """Refresh the menu dealing with custom macro launches."""
         menubar.clear_macros()
-        config_keys = sorted(list(self.data.config.keys()))
+        config_keys = sorted(self.data.config.keys())
         for config_name in config_keys:
             image = self.data.helper.get_icon_path_for_config(config_name)
             macros = self.data.config[config_name].macros

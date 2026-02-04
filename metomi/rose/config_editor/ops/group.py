@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -35,7 +32,7 @@ import metomi.rose.config
 import metomi.rose.config_editor
 
 
-class GroupOperations(object):
+class GroupOperations:
     """Class to perform actions on groups of sections and/or options."""
 
     def __init__(
@@ -512,7 +509,7 @@ class GroupOperations(object):
         )
 
 
-class SubDataOperations(object):
+class SubDataOperations:
     """Class to hold a selected set of functions."""
 
     def __init__(

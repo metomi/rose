@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -381,7 +378,7 @@ class PageLatentTable(Gtk.Table):
             ):
                 if "index" not in focus_dict:
                     focus_dict["index"] = variable_widget.get_focus_index()
-                if getattr(self, "focus_child") == child:
+                if self.focus_child == child:
                     focus_dict["had_focus"] = True
                 top_row = self.child_get(child, "top_attach")[0]
                 variable_row = top_row
