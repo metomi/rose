@@ -46,6 +46,17 @@ With ``pip``::
    See the :ref:`Cylc installation instructions <cylc:installation>` for more
    information.
 
+PyGobject
+"""""""""
+
+.. _pygobject installation instructions: https://pygobject.gnome.org/getting_started.html#ubuntu-logo-ubuntu-debian-logo-debian
+
+The :ref:`command-rose-config-edit` GUI requires PyGObject and its dependencies
+(which include Cairo, GI and GTK) to be installed.
+
+These dependencies are included in the Conda package. If installing via uv/pip
+you will need to follow the `pygobject installation instructions`_.
+
 Git
 """
 
@@ -91,6 +102,7 @@ Rose with the ``graph`` optional dependency::
    Git is likewise required for installing files from Git repositories or
    hosting services such as GitHub. Note Git is not automatically installed
    by the metomi-rose conda.
+
 
 Configuring Rose
 ----------------
