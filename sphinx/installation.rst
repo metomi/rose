@@ -92,6 +92,22 @@ Rose with the ``graph`` optional dependency::
    hosting services such as GitHub. Note Git is not automatically installed
    by the metomi-rose conda.
 
+Rosie
+"""""
+
+If installing via ``pip``, you will need to install the ``rosie`` optional
+dependency::
+
+   $ pip install metomi-rose[rosie]
+
+Rosa
+""""
+
+If installing via ``pip``, you will need to install the ``rosa`` optional
+dependency::
+
+   $ pip install metomi-rose[rosa]
+
 Configuring Rose
 ----------------
 

@@ -38,13 +38,13 @@ import os
 from pathlib import Path
 import pwd
 import signal
+import sys
 from time import sleep
 
 import jinja2
 from tornado.ioloop import IOLoop, PeriodicCallback
 import tornado.log
 import tornado.web
-import tornado.wsgi
 
 from metomi.isodatetime.data import get_timepoint_from_seconds_since_unix_epoch
 from metomi.rose import __version__ as ROSE_VERSION
@@ -104,7 +104,13 @@ class RosieDiscoServiceApplication(tornado.web.Application):
         )
 
         db_url_map = {}
-        for key, node in rose_conf.get(["rosie-db"]).value.items():
+        rosie_db = rose_conf.get(["rosie-db"])
+        if not rosie_db or not rosie_db.value:
+            sys.exit(
+                'Please configure one or more rosie prefix in'
+                ' "rose.conf[rosie-db]".'
+            )
+        for key, node in rosie_db.value.items():
             if key.startswith("db.") and key[3:]:
                 db_url_map[key[3:]] = node.value
         self.db_url_map = db_url_map
