@@ -555,10 +555,10 @@ def run_scrolled_dialog(text, title=None):
     label_box.pack_start(
         filler_eb, expand=True, fill=True, padding=DIALOG_PADDING)
     label_box.show()
-    requesition = label.size_request()
+    requisition = label.size_request()
     max_width, max_height = DIALOG_SIZE_SCROLLED_MAX
-    width = min([max_width, requesition.width]) + 2 * DIALOG_PADDING
-    height = min([max_height, requesition.height]) + 2 * DIALOG_PADDING
+    width = min([max_width, requisition.width]) + 2 * DIALOG_PADDING
+    height = min([max_height, requisition.height]) + 2 * DIALOG_PADDING
     scrolled.add_with_viewport(label_box)
     scrolled.get_child().set_shadow_type(Gtk.ShadowType.NONE)
     scrolled.set_size_request(width, height)

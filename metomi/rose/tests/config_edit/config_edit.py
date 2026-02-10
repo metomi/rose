@@ -20,7 +20,7 @@ from gi.repository.Gtk import MessageType
 
 from metomi.rose.gtk.dialog import run_dialog
 
-import metomi.rose.config_editor #NOQA: F401 lazily loaded.
+import metomi.rose.config_editor  # noqa: F401 lazily loaded.
 
 
 @pytest.mark.parametrize(
