@@ -15,12 +15,20 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
+import os
 import pytest
 from gi.repository.Gtk import MessageType
 
 from metomi.rose.gtk.dialog import run_dialog
 
 import metomi.rose.config_editor  # noqa: F401 lazily loaded.
+
+
+if not os.environ.get('DISPLAY', None):
+    pytest.skip(
+        'Headed testing required',
+        allow_module_level=True
+    )
 
 
 @pytest.mark.parametrize(
