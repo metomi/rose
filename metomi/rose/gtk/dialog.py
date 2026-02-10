@@ -364,7 +364,12 @@ def run_dialog(
             "clicked",
             lambda b: run_scrolled_dialog(extra_text, title=info_title),
         )
-        dialog.action_area.pack_start(info_button, expand=False, fill=False)
+        dialog.action_area.pack_start(
+            child=info_button,
+            expand=False,
+            fill=False,
+            padding=DIALOG_PADDING
+        )
     ok_button = dialog.add_button(Gtk.STOCK_OK, Gtk.ResponseType.OK)
     if dialog_type == Gtk.MessageType.INFO:
         stock_id = Gtk.STOCK_DIALOG_INFO
