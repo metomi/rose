@@ -223,7 +223,7 @@ The following should be returned:
 These are the renamed files.
 
 .. _rsync: https://linux.die.net/man/1/rsync
-.. _scp: https://www.lifewire.com/rcp-scp-ftp-commands-for-copying-files-3971107
+.. _scp: https://linux.die.net/man/1/scp
 
 Most users will have their own system or location that they wish to archive
 their data to. Here the example shown uses `rsync`_ and `scp`_.

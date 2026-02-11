@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -27,7 +24,7 @@ import metomi.rose.config
 REC_ELEMENT_SECTION = re.compile(r"^(.*)\((.+)\)$")
 
 
-class ConfigDataHelper(object):
+class ConfigDataHelper:
 
     def __init__(self, data, util):
         self.data = data
@@ -42,10 +39,10 @@ class ConfigDataHelper(object):
         save_sections = config_data.sections.get_all(
             save=True, skip_latent=True
         )
-        now_set = set([v.to_hashable() for v in variables])
-        save_set = set([v.to_hashable() for v in save_vars])
-        now_sect_set = set([s.to_hashable() for s in sections])
-        save_sect_set = set([s.to_hashable() for s in save_sections])
+        now_set = {v.to_hashable() for v in variables}
+        save_set = {v.to_hashable() for v in save_vars}
+        now_sect_set = {s.to_hashable() for s in sections}
+        save_sect_set = {s.to_hashable() for s in save_sections}
         return (
             config_name not in self.data.saved_config_names
             or now_set ^ save_set
@@ -249,7 +246,7 @@ class ConfigDataHelper(object):
         ns_metadata = self.data.namespace_meta_lookup.get(namespace, {})
         sections = ns_metadata.get("sections", [])
         if sections:
-            return [s for s in sections]
+            return list(sections)
         base, subsp = self.util.split_full_ns(self.data, namespace)
         ns_section = subsp.replace("/", ":")
         if ns_section in self.data.config[base].sections.now:

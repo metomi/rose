@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -21,7 +18,7 @@
 import metomi.rose.config_editor
 
 
-class Updater(object):
+class Updater:
     """This handles the updating of various statuses and displays."""
 
     def __init__(
@@ -347,9 +344,8 @@ class Updater(object):
                 continue
             variables = config_data.vars.now.get(section, [])
             sect_data.options = []
-            if not variables:
-                if section in config_data.vars.now:
-                    config_data.vars.now.pop(section)
+            if not variables and section in config_data.vars.now:
+                config_data.vars.now.pop(section)
             for variable in variables:
                 var_id = variable.metadata["id"]
                 option = self.util.get_section_option_from_id(var_id)[1]

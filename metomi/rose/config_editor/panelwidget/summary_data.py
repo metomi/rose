@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -441,7 +438,7 @@ class BaseSummaryDataPanel(Gtk.Box):
     def _get_selected_sections(self):
         """Return a set of the names of any sections that are currently being
         selected by the user."""
-        ret = set([])
+        ret = set()
         col = self.get_section_column_index()
         model, rows = self._view.get_selection().get_selected_rows()
         for row in rows:
@@ -459,7 +456,7 @@ class BaseSummaryDataPanel(Gtk.Box):
         """Return a set of any sub-sections contained within the section
         represented by the provided iter_. Method is recursive so will iterate
         down the tree."""
-        ret = set([])
+        ret = set()
         for child_no in range(model.iter_n_children(iter_)):
             child_iter = model.iter_nth_child(iter_, child_no)
             if not child_iter:

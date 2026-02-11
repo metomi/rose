@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -978,7 +975,7 @@ class BaseStashSummaryDataPanelv1(
         streq_remove_list = list(sections_for_removing)
         for profile_type in profile_streqs:
             for name, streq_list in list(profile_streqs[profile_type].items()):
-                if all([s in streq_remove_list for s in streq_list]):
+                if all(s in streq_remove_list for s in streq_list):
                     # This is only referenced by sections about to be removed.
                     profile_id = self._profile_location_map.get(
                         profile_type, {}
@@ -996,19 +993,18 @@ class BaseStashSummaryDataPanelv1(
         sections_for_changing = []
         for vars_ in list(self.variables.values()):
             for var in vars_:
-                if var.name == self.STREQ_NL_PACKAGE_OPT:
-                    if (
-                        only_this_package is None
-                        or var.value == only_this_package
-                    ):
-                        sect = self.util.get_section_option_from_id(
-                            var.metadata["id"]
-                        )[0]
-                        if sect not in sections_for_changing:
-                            is_ignored = (
-                                metomi.rose.variable.IGNORED_BY_USER
-                                in self.sections[sect].ignored_reason
-                            )
-                            if is_ignored != disable:
-                                sections_for_changing.append(sect)
+                if var.name == self.STREQ_NL_PACKAGE_OPT and (
+                    only_this_package is None
+                    or var.value == only_this_package
+                ):
+                    sect = self.util.get_section_option_from_id(
+                        var.metadata["id"]
+                    )[0]
+                    if sect not in sections_for_changing:
+                        is_ignored = (
+                            metomi.rose.variable.IGNORED_BY_USER
+                            in self.sections[sect].ignored_reason
+                        )
+                        if is_ignored != disable:
+                            sections_for_changing.append(sect)
         self.sub_ops.ignore_sections(sections_for_changing, disable)

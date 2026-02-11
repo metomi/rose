@@ -152,11 +152,6 @@ Metadata Items
       ``application-tutorial`` app we wrote in the
       :ref:`Rose application practical <rose-applications-practical>`.
 
-   .. note::
-
-      In order to use ``rose config-edit``, Rose 2019 must be installed.
-      Rose 2019 graphical utilities are compatible with Rose 2 configurations.
-
    #. **Create a Rose application called** ``metadata-tutorial``.
 
       Create a new copy of the ``application-tutorial`` application by running::
@@ -170,11 +165,6 @@ Metadata Items
       Rose configurations. Open the ``metadata-tutorial`` app::
 
          rose config-edit &
-
-      If you get a message saying this feature has been removed, you should
-      use Rose 2019 by running::
-
-         CYLC_VERSION=7 rose config-edit &
 
       .. tip::
 

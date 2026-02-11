@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -672,7 +669,7 @@ class ConfigPage(Gtk.Box):
             if len(section_choices) > 1:
                 text = metomi.rose.config_editor.ADD_MENU_BLANK_MULTIPLE
             actions.insert(0, ("Add blank", Gtk.STOCK_NEW, text))
-        ghost_list = [v for v in self.ghost_data]
+        ghost_list = list(self.ghost_data)
         sorter = metomi.rose.config.sort_settings
         ghost_list.sort(
             key=cmp_to_key(
@@ -1029,7 +1026,7 @@ class ConfigPage(Gtk.Box):
         self.show_modes[mode_key] = is_mode_on
         if hasattr(self.main_container, "show_mode_change"):
             self.update_ignored()
-            react_func = getattr(self.main_container, "show_mode_change")
+            react_func = self.main_container.show_mode_change
             react_func(mode_key, is_mode_on)
         elif mode_key in [
             metomi.rose.config_editor.SHOW_MODE_IGNORED,
@@ -1067,7 +1064,7 @@ class ConfigPage(Gtk.Box):
                 continue
             if target in target_widgets_done:
                 continue
-            for var_id, help_text in [x for x in new_tuples]:
+            for var_id, help_text in list(new_tuples):
                 if target.variable.metadata.get("id") == var_id:
                     self._set_widget_ignored(target, help_text)
                     new_tuples.remove((var_id, help_text))
@@ -1075,14 +1072,13 @@ class ConfigPage(Gtk.Box):
             else:
                 if hasattr(target, "is_ignored") and target.is_ignored:
                     self._set_widget_ignored(target, "", enabled=True)
-            if any(e in target.errors for e in relevant_errs) or any(
+            if (any(e in target.errors for e in relevant_errs) or any(
                 e in target.variable.error for e in relevant_errs
-            ):
-                if [e in target.errors for e in relevant_errs] != [
-                    e in target.variable.error for e in relevant_errs
-                ]:
-                    refresh_list.append(target.variable.metadata["id"])
-                    target.errors = list(target.variable.error.keys())
+            )) and [e in target.errors for e in relevant_errs] != [
+                e in target.variable.error for e in relevant_errs
+            ]:
+                refresh_list.append(target.variable.metadata["id"])
+                target.errors = list(target.variable.error.keys())
             target_widgets_done.append(target)
         if hasattr(self.main_container, "update_ignored"):
             self.main_container.update_ignored()
@@ -1118,13 +1114,13 @@ class ConfigPage(Gtk.Box):
 
     def reload_from_data(self, new_config_data, new_ghost_data):
         """Load the new data into the page as gracefully as possible."""
-        for variable in [v for v in self.panel_data]:
+        for variable in list(self.panel_data):
             # Remove redundant existing variables
             var_id = variable.metadata.get("id")
             new_id_list = [x.metadata["id"] for x in new_config_data]
             if var_id not in new_id_list or var_id is None:
                 self.variable_ops.remove_var(variable)
-        for variable in [v for v in self.ghost_data]:
+        for variable in list(self.ghost_data):
             # Remove redundant metadata variables.
             var_id = variable.metadata.get("id")
             new_id_list = [x.metadata["id"] for x in new_ghost_data]

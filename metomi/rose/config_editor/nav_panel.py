@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -279,13 +276,12 @@ class PageNavigationPanel(Gtk.ScrolledWindow):
             title = metomi.rose.config_editor.TITLE_PAGE_PREVIEW_MARKUP.format(
                 title
             )
-        if latent_status:
-            if self._get_is_latent_sub_tree(model, r_iter):
-                title = (
-                    metomi.rose.config_editor.TITLE_PAGE_LATENT_MARKUP.format(
-                        title
-                    )
+        if latent_status and self._get_is_latent_sub_tree(model, r_iter):
+            title = (
+                metomi.rose.config_editor.TITLE_PAGE_LATENT_MARKUP.format(
+                    title
                 )
+            )
         if ignored_status:
             title = metomi.rose.config_editor.TITLE_PAGE_IGNORED_MARKUP.format(
                 ignored_status, title

@@ -1,8 +1,4 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -154,7 +150,7 @@ class SplashScreen(Gtk.Window):
         return False
 
 
-class NullSplashScreenProcess(object):
+class NullSplashScreenProcess:
     """Implement a null interface similar to SplashScreenProcess."""
 
     def __init__(self, *args):
@@ -170,7 +166,7 @@ class NullSplashScreenProcess(object):
         pass
 
 
-class SplashScreenProcess(object):
+class SplashScreenProcess:
     """Run a separate process that launches a splash screen.
 
     Communicate via the update method.

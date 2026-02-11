@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -33,7 +30,7 @@ import metomi.rose.config_editor
 import metomi.rose.config_editor.stack
 
 
-class VariableOperations(object):
+class VariableOperations:
     """A class to hold functions that act on variables and their storage."""
 
     def __init__(
@@ -249,14 +246,13 @@ class VariableOperations(object):
             not override
             and metomi.rose.variable.IGNORED_BY_SYSTEM in old_reason
             and metomi.rose.variable.IGNORED_BY_SYSTEM not in new_reason_dict
+        ) and (
+            metomi.rose.config_editor.WARNING_TYPE_NOT_TRIGGER
+            in variable.error
         ):
-            if (
+            variable.error.pop(
                 metomi.rose.config_editor.WARNING_TYPE_NOT_TRIGGER
-                in variable.error
-            ):
-                variable.error.pop(
-                    metomi.rose.config_editor.WARNING_TYPE_NOT_TRIGGER
-                )
+            )
         my_ignored_keys = list(variable.ignored_reason.keys())
         if metomi.rose.variable.IGNORED_BY_SECTION in my_ignored_keys:
             my_ignored_keys.remove(metomi.rose.variable.IGNORED_BY_SECTION)

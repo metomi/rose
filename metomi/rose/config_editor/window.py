@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -42,7 +39,7 @@ REC_SPLIT_MACRO_TEXT = re.compile(
 )
 
 
-class MetadataTable(object):
+class MetadataTable:
     """
     Creates a table from the provided list of paths appending it to the
     provided parent.
@@ -104,7 +101,7 @@ class MetadataTable(object):
         self.draw_table()
 
 
-class MainWindow(object):
+class MainWindow:
     """Generate the main window and dialog handling for this example."""
 
     def load(
@@ -376,7 +373,7 @@ class MainWindow(object):
         section_label = Gtk.Label(label=section_title)
         section_label.show()
         config_name_box = Gtk.ComboBoxText()
-        name_keys = sorted(list(name_section_dict.keys()))
+        name_keys = sorted(name_section_dict.keys())
         for k, name in enumerate(name_keys):
             config_name_box.append_text(name)
             if name in prefs:

@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -48,7 +45,7 @@ NON_TEXT_TYPES = (
 )
 
 
-class ValueWidgetHook(object):
+class ValueWidgetHook:
     """Provides hook functions for valuewidgets."""
 
     def __init__(self, scroll_func=None, focus_func=None):

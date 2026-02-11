@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -538,7 +535,7 @@ class TooltipTreeView(Gtk.TreeView):
         return self.get_tooltip(view, row_iter, col_index, tip)
 
 
-class TreeModelSortUtil(object):
+class TreeModelSortUtil:
     """This class contains useful sorting methods for TreeModelSort.
 
     Arguments:

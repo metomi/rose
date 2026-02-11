@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright (C) 2012-2020 British Crown (Met Office) & Contributors.
-#
+# Copyright (C) British Crown (Met Office) & Contributors.
 # This file is part of Rose, a framework for meteorological suites.
 #
 # Rose is free software: you can redistribute it and/or modify
@@ -51,7 +48,7 @@ REC_NS_SECTION = re.compile(
 )
 
 
-class VarData(object):
+class VarData:
     """Stores past, present, and missing variables."""
 
     def __init__(self, v_map, latent_v_map, save_v_map, latent_save_v_map):
@@ -105,7 +102,7 @@ class VarData(object):
         return None
 
 
-class SectData(object):
+class SectData:
     """Stores past, present, and missing sections."""
 
     def __init__(
@@ -145,7 +142,7 @@ class SectData(object):
         return None
 
 
-class ConfigData(object):
+class ConfigData:
     """Stores information about a configuration."""
 
     def __init__(
@@ -177,7 +174,7 @@ class ConfigData(object):
         self.is_preview = is_preview
 
 
-class ConfigDataManager(object):
+class ConfigDataManager:
     """Loads the information from the various configurations."""
 
     def __init__(
@@ -1196,10 +1193,9 @@ class ConfigDataManager(object):
                                 metomi.rose.config_editor
                                 .WARNING_TYPE_USER_IGNORED
                             )
-                            val = getattr(
-                                metomi.rose.config_editor,
-                                "WARNING_USER_NOT_TRIGGER_IGNORED",
-                            )
+                            val = (
+                                metomi.rose.config_editor
+                            ).WARNING_USER_NOT_TRIGGER_IGNORED
                             node_inst.warning.update({key: val})
                         else:
                             # Doc table: I_u -> I_t -> optional
