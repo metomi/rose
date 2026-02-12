@@ -28,7 +28,7 @@ if ! python3 -c 'import tornado, sqlalchemy' 2>/dev/null; then
 fi
 if [[ "$OSTYPE" == darwin* ]]; then
     # tests not yet passing on GH Mac OS runner
-    # see: https://github.com/metomi/rose/pull/2985
+    # see: https://github.com/metomi/rose/pull/2985#discussion_r2800078248
     skip_all 'Does not work on MacOS'
 fi
 tests 91
