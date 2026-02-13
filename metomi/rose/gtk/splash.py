@@ -227,8 +227,9 @@ class SplashScreenProcess:
         )
 
     def stop(self):
-        self.process.kill()
-        self.process = None
+        if self.process:
+            self.process.kill()
+            self.process = None
 
 
 class SplashScreenUpdaterThread(threading.Thread):
