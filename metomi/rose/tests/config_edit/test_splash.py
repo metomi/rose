@@ -15,8 +15,8 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-
 from metomi.rose.gtk.splash import SplashScreenProcess
+
 
 def test_stop_safe(monkeypatch):
     """Ensure that stop is safe to call if the process doesn't exist
@@ -25,7 +25,7 @@ def test_stop_safe(monkeypatch):
     """
 
     # Don't run a real process:
-    def start(x): x.process = None
+    def start(x): x.process = None  # noqa: E704
     monkeypatch.setattr(
         'metomi.rose.gtk.splash.SplashScreenProcess.start', start)
 
