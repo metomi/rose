@@ -535,7 +535,8 @@ run_pass "$TEST_KEY" timeout 10 \
       --format='%access-list %branch %date %from_idx %idx %issue-list'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<__OUT__
 ┌────────────┬────────┬───────────────────┬──────────┬───────────┬─────────────┐
-│ access-list │ branch │ date              │ from_idx │ idx       │ issue-list  │
+│ access-    │ branch │ date              │ from_idx │ idx       │ issue-list  │
+│ list       │        │                   │          │           │             │
 ├────────────┼────────┼───────────────────┼──────────┼───────────┼─────────────┤
 ├────────────┼────────┼───────────────────┼──────────┼───────────┼─────────────┤
 │ ['roses',  │ trunk  │ 2009-02-          │ None     │ foo-aa001 │ %issue-list │

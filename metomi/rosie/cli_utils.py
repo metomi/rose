@@ -105,6 +105,7 @@ def table(
     """
     if not rows:
         return ''
+
     # determine character set
     if unicode:
         hl = U_HL
@@ -167,7 +168,11 @@ def table(
             textwrap.wrap(col, width=widths[ind])
             for ind, col in enumerate(row)
         ]
-        for row in rows
+        for row in (
+            [header, [''] * len(widths), *rows]
+            if header
+            else rows
+        )
     ]
 
     # Python f-string for formatting each row of the table
@@ -180,11 +185,6 @@ def table(
 
     # top border of table
     ret = [tl + tx.join(hl * (width + 2) for width in widths) + tr]
-
-    # table header
-    if header:
-        ret.append(row_format.format(*header))
-        ret.extend([blank_line, blank_line])
 
     # table body
     for row_ind, row in enumerate(_rows):
