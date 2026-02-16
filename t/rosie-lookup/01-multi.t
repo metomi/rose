@@ -17,12 +17,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-# Basic multi-source tests for "rosie lookup".
+# Basic multi-source tests for " rosie lookup".
 #-------------------------------------------------------------------------------
 . $(dirname $0)/test_header
 #-------------------------------------------------------------------------------
 if ! python3 -c 'import tornado, sqlalchemy' 2>/dev/null; then
     skip_all '"tornado" or "sqlalchemy" not installed'
+fi
+if [[ "$OSTYPE" == darwin* ]]; then
+    # tests not yet passing on GH Mac OS runner
+    # see: https://github.com/metomi/rose/pull/2985
+    skip_all 'Does not work on MacOS'
 fi
 tests 18
 #-------------------------------------------------------------------------------
@@ -94,8 +99,8 @@ while port_is_busy "${PORT}"; do
 done
 cat >'conf/opt/rose-port.conf' <<__ROSE_CONF__
 [rosie-id]
-prefix-ws.bar=http://${HOSTNAME}:${PORT}/bar
-prefix-ws.foo=http://${HOSTNAME}:${PORT}/foo
+prefix-ws.bar=http://$(hostname -f):${PORT}/bar
+prefix-ws.foo=http://$(hostname -f):${PORT}/foo
 __ROSE_CONF__
 rosie disco 'start' "${PORT}" \
     0<'/dev/null' 1>'rosie-disco.out' 2>'rosie-disco.err' &
@@ -112,34 +117,34 @@ set +e
 
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-search-both"
-run_pass "${TEST_KEY}" rosie lookup 'bus'
+run_pass "${TEST_KEY}" rosie lookup --no-pretty 'bus'
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<__OUT__
 local suite             owner project title
       bar-aa000/trunk@1 beth  bus     Down by the bus station
-url: http://${HOSTNAME}:${PORT}/bar/search?s=bus
+url: http://$(hostname -f):${PORT}/bar/search?s=bus
 local suite             owner project title
       foo-aa000/trunk@1 billy bus     Wheels on the bus
-url: http://${HOSTNAME}:${PORT}/foo/search?s=bus
+url: http://$(hostname -f):${PORT}/foo/search?s=bus
 __OUT__
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-search-both-1"
-run_pass "${TEST_KEY}" rosie lookup 'beth'
+run_pass "${TEST_KEY}" rosie lookup --no-pretty 'beth'
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<__OUT__
 local suite             owner project title
       bar-aa000/trunk@1 beth  bus     Down by the bus station
-url: http://${HOSTNAME}:${PORT}/bar/search?s=beth
+url: http://$(hostname -f):${PORT}/bar/search?s=beth
 local suite owner project title
-url: http://${HOSTNAME}:${PORT}/foo/search?s=beth
+url: http://$(hostname -f):${PORT}/foo/search?s=beth
 __OUT__
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-search-single"
-run_pass "${TEST_KEY}" rosie lookup --prefix=foo 'bus'
+run_pass "${TEST_KEY}" rosie lookup --no-pretty --prefix=foo 'bus'
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<__OUT__
 local suite             owner project title
       foo-aa000/trunk@1 billy bus     Wheels on the bus
-url: http://${HOSTNAME}:${PORT}/foo/search?s=bus
+url: http://$(hostname -f):${PORT}/foo/search?s=bus
 __OUT__
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" </dev/null
 #-------------------------------------------------------------------------------
@@ -148,40 +153,40 @@ cat >'conf/opt/rose-default.conf' <<__ROSE_CONF__
 [rosie-id]
 prefixes-ws-default=foo
 __ROSE_CONF__
-run_pass "${TEST_KEY}" rosie lookup 'bus'
+run_pass "${TEST_KEY}" rosie lookup --no-pretty 'bus'
 rm 'conf/opt/rose-default.conf'
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<__OUT__
 local suite             owner project title
       foo-aa000/trunk@1 billy bus     Wheels on the bus
-url: http://${HOSTNAME}:${PORT}/foo/search?s=bus
+url: http://$(hostname -f):${PORT}/foo/search?s=bus
 __OUT__
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-address-both"
-run_pass "${TEST_KEY}" rosie lookup --lookup-mode=address 'search?s=bus'
+run_pass "${TEST_KEY}" rosie lookup --no-pretty --lookup-mode=address 'search?s=bus'
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<__OUT__
 local suite             owner project title
       bar-aa000/trunk@1 beth  bus     Down by the bus station
-url: http://${HOSTNAME}:${PORT}/bar/search?s=bus
+url: http://$(hostname -f):${PORT}/bar/search?s=bus
 local suite             owner project title
       foo-aa000/trunk@1 billy bus     Wheels on the bus
-url: http://${HOSTNAME}:${PORT}/foo/search?s=bus
+url: http://$(hostname -f):${PORT}/foo/search?s=bus
 __OUT__
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" </dev/null
 #-------------------------------------------------------------------------------
 TEST_KEY="${TEST_KEY_BASE}-query-both"
-run_pass "${TEST_KEY}" rosie lookup -Q 'project' 'eq' 'bus'
+run_pass "${TEST_KEY}" rosie lookup --no-pretty -Q 'project' 'eq' 'bus'
 file_cmp "${TEST_KEY}.out" "${TEST_KEY}.out" <<__OUT__
 local suite             owner project title
       bar-aa000/trunk@1 beth  bus     Down by the bus station
-url: http://${HOSTNAME}:${PORT}/bar/query?q=and+project+eq+bus
+url: http://$(hostname -f):${PORT}/bar/query?q=and+project+eq+bus
 local suite             owner project title
       foo-aa000/trunk@1 billy bus     Wheels on the bus
-url: http://${HOSTNAME}:${PORT}/foo/query?q=and+project+eq+bus
+url: http://$(hostname -f):${PORT}/foo/query?q=and+project+eq+bus
 __OUT__
 file_cmp "${TEST_KEY}.err" "${TEST_KEY}.err" </dev/null
 #-------------------------------------------------------------------------------
 kill "${ROSA_WS_PID}"
 wait 2>'/dev/null'
-rm -f ~/.metomi/rosie-disco-${HOSTNAME:-0.0.0.0}-${PORT}*
+rm -f ~/.metomi/rosie-disco-$(hostname -f)-${PORT}*
 exit

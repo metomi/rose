@@ -57,7 +57,6 @@ dependencies = [
     "metomi-isodatetime==1!3.*",
     "psutil>=5.6.0",
     "requests",
-    "sqlalchemy==1.*",
 ]
 
 [project.urls]
@@ -96,22 +95,22 @@ tutorials = [
     "cylc-flow[tutorials]>=8.6.1"
 ]
 rosa = []
-# disco = [
-#     TODO: rosie disco has been disabled due to the removal of WSGI support at
-#     Tornado 6.
-#     tornado
-# ]
 edit = [
     "pygobject>=3.50.0",
+]
+disco = [
+    "sqlalchemy==1.*",
+    "tornado",
 ]
 all = [
     "metomi-rose[lint]",
     "metomi-rose[docs]",
     "metomi-rose[graph]",
     "metomi-rose[tests]",
+    "metomi-rose[tutorials]",
     "metomi-rose[rosa]",
     "metomi-rose[edit]",
-    "metomi-rose[tutorials]",
+    "metomi-rose[disco]",
 ]
 
 [project.scripts]
@@ -145,7 +144,7 @@ rosa = "metomi.rose.rose:rosa"
 "checkout" = "metomi.rosie.vc:checkout"
 "create" = "metomi.rosie.vc:create"
 "delete" = "metomi.rosie.vc:delete"
-# "disco" = "metomi.rosie.ws:main [disco]"
+"disco" = "metomi.rosie.ws:main [disco]"
 "graph" = "metomi.rosie.graph:main [graph]"
 "hello" = "metomi.rosie.ws_client_cli:hello"
 "id" = "metomi.rosie.suite_id:main"

@@ -154,7 +154,12 @@ A blank field means there is no related suite checked out.
 * `X` means that the suite is checked out but is corrupted.
         ''',
     ).add_my_options(
-        "no_headers", "prefixes", "print_format", "reverse", "sort", "user"
+        "no_headers",
+        "prefixes",
+        "print_format",
+        "reverse",
+        "sort",
+        "user",
     )
     opt_parser.modify_option(
         'verbosity',
@@ -390,7 +395,7 @@ def _display_maps(opts, ws_client, dict_rows, url=None):
         if "%" + key in opts.print_format:
             keylist.append(key)
 
-    if not opts.no_headers:
+    if getattr(opts, 'no_pretty_mode', True) and not opts.no_headers:
         dummy_row = {}
         for key in all_keys:
             dummy_row[key] = key
@@ -415,8 +420,21 @@ def _display_maps(opts, ws_client, dict_rows, url=None):
         if url is not None:
             report(URLEvent(url + "\n"), prefix="")
     else:
-        cols = [x.replace('%', '') for x in opts.print_format.split()]
-        _rows = [[_dict[col] for col in cols] for _dict in dict_rows[2:]]
+        cols = [
+            col[1:]
+            for col in opts.print_format.split()
+            # NOTE: strip off anything which isn't a valid field
+            if col[0] == '%'
+        ]
+        _rows = [
+            # NOTE: tolerate missing fields - column format used as placeholder
+            # (e.g, "access-list" might not be defined for all rows)
+            # NOTE: convert to string (e.g, "access-list" is a list)
+            [str(_dict.get(col, f"%{col}")) for col in cols]
+            for _dict in dict_rows
+        ]
+        if opts.no_headers:
+            cols = None  # turn header row off in table
         try:
             print(table(_rows, header=cols, max_width=terminal_cols))
         except UnicodeDecodeError:

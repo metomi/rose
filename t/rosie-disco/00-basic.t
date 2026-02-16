@@ -24,8 +24,22 @@ if ! python3 -c 'import tornado, sqlalchemy' 2>/dev/null; then
     skip_all '"tornado" or "sqlalchemy" not installed'
 fi
 #-------------------------------------------------------------------------------
-tests 23
+tests 27
 #-------------------------------------------------------------------------------
+# Test without config
+TEST_KEY="${TEST_KEY_BASE}-no-config"
+export ROSE_CONF_PATH=$PWD
+run_fail "${TEST_KEY}-1" rosie disco start
+cat >rose.conf <<__ROSE_CONF__
+[rosie-id]
+__ROSE_CONF__
+run_fail "${TEST_KEY}-2" rosie disco start
+file_cmp "${TEST_KEY}-1.err" "${TEST_KEY}-1.err" <<__STDERR__
+Please configure one or more rosie prefix in "rose.conf[rosie-db]".
+__STDERR__
+file_cmp "${TEST_KEY}-the-same" "${TEST_KEY}-1.out" "${TEST_KEY}-2.out"
+#-------------------------------------------------------------------------------
+# create valid config
 mkdir svn
 svnadmin create svn/foo
 SVN_URL=file://$PWD/svn/foo
@@ -39,14 +53,12 @@ local-copy-root=$PWD/roses
 prefix-default=foo
 prefix-location.foo=$SVN_URL
 __ROSE_CONF__
-export ROSE_CONF_PATH=$PWD
 rosa db-create -q
 #-------------------------------------------------------------------------------
 rose_ws_init 'rosie' 'disco'
 if [[ -z "${TEST_ROSE_WS_PORT}" ]]; then
     exit 1
 fi
-
 URL_FOO="${TEST_ROSE_WS_URL}/foo/"
 URL_FOO_S="${URL_FOO}search?"
 URL_FOO_Q="${URL_FOO}query?"
