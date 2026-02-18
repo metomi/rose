@@ -232,6 +232,14 @@ def check(dependency, min_version=None, min_incompat_version=None, **kwargs):
     return (line + 'ok (%s)' % version_string, True)
 
 
+def check_gtk(src, min_version=None):
+    """Extra setup for GTK before passing over to check function."""
+    import gi
+    gi.require_version("Gtk", "3.0")  # Required to avoid warning.
+
+    return check(f'py:gi.repository.{src}', min_version)
+
+
 def check_all(name, dep_list):
     """Evaluate the provided list of dependencies.
 
@@ -264,21 +272,36 @@ def check_all(name, dep_list):
 def check_software(check=check):
     """Check required and optional dependencies."""
     ret = check_all('Required Software', [
-        check('python3', (3, 6), version_template=r'Python (.*)'),
+        check('python3', (3, 12), version_template=r'Python (.*)'),
+        # Implicit, collected based on cylc-rose:
         check('cylc', (8,)),
+        check('py:aiofiles'),
         check('py:jinja2'),
-        check('py:aiofiles')
+        # Module has no internal version - hope that the install was correct.
+        check('py:keyring'),
+        check('py:ldap3'),
+        check('py:metomi.isodatetime'),
+        check('py:psutil', (5, 6, 0)),
+        check('py:requests')
     ])
 
     check_all('Rosie', [
         check('py:tornado', (3, 0), attr_name='version'),
         check('py:requests', (2, 2, 1)),
-        check('py:sqlalchemy', (0, 9)),
+        check('py:sqlalchemy', (1, 0)),
         check('svn', (1, 8), command_template=['--version', '--quiet']),
         check('fcm', version_template=r'FCM ([\d\.\-]+)'),
         check('cmd:perl', (5, 10, 1),
               shell=['perl', '-e', 'print(substr($^V, 1))'])
     ])
+
+    check_all(
+        'Rose Edit',
+        [
+            check_gtk('Gtk', (3, 0)),
+            check_gtk('Gdk'),
+        ]
+    )
 
     tutorial(check=check)
     docs(check=check)
@@ -288,7 +311,7 @@ def check_software(check=check):
 def tutorial(check=check):
     """Check software dependencies for the Cylc/Rose tutorial."""
     ret = check_all('Tutorial', [
-        check('py:pillow <PIL>')
+        check('py:h5py')
     ])
 
     return ret
@@ -297,18 +320,39 @@ def tutorial(check=check):
 def docs(check=check):
     """Check software dependencies for the documentation builder."""
     ret = check_all('Documentation Builder', [
-        check('py:sphinx', (1, 5, 3)),
-        check('py:sphinx_rtd_theme', (0, 2, 4)),
+        check('py:cylc.sphinx_ext'),
+        check('py:hieroglyph', (2, 1)),
+        check('py:sphinx'),
+        check('py:sphinx_copybutton'),
+        check('py:sphinx_rtd_theme'),
         check('py:sphinxcontrib.httpdomain'),
-        check('py:hieroglyph')
     ])
 
-    check_all('Documentation Builder - Recommended Extras', [
+    # sphinx/conf.py tries both of these in turn:
+    rsvg_checks = (
         check('rsvg', version_template=r'rsvg version (.*)'),
         check(
             'py:sphinxcontrib.svg2pdfconverter <sphinxcontrib.rsvgconverter>'
         )
-    ])
+    )
+    # If rsvg checks all (both) pass then we can use that:
+    if all(c[1] for c in rsvg_checks):
+        check_all(
+            'Documentation Builder - Recommended Extras (rsvg)',
+            rsvg_checks
+        )
+    else:
+        # Otherwise fall back to inkscape:
+        check_all(
+            'Documentation Builder - Recommend Extras (Inkscape)',
+            [
+                check('inkscape', version_template=r'Inkscape (.*) .*'),
+                check(
+                    'py:sphinxcontrib.svg2pdfconverter'
+                    ' <sphinxcontrib.inkscapeconverter>'
+                )
+            ]
+        )
 
     check_all('Documentation Builder - PDF Dependencies', [
         check('tex', version_template=r'TeX ([^\s]+)'),
