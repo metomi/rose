@@ -20,57 +20,65 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ env.MERGE_SHA }}
 
-    - name: Checkout repo
-      uses: actions/checkout@v6
-      with:
-        ref: ${{ env.MERGE_SHA }}
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
 
-    - name: Setup Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.x'
+      - name: Install System Deps
+        run: |
+          sudo apt-get update
+          sudo apt install -y \
+            libgirepository-2.0-dev \
+            libcairo2-dev \
+            pkg-config \
+            gir1.2-gtk-3.0
 
-    - name: Get the version number
-      uses: cylc/release-actions/stage-2/get-version-from-pr@v1
+      - name: Get the version number
+        uses: cylc/release-actions/stage-2/get-version-from-pr@v1
 
-    - name: Build
-      uses: cylc/release-actions/build-python-package@v1
+      - name: Build
+        uses: cylc/release-actions/build-python-package@v1
 
-    - name: Publish distribution to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        user: __token__ # uses the API token feature of PyPI - least permissions possible
-        password: ${{ secrets.PYPI_TOKEN }}
-        # # Can try using this for testing:
-        # repository_url: https://test.pypi.org/legacy/
+      - name: Publish distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__ # uses the API token feature of PyPI - least permissions possible
+          password: ${{ secrets.PYPI_TOKEN }}
+          # # Can try using this for testing:
+          # repository_url: https://test.pypi.org/legacy/
 
-    - name: Publish GitHub release
-      id: create-release
-      uses: cylc/release-actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        commitish: ${{ env.MERGE_SHA }}
-        tag_name: ${{ env.VERSION }}
-        release_name: Rose ${{ env.VERSION }}
-        prerelease: ${{ env.PRERELEASE }}
-        body: |
-          See [${{ env.CHANGELOG_FILE }}](https://github.com/${{ github.repository }}/blob/master/${{ env.CHANGELOG_FILE }}) for details.
-        # TODO: Get topmost changelog section somehow and use that as the body?
-        # https://github.com/cylc/cylc-uiserver/pull/201#discussion_r609101816
+      - name: Publish GitHub release
+        id: create-release
+        uses: cylc/release-actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          commitish: ${{ env.MERGE_SHA }}
+          tag_name: ${{ env.VERSION }}
+          release_name: Rose ${{ env.VERSION }}
+          prerelease: ${{ env.PRERELEASE }}
+          body: |
+            See [${{ env.CHANGELOG_FILE }}](https://github.com/${{ github.repository }}/blob/master/${{ env.CHANGELOG_FILE }}) for details.
+          # TODO: Get topmost changelog section somehow and use that as the body?
+          # https://github.com/cylc/cylc-uiserver/pull/201#discussion_r609101816
 
-    - name: Comment on the release PR with the results & next steps
-      if: always()
-      uses: cylc/release-actions/stage-2/comment-on-pr@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        release-url: ${{ steps.create-release.outputs.html_url }}
+      - name: Comment on the release PR with the results & next steps
+        if: always()
+        uses: cylc/release-actions/stage-2/comment-on-pr@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release-url: ${{ steps.create-release.outputs.html_url }}
 
-    - name: Bump dev version
-      uses: cylc/release-actions/stage-2/bump-dev-version@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        init-file: 'metomi/rose/__init__.py'
+      - name: Bump dev version
+        uses: cylc/release-actions/stage-2/bump-dev-version@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          init-file: 'metomi/rose/__init__.py'
