@@ -10,6 +10,18 @@ $ towncrier create <PR-number>.<break|feat|fix>.md --content "Short description"
 
 <!-- towncrier release notes start -->
 
+## 2.7.0 (Released 2026-02-24)
+
+### 🚀 Enhancements
+
+[#2808](https://github.com/metomi/rose/pull/2808) - The `rose edit` GUI has been restored to Rose 2.
+It is available as the pip-package `metomi-rose[edit]` (you will need to ensure GTK3 and `cairo` are installed), or the conda-forge package `metomi-rose` (which includes all of the required system dependencies).
+
+[#2979](https://github.com/metomi/rose/pull/2979) - Allow Rose fileinstall to install folders containing broken Symlinks.
+
+[#2985](https://github.com/metomi/rose/pull/2985) - rosie: The `rosie disco` server has been restored to Rose 2.
+It is now available as the pip package `rose[disco]` or the conda-forge package `metomi-rose`.
+
 ## 2.6.3 (Released 2026-01-08)
 
 ### 🚀 Enhancements
