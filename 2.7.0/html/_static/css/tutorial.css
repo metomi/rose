@@ -1,0 +1,3 @@
+.admonition.tutorial-ref .admonition-title:before {
+    content: "";
+}
