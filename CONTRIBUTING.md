@@ -74,6 +74,7 @@ below:
  - Joseph Abram (Met Office, UK)
  - James Frost (Met Office, UK)
  - Christopher Bennett (Met Office, UK)
+ - Louis Cianciullo (Bureau of Meteorology, Australia)
 <!-- end-shortlog -->
 
 (All contributors are identifiable with email addresses in the version control
