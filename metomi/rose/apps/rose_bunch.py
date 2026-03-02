@@ -251,7 +251,20 @@ class RoseBunchApp(BuiltinApp):
                 arglength = len(instances)
             else:
                 arglength = len(bunch_args_values[0])
-            self.invocation_names = list(range(0, arglength))
+            self.names_from_args = conf_tree.node.get_value(
+            [self.BUNCH_SECTION, "names-from-args"]
+            )
+
+            if self.names_from_args:
+                self.invocation_names = []
+                for i in range(arglength):
+                    invocation_args = [bunch_arg_list[i] for bunch_arg_list in bunch_args_values]
+                    invocation_name = f"{'.'.join(invocation_args)}"
+                    if instances:
+                        invocation_name = f"{i}.{invocation_name}"
+                    self.invocation_names.append(invocation_name)
+            else:
+                self.invocation_names = list(range(0, arglength))
         else:
             arglength = len(self.invocation_names)
 
