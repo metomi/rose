@@ -18,21 +18,26 @@
 Convenient functions for searching resource files.
 """
 
-from importlib.machinery import SourceFileLoader
 import inspect
 import os
-from pathlib import Path
 import string
 import sys
+from contextlib import suppress
+from importlib.util import module_from_spec, spec_from_file_location
+from pathlib import Path
+from typing import TYPE_CHECKING
 
 import metomi.rose
-from metomi.rose.config import ConfigLoader, ConfigNode
 import metomi.rose.opt_parse
+from metomi.rose.config import ConfigLoader, ConfigNode
 from metomi.rose.reporter import Reporter
+
+if TYPE_CHECKING:
+    from types import ModuleType
 
 ERROR_LOCATE_OBJECT = "Could not locate {0}"
 
-MODULES: dict = {}
+MODULES: 'dict[tuple[str, str], ModuleType]' = {}
 
 
 class ResourceError(Exception):
@@ -172,6 +177,59 @@ class ResourceLocator:
         raise ResourceError(key)
 
 
+def _import_module_from_path(module_name, file_path):
+    """Import a Python module from the given file path.
+
+    This can be used to import things which are outside of `sys.path` by
+    providing an absolute path to the module itself.
+
+    Once imported, the module will be cached for future operations (so won't be
+    imported twice), but will not be added to ``sys.modules`` (from where the
+    could be imported via regular Python ``import``s).
+
+    https://docs.python.org/3/library/importlib.html#importing-a-source-file-directly
+
+    Args:
+        module_name: The name to assign to the loaded module.
+        file_path: The location of the Python file to import.
+
+    Examples:
+        It imports modules and caches them:
+        >>> csv_module_path = Path(os.__file__).parent / 'csv.py'
+        >>> csv1 = _import_module_from_path('csv', csv_module_path)
+        >>> csv2 = _import_module_from_path('csv', csv_module_path)
+        >>> assert id(csv1) == id(csv2)  # literally the same object
+
+        Modules are not loaded into sys.modules:
+        >>> import csv  # import "csv" the normal way
+        >>> assert id(csv) != id(csv1)  # different objects
+
+        It raises ImportError when appropriate:
+        >>> _import_module_from_path('csv', csv_module_path / 'does-not-exist')
+        Traceback (most recent call last):
+        ...
+        ImportError: Error importing csv from ...does-not-exist
+
+    Raises:
+        ImportError
+
+    """
+    # attempt to return module if already imported
+    with suppress(KeyError):
+        return MODULES[(module_name, file_path)]
+
+    # import from scratch
+    spec = spec_from_file_location(module_name, file_path)
+    if spec is None:
+        raise ImportError(f'Error importing {module_name} from {file_path}')
+    module = module_from_spec(spec)
+    if not spec.loader:
+        raise ImportError(f'Error importing {module_name} from {file_path}')
+    spec.loader.exec_module(module)
+    MODULES[(module_name, file_path)] = module
+    return module
+
+
 def import_object(
     import_string, from_files, error_handler
 ):
@@ -207,12 +265,10 @@ def import_object(
             error_handler(exc)
     else:
         for filename in module_files:
-            sys.path.insert(0, os.path.dirname(filename))
             try:
-                module = SourceFileLoader(module_name, filename).load_module()
+                module = _import_module_from_path(module_name, filename)
             except ImportError as exc:
                 error_handler(exc)
-            sys.path.pop(0)
     if module is None:
         error_handler(ERROR_LOCATE_OBJECT.format(module_name))
         return None
