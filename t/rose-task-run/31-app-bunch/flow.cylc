@@ -31,6 +31,8 @@
         inherit = BUNCH_TASKS
     [[bunch_names]]
         inherit = BUNCH_TASKS
+    [[bunch_names_from_args]]
+        inherit = BUNCH_TASKS
     [[bunch_env_pass]]
         inherit = BUNCH_TASKS
         [[[job]]]

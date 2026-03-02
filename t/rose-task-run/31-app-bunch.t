@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 78
+tests 82
 #-------------------------------------------------------------------------------
 # Define some constant patterns
 FAIL_PATTERN="\[FAIL\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*"
@@ -178,6 +178,19 @@ for KEY in $(seq 0 2); do
         "a comment" $FILE_DIR/bunch.$KEY.out
 done
 #-------------------------------------------------------------------------------
+# Testing names from arguments works
+#-------------------------------------------------------------------------------
+APP=bunch_names_from_args
+#-------------------------------------------------------------------------------
+arg1_list=("test1" "test2" "test3" "test4")
+arg2_list=("foo" "bar" "baz" "qux")
+TEST_KEY_PREFIX=names_from_args
+FILE_DIR=$LOG_DIR/$APP/01/
+for i in $(seq 0 3); do
+    file_grep $TEST_KEY_PREFIX-ran-$i \
+        "arg1: ${arg1_list[i]}, arg2: ${arg2_list[i]}, command-instance: ${i}" \
+        $FILE_DIR/"bunch.${i}.${arg1_list[i]}.${arg2_list[i]}.out"
+done
 #-------------------------------------------------------------------------------
 # Testing ROSE_BUNCH_LOG_PREFIX is correctly set
 #-------------------------------------------------------------------------------
