@@ -245,20 +245,28 @@ class RoseBunchApp(BuiltinApp):
                 "must be one of %s" % self.ACCEPTED_ARGUMENT_MODES,
             )
 
+        self.names_from_args = conf_tree.node.get_value(
+            [self.BUNCH_SECTION, "names-from-args"])
+        if self.names_from_args and self.invocation_names:
+            raise ConfigValueError(
+                [self.BUNCH_SECTION, "names"],
+                self.invocation_names,
+                "names and names-from-args cannot both be set")
+
         # Validate runlists
         if not self.invocation_names:
             if instances:
                 arglength = len(instances)
             else:
                 arglength = len(bunch_args_values[0])
-            self.names_from_args = conf_tree.node.get_value(
-            [self.BUNCH_SECTION, "names-from-args"]
-            )
 
             if self.names_from_args:
                 self.invocation_names = []
                 for i in range(arglength):
-                    invocation_args = [bunch_arg_list[i] for bunch_arg_list in bunch_args_values]
+                    invocation_args = [
+                        bunch_arg_list[i] for bunch_arg_list in
+                        bunch_args_values
+                    ]
                     invocation_name = f"{'.'.join(invocation_args)}"
                     if instances:
                         invocation_name = f"{i}.{invocation_name}"

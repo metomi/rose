@@ -139,8 +139,8 @@ sections of the :rose:file:`rose-app.conf` file, but
 
          Allows for automatic generation of names for each command variant
          to be run, based on the supplied arguments. If
-         `[bunch]names` is set then this will take precedence.
-         Otherwise the logs will be generated with names of the form:
+         `[bunch]names` is also set then an error will be thrown.
+         Otherwise, the logs will be generated with names of the form:
          ``bunch.%(arg1).%(arg2)....%(argN).{err,out}``. If 
          `[bunch]command-instances` is specified then the logs will specify
          the instance as well:
