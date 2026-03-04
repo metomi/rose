@@ -135,8 +135,6 @@ sections of the :rose:file:`rose-app.conf` file, but
       
       .. rose:conf:: names-from-args=args_only|name_numerical|name_all
 
-         :default: false
-
          Allows for automatic generation of names for each command variant
          to be run, based on the supplied arguments. If
          `[bunch]names` is also set then an error will be thrown.
