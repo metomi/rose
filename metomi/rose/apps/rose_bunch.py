@@ -17,6 +17,7 @@
 """Builtin application: rose_bunch: run multiple commands in parallel.
 """
 
+from enum import Enum
 import itertools
 import os
 import shlex
@@ -102,6 +103,12 @@ class NotRunEvent(Event):
     def __str__(self):
         name, cmd = self.args
         return " %s: %s" % (name, cmd)
+
+
+class NamesFromArgsMode(Enum):
+    ARGS_ONLY = "args_only"
+    NAME_NUMERICAL = "name_numerical"
+    NAME_ALL = "name_all"
 
 
 class RoseBunchApp(BuiltinApp):
@@ -261,13 +268,44 @@ class RoseBunchApp(BuiltinApp):
                 arglength = len(bunch_args_values[0])
 
             if self.names_from_args:
+                try:
+                    names_from_args = NamesFromArgsMode(self.names_from_args)
+                except ValueError:
+                    raise ConfigValueError(
+                        [self.BUNCH_SECTION, "names-from-args"],
+                        self.names_from_args,
+                        "names-from-args must be one of the following %s" % [
+                            arg_name_mode.value for arg_name_mode in
+                            NamesFromArgsMode])
+
                 self.invocation_names = []
                 for i in range(arglength):
                     invocation_args = [
                         bunch_arg_list[i] for bunch_arg_list in
                         bunch_args_values
                     ]
-                    invocation_name = f"{'.'.join(invocation_args)}"
+                    match names_from_args:
+                        case NamesFromArgsMode.ARGS_ONLY:
+                            invocation_name = f"{'.'.join(invocation_args)}"
+
+                        case NamesFromArgsMode.NAME_NUMERICAL:
+                            arg_str_list = []
+                            for arg_name, arg in zip(bunch_args_names,
+                                                     invocation_args):
+                                # quickly check if the arg is numerical or not
+                                try:
+                                    float(arg)
+                                    arg_str_list.append("%s=%s" %
+                                                        (arg_name, arg))
+                                except ValueError:
+                                    arg_str_list.append(arg)
+                            invocation_name = ".".join(arg_str_list)
+
+                        case NamesFromArgsMode.NAME_ALL:
+                            invocation_name = ".".join(
+                                ["%s=%s" % (arg_name, arg) for arg_name, arg in
+                                 zip(bunch_args_names, invocation_args)])
+
                     if instances:
                         invocation_name = f"{i}.{invocation_name}"
                     self.invocation_names.append(invocation_name)
