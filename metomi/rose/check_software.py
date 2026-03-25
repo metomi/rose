@@ -234,10 +234,15 @@ def check(dependency, min_version=None, min_incompat_version=None, **kwargs):
 
 def check_gtk(src, min_version=None):
     """Extra setup for GTK before passing over to check function."""
-    import gi
-    gi.require_version("Gtk", "3.0")  # Required to avoid warning.
-
-    return check(f'py:gi.repository.{src}', min_version)
+    try:
+        import gi
+    except Exception:
+        line = src
+        line += ' ' + '.' * (TERM_WIDTH - len(line) - 25) + ' '
+        return (line + 'not ok (Not installed)', False)
+    else:
+        gi.require_version("Gtk", "3.0")  # Required to avoid warning.
+        return check(f'py:gi.repository.{src}', min_version)
 
 
 def check_all(name, dep_list):
