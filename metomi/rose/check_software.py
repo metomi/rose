@@ -27,6 +27,8 @@ OPTIONS
     --doc   Only check dependencies for the documentation builder.
     --rst   Output dependencies as text in rst format."""
 
+from pathlib import Path
+import os
 import re
 from subprocess import Popen, PIPE
 from shutil import get_terminal_size
@@ -67,6 +69,31 @@ def cmd_exists(command):
     return True
 
 
+def get_cylc_env():
+    """Work out the version of Cylc set in the environment in which
+    this script is run. The logic should be a reflection of the Cylc
+    wrapper script.
+    """
+    # Variables which usually define site set envs:
+    cylc_home_root = os.environ.get('CYLC_HOME_ROOT', None)
+    cylc_version = os.environ.get('CYLC_VERSION', None)
+
+    # Variables which usually define user envs:
+    cylc_home_root_alt = os.environ.get('CYLC_HOME_ROOT_ALT', None)
+    cylc_env_name = os.environ.get('CYLC_ENV_NAME', None)
+
+    # Reflects logic in Cylc wrapper script:
+    if not cylc_env_name and cylc_version:
+        cylc_env_name = f'cylc-{cylc_version}'
+    elif not cylc_env_name and not cylc_version:
+        cylc_env_name = 'cylc'
+
+    for root in [r for r in [cylc_home_root, cylc_home_root_alt] if r]:
+        envpath = (Path(root) / cylc_env_name)
+        if envpath.is_dir():
+            return envpath
+
+
 def cmd_version(command, command_template='--version',
                 version_template=r'(.*)', outfile=1):
     """Return the version number of a provided shell command.
@@ -87,8 +114,15 @@ def cmd_version(command, command_template='--version',
         return DEP_NOT_FOUND
     if not isinstance(command_template, list):
         command_template = [command_template]
-    output = Popen([command] + command_template, stdout=PIPE,
-                   stderr=PIPE, text=True).communicate()[outfile - 1].strip()
+
+    cylc_env = get_cylc_env()
+
+    output = Popen(
+        ['conda', 'run', '-p', cylc_env] + [command] + command_template,
+        stdout=PIPE,
+        stderr=PIPE,
+        text=True,
+    ).communicate()[outfile - 1].strip()
     try:
         return re.search(version_template, output).groups()[0]
     except AttributeError:
@@ -206,6 +240,7 @@ def check(dependency, min_version=None, min_incompat_version=None, **kwargs):
 
     # Get version number.
     version_string = version_checker(dependency_name, **kwargs)
+
     if version_string == DEP_NOT_FOUND:
         return (line + 'not ok (not found)', False)
 
