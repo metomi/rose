@@ -27,8 +27,6 @@ OPTIONS
     --doc   Only check dependencies for the documentation builder.
     --rst   Output dependencies as text in rst format."""
 
-from pathlib import Path
-import os
 import re
 from subprocess import Popen, PIPE
 from shutil import get_terminal_size
@@ -69,31 +67,6 @@ def cmd_exists(command):
     return True
 
 
-def get_cylc_env():
-    """Work out the version of Cylc set in the environment in which
-    this script is run. The logic should be a reflection of the Cylc
-    wrapper script.
-    """
-    # Variables which usually define site set envs:
-    cylc_home_root = os.environ.get('CYLC_HOME_ROOT', None)
-    cylc_version = os.environ.get('CYLC_VERSION', None)
-
-    # Variables which usually define user envs:
-    cylc_home_root_alt = os.environ.get('CYLC_HOME_ROOT_ALT', None)
-    cylc_env_name = os.environ.get('CYLC_ENV_NAME', None)
-
-    # Reflects logic in Cylc wrapper script:
-    if not cylc_env_name and cylc_version:
-        cylc_env_name = f'cylc-{cylc_version}'
-    elif not cylc_env_name and not cylc_version:
-        cylc_env_name = 'cylc'
-
-    for root in [r for r in [cylc_home_root, cylc_home_root_alt] if r]:
-        envpath = (Path(root) / cylc_env_name)
-        if envpath.is_dir():
-            return envpath
-
-
 def cmd_version(command, command_template='--version',
                 version_template=r'(.*)', outfile=1):
     """Return the version number of a provided shell command.
@@ -115,10 +88,8 @@ def cmd_version(command, command_template='--version',
     if not isinstance(command_template, list):
         command_template = [command_template]
 
-    cylc_env = get_cylc_env()
-
     output = Popen(
-        ['conda', 'run', '-p', cylc_env] + [command] + command_template,
+        [command] + command_template,
         stdout=PIPE,
         stderr=PIPE,
         text=True,
@@ -161,8 +132,17 @@ def py_version(module, attr_name='__version__'):
         return None
 
 
+def python_version(*_):
+    """return the version of python being used to run this script
+    """
+    vinfo = sys.version_info
+    return f'{vinfo.major}.{vinfo.minor}.{vinfo.micro}'
+
+
 # List of functions for obtaining version types - default is cmd_version.
-VERSION_CHECKERS = {'py': py_version, 'cmd': shell_command}
+VERSION_CHECKERS = {
+    'py': py_version, 'cmd': shell_command, 'python': python_version
+}
 
 
 def dep_str(min_version=None, min_incompat_version=None):
@@ -312,7 +292,7 @@ def check_all(name, dep_list):
 def check_software(check=check):
     """Check required and optional dependencies."""
     ret = check_all('Required Software', [
-        check('python3', (3, 12), version_template=r'Python (.*)'),
+        check('python:', (3, 12)),
         # Implicit, collected based on cylc-rose:
         check('cylc', (8,)),
         check('py:aiofiles'),
