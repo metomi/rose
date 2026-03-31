@@ -55,7 +55,7 @@ jobs:
             gir1.2-gtk-3.0
 
       - name: Install Python
-        uses: mamba-org/setup-micromamba@v2
+        uses: mamba-org/setup-micromamba@v3
         with:
           cache-environment: true
           post-cleanup: 'all'

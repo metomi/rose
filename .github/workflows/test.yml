@@ -58,7 +58,7 @@ jobs:
           ref: ${{ inputs.rose_ref || github.sha }}
 
       - name: Configure Python
-        uses: mamba-org/setup-micromamba@v2
+        uses: mamba-org/setup-micromamba@v3
         with:
           cache-environment: true
           post-cleanup: 'all'
@@ -109,7 +109,7 @@ jobs:
           path: rose
 
       - name: Configure Python
-        uses: mamba-org/setup-micromamba@v2
+        uses: mamba-org/setup-micromamba@v3
         with:
           cache-environment: true
           post-cleanup: 'all'
@@ -245,7 +245,7 @@ jobs:
           ref: ${{ inputs.rose_ref || github.sha }}
 
       - name: Configure Python
-        uses: mamba-org/setup-micromamba@v2
+        uses: mamba-org/setup-micromamba@v3
         with:
           cache-environment: true
           post-cleanup: 'all'
