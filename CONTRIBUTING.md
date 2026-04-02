@@ -73,6 +73,7 @@ below:
  - Dimitrios Theodorakis (Met Office, UK)
  - Joseph Abram (Met Office, UK)
  - James Frost (Met Office, UK)
+ - David Rundle (Met Office, UK)
  - Christopher Bennett (Met Office, UK)
  - Louis Cianciullo (Bureau of Meteorology, Australia)
 <!-- end-shortlog -->
