@@ -1081,7 +1081,7 @@ def pretty_format_config(config, ignore_error=False):
                             keylist[1], new_keylist[1]
                         )
                     )
-                    sys.exit(0)
+                    sys.exit(1)
 
 
 def standard_format_config(config):
