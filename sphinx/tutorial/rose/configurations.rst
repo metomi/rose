@@ -1,7 +1,3 @@
-
-    :start-line: 1
-
-
 .. _tutorial-rose-configurations:
 
 Rose Configurations

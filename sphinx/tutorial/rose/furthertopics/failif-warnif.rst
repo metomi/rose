@@ -1,6 +1,3 @@
-
-   :start-line: 1
-
 .. _tutorial-rose-fail-if-warn-if:
 
 Fail-If, Warn-If
