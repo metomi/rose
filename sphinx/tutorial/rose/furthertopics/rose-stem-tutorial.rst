@@ -1,6 +1,3 @@
-
-   :start-line: 1
-
 .. _Rose Stem Tutorial:
 
 Rose Stem Tutorial
@@ -11,7 +8,7 @@ Rose Stem Tutorial
    Before proceeding you should already be familiar with the :ref:`Rose Stem`
    section.
 
-.. image:: https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Cassini_Saturn_Orbit_Insertion.jpg/320px-Cassini_Saturn_Orbit_Insertion.jpg
+.. image:: https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Cassini_Saturn_Orbit_Insertion.jpg/330px-Cassini_Saturn_Orbit_Insertion.jpg
    :align: right
    :alt: Artist's Impression of Cassini entering Saturn orbit
    :width: 300px
