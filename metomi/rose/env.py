@@ -81,7 +81,7 @@ _RE_BRACE = re.compile(
 _MATCH_MODES = {"brace": _RE_BRACE, "default": _RE_DEFAULT, None: _RE_DEFAULT}
 
 
-_EXPORTED_ENVS = {}
+_EXPORTED_ENVS: dict[str, str] = {}
 
 
 class EnvExportEvent(Event):

@@ -52,7 +52,7 @@ from metomi.rose.scheme_handler import SchemeHandlersManager
 # from any code (i.e. are not directly awaited), adding them to this list
 # avoids the potential for garbage collection to delete them whilst they are
 # running
-_BACKGROUND_TASKS = set()
+_BACKGROUND_TASKS: set[asyncio.Task] = set()
 
 
 class ConfigProcessorForFile(ConfigProcessorBase):
