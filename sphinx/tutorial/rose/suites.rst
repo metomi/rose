@@ -524,12 +524,13 @@ Rose Applications In Rose Suite Configurations
 
       .. note:: Manually starting Cylc Review
 
-         ``cylc review`` is a Cylc 7 utility which can view Cylc 8 workflows.
+         Cylc Review is part of the cylc-uiserver package
+         (see the :external+cylc:ref:`Cylc installation <installation>`
+         docs).
 
-         If you have Cylc 7 installed you can start a Cylc Review server by
-         running the following command and opening the printed URL::
+         To start a server, run::
 
-            CYLC_VERSION=7 cylc review start
+            cylc review start
 
 
       Navigate to your latest rose-suite-tutorial run and click
