@@ -151,7 +151,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
       the application standalone (running it as a task in the workflow will
       come later).
 
-   Create a directory on your filesystem called ``rose-tutorial``::
+   #. **Create a directory on your filesystem called ``rose-tutorial``::**
 
       mkdir ~/rose-tutorial
       cd ~/rose-tutorial

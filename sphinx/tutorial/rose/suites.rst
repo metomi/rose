@@ -250,10 +250,10 @@ Using a Rose workflow configuration with Cylc 8
 
           [task parameters]
              # A list of the weather stations we will be fetching observations from.
-         -   station = camborne, heathrow, shetland, aldergrove
+         -   station = aldergrove, camborne, heathrow, shetland
          +   station = {{ station | join(", ") }}
              # A list of the sites we will be generating forecasts for.
-             site = exeter
+             site = exeter, edinburgh
 
    #. **Install the workflow**
 
