@@ -477,7 +477,7 @@ Rose Applications In Rose Suite Configurations
          RAINFALL_FILE=$CYLC_WORKFLOW_WORK_DIR/$CYLC_TASK_CYCLE_POINT/get_rainfall/rainfall.csv
          MAP_FILE=${CYLC_TASK_LOG_ROOT}-map.html
 
-      .. note::
+      .. tip::
 
           We have removed the ``CYLC_TASK_CYCLE_POINT``, ``RESOLUTION`` and ``DOMAIN`` environment
           variables; the ``RESOLUTION`` and ``DOMAIN`` are provided by the suite configuration and
