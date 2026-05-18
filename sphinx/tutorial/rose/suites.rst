@@ -167,8 +167,8 @@ Using a Rose workflow configuration with Cylc 8
       You now have a Rose suite configuration. A :rose:file:`rose-suite.conf`
       file does not need to have anything in it.
 
-      There are three things defined in the ``flow.cylc`` file which it might be
-      useful to be able to configure:
+      There are a few things defined in the ``flow.cylc`` file which it might be
+      useful to be able to configure, we are going to focus on:
 
       ``station``
          The list of weather stations to gather observations from.
@@ -183,7 +183,7 @@ Using a Rose workflow configuration with Cylc 8
       .. code-block:: rose
 
          [template variables]
-         station="camborne", "heathrow", "shetland", "aldergrove"
+         station="aldergrove", "camborne", "heathrow", "shetland"
          RESOLUTION=0.2
          DOMAIN=-12,46,12,61
 
@@ -476,6 +476,13 @@ Rose Applications In Rose Suite Configurations
          WIND_CYCLES=0, -3, -6
          RAINFALL_FILE=$CYLC_WORKFLOW_WORK_DIR/$CYLC_TASK_CYCLE_POINT/get_rainfall/rainfall.csv
          MAP_FILE=${CYLC_TASK_LOG_ROOT}-map.html
+
+      .. note::
+
+          We have removed the ``CYLC_TASK_CYCLE_POINT``, ``RESOLUTION`` and ``DOMAIN`` environment
+          variables; the ``RESOLUTION`` and ``DOMAIN`` are provided by the suite configuration and
+          since we are not using the test data, we want the ``CYLC_TASK_CYCLE_POINT`` variable to
+          be provided by Cylc rather than hard coded.
 
       Finally we need to change the ``forecast`` task to run
       :ref:`command-rose-task-run`. The ``[runtime]forecast`` section of the
