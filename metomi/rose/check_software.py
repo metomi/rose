@@ -87,8 +87,13 @@ def cmd_version(command, command_template='--version',
         return DEP_NOT_FOUND
     if not isinstance(command_template, list):
         command_template = [command_template]
-    output = Popen([command] + command_template, stdout=PIPE,
-                   stderr=PIPE, text=True).communicate()[outfile - 1].strip()
+
+    output = Popen(
+        [command] + command_template,
+        stdout=PIPE,
+        stderr=PIPE,
+        text=True,
+    ).communicate()[outfile - 1].strip()
     try:
         return re.search(version_template, output).groups()[0]
     except AttributeError:
@@ -127,8 +132,17 @@ def py_version(module, attr_name='__version__'):
         return None
 
 
+def python_version(*_):
+    """return the version of python being used to run this script
+    """
+    vinfo = sys.version_info
+    return f'{vinfo.major}.{vinfo.minor}.{vinfo.micro}'
+
+
 # List of functions for obtaining version types - default is cmd_version.
-VERSION_CHECKERS = {'py': py_version, 'cmd': shell_command}
+VERSION_CHECKERS = {
+    'py': py_version, 'cmd': shell_command, 'python': python_version
+}
 
 
 def dep_str(min_version=None, min_incompat_version=None):
@@ -206,6 +220,7 @@ def check(dependency, min_version=None, min_incompat_version=None, **kwargs):
 
     # Get version number.
     version_string = version_checker(dependency_name, **kwargs)
+
     if version_string == DEP_NOT_FOUND:
         return (line + 'not ok (not found)', False)
 
@@ -234,10 +249,15 @@ def check(dependency, min_version=None, min_incompat_version=None, **kwargs):
 
 def check_gtk(src, min_version=None):
     """Extra setup for GTK before passing over to check function."""
-    import gi
-    gi.require_version("Gtk", "3.0")  # Required to avoid warning.
-
-    return check(f'py:gi.repository.{src}', min_version)
+    try:
+        import gi
+    except Exception:
+        line = src
+        line += ' ' + '.' * (TERM_WIDTH - len(line) - 25) + ' '
+        return (line + 'not ok (Not installed)', False)
+    else:
+        gi.require_version("Gtk", "3.0")  # Required to avoid warning.
+        return check(f'py:gi.repository.{src}', min_version)
 
 
 def check_all(name, dep_list):
@@ -272,7 +292,7 @@ def check_all(name, dep_list):
 def check_software(check=check):
     """Check required and optional dependencies."""
     ret = check_all('Required Software', [
-        check('python3', (3, 12), version_template=r'Python (.*)'),
+        check('python:', (3, 12)),
         # Implicit, collected based on cylc-rose:
         check('cylc', (8,)),
         check('py:aiofiles'),
