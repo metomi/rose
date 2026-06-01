@@ -848,11 +848,11 @@ class BaseSummaryDataPanel(Gtk.Box):
             # `Delete` - remove section(s)
             self._remove_selected_sections()
         # detect key combination
-        elif "GDK_CONTROL_MASK" in event.get_state().value_names:
-            # `Ctrl + ?`
-            if event.keyval == Gdk.KEY_i:
-                # `Ctrl + i` - ignore section(s)
-                self._ignore_selected_sections(None)
+        elif ("GDK_CONTROL_MASK" in event.get_state().value_names
+              # `Ctrl + ?`
+              and event.keyval == Gdk.KEY_i):
+            # `Ctrl + i` - ignore section(s)
+            self._ignore_selected_sections(None)
 
     def _remove_selected_sections(self, *args):
         """Remove any sections currently selected by the user."""
@@ -993,7 +993,7 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
         sub_sect_names = list(self.sections.keys())
         sub_var_names = []
         self.var_id_map = {}
-        for section, variables in list(self.variables.items()):
+        for _, variables in list(self.variables.items()):
             for variable in variables:
                 self.var_id_map[variable.metadata["id"]] = variable
                 if variable.name not in sub_var_names:

@@ -249,10 +249,8 @@ class ChoicesValueWidget(Gtk.Box):
         values = self._get_value_values()
         if self.all_group in values:
             return True
-        for group in self.groups:
-            if group in values and set(group).issubset(name) and group != name:
-                return True
-        return False
+        return any(group in values and set(group).issubset(name)
+                   and (group != name) for group in self.groups)
 
     def _set_value_listview(self, new_value):
         if new_value != self.value:

@@ -311,7 +311,7 @@ class ChoicesTreeView(Gtk.TreeView):
             groups = self._get_groups(name, ok_content_sections)
             if self._get_is_implicit is None:
                 is_implicit = any(
-                    [self._get_is_included(g, ok_values) for g in groups]
+                    self._get_is_included(g, ok_values) for g in groups
                 )
             else:
                 is_implicit = self._get_is_implicit(name)
@@ -334,7 +334,7 @@ class ChoicesTreeView(Gtk.TreeView):
             if self._get_is_implicit is None:
                 groups = self._get_groups(name, ok_content_sections)
                 is_implicit = any(
-                    [self._get_is_included(g, ok_values) for g in groups]
+                    self._get_is_included(g, ok_values) for g in groups
                 )
             else:
                 is_implicit = self._get_is_implicit(name)

@@ -17,6 +17,7 @@
 
 import copy
 import re
+import contextlib
 
 import metomi.rose.env
 import metomi.rose.macro
@@ -171,13 +172,11 @@ class ValueChecker(metomi.rose.macro.MacroBase):
             if num_elements == 1 and isinstance(meta_type, str):
                 # A standard, non array variable.
                 for val in val_list:
-                    try:
+                    with contextlib.suppress(KeyError):
                         if not self.meta_check(val, meta_type, sect, key):
                             self.bad_value_meta_map[
                                 goodness_id
                             ] = self.reports[-1].info
-                    except KeyError:
-                        pass
 
             else:
                 # The variable is an array or a derived type array.
@@ -195,14 +194,13 @@ class ValueChecker(metomi.rose.macro.MacroBase):
                 for type_name, val in zip(type_list, val_list):
                     if skip_nulls and not val:
                         continue
-                    try:
+                    with contextlib.suppress(KeyError):
                         if not self.meta_check(val, type_name, sect, key):
                             self.bad_value_meta_map[
                                 goodness_id
                             ] = self.reports[-1].info
                             break
-                    except KeyError:
-                        pass
+
         if metomi.rose.META_PROP_PATTERN in metadata:
             pattern = metadata[metomi.rose.META_PROP_PATTERN]
             if pattern not in self.pattern_comp_map:
@@ -229,12 +227,10 @@ class ValueChecker(metomi.rose.macro.MacroBase):
                 self.bad_value_meta_map[goodness_id] = text
                 self.add_report(sect, key, value, text)
                 return
-        if not self.reports or not (
+        if (not self.reports or not (
             sect == self.reports[-1].section and key == self.reports[-1].option
-        ):
-            # Then this value correctly matches the metadata.
-            if goodness_id not in self.good_value_meta_map:
-                self.good_value_meta_map[goodness_id] = None
+        ) and goodness_id not in self.good_value_meta_map):
+            self.good_value_meta_map[goodness_id] = None
 
     def meta_check(self, value, meta_type, sect, key):
         """Check function wrapper"""
@@ -287,12 +283,11 @@ class ValueChecker(metomi.rose.macro.MacroBase):
                 tiny_config.set([sect, key], val)
                 tiny_meta_config = metomi.rose.config.ConfigNode()
                 evaluator = metomi.rose.macros.rule.RuleEvaluator()
-                try:
+                with contextlib.suppress(metomi.rose.
+                                         macros.rule.RuleValueError):
                     check_ok = evaluator.evaluate_rule(
                         range_pat, var_id, tiny_config, tiny_meta_config
                     )
-                except metomi.rose.macros.rule.RuleValueError:
-                    pass
             else:
                 val_num = float(val)
                 if not check_func(val_num):

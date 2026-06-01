@@ -28,11 +28,11 @@ class Exact:
         """Perform an exact comparison between the result and the KGO data"""
         if len(task.resultdata) != len(task.kgo1data):
             raise DataLengthError(task)
-        location = 0
         if not task.resultdata:
             task.set_pass(ExactComparisonSuccess(task))
             return task
-        for val1, val2 in zip(task.resultdata, task.kgo1data):
+        for location, (val1, val2) in enumerate(zip(task.resultdata,
+                                                task.kgo1data)):
             location += 1
             if val1 != val2:
                 task.set_failure(

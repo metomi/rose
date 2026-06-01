@@ -847,23 +847,22 @@ class ConfigPage(Gtk.Box):
             return
         if self.show_modes[metomi.rose.config_editor.SHOW_MODE_LATENT]:
             for widget in self.get_main_variable_widgets():
-                if hasattr(widget.get_parent(), "variable"):
-                    if widget.get_parent().variable.name == "":
-                        widget.get_parent().grab_focus()
-                        return
+                if (hasattr(widget.get_parent(), "variable")
+                   and widget.get_parent().variable.name == ""):
+                    widget.get_parent().grab_focus()
+                    return
         names = [v.name for v in (self.panel_data + self.ghost_data)]
         if focus_variable is None or focus_variable.name not in names:
             return
         if self.panel_data:
             for widget in self.get_main_variable_widgets():
-                if hasattr(widget.get_parent(), "variable"):
-                    var = widget.get_parent().variable
-                    if var.name == focus_variable.name:
-                        if var.metadata.get(
-                            "id"
-                        ) == focus_variable.metadata.get("id"):
-                            widget.get_parent().grab_focus()
-                            return
+                var = widget.get_parent().variable
+                if (hasattr(widget.get_parent(), "variable")
+                   and var.name == focus_variable.name
+                   and var.metadata.get("id") ==
+                   focus_variable.metadata.get("id")):
+                    widget.get_parent().grab_focus()
+                    return
 
     def refresh(self, only_this_var_id=None):
         """Reload the page or selectively refresh widgets for one variable."""
@@ -1325,26 +1324,23 @@ class ConfigPage(Gtk.Box):
         elif (
             self.see_also == ""
             or metomi.rose.FILE_VAR_SOURCE not in self.see_also
-        ):
-            # This adds an 'orphaned' warning, only if the section is enabled.
-            if self.section is not None and self.section.name.startswith(
-                "namelist:"
-            ):
-                error_button = metomi.rose.gtk.util.CustomButton(
-                    stock_id=Gtk.STOCK_DIALOG_WARNING,
-                    as_tool=True,
-                    tip_text=(
-                        metomi.rose.config_editor.ERROR_ORPHAN_SECTION_TIP
-                    ),
-                )
-                error_label = Gtk.Label()
-                info = metomi.rose.config_editor.ERROR_ORPHAN_SECTION.format(
-                    self.section.name
-                )
-                error_label.set_text(info)
-                error_label.show()
-                button_list.append(error_button)
-                label_list.append(error_label)
+        ) and self.section is not None and self.section.name.startswith(
+                "namelist:"):
+            error_button = metomi.rose.gtk.util.CustomButton(
+                stock_id=Gtk.STOCK_DIALOG_WARNING,
+                as_tool=True,
+                tip_text=(
+                    metomi.rose.config_editor.ERROR_ORPHAN_SECTION_TIP
+                ),
+            )
+            error_label = Gtk.Label()
+            info = metomi.rose.config_editor.ERROR_ORPHAN_SECTION.format(
+                self.section.name
+            )
+            error_label.set_text(info)
+            error_label.show()
+            button_list.append(error_button)
+            label_list.append(error_label)
         has_data = (
             has_no_content
             or self.sub_data is not None

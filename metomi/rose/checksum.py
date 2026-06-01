@@ -21,6 +21,7 @@ import errno
 import hashlib
 import inspect
 import os
+import contextlib
 
 from metomi.rose.resource import ResourceLocator
 
@@ -124,10 +125,8 @@ def guess_checksum_algorithm(checksum):
     if _HASH_LENGTHS is None:
         _HASH_LENGTHS = {}
         for algorithm, func in inspect.getmembers(hashlib, inspect.isbuiltin):
-            try:
+            with contextlib.suppress(TypeError):
                 _HASH_LENGTHS[len(func().hexdigest())] = algorithm
-            except TypeError:
-                pass
     return _HASH_LENGTHS.get(len(checksum))
 
 

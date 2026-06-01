@@ -255,7 +255,7 @@ class MenuWidget(Gtk.Box):
             err_item.set_tooltip_text(self.my_variable.error[error])
             err_item.connect(
                 "activate",
-                lambda e: dialog_func(
+                dialog_func(
                     Gtk.STOCK_DIALOG_WARNING,
                     self.my_variable.error[error],
                     title,
@@ -275,7 +275,7 @@ class MenuWidget(Gtk.Box):
             warn_item.set_tooltip_text(self.my_variable.warning[warning])
             warn_item.connect(
                 "activate",
-                lambda e: dialog_func(
+                dialog_func(
                     Gtk.STOCK_DIALOG_INFO,
                     self.my_variable.warning[warning],
                     title,

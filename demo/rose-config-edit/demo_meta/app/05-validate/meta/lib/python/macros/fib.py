@@ -26,7 +26,7 @@ class FibonacciChecker(metomi.rose.macro.MacroBase):
             return []
         value = node.value
         elems = metomi.rose.variable.array_split(value)
-        if all([w.isdigit() for w in elems]) and len(elems) > 1:
+        if all(w.isdigit() for w in elems) and len(elems) > 1:
             int_elems = [int(w) for w in elems]
             if len(int_elems) >= 2 and int_elems[:2] != seq:
                 self.add_report(section, option, value, self.BAD_SEQUENCE)

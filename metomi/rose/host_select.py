@@ -35,6 +35,7 @@ import textwrap
 from time import sleep, time
 import traceback
 from typing import List, Optional
+import contextlib
 
 from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.popen import RosePopener
@@ -170,10 +171,8 @@ class HostSelector:
             self.local_host_strs = []
             items = []
             for item in gethostname, getfqdn:
-                try:
+                with contextlib.suppress(SocketError):
                     items.append(item())
-                except SocketError:
-                    pass
             for item in items + ["localhost"]:
                 if item in self.local_host_strs:
                     continue
@@ -185,12 +184,10 @@ class HostSelector:
                 else:
                     if name not in self.local_host_strs:
                         self.local_host_strs.append(name)
-                try:
+                with contextlib.suppress((IndexError, SocketError)):
                     for addrinfo_item in getaddrinfo(item, None):
                         if addrinfo_item[4][0] not in self.local_host_strs:
                             self.local_host_strs.append(addrinfo_item[4][0])
-                except (IndexError, SocketError):
-                    pass
         return self.local_host_strs
 
     def get_local_host(self):
@@ -210,7 +207,7 @@ class HostSelector:
                 if (
                     isinstance(value, type)
                     and issubclass(value, RandomScorer)
-                    and value.KEY == method
+                    and method == value.KEY
                 ):
                     self.scorers[method] = value()
         return self.scorers[method]
@@ -276,9 +273,9 @@ class HostSelector:
             else:
                 rank_method = self.RANK_METHOD_DEFAULT
 
-        if thresholds is None:
-            if len(thresholds_set) == 1:
-                thresholds = thresholds_set.pop()
+        if (thresholds is None
+           and len(thresholds_set) == 1):
+            thresholds = thresholds_set.pop()
 
         return host_names, rank_method, thresholds
 
@@ -351,7 +348,7 @@ class HostSelector:
                 try:
                     float(value)
                 except ValueError:
-                    raise ValueError(threshold)
+                    raise ValueError(threshold) from None
                 scorer = self.get_scorer(method)
                 if method_arg is None:
                     method_arg = scorer.ARG

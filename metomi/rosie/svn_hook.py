@@ -161,7 +161,7 @@ class RosieSvnHook:
                 ).encode()
             )
         except UnicodeDecodeError as err:
-            raise ConfigDecodeError(info_file_path, err)
+            raise ConfigDecodeError(info_file_path, err) from None
         except RosePopenError as err:
             if allow_popen_err:
                 return None

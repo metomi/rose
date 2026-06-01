@@ -152,7 +152,7 @@ class RoseArchApp(BuiltinApp):
             try:
                 s_key_tail = env_var_process(s_key_tail)
             except UnboundEnvironmentVariableError as exc:
-                raise ConfigValueError([t_key, ""], "", exc)
+                raise ConfigValueError([t_key, ""], "", exc) from None
 
             # If parenthesised target is optional.
             is_compulsory_target = True
@@ -248,7 +248,7 @@ class RoseArchApp(BuiltinApp):
                 update_check_str,
                 type(exc).__name__,
                 exc,
-            )
+            ) from None
         source_prefix = self._get_conf(
             config, t_node, "source-prefix", default=""
         )
@@ -327,7 +327,7 @@ class RoseArchApp(BuiltinApp):
                         rename_parser_str,
                         type(exc).__name__,
                         exc,
-                    )
+                    ) from None
             else:
                 rename_parser = None
             for source in target.sources.values():
@@ -348,7 +348,7 @@ class RoseArchApp(BuiltinApp):
                         rename_format,
                         type(exc).__name__,
                         exc,
-                    )
+                    ) from None
         return target
 
     @classmethod
@@ -443,7 +443,7 @@ class RoseArchApp(BuiltinApp):
             try:
                 value = env_var_process(value)
             except UnboundEnvironmentVariableError as exc:
-                raise ConfigValueError([key], value, exc)
+                raise ConfigValueError([key], value, exc) from None
         return value
 
 
