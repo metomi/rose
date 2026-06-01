@@ -54,7 +54,7 @@ def mro(target_name, get_base_names, *args, **kwargs):
         base_names_of[name] = get_base_names(name, *args, **kwargs)
         if base_names_of[name]:
             # "name" has parents
-            if all([n in results for n in base_names_of[name]]):
+            if all(n in results for n in base_names_of[name]):
                 # All parents resolved. Time to merge them.
                 results[name] = [name]
                 # Walk the mro of each parent, breadth 1st.

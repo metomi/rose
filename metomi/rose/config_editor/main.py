@@ -641,68 +641,66 @@ class MainController:
             ("/TopMenuBar/Help/About", self.main_handle.about_dialog),
         ]
         is_toggled = dict(
-            [
-                (
-                    "/TopMenuBar/View/View fixed vars",
-                    metomi.rose.config_editor.SHOULD_SHOW_FIXED_VARS,
-                ),
-                (
-                    "/TopMenuBar/View/View ignored vars",
-                    metomi.rose.config_editor.SHOULD_SHOW_IGNORED_VARS,
-                ),
-                (
-                    "/TopMenuBar/View/View user-ignored vars",
-                    metomi.rose.config_editor.SHOULD_SHOW_USER_IGNORED_VARS,
-                ),
-                (
-                    "/TopMenuBar/View/View latent vars",
-                    metomi.rose.config_editor.SHOULD_SHOW_LATENT_VARS,
-                ),
-                (
-                    "/TopMenuBar/Metadata/Prefs/View without descriptions",
-                    metomi.rose.config_editor.SHOULD_SHOW_NO_DESCRIPTION,
-                ),
-                (
-                    "/TopMenuBar/Metadata/Prefs/View without help",
-                    metomi.rose.config_editor.SHOULD_SHOW_NO_HELP,
-                ),
-                (
-                    "/TopMenuBar/Metadata/Prefs/View without titles",
-                    metomi.rose.config_editor.SHOULD_SHOW_NO_TITLE,
-                ),
-                (
-                    "/TopMenuBar/View/View ignored pages",
-                    metomi.rose.config_editor.SHOULD_SHOW_IGNORED_PAGES,
-                ),
-                (
-                    "/TopMenuBar/View/View user-ignored pages",
-                    metomi.rose.config_editor.SHOULD_SHOW_USER_IGNORED_PAGES,
-                ),
-                (
-                    "/TopMenuBar/View/View latent pages",
-                    metomi.rose.config_editor.SHOULD_SHOW_LATENT_PAGES,
-                ),
-                (
-                    "/TopMenuBar/View/Flag opt config vars",
-                    metomi.rose.config_editor.SHOULD_SHOW_FLAG_OPT_CONF_VARS,
-                ),
-                (
-                    "/TopMenuBar/View/Flag optional vars",
-                    metomi.rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL_VARS,
-                ),
-                (
-                    "/TopMenuBar/View/Flag no-metadata vars",
-                    metomi.rose.config_editor.SHOULD_SHOW_FLAG_NO_META_VARS,
-                ),
-                (
-                    "/TopMenuBar/View/View status bar",
-                    metomi.rose.config_editor.SHOULD_SHOW_STATUS_BAR,
-                ),
-                (
-                    "/TopMenuBar/Metadata/Switch off metadata",
-                    self.metadata_off,
-                ),
-            ]
+            (
+                "/TopMenuBar/View/View fixed vars",
+                metomi.rose.config_editor.SHOULD_SHOW_FIXED_VARS,
+            ),
+            (
+                "/TopMenuBar/View/View ignored vars",
+                metomi.rose.config_editor.SHOULD_SHOW_IGNORED_VARS,
+            ),
+            (
+                "/TopMenuBar/View/View user-ignored vars",
+                metomi.rose.config_editor.SHOULD_SHOW_USER_IGNORED_VARS,
+            ),
+            (
+                "/TopMenuBar/View/View latent vars",
+                metomi.rose.config_editor.SHOULD_SHOW_LATENT_VARS,
+            ),
+            (
+                "/TopMenuBar/Metadata/Prefs/View without descriptions",
+                metomi.rose.config_editor.SHOULD_SHOW_NO_DESCRIPTION,
+            ),
+            (
+                "/TopMenuBar/Metadata/Prefs/View without help",
+                metomi.rose.config_editor.SHOULD_SHOW_NO_HELP,
+            ),
+            (
+                "/TopMenuBar/Metadata/Prefs/View without titles",
+                metomi.rose.config_editor.SHOULD_SHOW_NO_TITLE,
+            ),
+            (
+                "/TopMenuBar/View/View ignored pages",
+                metomi.rose.config_editor.SHOULD_SHOW_IGNORED_PAGES,
+            ),
+            (
+                "/TopMenuBar/View/View user-ignored pages",
+                metomi.rose.config_editor.SHOULD_SHOW_USER_IGNORED_PAGES,
+            ),
+            (
+                "/TopMenuBar/View/View latent pages",
+                metomi.rose.config_editor.SHOULD_SHOW_LATENT_PAGES,
+            ),
+            (
+                "/TopMenuBar/View/Flag opt config vars",
+                metomi.rose.config_editor.SHOULD_SHOW_FLAG_OPT_CONF_VARS,
+            ),
+            (
+                "/TopMenuBar/View/Flag optional vars",
+                metomi.rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL_VARS,
+            ),
+            (
+                "/TopMenuBar/View/Flag no-metadata vars",
+                metomi.rose.config_editor.SHOULD_SHOW_FLAG_NO_META_VARS,
+            ),
+            (
+                "/TopMenuBar/View/View status bar",
+                metomi.rose.config_editor.SHOULD_SHOW_STATUS_BAR,
+            ),
+            (
+                "/TopMenuBar/Metadata/Switch off metadata",
+                self.metadata_off,
+            ),
         )
         for address, action in menu_list:
             widget = self.menubar.uimanager.get_widget(address)
@@ -1043,11 +1041,11 @@ class MainController:
             )
             tab_window.connect(
                 "destroy-event",
-                lambda w, e: self.tab_windows.remove(w) and False,
+                lambda w, e: self.tab_windows.remove(w), False,
             )
             tab_window.connect(
                 "delete-event",
-                lambda w, e: self.tab_windows.remove(w) and False,
+                lambda w, e: self.tab_windows.remove(w), False,
             )
         else:
             tab_window = old_window
@@ -1413,7 +1411,7 @@ class MainController:
             metomi.rose.macro.pretty_format_config(config, ignore_error=True)
             try:
                 metomi.rose.config.dump(config, save_path)
-            except (OSError, IOError) as exc:
+            except OSError as exc:
                 metomi.rose.gtk.dialog.run_dialog(
                     metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
                     metomi.rose.config_editor.ERROR_SAVE_PATH_FAIL.format(exc),
@@ -1496,7 +1494,7 @@ class MainController:
         try:
             os.mkdir(os.path.dirname(new_path))
             metomi.rose.config.dump(new_config, new_path)
-        except (OSError, IOError) as exc:
+        except OSError as exc:
             text = metomi.rose.config_editor.ERROR_CONFIG_CREATE.format(
                 new_path, type(exc), str(exc)
             )
@@ -1547,7 +1545,7 @@ class MainController:
         if dirpath is not None:
             try:
                 shutil.rmtree(dirpath)
-            except (shutil.Error, OSError, IOError) as exc:
+            except (shutil.Error, OSError) as exc:
                 text = metomi.rose.config_editor.ERROR_CONFIG_DELETE.format(
                     dirpath, type(exc), str(exc)
                 )
@@ -1770,9 +1768,9 @@ class MainController:
             )[0]
             self._get_pagelist()
             page_namespaces = [page.namespace for page in self.pagelist]
-            if config_name in configs:
-                if current_namespace in page_namespaces:
-                    self.view_page(current_namespace, current_id)
+            if (config_name in configs
+               and current_namespace in page_namespaces):
+                self.view_page(current_namespace, current_id)
 
     def load_custom_metadata(self):
         # open metadata dialog, use list() to pass by value
@@ -2142,7 +2140,7 @@ def spawn_window(
         full_namespaces = []
         for namespace in initial_namespaces:
             exp = re.compile(r"(.*%s?[^\/]+)" % (re.escape(namespace),))
-            for ns in sorted(sorted(ctrl.data.namespace_meta_lookup), key=len):
+            for ns in sorted(ctrl.data.namespace_meta_lookup, key=len):
                 match = exp.search(ns)
                 if match:
                     full_namespaces.append(match.groups()[0])

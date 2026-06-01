@@ -234,9 +234,7 @@ class MixedArrayValueWidget(Gtk.Box):
         else:
             self.add_button.show()
             self.del_button.show()
-        if len(self.rows) == 1:
-            self.del_button.hide()
-        elif len(self.rows) == 2 and self.has_titles:
+        if len(self.rows) == 1 or len(self.rows) == 2 and self.has_titles:
             self.del_button.hide()
         else:
             self.add_button.show()

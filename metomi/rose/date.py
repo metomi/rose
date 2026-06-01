@@ -210,7 +210,7 @@ class RoseDateTimeOperator:
                 try:
                     duration = self.duration_parser.parse(offset)
                 except ValueError:
-                    raise OffsetValueError(offset)
+                    raise OffsetValueError(offset) from None
                 if sign == "-":
                     time_point -= duration
                 else:

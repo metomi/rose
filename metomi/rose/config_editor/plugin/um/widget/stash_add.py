@@ -172,7 +172,7 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
         if is_startup:
             group_model = Gtk.TreeStore(str)
             group_model.append(None, [""])
-            for i, name in enumerate(self.column_names):
+            for _, name in enumerate(self.column_names):
                 if name not in ["?", "#"]:
                     group_model.append(None, [name])
             self._group_widget.set_model(group_model)
@@ -772,9 +772,9 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
             if should_show:
                 if name not in self._visible_metadata_columns:
                     self._visible_metadata_columns.append(name)
-            elif name in self._visible_metadata_columns:
-                if name != "Section":
-                    self._visible_metadata_columns.remove(name)
+            elif (name in self._visible_metadata_columns
+                  and name != "Section"):
+                self._visible_metadata_columns.remove(name)
         self._view.columns_autosize()
 
     def _toggle_show_meta_column_titles(self, widget):

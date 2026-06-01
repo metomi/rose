@@ -35,13 +35,13 @@ class CompulsoryChecker(metomi.rose.macro.MacroBaseRoseEdit):
     """
 
     WARNING_COMPULSORY_SECT_MISSING = (
-        'Section set as compulsory, but ' 'not in configuration.'
+        'Section set as compulsory, but not in configuration.'
     )
     WARNING_COMPULSORY_OPT_MISSING = (
-        'Variable set as compulsory, but ' 'not in configuration.'
+        'Variable set as compulsory, but not in configuration.'
     )
     WARNING_COMPULSORY_USER_IGNORED = (
-        'Compulsory settings should not be ' 'user-ignored.'
+        'Compulsory settings should not be user-ignored.'
     )
 
     def __init__(self, *args, **kwargs):
@@ -238,7 +238,7 @@ class CompulsoryChecker(metomi.rose.macro.MacroBaseRoseEdit):
                     metomi.rose.macro.REC_ID_STRIP_DUPL.sub('', section)
                 )
                 basic_sections = set(
-                    [basic_section_no_modifier, basic_section_keep_modifier]
+                    basic_section_no_modifier, basic_section_keep_modifier
                 )
                 for basic_section in basic_sections:
                     self.alias_section_to_basics.setdefault(section, [])

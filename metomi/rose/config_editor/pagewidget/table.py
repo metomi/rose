@@ -107,12 +107,12 @@ class PageTable(Gtk.Table):
 
     def attach_variable_widgets(self, variable_is_ghost_list, start_index=0):
         """Create and attach variable widgets for these inputs."""
-        rownum = start_index
-        for variable, is_ghost in variable_is_ghost_list:
+
+        for variable, is_ghost, counter in enumerate(variable_is_ghost_list):
+            rownum = counter + start_index
             variable_widget = self.get_variable_widget(variable, is_ghost)
             variable_widget.insert_into(self, self.MAX_COLS, rownum + 1)
             variable_widget.set_sensitive(not is_ghost)
-            rownum += 1
 
     def get_variable_widget(self, variable, is_ghost=False):
         """Create a variable widget for this variable."""
@@ -194,19 +194,15 @@ class PageTable(Gtk.Table):
                 len(variable.metadata.get(metomi.rose.META_PROP_VALUES, []))
                 == 1
                 and not modes[metomi.rose.config_editor.SHOW_MODE_FIXED]
-            ):
-                variable_widget.hide()
-            elif (
+            ) or (
                 variable_widget.is_ghost
                 and not modes[metomi.rose.config_editor.SHOW_MODE_LATENT]
-            ):
-                variable_widget.hide()
-            elif (
+            ) or (
                 metomi.rose.variable.IGNORED_BY_SYSTEM in ign_reason
                 or metomi.rose.variable.IGNORED_BY_SECTION in ign_reason
-            ) and not modes[metomi.rose.config_editor.SHOW_MODE_IGNORED]:
-                variable_widget.hide()
-            elif metomi.rose.variable.IGNORED_BY_USER in ign_reason and not (
+            ) and (not modes[metomi.rose.config_editor.SHOW_MODE_IGNORED] or
+                   metomi.rose.variable.IGNORED_BY_USER in ign_reason
+                   ) and not (
                 modes[metomi.rose.config_editor.SHOW_MODE_IGNORED]
                 or modes[metomi.rose.config_editor.SHOW_MODE_USER_IGNORED]
             ):
@@ -242,12 +238,11 @@ class PageArrayTable(PageTable):
     def attach_variable_widgets(self, variable_is_ghost_list, start_index=0):
         """Create and attach variable widgets for these inputs."""
         self._set_length()
-        rownum = start_index
-        for variable, is_ghost in variable_is_ghost_list:
+        for variable, is_ghost, counter in enumerate(variable_is_ghost_list):
+            rownum = start_index + counter
             variable_widget = self.get_variable_widget(variable, is_ghost)
             variable_widget.insert_into(self, self.MAX_COLS, rownum + 1)
             variable_widget.set_sensitive(not is_ghost)
-            rownum += 1
 
     def get_variable_widget(self, variable, is_ghost=False):
         """Create a variable widget for this variable."""
@@ -322,7 +317,6 @@ class PageLatentTable(Gtk.Table):
         self.alt_menu_class = (
             metomi.rose.config_editor.menuwidget.CheckedMenuWidget
         )
-        rownum = 0
         v_sort_ids = []
         for val in self.panel_data + self.ghost_data:
             v_sort_ids.append(
@@ -336,7 +330,7 @@ class PageLatentTable(Gtk.Table):
             )
         )
         v_sort_ids.sort(key=lambda x: "=null" in x[1])
-        for _, var_id in v_sort_ids:
+        for _, var_id, rownum in enumerate(v_sort_ids):
             is_ghost = False
             for variable in self.panel_data:
                 if variable.metadata["id"] == var_id:

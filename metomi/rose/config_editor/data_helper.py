@@ -76,10 +76,8 @@ class ConfigDataHelper:
     def is_ns_content(self, ns):
         """Return whether a namespace has any existing content."""
         config_name = self.util.split_full_ns(self.data, ns)[0]
-        for section in self.get_sections_from_namespace(ns):
-            if section in self.data.config[config_name].sections.now:
-                return True
-        return self.is_ns_sub_data(ns)
+        return any(section in self.data.config[config_name].sections.now for
+                   section in self.get_sections_from_namespace(ns))
 
     def get_metadata_for_config_id(self, node_id, config_name):
         """Retrieve the corresponding metadata for a variable."""

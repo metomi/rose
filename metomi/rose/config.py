@@ -208,8 +208,7 @@ class ConfigNode:
 
     def __iter__(self):
         if isinstance(self.value, dict):
-            for key in self.value.keys():
-                yield key
+            yield from self.value.keys()
 
     def __eq__(self, other):
         if self is other:
@@ -226,7 +225,7 @@ class ConfigNode:
                     or node_1.comments != node_2.comments
                 ):
                     return False
-            for keys_2, node_2 in other.walk(no_ignore=True):
+            for keys_2, _ in other.walk(no_ignore=True):
                 if self.get(keys_2, no_ignore=True) is None:
                     return False
         except AttributeError:  # Should handle "other is None"
@@ -1499,7 +1498,7 @@ class ConfigLoader:
                 try:
                     line = line.decode()
                 except UnicodeDecodeError as exc:
-                    raise ConfigDecodeError(source, exc)
+                    raise ConfigDecodeError(source, exc) from None
             if not line:
                 break
             line_num += 1

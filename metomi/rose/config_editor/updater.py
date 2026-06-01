@@ -102,12 +102,12 @@ class Updater:
                     return (
                         metomi.rose.config_editor.TREE_PANEL_TIP_DIFF_SECTIONS
                     )
-                if sect_data is not None and save_sect_data is not None:
-                    if sect_data.to_hashable() != save_sect_data.to_hashable():
-                        return (
-                            metomi.rose.config_editor
-                            .TREE_PANEL_TIP_CHANGED_SECTIONS
-                        )
+                if (sect_data is not None and save_sect_data is not None and
+                   sect_data.to_hashable() != save_sect_data.to_hashable()):
+                    return (
+                        metomi.rose.config_editor
+                        .TREE_PANEL_TIP_CHANGED_SECTIONS
+                    )
         return ""
 
     def update_ns_tree_states(self, namespace):

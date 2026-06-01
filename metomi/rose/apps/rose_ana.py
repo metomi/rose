@@ -642,7 +642,7 @@ class RoseAnaApp(BuiltinApp):
         for path in method_paths:
             self.reporter(" * {0}".format(path))
 
-        self.modules = set([])
+        self.modules = {[]}
         for path in method_paths:
             # Add the method path to the start of the sys.path
             sys.path.insert(0, os.path.abspath(path))

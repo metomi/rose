@@ -932,9 +932,9 @@ class ConfigDataManager:
         for section in allowed_sections:
             variables = var_map.get(section, [])
             for variable in variables:
-                if only_this_ns is not None:
-                    if variable.metadata["full_ns"] != only_this_ns:
-                        continue
+                if (only_this_ns is not None
+                   and variable.metadata["full_ns"] != only_this_ns):
+                    continue
                 option = variable.name
                 if not variable.name:
                     var_id = variable.metadata["id"]
@@ -1269,21 +1269,21 @@ class ConfigDataManager:
                         # Overlook for optional variables.
                         # Doc table: I_t -> not trigger -> optional
                         pass
-            elif metomi.rose.variable.IGNORED_BY_USER in ignored_reasons:
-                # It possibly should be enabled, but is user-ignored.
-                # Doc table: I_u
-                # We've already covered I_u -> I_t
-                if node_is_compulsory:
-                    # Compulsory settings should not be user-ignored.
-                    # Doc table: I_u -> E -> compulsory
-                    # Doc table: I_u -> not trigger -> compulsory
-                    help_str = (
-                        metomi.rose.config_editor.WARNING_NOT_USER_IGNORABLE
-                    )
-                    err_type = (
-                        metomi.rose.config_editor.WARNING_TYPE_USER_IGNORED
-                    )
-                    node_inst.error.update({err_type: help_str})
+            elif (metomi.rose.variable.IGNORED_BY_USER in ignored_reasons
+                  # It possibly should be enabled, but is user-ignored.
+                  # Doc table: I_u
+                  # We've already covered I_u -> I_t
+                  and node_is_compulsory):
+                # Compulsory settings should not be user-ignored.
+                # Doc table: I_u -> E -> compulsory
+                # Doc table: I_u -> not trigger -> compulsory
+                help_str = (
+                    metomi.rose.config_editor.WARNING_NOT_USER_IGNORABLE
+                )
+                err_type = (
+                    metomi.rose.config_editor.WARNING_TYPE_USER_IGNORED
+                )
+                node_inst.error.update({err_type: help_str})
             # Remaining possibilities are not a problem:
             # Doc table: E -> E, E -> not trigger
 

@@ -24,6 +24,7 @@ Functions:
     main - CLI interface function.
 
 """
+import contextlib
 import json
 import os
 from pathlib import Path
@@ -51,7 +52,7 @@ class SvnCaller(RosePopener):
     def __call__(self, *args):
         environ = dict(os.environ)
         environ["LANG"] = "C"
-        return self.run_ok("svn", env=environ, *args)[0]
+        return self.run_ok(*args, "svn", env=environ)[0]
 
 
 class SuiteIdError(ValueError):
@@ -360,10 +361,8 @@ class SuiteId:
         if not match:
             raise SuiteIdTextError(id_text)
         self.prefix, self.sid, self.branch, self.revision = match.groups()
-        try:
+        with contextlib.suppress((TypeError, ValueError)):
             self.revision = int(self.revision)
-        except (TypeError, ValueError):
-            pass
         if not self.prefix:
             self.prefix = self.get_prefix_default()
             if not self.prefix:
@@ -382,8 +381,8 @@ class SuiteId:
         try:
             info_entry = info_parser.parse(
                 self.svn("info", "--xml", location))
-        except RosePopenError:
-            raise SuiteIdLocationError(location)
+        except RosePopenError as exc:
+            raise SuiteIdLocationError(location) from exc
         if "url" not in info_entry:
             raise SuiteIdLocationError(location)
         root = info_entry["repository:root"]
@@ -429,8 +428,8 @@ class SuiteId:
                 pass
             else:
                 # Slightly odd construction = loc + parents
-                for loc in (loc.relative_to(sdrr) / '_').parents:
-                    vcfilepath = sdrr / loc / SuiteId.VC_FILENAME
+                for locy in (loc.relative_to(sdrr) / '_').parents:
+                    vcfilepath = sdrr / locy / SuiteId.VC_FILENAME
                     if os.access(vcfilepath, os.F_OK | os.R_OK):
                         return vcfilepath
         return None
@@ -553,8 +552,8 @@ class SuiteId:
                 info_entry = info_parser.parse(
                     self.svn("info", "--xml", location)
                 )
-            except RosePopenError:
-                raise SuiteIdTextError(location)
+            except RosePopenError as exc:
+                raise SuiteIdTextError(location) from exc
             else:
                 if "commit:revision" in info_entry:
                     revision = int(info_entry["commit:revision"])

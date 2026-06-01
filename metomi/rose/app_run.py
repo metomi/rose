@@ -141,7 +141,7 @@ class Poller:
             except UnboundEnvironmentVariableError as exc:
                 raise ConfigValueError(
                     ["poll", "all-files"], poll_all_files_value, exc
-                )
+                ) from None
         poll_any_files_value = conf_tree.node.get_value(["poll", "any-files"])
         poll_any_files = []
         if poll_any_files_value:
@@ -152,7 +152,7 @@ class Poller:
             except UnboundEnvironmentVariableError as exc:
                 raise ConfigValueError(
                     ["poll", "any-files"], poll_any_files_value, exc
-                )
+                ) from None
         poll_file_test = None
         if poll_all_files or poll_any_files:
             poll_file_test = conf_tree.node.get_value(["poll", "file-test"])
@@ -188,7 +188,7 @@ class Poller:
                 except ValueError:
                     raise ConfigValueError(
                         conf_keys, poll_delays_value, ConfigValueError.SYNTAX
-                    )
+                    ) from None
             try:
                 value = self.date_time_oper.duration_parser.parse(
                     value
@@ -209,7 +209,7 @@ class Poller:
                 except ValueError:
                     raise ConfigValueError(
                         conf_keys, poll_delays_value, ConfigValueError.SYNTAX
-                    )
+                    ) from None
                 if unit:
                     value *= unit
                 is_legacy = True
