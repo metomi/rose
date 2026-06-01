@@ -75,7 +75,7 @@ below:
  - James Frost (Met Office, UK)
  - Christopher Bennett (Met Office, UK)
  - Louis Cianciullo (Bureau of Meteorology, Australia)
- - Scott Owen James
+ - Scott Owen James (Met Office, UK)
 <!-- end-shortlog -->
 
 (All contributors are identifiable with email addresses in the version control
