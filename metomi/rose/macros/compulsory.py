@@ -237,9 +237,9 @@ class CompulsoryChecker(metomi.rose.macro.MacroBaseRoseEdit):
                 basic_section_keep_modifier = (
                     metomi.rose.macro.REC_ID_STRIP_DUPL.sub('', section)
                 )
-                basic_sections = set(
+                basic_sections = {
                     basic_section_no_modifier, basic_section_keep_modifier
-                )
+                }
                 for basic_section in basic_sections:
                     self.alias_section_to_basics.setdefault(section, [])
                     self.alias_section_to_basics[section].append(basic_section)
