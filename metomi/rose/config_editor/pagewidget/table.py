@@ -108,7 +108,7 @@ class PageTable(Gtk.Table):
     def attach_variable_widgets(self, variable_is_ghost_list, start_index=0):
         """Create and attach variable widgets for these inputs."""
 
-        for variable, is_ghost, counter in enumerate(variable_is_ghost_list):
+        for counter, variable, is_ghost in enumerate(variable_is_ghost_list):
             rownum = counter + start_index
             variable_widget = self.get_variable_widget(variable, is_ghost)
             variable_widget.insert_into(self, self.MAX_COLS, rownum + 1)
@@ -238,7 +238,7 @@ class PageArrayTable(PageTable):
     def attach_variable_widgets(self, variable_is_ghost_list, start_index=0):
         """Create and attach variable widgets for these inputs."""
         self._set_length()
-        for variable, is_ghost, counter in enumerate(variable_is_ghost_list):
+        for counter, variable, is_ghost in enumerate(variable_is_ghost_list):
             rownum = start_index + counter
             variable_widget = self.get_variable_widget(variable, is_ghost)
             variable_widget.insert_into(self, self.MAX_COLS, rownum + 1)
@@ -330,7 +330,7 @@ class PageLatentTable(Gtk.Table):
             )
         )
         v_sort_ids.sort(key=lambda x: "=null" in x[1])
-        for _, var_id, rownum in enumerate(v_sort_ids):
+        for rownum, _, var_id in enumerate(v_sort_ids):
             is_ghost = False
             for variable in self.panel_data:
                 if variable.metadata["id"] == var_id:
@@ -345,7 +345,6 @@ class PageLatentTable(Gtk.Table):
             )
             variable_widget.insert_into(self, self.MAX_COLS, rownum + 1)
             variable_widget.set_sensitive(not is_ghost)
-            rownum += 1
 
     def get_variable_widget(self, variable, is_ghost=False):
         """Create a variable widget for this variable."""

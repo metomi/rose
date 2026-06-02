@@ -108,7 +108,7 @@ def type_gen(value):
     types = []
     if not value:
         return None, 0
-    for val, lenTemp in enumerate(metomi.rose.variable.array_split(value)):
+    for lenTemp, val in enumerate(metomi.rose.variable.array_split(value)):
         length = lenTemp
         val_meta_type = "raw"
         for meta_type in [
