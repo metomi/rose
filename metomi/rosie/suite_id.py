@@ -52,7 +52,8 @@ class SvnCaller(RosePopener):
     def __call__(self, *args):
         environ = dict(os.environ)
         environ["LANG"] = "C"
-        return self.run_ok(*args, "svn", env=environ)[0]
+        # return self.run_ok(*args, "svn", env=environ)[0]
+        return self.run_ok("svn", env=environ, *args)[0]  # noqa: B026
 
 
 class SuiteIdError(ValueError):
