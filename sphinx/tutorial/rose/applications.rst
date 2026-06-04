@@ -152,7 +152,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
       come later).
    .. note::
       :class: hint
-      
+
       This practical can stand on it's own, but it will be easier to follow if
       you have already completed the
       :ref:`Cylc tutorials <tutorial-cylc-runtime-forecasting-workflow>`.
@@ -245,9 +245,9 @@ An application can be run using the :ref:`command-rose-app-run` command:
       * ``MAP_TEMPLATE``
 
       We will now add these into the application. This way, all of the
-      configuration specific to the application live within it.  The variable names
+      configuration specific to the application live within it. The variable names
       and values are provided here in case you have not completed the previous Cylc
-      tutorial.  We also adjust some of the values to point at the test data files
+      tutorial. We also adjust some of the values to point at the test data files
       so ensure you copy these values rather than from the previous tutorial.
 
       Add the following lines to the :rose:conf:`rose-app.conf[env]` section:
