@@ -227,8 +227,12 @@ Metadata Items
       Next reload the metadata in the :ref:`command-rose-config-edit` window
       using the :menuselection:`Metadata --> Refresh Metadata` menu item.
       The descriptions should now display under each environment variable.
-      Comments removed from the :rose:file:`rose-app.conf` file may not disappear
-      on the refresh so you may need to close and reopen the window.
+
+      .. note::
+         :class: hint
+
+         The comments are part of the configuration rather than the metadata,
+         so they won't disappear from the GUI until it is closed/reopened.
 
       .. tip::
 
