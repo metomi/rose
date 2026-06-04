@@ -150,6 +150,9 @@ An application can be run using the :ref:`command-rose-app-run` command:
       into a standalone Rose application. By the end you will be able to run
       the application standalone (running it as a task in the workflow will
       come later).
+   .. note::
+      :class: hint
+      
       This practical can stand on it's own, but it will be easier to follow if
       you have already completed the
       :ref:`Cylc tutorials <tutorial-cylc-runtime-forecasting-workflow>`.
