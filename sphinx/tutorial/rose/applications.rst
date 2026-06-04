@@ -305,7 +305,10 @@ An application can be run using the :ref:`command-rose-app-run` command:
          cd run
          rose app-run -C ../
 
-      ../ here is the path to the application directory, assuming you created
-      the run directory inside the application directory.
+      .. note::
+         :class: hint
+
+         ``../`` is the path to the Rose application directory.
+
       The application should run successfully, leaving behind some files. Try
       opening the ``map.html`` file in a web browser.
