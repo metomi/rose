@@ -96,11 +96,11 @@ DEAD_ENDS = {
     ('rose', 'task-hook'):
         'Command obsolete, use Cylc event handlers',
     ('rose', 'suite-log-view'):
-        'This command has been removed: use cylc review at Cylc 7 instead.',
+        'This command has been removed: use cylc review instead.',
     ('rose', 'suite-log'):
-        'This command has been removed: use cylc review at Cylc 7 instead.',
+        'This command has been removed: use cylc review instead.',
     ('rose', 'slv'):
-        'This command has been removed: use cylc review at Cylc 7 instead.',
+        'This command has been removed: use cylc review instead.',
     ('rose', 'suite-restart'):
         'This command has been replaced by: "cylc restart".',
     ('rose', 'suite-run'):
