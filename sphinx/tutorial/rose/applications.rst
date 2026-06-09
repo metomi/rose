@@ -245,10 +245,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
       * ``MAP_TEMPLATE``
 
       We will now add these into the application. This way, all of the
-      configuration specific to the application live within it. The variable names
-      and values are provided here in case you have not completed the previous Cylc
-      tutorial. We also adjust some of the values to point at the test data files
-      so ensure you copy these values rather than from the previous tutorial.
+      configuration specific to the application live within it.
 
       Add the following lines to the :rose:conf:`rose-app.conf[env]` section:
 
@@ -268,6 +265,12 @@ An application can be run using the :ref:`command-rose-app-run` command:
          MAP_FILE=map.html
          # The path to the HTML map template file.
          MAP_TEMPLATE=map-template.html
+
+      .. note::
+         :class: hint
+
+         The values given here are slightly different to those in the previous
+         Cylc tutorial; use these values.
 
       Note that the ``WIND_FILE_TEMPLATE`` and ``RAINFALL_FILE`` environment
       variables are pointing at files in the ``test-data`` directory.

@@ -479,10 +479,9 @@ Rose Applications In Rose Suite Configurations
 
       .. tip::
 
-          We have removed the ``CYLC_TASK_CYCLE_POINT``, ``RESOLUTION`` and ``DOMAIN`` environment
-          variables; the ``RESOLUTION`` and ``DOMAIN`` are provided by the suite configuration and
-          since we are not using the test data, we want the ``CYLC_TASK_CYCLE_POINT`` variable to
-          be provided by Cylc rather than hard coded.
+          Note the env vars ``CYLC_TASK_CYCLE_POINT``, ``RESOLUTION`` and ``DOMAIN`` should no
+          longer be set in :rose:file:`rose-app.conf`. The ``RESOLUTION`` and ``DOMAIN`` are provided
+          by the suite configuration, and the ``CYLC_TASK_CYCLE_POINT`` should be provided by Cylc.
 
       Finally we need to change the ``forecast`` task to run
       :ref:`command-rose-task-run`. The ``[runtime]forecast`` section of the
