@@ -236,7 +236,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
 
       In the ``[runtime][forecast][environment]`` section of the ``flow.cylc``
       file in the :ref:`Cylc tutorials <tutorial-cylc-runtime-forecasting-workflow>`
-      we set a few environment variables:
+      we had set a few environment variables:
 
       * ``WIND_FILE_TEMPLATE``
       * ``WIND_CYCLES``
