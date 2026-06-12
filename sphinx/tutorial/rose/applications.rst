@@ -175,13 +175,14 @@ An application can be run using the :ref:`command-rose-app-run` command:
    #. **Provide the required resources in the** ``application-tutorial``
       **application.**
 
-      The application gets three resources from different places:
+      The `forecast` task from the Cylc workflow used resources in three locations:
 
       * The ``bin/forecast`` script.
-      * The ``bin/util.py`` Python library.
-      * The ``file/map-template.html`` HTML template.
+      * The ``lib/python/util.py`` Python library.
+      * The ``lib/template/map.html`` HTML template.
 
-      We will move all these resources into a single application directory.
+      We will now create a Rose application which bundles all of these resources into
+      a single directory.
 
       This makes a rose application easier to maintain by keeping all the
       files required in the same place.
