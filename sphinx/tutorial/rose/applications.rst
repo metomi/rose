@@ -181,8 +181,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
       * The ``lib/python/util.py`` Python library.
       * The ``lib/template/map.html`` HTML template.
 
-      We will now create a Rose application which bundles all of these resources into
-      a single directory.
+      We will now bundle these resources into our Rose Application.
 
       This makes a rose application easier to maintain by keeping all the
       files required in the same place.
