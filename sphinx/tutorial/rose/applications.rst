@@ -150,11 +150,19 @@ An application can be run using the :ref:`command-rose-app-run` command:
       into a standalone Rose application. By the end you will be able to run
       the application standalone (running it as a task in the workflow will
       come later).
+   .. note::
+      :class: hint
 
-   Create a directory on your filesystem called ``rose-tutorial``::
+      This practical can stand on it's own, but it will be easier to follow if
+      you have already completed the
+      :ref:`Cylc tutorials <tutorial-cylc-runtime-forecasting-workflow>`.
 
-      mkdir ~/rose-tutorial
-      cd ~/rose-tutorial
+   #. **Create a directory on your filesystem called** ``rose-tutorial``
+
+      This directory will be used for multiple Rose tutorials.::
+
+        mkdir ~/rose-tutorial
+        cd ~/rose-tutorial
 
    #. **Create a Rose application**
 
@@ -167,13 +175,13 @@ An application can be run using the :ref:`command-rose-app-run` command:
    #. **Provide the required resources in the** ``application-tutorial``
       **application.**
 
-      The application gets three resources from different places:
+      The `forecast` task from the Cylc workflow used resources in three locations:
 
       * The ``bin/forecast`` script.
       * The ``lib/python/util.py`` Python library.
       * The ``lib/template/map.html`` HTML template.
 
-      We will move all these resources into a single application directory.
+      We will now bundle these resources into our Rose Application.
 
       This makes a rose application easier to maintain by keeping all the
       files required in the same place.
@@ -227,7 +235,8 @@ An application can be run using the :ref:`command-rose-app-run` command:
    #. **Move environment variables defined in the** ``flow.cylc`` **file.**
 
       In the ``[runtime][forecast][environment]`` section of the ``flow.cylc``
-      file in the weather-forecasting workflow we set a few environment variables:
+      file in the :ref:`Cylc tutorials <tutorial-cylc-runtime-forecasting-workflow>`
+      we had set a few environment variables:
 
       * ``WIND_FILE_TEMPLATE``
       * ``WIND_CYCLES``
@@ -257,6 +266,12 @@ An application can be run using the :ref:`command-rose-app-run` command:
          # The path to the HTML map template file.
          MAP_TEMPLATE=map-template.html
 
+      .. note::
+         :class: hint
+
+         The values given here are slightly different to those in the previous
+         Cylc tutorial; use these values.
+
       Note that the ``WIND_FILE_TEMPLATE`` and ``RAINFALL_FILE`` environment
       variables are pointing at files in the ``test-data`` directory.
 
@@ -267,7 +282,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
       file as well as the ``CYLC_TASK_CYCLE_POINT`` environment variable
       provided by Cylc when it runs a task.
 
-      Add the following lines to the :rose:file:`rose-app.conf`:
+      Add the following lines to the :rose:conf:`rose-app.conf[env]` section:
 
       .. code-block:: rose
 
@@ -292,6 +307,11 @@ An application can be run using the :ref:`command-rose-app-run` command:
          mkdir run
          cd run
          rose app-run -C ../
+
+      .. note::
+         :class: hint
+
+         ``../`` is the path to the Rose application directory.
 
       The application should run successfully, leaving behind some files. Try
       opening the ``map.html`` file in a web browser.
