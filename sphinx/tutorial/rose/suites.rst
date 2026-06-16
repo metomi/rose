@@ -167,8 +167,8 @@ Using a Rose workflow configuration with Cylc 8
       You now have a Rose suite configuration. A :rose:file:`rose-suite.conf`
       file does not need to have anything in it.
 
-      There are three things defined in the ``flow.cylc`` file which it might be
-      useful to be able to configure:
+      There are a few things defined in the ``flow.cylc`` file which it might be
+      useful to be able to configure, we are going to focus on:
 
       ``station``
          The list of weather stations to gather observations from.
@@ -183,7 +183,7 @@ Using a Rose workflow configuration with Cylc 8
       .. code-block:: rose
 
          [template variables]
-         station="camborne", "heathrow", "shetland", "aldergrove"
+         station="aldergrove", "camborne", "heathrow", "shetland"
          RESOLUTION=0.2
          DOMAIN=-12,46,12,61
 
@@ -250,10 +250,10 @@ Using a Rose workflow configuration with Cylc 8
 
           [task parameters]
              # A list of the weather stations we will be fetching observations from.
-         -   station = camborne, heathrow, shetland, aldergrove
+         -   station = aldergrove, camborne, heathrow, shetland
          +   station = {{ station | join(", ") }}
              # A list of the sites we will be generating forecasts for.
-             site = exeter
+             site = exeter, edinburgh
 
    #. **Install the workflow**
 
@@ -476,6 +476,13 @@ Rose Applications In Rose Suite Configurations
          WIND_CYCLES=0, -3, -6
          RAINFALL_FILE=$CYLC_WORKFLOW_WORK_DIR/$CYLC_TASK_CYCLE_POINT/get_rainfall/rainfall.csv
          MAP_FILE=${CYLC_TASK_LOG_ROOT}-map.html
+
+      .. tip::
+
+          Note the env vars ``CYLC_TASK_CYCLE_POINT``, ``RESOLUTION`` and ``DOMAIN`` should no
+          longer be set in`rose-app.conf`. The ``RESOLUTION`` and ``DOMAIN`` are provided by
+          `rose-suite.conf` and overwritten in `rose-app-test.conf`, and the ``CYLC_TASK_CYCLE_POINT``
+          should be provided by Cylc.
 
       Finally we need to change the ``forecast`` task to run
       :ref:`command-rose-task-run`. The ``[runtime]forecast`` section of the
