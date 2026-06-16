@@ -299,7 +299,6 @@ def check_software(check=check):
         check('py:jinja2'),
         # Module has no internal version - hope that the install was correct.
         check('py:keyring'),
-        check('py:ldap3'),
         check('py:metomi.isodatetime'),
         check('py:psutil', (5, 6, 0)),
         check('py:requests')
@@ -312,7 +311,8 @@ def check_software(check=check):
         check('svn', (1, 8), command_template=['--version', '--quiet']),
         check('fcm', version_template=r'FCM ([\d\.\-]+)'),
         check('cmd:perl', (5, 10, 1),
-              shell=['perl', '-e', 'print(substr($^V, 1))'])
+              shell=['perl', '-e', 'print(substr($^V, 1))']),
+        check('py:ldap')
     ])
 
     check_all(

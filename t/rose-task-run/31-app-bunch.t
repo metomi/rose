@@ -22,7 +22,7 @@
 . $(dirname $0)/test_header
 
 #-------------------------------------------------------------------------------
-tests 78
+tests 90
 #-------------------------------------------------------------------------------
 # Define some constant patterns
 FAIL_PATTERN="\[FAIL\] [0-9]*-[0-9]*-[0-9]*T[0-9]*:[0-9]*:[0-9]*+[0:9]*"
@@ -178,6 +178,46 @@ for KEY in $(seq 0 2); do
         "a comment" $FILE_DIR/bunch.$KEY.out
 done
 #-------------------------------------------------------------------------------
+# Testing names from arguments works
+#-------------------------------------------------------------------------------
+APP=bunch_names_from_args_args_only
+#-------------------------------------------------------------------------------
+TEST_KEY_PREFIX=names_from_args_args_only
+FILE_DIR=$LOG_DIR/$APP/01/
+arg1_list=("test1" "2" "test3" "4")
+arg2_list=("foo" "bar" "baz" "qux")
+for i in $(seq 0 3); do
+    file_grep $TEST_KEY_PREFIX-ran-$i \
+        "arg1: ${arg1_list[i]}, arg2: ${arg2_list[i]}, command-instance: ${i}" \
+        $FILE_DIR/"bunch.${i}.${arg1_list[i]}.${arg2_list[i]}.out"
+done
+#-------------------------------------------------------------------------------
+APP=bunch_names_from_args_name_numerical
+#-------------------------------------------------------------------------------
+TEST_KEY_PREFIX=names_from_args_name_numerical
+FILE_DIR=$LOG_DIR/$APP/01/
+for i in 0 2; do
+    file_grep $TEST_KEY_PREFIX-ran-$i \
+        "arg1: ${arg1_list[i]}, arg2: ${arg2_list[i]}, command-instance: ${i}" \
+        $FILE_DIR/"bunch.${i}.${arg1_list[i]}.${arg2_list[i]}.out"
+done
+for i in 1 3; do
+    file_grep $TEST_KEY_PREFIX-ran-$i \
+        "arg1: ${arg1_list[i]}, arg2: ${arg2_list[i]}, command-instance: ${i}" \
+        $FILE_DIR/"bunch.${i}.arg1=${arg1_list[i]}.${arg2_list[i]}.out"
+done
+#-------------------------------------------------------------------------------
+APP=bunch_names_from_args_name_all
+#-------------------------------------------------------------------------------
+TEST_KEY_PREFIX=names_from_args_name_all
+FILE_DIR=$LOG_DIR/$APP/01/
+arg1_list=("test1" "2" "test3" "4")
+arg2_list=("foo" "bar" "baz" "qux")
+for i in $(seq 0 3); do
+    file_grep $TEST_KEY_PREFIX-ran-$i \
+        "arg1: ${arg1_list[i]}, arg2: ${arg2_list[i]}, command-instance: ${i}" \
+        $FILE_DIR/"bunch.${i}.arg1=${arg1_list[i]}.arg2=${arg2_list[i]}.out"
+done
 #-------------------------------------------------------------------------------
 # Testing ROSE_BUNCH_LOG_PREFIX is correctly set
 #-------------------------------------------------------------------------------

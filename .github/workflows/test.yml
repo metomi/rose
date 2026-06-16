@@ -58,7 +58,7 @@ jobs:
           ref: ${{ inputs.rose_ref || github.sha }}
 
       - name: Configure Python
-        uses: mamba-org/setup-micromamba@v2
+        uses: mamba-org/setup-micromamba@v3
         with:
           cache-environment: true
           post-cleanup: 'all'
@@ -109,7 +109,7 @@ jobs:
           path: rose
 
       - name: Configure Python
-        uses: mamba-org/setup-micromamba@v2
+        uses: mamba-org/setup-micromamba@v3
         with:
           cache-environment: true
           post-cleanup: 'all'
@@ -125,6 +125,7 @@ jobs:
             pygraphviz
             pygobject>=3.50.0
             gtk3>=3.24.43
+            python-ldap
 
       - name: Patch DNS
         uses: cylc/release-actions/patch-dns@v1
@@ -147,7 +148,7 @@ jobs:
       - name: Install Rose
         working-directory: rose
         run: |
-          pip install ."[tests,docs,rose-edit,graph,rosa,disco]"
+          pip install ."[tests,docs,rose-edit,graph,rosa,disco,ldap]"
           yarn install
 
       - name: Install Cylc
@@ -245,7 +246,7 @@ jobs:
           ref: ${{ inputs.rose_ref || github.sha }}
 
       - name: Configure Python
-        uses: mamba-org/setup-micromamba@v2
+        uses: mamba-org/setup-micromamba@v3
         with:
           cache-environment: true
           post-cleanup: 'all'

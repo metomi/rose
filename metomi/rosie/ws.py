@@ -36,7 +36,6 @@ import json
 import logging
 import os
 from pathlib import Path
-import pwd
 import signal
 import sys
 from time import sleep
@@ -86,6 +85,10 @@ class RosieDiscoServiceApplication(tornado.web.Application):
                     ".", 1
                 )[0]
         self.props["rose_version"] = ROSE_VERSION
+        if self.service_root_mode:
+            self.props["static_url_prefix"] = "/%s/static/" % (self.NAMESPACE)
+        else:
+            self.props["static_url_prefix"] = "/static/"
 
         # Get location of HTML files from package
         rosie_lib = str(files('metomi.rosie').joinpath(
@@ -116,7 +119,7 @@ class RosieDiscoServiceApplication(tornado.web.Application):
         self.db_url_map = db_url_map
 
         # Specify the root URL for the handlers and template.
-        ROOT = "%s-%s" % (self.NAMESPACE, self.UTIL)
+        ROOT = "%s" % (self.NAMESPACE)
         service_root = r"/?"
         if self.service_root_mode:
             service_root = service_root.replace("?", ROOT + r"/?")
@@ -177,6 +180,7 @@ class RosieDiscoServiceApplication(tornado.web.Application):
             static_path=str(
                 Path(metomi.rosie.__file__).parent / 'lib/html/static'
             ),
+            static_url_prefix=self.props["static_url_prefix"]
         )
         super(RosieDiscoServiceApplication, self).__init__(
             handlers, **settings
@@ -218,7 +222,7 @@ class RosieDiscoServiceRoot(tornado.web.RequestHandler):
                 title=self.props["title"],
                 host=self.props["host_name"],
                 rose_version=self.props["rose_version"],
-                script="/static",
+                script=self.props["static_url_prefix"].rstrip("/"),
                 keys=sorted(self.db_url_map.keys()),
             )
         )
@@ -274,7 +278,7 @@ class RosieDiscoService(tornado.web.RequestHandler):
                 title=self.props["title"],
                 host=self.props["host_name"],
                 rose_version=self.props["rose_version"],
-                script="/static",
+                script=self.props["static_url_prefix"].rstrip("/"),
                 service_root=self.service_root,
                 prefix=self.prefix,
                 prefix_source_url=self.source_url,
@@ -310,18 +314,17 @@ class GetHandler(RosieDiscoService):
 
 class HelloHandler(RosieDiscoService):
 
-    """Writes a 'Hello' message to the current logged-in user, else 'user'."""
+    """Writes a 'Hello' message."""
 
-    HELLO = "Hello %s\n"
+    HELLO = "Hello\n"
 
     def get(self, *args):
         """Say Hello on success."""
         format_arg = self.get_query_argument("format", default=None)
-        data = self.HELLO % pwd.getpwuid(os.getuid()).pw_name
         if format_arg == "json":
-            self.write(json.dumps(data))
+            self.write(json.dumps(self.HELLO))
         else:
-            self.write(data)
+            self.write(self.HELLO)
 
 
 class SearchHandler(RosieDiscoService):
@@ -560,7 +563,7 @@ def main():
         print("Started" + user_msg_end)
         append_url_root = ""
         if app.service_root_mode:
-            append_url_root = "%s-%s/" % (app.NAMESPACE, app.UTIL)
+            append_url_root = "%s/" % (app.NAMESPACE)
         # Also print the URL for quick access; 'http://' added so that the URL
         # is hyperlinked in the terminal stdout, but it is not required.
         print(

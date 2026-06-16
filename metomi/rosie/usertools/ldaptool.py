@@ -20,7 +20,7 @@
 """User information via LDAP."""
 
 try:
-    import ldap3 as ldap
+    import ldap as ldap
 except ImportError:
     pass
 import os
@@ -91,4 +91,5 @@ class LDAPUserTool:
         conn.bind_s(binddn, passwd)
         results = conn.search_s(basedn, ldap.SCOPE_SUBTREE, filter_str, [attr])
         conn.unbind()
-        return [result[1][attr][0] for result in results]
+        return [result[1][attr][0].decode('utf-8', errors='replace')
+                for result in results]
