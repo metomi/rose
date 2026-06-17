@@ -378,7 +378,6 @@ class AppRunner(Runner):
 
     def run_impl(self, opts, args, uuid, work_files):
         """The actual logic for a run."""
-
         # Preparation.
         conf_tree = self.config_load(opts)
         self._prep(conf_tree, opts)

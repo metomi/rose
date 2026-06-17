@@ -107,11 +107,16 @@ class UnboundEnvironmentVariableError(Exception):
 
 def env_export(key, value, event_handler=None):
     """Export an environment variable."""
-    if key not in _EXPORTED_ENVS or os.environ.get(key) != value:
+    if (
+        key not in _EXPORTED_ENVS
+        or os.environb.get(key.encode("UTF-8"))
+            != value.encode("UTF-8")
+    ):
         # N.B. Should be safe, because the list of environment variables is
         #      normally quite small.
         _EXPORTED_ENVS[key] = value
         os.environb[key.encode('UTF-8')] = value.encode('UTF-8')
+
         if callable(event_handler):
             event_handler(EnvExportEvent(key, value))
 
@@ -134,7 +139,7 @@ def env_var_escape(text, match_mode=None):
     return ret
 
 
-def env_var_process(text, unbound=None, match_mode=None, environ=os.environ):
+def env_var_process(text, unbound=None, match_mode=None, environ=None):
     """Substitute environment variables into a string.
 
     For each $NAME and ${NAME} in "text", substitute with the value
@@ -145,6 +150,8 @@ def env_var_process(text, unbound=None, match_mode=None, environ=os.environ):
     value of "unbound".
 
     """
+    if environ is None:
+        environ = os.environ
     ret = ""
     try:
         tail = text.decode()

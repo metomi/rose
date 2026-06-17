@@ -35,14 +35,12 @@ def test_output_to_file(tmp_path, monkeypatch):
     outputfile = tmp_path / 'outputfile'
     inputfile.write_text(r'Hello ${WORLD}')
     monkeypatch.setenv('WORLD', 'Jupiter')
-
     opts = SimpleNamespace(
         match_mode=None,
         output_file=str(outputfile),
         unbound=None
     )
     args = [str(inputfile)]
-
     assert rose_env_cat(args, opts) is None
     assert outputfile.read_text() == 'Hello Jupiter'
 
