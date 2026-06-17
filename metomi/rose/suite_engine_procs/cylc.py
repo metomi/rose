@@ -27,6 +27,7 @@ import tarfile
 from time import sleep
 from typing import Any, List, Optional, Tuple
 from uuid import uuid4
+import contextlib
 
 from metomi.rose.fs_util import FileSystemEvent
 from metomi.rose.popen import WorkflowFileNotFoundError, RosePopenError
@@ -81,13 +82,13 @@ class CylcProcessor(SuiteEngineProcessor):
 
         task_platforms = {}
         if cycle_name_tuples is not None:
-            for cycle, name in cycle_name_tuples:
+            for cycle, _ in cycle_name_tuples:
                 new_platforms = get_platforms_from_task_jobs(suite_name, cycle)
                 task_platforms[cycle] = new_platforms
 
         # For each platform get a list of hosts.
         hosts = []
-        for cycle, tasks in task_platforms.items():
+        for _, tasks in task_platforms.items():
             for platform in tasks.values():
                 hosts.append(get_host_from_platform(platform))
         hosts = list(set(hosts))
@@ -126,7 +127,7 @@ class CylcProcessor(SuiteEngineProcessor):
         except KeyError:
             return None
         except (WorkflowFilesError):
-            raise WorkflowFileNotFoundError
+            raise WorkflowFileNotFoundError from None
         else:
             if platform is None:
                 return 'localhost'
@@ -150,7 +151,7 @@ class CylcProcessor(SuiteEngineProcessor):
         task_name = os.environ["CYLC_TASK_NAME"]
         task_cycle_time = os.environ["CYLC_TASK_CYCLE_POINT"]
         cycling_mode = os.environ.get("CYLC_CYCLING_MODE", "gregorian")
-        if task_cycle_time == "1" and not cycling_mode == "integer":
+        if task_cycle_time == "1" and cycling_mode != "integer":
             task_cycle_time = None
         task_log_root = os.environ["CYLC_TASK_LOG_ROOT"]
         task_is_cold_start = "false"
@@ -219,10 +220,8 @@ class CylcProcessor(SuiteEngineProcessor):
                 )
                 self.fs_util.delete(os.path.join("log", "job", cycle))
         finally:
-            try:
+            with contextlib.suppress(OSError):
                 self.fs_util.chdir(cwd)
-            except OSError:
-                pass
 
     def job_logs_housekeep_remote(
         self, suite_name, items, prune_remote_mode=False, force_mode=False,
@@ -296,7 +295,7 @@ class CylcProcessor(SuiteEngineProcessor):
                             excludes = ["/*", "/*/*"]
                         auths_filters.append((auths, includes, excludes))
 
-            for auths, includes, excludes in auths_filters:
+            for auths, includes, _ in auths_filters:
                 for auth in auths:
                     data = {
                         "auth": auth,
@@ -374,10 +373,8 @@ class CylcProcessor(SuiteEngineProcessor):
                 if os.path.exists(dir_name):
                     self.fs_util.delete(dir_name)
         finally:
-            try:
+            with contextlib.suppress(OSError):
                 self.fs_util.chdir(cwd)
-            except OSError:
-                pass
 
     @classmethod
     def parse_job_log_rel_path(cls, f_name):
@@ -466,10 +463,10 @@ class CylcSuiteDAO:
     def close(self):
         """Close the DB connection."""
         if self.conn is not None:
-            try:
+            with contextlib.suppress((sqlite3.OperationalError,
+                                      sqlite3.ProgrammingError)):
                 self.conn.close()
-            except (sqlite3.OperationalError, sqlite3.ProgrammingError):
-                pass
+
         self.cursor = None
         self.conn = None
 

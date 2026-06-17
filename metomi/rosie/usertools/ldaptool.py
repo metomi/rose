@@ -18,11 +18,9 @@
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 """User information via LDAP."""
-
-try:
-    import ldap as ldap
-except ImportError:
-    pass
+import contextlib
+with contextlib.suppress(ImportError):
+    import ldap
 import os
 
 from metomi.rose.resource import ResourceLocator
@@ -75,7 +73,8 @@ class LDAPUserTool:
             ["rosa-ldap", "password-file"], cls.PASSWD_FILE
         )
         if passwd_file:
-            passwd = open(os.path.expanduser(passwd_file)).read().strip()
+            with open(os.path.expanduser(passwd_file)) as file:
+                passwd = file.read().strip()
         basedn = conf.get_value(["rosa-ldap", "basedn"], "")
         filter_str = "(|(uid=" + ")(uid=".join(users) + "))"
         filter_more_str = conf.get_value(["rosa-ldap", "filter-more"], "")

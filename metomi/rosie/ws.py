@@ -52,6 +52,7 @@ from metomi.rose.opt_parse import RoseOptionParser
 from metomi.rose.resource import ResourceLocator
 import metomi.rosie.db
 from metomi.rosie.suite_id import SuiteId
+import contextlib
 
 LOG_ROOT_TMPL = os.path.join(
     "~", ".metomi", "%(ns)s-%(util)s-%(host)s-%(port)s"
@@ -175,13 +176,13 @@ class RosieDiscoServiceApplication(tornado.web.Application):
             )
 
         handlers = [root_handler] + prefix_handlers
-        settings = dict(
-            autoreload=True,
-            static_path=str(
+        settings = {
+            "autoreload": True,
+            "static_path": str(
                 Path(metomi.rosie.__file__).parent / 'lib/html/static'
             ),
-            static_url_prefix=self.props["static_url_prefix"]
-        )
+            "static_url_prefix": self.props["static_url_prefix"]
+        }
         super(RosieDiscoServiceApplication, self).__init__(
             handlers, **settings
         )
@@ -259,7 +260,7 @@ class RosieDiscoService(tornado.web.RequestHandler):
 
             traceback.print_exc()
         except metomi.rosie.db.RosieDatabaseConnectError as exc:
-            raise tornado.web.HTTPError(404, str(exc))
+            raise tornado.web.HTTPError(404, str(exc)) from exc
 
     def _render(self, all_revs=0, data=None, filters=None, s=None):
         """Render return data with a template."""
@@ -393,7 +394,7 @@ class QueryHandler(RosieDiscoService):
         if (
             len(last_groups) > 1
             and last_groups[1]
-            and all([s == ")" for s in last_groups[1]])
+            and all(s == ")" for s in last_groups[1])
         ):
             filt.extend(last_groups)
         else:
@@ -459,13 +460,12 @@ def _get_server_status(application, host, port):
         }
     )
     for filename in glob(log_root_glob + ".status"):
-        try:
-            for line in open(filename):
+        with (contextlib.suppress((IOError, ValueError)),
+              open(filename) as file):
+            for line in file:
                 key, value = line.strip().split("=", 1)
                 ret[key] = value
             break
-        except (IOError, ValueError):
-            pass
     return ret
 
 

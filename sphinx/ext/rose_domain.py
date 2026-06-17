@@ -118,6 +118,7 @@ Referencing Objects Via Intersphinx:
 """
 
 import re
+import contextlib
 
 from docutils.nodes import block_quote
 from docutils.parsers.rst import Directive
@@ -482,10 +483,8 @@ class RoseDirective(ObjectDescription):
         # Separate argument strings (e.g. foo=FOO).
         argument = ''
         if self.ARGUMENT_REGEX:
-            try:
+            with contextlib.suppress(ValueError):
                 name, argument = self.ARGUMENT_REGEX.search(name).groups()
-            except ValueError:
-                pass
 
         # Apply custom name template if specified.
         if hasattr(self, 'custom_name_template'):
@@ -844,7 +843,7 @@ class RoseDomain(Domain):
             return False
         except AttributeError:
             LOGGER.warning(
-                'inter-sphinx required for cross-project ' 'references.'
+                'inter-sphinx required for cross-project references.'
             )
             return False
         try:

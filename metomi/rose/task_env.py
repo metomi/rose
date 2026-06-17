@@ -112,7 +112,7 @@ def get_prepend_paths(
             prepend_paths_map[name].extend(more_prepend_paths)
         elif more_prepend_paths:
             prepend_paths_map[name] = more_prepend_paths
-    for key, prepend_paths in prepend_paths_map.items():
+    for _, prepend_paths in prepend_paths_map.items():
         prepend_paths.reverse()
 
     return prepend_paths_map

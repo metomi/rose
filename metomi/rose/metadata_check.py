@@ -121,9 +121,8 @@ def _check_macro(value, module_files=None, meta_dir=None):
             return INVALID_IMPORT.format(macro, type(exc).__name__, exc)
         if macro_obj is None:
             return INVALID_OBJECT.format(macro)
-        elif method is not None:
-            if not hasattr(macro_obj, method):
-                return INVALID_OBJECT.format(method)
+        elif method is not None and not hasattr(macro_obj, method):
+            return INVALID_OBJECT.format(method)
 
 
 def _check_pattern(value):
@@ -284,15 +283,15 @@ def metadata_check(
                             section, type_like_prop, value, info
                         )
                     )
-        if node.get_value([metomi.rose.META_PROP_TYPE]) == "python_list":
-            if node.get_value([metomi.rose.META_PROP_LENGTH]):
-                info = INCOMPATIBLE.format(metomi.rose.META_PROP_TYPE)
-                value = node.get_value([metomi.rose.META_PROP_LENGTH])
-                reports.append(
-                    metomi.rose.macro.MacroReport(
-                        section, metomi.rose.META_PROP_LENGTH, value, info
-                    )
+        if (node.get_value([metomi.rose.META_PROP_TYPE]) == "python_list"
+           and node.get_value([metomi.rose.META_PROP_LENGTH])):
+            info = INCOMPATIBLE.format(metomi.rose.META_PROP_TYPE)
+            value = node.get_value([metomi.rose.META_PROP_LENGTH])
+            reports.append(
+                metomi.rose.macro.MacroReport(
+                    section, metomi.rose.META_PROP_LENGTH, value, info
                 )
+            )
         options = list(node.value)
         options.sort(key=cmp_to_key(metomi.rose.config.sort_settings))
         for option in options:

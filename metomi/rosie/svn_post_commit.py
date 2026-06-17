@@ -24,7 +24,7 @@ Notify owner and users on access-list on changes to trunk.
 
 """
 
-
+import contextlib
 from difflib import unified_diff
 from email.mime.text import MIMEText
 from io import StringIO
@@ -149,7 +149,7 @@ class RosieSvnPostCommitHook(RosieSvnHook):
         }
         branch_attribs_dict = self._get_suite_branch_changes(repos, revision)
 
-        for key, branch_attribs in sorted(branch_attribs_dict.items()):
+        for _, branch_attribs in sorted(branch_attribs_dict.items()):
             # Update known keys in suite info database meta table
             if branch_attribs["has_changed_known_keys_file"]:
                 self._update_known_keys(dao, changeset_attribs)
@@ -214,7 +214,8 @@ class RosieSvnPostCommitHook(RosieSvnHook):
                                 allow_popen_err=True,
                             )
                         except metomi.rose.config.ConfigSyntaxError as exc:
-                            raise InfoFileError(InfoFileError.VALUE, exc)
+                            raise InfoFileError(InfoFileError.VALUE,
+                                                exc) from None
                     if path_status != self.ST_ADDED:
                         branch_attribs["old_info"] = self._load_info(
                             repos,
@@ -251,7 +252,8 @@ class RosieSvnPostCommitHook(RosieSvnHook):
                             allow_popen_err=True,
                         )
                     except metomi.rose.config.ConfigSyntaxError as exc:
-                        raise InfoFileError(InfoFileError.VALUE, exc)
+                        raise InfoFileError(InfoFileError.VALUE,
+                                            exc) from None
                     # Note: if (allowed) popen err, no DB entry will be created
                 if (
                     branch_attribs["old_info"] is None
@@ -421,15 +423,12 @@ class RosieSvnPostCommitHook(RosieSvnHook):
             "revision": changeset_attribs["revision"],
         }
         # Latest table
-        try:
+        with contextlib.suppress(al.exc.IntegrityError):
             dao.delete(
                 LATEST_TABLE_NAME,
                 idx=vc_attrs["idx"],
                 branch=vc_attrs["branch"],
             )
-        except al.exc.IntegrityError:
-            # idx and branch were just added: there is no previous record.
-            pass
         if branch_attribs["status"] != self.ST_DELETED:
             dao.insert(LATEST_TABLE_NAME, **vc_attrs)
         # N.B. deleted suite branch only has old info

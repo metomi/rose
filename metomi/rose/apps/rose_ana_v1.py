@@ -337,10 +337,8 @@ class Analyse:
 
     def check_extract(self, task):
         """Check if an extract name is present in a user method."""
-        for _, class_name, _, _ in self.user_methods:
-            if task.extract == class_name:
-                return True
-        return False
+        return any(task.extract == class_name for (_, class_name, _, _) in
+                   self.user_methods)
 
     def do_comparison(self, task):
         """Run the comparison."""
@@ -349,7 +347,7 @@ class Analyse:
                 for module in self.modules:
                     if module.__name__ == module_name:
                         comparison_inst = getattr(module, class_name)()
-                        getattr(comparison_inst, "run")(task)
+                        comparison_inst.run(task)
         return task
 
     def do_extract(self, task, var):
@@ -359,7 +357,7 @@ class Analyse:
                 for module in self.modules:
                     if module.__name__ == module_name:
                         extract_inst = getattr(module, class_name)()
-                        getattr(extract_inst, "run")(task, var)
+                        extract_inst.run(task, var)
         return task
 
     def _run_command(self, command):

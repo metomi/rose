@@ -175,7 +175,8 @@ class RosePruneApp(BuiltinApp):
         try:
             items_str = env_var_process(items_str)
         except UnboundEnvironmentVariableError as exc:
-            raise ConfigValueError([self.SECTION, key], items_str, exc)
+            raise ConfigValueError([self.SECTION, key],
+                                   items_str, exc) from None
         items = []
         ref_point_str = os.getenv(RoseDateTimeOperator.TASK_CYCLE_TIME_ENV)
         try:
@@ -219,7 +220,8 @@ class RosePruneApp(BuiltinApp):
                 else:
                     items.append(cycle)
         except ValueError as exc:
-            raise ConfigValueError([self.SECTION, key], items_str, exc)
+            raise ConfigValueError([self.SECTION, key],
+                                   items_str, exc) from None
         return items
 
     @classmethod
@@ -256,7 +258,7 @@ class RosePruneApp(BuiltinApp):
                 except (UnboundEnvironmentVariableError, ValueError) as exc:
                     raise ConfigValueError(
                         [self.SECTION, key], node.value, exc
-                    )
+                    ) from None
         cycle_set = set()
         for key, node in sorted(nodes.items()):
             if node.is_ignored():

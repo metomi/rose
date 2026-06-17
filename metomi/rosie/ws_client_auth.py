@@ -32,6 +32,7 @@ from metomi.rose.env import env_var_process
 from metomi.rose.popen import RosePopener
 from metomi.rose.reporter import Reporter
 from metomi.rose.resource import ResourceLocator
+import contextlib
 
 try:
     import keyring
@@ -128,7 +129,7 @@ class GPGAgentStore(BaseStore):
         try:
             gpg_socket.connect(socket_address)
         except socket.error as exc:
-            raise GPGAgentStoreConnectionError(f"socket error: {exc}")
+            raise GPGAgentStoreConnectionError(f"socket error: {exc}") from exc
         cls._socket_receive(gpg_socket, b"^OK .*\n")
         gpg_socket.send(b"GETINFO socket_name\n")
         reply = cls._socket_receive(gpg_socket, b"^(?!OK)[^ ]+ .*\n")
@@ -242,11 +243,8 @@ class KeyringStore(BaseStore):
     def clear_password(
         self, scheme: str, host: str, username: str
     ) -> None:
-        try:
+        with contextlib.suppress(keyring.errors.PasswordDeleteError):
             keyring.delete_password(host, username)
-        except keyring.errors.PasswordDeleteError:
-            # No such password
-            pass
 
 
 class RosieWSClientAuthManager:
