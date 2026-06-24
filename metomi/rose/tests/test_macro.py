@@ -30,7 +30,7 @@ def test_pretty_format_config(capsys):
     node.set(['namelist:a', 'Foo'], 'bar')
 
     _out, err = capsys.readouterr()
-    assert _out, err == None
+    assert (_out, err) == None
 
     # which should cause this call to exit 1
     with pytest.raises(SystemExit) as exc_ctx:
