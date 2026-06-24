@@ -1066,21 +1066,27 @@ def pretty_format_config(config, ignore_error=False):
             pretty_format_keys = getattr(scheme_module, "pretty_format_keys")
             pretty_format_value = getattr(scheme_module, "pretty_format_value")
         except AttributeError:
+            print('#1', file=sys.stderr)
             continue
         for keylist, node in list(s_node.walk()):
             # FIXME: Surely, only the scheme knows how to split its array?
+            print(f'#2 {keylist=}', file=sys.stderr)
             values = metomi.rose.variable.array_split(node.value, ",")
             node.value = pretty_format_value(values)
             new_keylist = pretty_format_keys(keylist)
+            print(f'#3 {new_keylist=} {node.value=}')
             if new_keylist != keylist:
+                print(f'#4 {ignore_error=}')
                 s_node.unset(keylist)
                 s_node.set(new_keylist, node.value, node.state, node.comments)
                 if ignore_error is False:
+                    print('#5')
                     _report_error(
                         text=ERROR_MACRO_CASE_MISMATCH.format(
                             keylist[1], new_keylist[1]
                         )
                     )
+                    print('#6')
                     sys.exit(1)
 
 
