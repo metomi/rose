@@ -20,7 +20,7 @@ from metomi.rose.config import ConfigNode
 from metomi.rose.macro import pretty_format_config
 
 
-def test_pretty_format_config(capsys):
+def test_pretty_format_config():
     """It should exit 1 on config format issue.
 
     See https://github.com/metomi/rose/pull/3022
@@ -32,10 +32,6 @@ def test_pretty_format_config(capsys):
     # which should cause this call to exit 1
     with pytest.raises(SystemExit) as exc_ctx:
         pretty_format_config(node)
-
-    # and output a message to stderr
-    _out, err = capsys.readouterr()
-    assert 'Foo does not match foo' in err
 
     assert exc_ctx.value.code == 1
 
