@@ -1074,19 +1074,19 @@ def pretty_format_config(config, ignore_error=False):
             values = metomi.rose.variable.array_split(node.value, ",")
             node.value = pretty_format_value(values)
             new_keylist = pretty_format_keys(keylist)
-            print(f'#3 {new_keylist=} {node.value=}')
+            print(f'#3 {new_keylist=} {node.value=}', file=sys.stderr)
             if new_keylist != keylist:
-                print(f'#4 {ignore_error=}')
+                print(f'#4 {ignore_error=}', file=sys.stderr)
                 s_node.unset(keylist)
                 s_node.set(new_keylist, node.value, node.state, node.comments)
                 if ignore_error is False:
-                    print('#5')
+                    print('#5', file=sys.stderr)
                     _report_error(
                         text=ERROR_MACRO_CASE_MISMATCH.format(
                             keylist[1], new_keylist[1]
                         )
                     )
-                    print('#6')
+                    print('#6', file=sys.stderr)
                     sys.exit(1)
 
 

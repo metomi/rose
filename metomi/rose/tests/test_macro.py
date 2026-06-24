@@ -33,8 +33,10 @@ def test_pretty_format_config(capsys):
     with pytest.raises(SystemExit) as exc_ctx:
         pretty_format_config(node)
 
-    assert exc_ctx.value.code == 1
-
     # and output a message to stderr
     _out, err = capsys.readouterr()
     assert 'Foo does not match foo' in err
+
+    assert exc_ctx.value.code == 1
+
+
