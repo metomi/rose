@@ -369,7 +369,7 @@ Rose Applications In Rose Suite Configurations
    #. **Create a test configuration for the** ``forecast`` **application.**
 
       The ``forecast`` application comes with test data
-      (in ``file/test-date``), and is currently set up to work with
+      (in ``file/test-data``), and is currently set up to work with
       this data.
 
       We will now adjust this configuration to make it work with
