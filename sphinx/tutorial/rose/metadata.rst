@@ -69,7 +69,7 @@ The Metadata Format
    values=Mercury, Venus, Earth, Mars, Jupiter,
          =Saturn, Uranus, Neptune
 
-This example gives the ``WORLD`` variable a title and a list of allowed values.
+This example gives the ``WORLD`` variable a description and a list of allowed values.
 
 
 Metadata Commands
