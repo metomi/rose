@@ -185,13 +185,6 @@ jobs:
             libdbi-perl \
             libdbd-sqlite3-perl
 
-          # install wandisco
-          sudo sh -c 'echo "deb http://opensource.wandisco.com/ubuntu \
-            `lsb_release -cs` svn19" \
-            >> /etc/apt/sources.list.d/subversion19.list'
-          sudo wget -q http://opensource.wandisco.com/wandisco-debian.gpg -O- \
-            | sudo apt-key add -
-
           # prepend FCM bin to $PATH
           FCM_PATH="$GITHUB_WORKSPACE/fcm/bin"
           # the github actions way (needed for cylc jobs)
