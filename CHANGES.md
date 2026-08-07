@@ -10,6 +10,10 @@ $ towncrier create <PR-number>.<break|feat|fix>.md --content "Short description"
 
 <!-- towncrier release notes start -->
 
+## 2.7.1 (Released 2026-06-18)
+
+Some small updates to the Rose tutorials.
+
 ## 2.7.0 (Released 2026-02-24)
 
 ### 🚀 Enhancements

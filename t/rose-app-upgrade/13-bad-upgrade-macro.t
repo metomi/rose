@@ -56,7 +56,7 @@ class Upgrade01to02(metomi.rose.upgrade.MacroUpgrade):
         return config, self.reports
 __MACRO__
 
-run_pass "$TEST_KEY" rose app-upgrade -y \
+run_fail "$TEST_KEY" rose app-upgrade -y \
 --meta-path=../rose-meta/ -C ../config/ 0.2
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" <<'__OUTPUT__'
 [U] Upgrade_0.1-0.2: changes: 2
