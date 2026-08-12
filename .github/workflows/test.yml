@@ -145,13 +145,12 @@ jobs:
       - name: Configure git  # Configure Git for Git dependent tests.
         uses: cylc/release-actions/configure-git@v1
 
-      - name: Install Rose
+      - name: Install Node Packages
         working-directory: rose
         run: |
-          pip install ."[tests,docs,rose-edit,graph,rosa,disco,ldap]"
           yarn install
 
-      - name: Install Cylc
+      - name: Install
         uses: cylc/release-actions/install-cylc-components@v1
         with:
           branch: ${{ inputs.rose_ref || '' }}
@@ -163,6 +162,7 @@ jobs:
           cylc_rose_opts: ''
           cylc_rose_repo: ${{ inputs.cylc_rose_repo || 'cylc/cylc-rose' }}
           cylc_rose_tag: ${{ inputs.cylc_rose_tag }}
+          local_source: ./rose[tests,docs,rose-edit,graph,rosa,disco,ldap]
 
       - name: Checkout FCM
         if: startsWith(matrix.os, 'ubuntu')
@@ -185,13 +185,6 @@ jobs:
             libconfig-inifiles-perl \
             libdbi-perl \
             libdbd-sqlite3-perl
-
-          # install wandisco
-          sudo sh -c 'echo "deb http://opensource.wandisco.com/ubuntu \
-            `lsb_release -cs` svn19" \
-            >> /etc/apt/sources.list.d/subversion19.list'
-          sudo wget -q http://opensource.wandisco.com/wandisco-debian.gpg -O- \
-            | sudo apt-key add -
 
           # prepend FCM bin to $PATH
           FCM_PATH="$GITHUB_WORKSPACE/fcm/bin"
@@ -258,11 +251,7 @@ jobs:
             pygobject>=3.50.0
             gtk3>=3.24.43
 
-      - name: Install Rose
-        run: |
-          pip install -e .[docs,graph,edit,disco] --upgrade-strategy='only-if-needed'
-
-      - name: Install Cylc
+      - name: Install
         uses: cylc/release-actions/install-cylc-components@v1
         with:
           branch: ${{ inputs.rose_ref || '' }}
@@ -274,6 +263,7 @@ jobs:
           cylc_rose_opts: ''
           cylc_rose_repo: ${{ inputs.cylc_rose_repo || 'cylc/cylc-rose' }}
           cylc_rose_tag: ${{ inputs.cylc_rose_tag }}
+          local_source: .[docs,graph,edit,disco]
 
       - name: build (html)
         run: |
