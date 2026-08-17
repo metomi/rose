@@ -237,9 +237,9 @@ Arch Settings
 Some settings that can be used are described below. See the :ref:`rose_arch`
 documentation for more information:
 
-Above ``.tar`` was used to compress the file. However, ``compress=gzip``
-can also be used. Note either of these commands can be used to compress a
-file or a folder/directory.
+Above ``.tar`` was used to compress the file. However, ``compress=gzip``,
+``compress=xz`` or ``compress=zstd`` can also be used. Note any of these
+commands can be used to compress a file or a folder/directory.
 
 In the above example a regular expression 'reg exp' was used by the
 ``rename-parser``, for example, ``^.*list(?P<tag>.*)$``, where:

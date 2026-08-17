@@ -14,18 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-"""Compress archive sources in gzip."""
+"""Compress archive sources using xz."""
 
 
 from metomi.rose.apps.rose_arch_compressions.compression_util import (
-    GZIP,
+    XZ,
     RoseArchCompressor,
 )
 
 
-class RoseArchGzip(RoseArchCompressor):
+class RoseArchXz(RoseArchCompressor):
 
-    """Compress archive sources in gzip."""
+    """Compress archive sources in xz."""
 
-    SCHEMES = ["gz", "gzip"]
-    COMPRESSOR = GZIP
+    SCHEMES = ["xz"]
+    COMPRESSOR = XZ
