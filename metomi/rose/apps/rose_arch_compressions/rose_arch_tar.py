@@ -20,24 +20,56 @@ import os
 import tarfile
 from tempfile import mkstemp
 
+from metomi.rose.apps.rose_arch_compressions.compression_util import (
+    GZIP,
+    MULTI_THREADED,
+    XZ,
+    ZSTD,
+    check_threads,
+    compress,
+)
+
 
 class RoseArchTarGzip:
 
     """Compress archive sources in tar."""
 
-    SCHEMES = ["pax", "pax.gz", "tar", "tar.gz", "tgz"]
-    SCHEME_FORMATS = {"pax": tarfile.PAX_FORMAT, "pax.gz": tarfile.PAX_FORMAT}
-    GZIP_EXTS = ["pax.gz", "tar.gz", "tgz"]
+    # Compression scheme: compressor to apply to the tar file.
+    COMPRESSORS = {
+        "pax.gz": GZIP,
+        "tar.gz": GZIP,
+        "tgz": GZIP,
+        "pax.xz": XZ,
+        "tar.xz": XZ,
+        "txz": XZ,
+        "pax.zst": ZSTD,
+        "tar.zst": ZSTD,
+        "tzst": ZSTD,
+    }
+    SCHEMES = ["pax", "tar"] + list(COMPRESSORS)
+    SCHEME_FORMATS = {
+        scheme: tarfile.PAX_FORMAT
+        for scheme in SCHEMES
+        if scheme.startswith("pax")
+    }
 
     def __init__(self, app_runner, *args, **kwargs):
         self.app_runner = app_runner
 
-    def compress_sources(self, target, work_dir):
+    @classmethod
+    def supports_threads(cls, scheme):
+        """Return True if "scheme" can be compressed with many threads."""
+        return cls.COMPRESSORS.get(scheme) in MULTI_THREADED
+
+    def compress_sources(self, target, work_dir, threads=1):
         """Create a tar archive of all files in target.
 
         Use work_dir to dump results.
 
         """
+        compressor = self.COMPRESSORS.get(target.compress_scheme)
+        check_threads(compressor or target.compress_scheme, threads)
+
         sources = list(target.sources.values())
         if len(sources) == 1 and sources[0].path.endswith(
             "." + target.compress_scheme
@@ -60,13 +92,12 @@ class RoseArchTarGzip:
             tarinfo = tarhandle.gettarinfo(arcname=source.name, fileobj=handle)
             tarhandle.addfile(tarinfo, handle)
         tarhandle.close()
-        # N.B. Python's gzip is slow
-        if target.compress_scheme in self.GZIP_EXTS:
-            fdsec, gz_name = mkstemp(
+
+        if compressor is not None:
+            fdsec, work_path = mkstemp(
                 suffix="." + target.compress_scheme, dir=work_dir
             )
             os.close(fdsec)
-            target.work_source_path = gz_name
-            command = "gzip -c '%s' >'%s'" % (tar_name, gz_name)
-            self.app_runner.popen.run_simple(command, shell=True)
+            target.work_source_path = work_path
+            compress(self.app_runner, compressor, tar_name, work_path, threads)
             self.app_runner.fs_util.delete(tar_name)
