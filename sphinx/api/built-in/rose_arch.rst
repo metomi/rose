@@ -32,7 +32,7 @@ The application provides some useful functionalities:
   source files and the return code of archive command. In a retry, it
   would only redo targets that did not succeed in the previous attempts.
 * Rename source files.
-* Tar-Gzip or Gzip source files before sending them to the archive.
+* Tar and/or compress source files before sending them to the archive.
 
 
 Invocation
@@ -124,8 +124,8 @@ on:
    [arch:(black-box/)]
    source=cats.txt dogs.txt
 
-Zipping files
-^^^^^^^^^^^^^
+Compressing files
+^^^^^^^^^^^^^^^^^
 There are multiple ways of specifying that you want your archive to be
 compressed:
 
@@ -147,11 +147,11 @@ not recognized by rose arch as an extension to be compressed.)
 
 For more details see :rose:conf:`rose_arch[arch]compress`
 
-Zipping directories
-^^^^^^^^^^^^^^^^^^^
-You can tar and zip entire directories - as with single files Rose Arch will
-attempt to infer archive and compression from ``[arch:TARGET.extension]`` if it
-can:
+Compressing directories
+^^^^^^^^^^^^^^^^^^^^^^^
+You can tar and compress entire directories - as with single files Rose
+Arch will attempt to infer archive and compression from
+``[arch:TARGET.extension]`` if it can:
 
 .. code-block:: rose
 
@@ -205,6 +205,22 @@ with names in the form ``data_001.txt``:
    source=/some/path/data*.txt
    rename-parser=^//some//path//data_(?P<serial_number>[0-9]{3})(?P<name_tail>.*)$
    rename-format=hello/%(cycle)s-%(name_head)s%(name_tail)s
+
+Using multiple threads for compression (zstd only)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The number of threads used to compress each file is controlled by the
+:rose:conf:`rose_arch[arch]compress-threads` setting. This can significantly
+improve throughput for large files, but is only supported by ``zstd``.
+
+.. code-block:: rose
+
+   [arch:large-data.tar.zst]
+   compress=tar.zst
+   compress-threads=8
+   source=large-data/*
+
+In this example ``zstd`` will use 8 threads.
 
 Output
 ------
@@ -262,7 +278,7 @@ Configuration
          and ``%(target)s`` for substitution of the sources and the target
          respectively.
 
-      .. rose:conf:: compress=pax|tar|pax.gz|tar.gz|tgz|gz
+      .. rose:conf:: compress=pax|tar|pax.gz|tar.gz|tgz|gz|gzip|pax.xz|tar.xz|txz|xz|pax.zst|tar.zst|tzst|zst|zstd
 
          If specified, compress source files scheme before sending them to the
          archive. If not set Rose Arch will attempt to set a compression scheme
@@ -272,19 +288,92 @@ Configuration
 
          Each compression scheme works slightly differently:
 
-         +------------------+-----------------------------------------------+
-         |Compression Scheme|Behaviour                                      |
-         +------------------+-----------------------------------------------+
-         |``pax`` or ``tar``|Sources will be placed in a TAR archive before |
-         |                  |being sent to the target.                      |
-         +------------------+-----------------------------------------------+
-         |``pax.gz``,       |Sources will be placed in a TAR-GZIP file      |
-         |``tar.gz`` or     |before being sent to the target.               |
-         |``tgz``           |                                               |
-         +------------------+-----------------------------------------------+
-         |``gz``            |Each source file will be compressed by GZIP    |
-         |                  |before being sent to the target.               |
-         +------------------+-----------------------------------------------+
+         +------------------------+-------------------------------------------+
+         |Compression Scheme      |Behaviour                                  |
+         +------------------------+-------------------------------------------+
+         |``pax`` or ``tar``      |Sources will be placed in a TAR archive    |
+         |                        |before being sent to the target.           |
+         +------------------------+-------------------------------------------+
+         |``pax.gz``, ``tar.gz``  |Sources will be placed in a TAR archive    |
+         |or ``tgz``              |which is then compressed by gzip before    |
+         |                        |being sent to the target.                  |
+         +------------------------+-------------------------------------------+
+         |``pax.xz``, ``tar.xz``  |Sources will be placed in a TAR archive    |
+         |or ``txz``              |which is then compressed by xz before      |
+         |                        |being sent to the target.                  |
+         +------------------------+-------------------------------------------+
+         |``pax.zst``,            |Sources will be placed in a TAR archive    |
+         |``tar.zst`` or ``tzst`` |which is then compressed by zstd before    |
+         |                        |being sent to the target.                  |
+         +------------------------+-------------------------------------------+
+         |``gz`` or ``gzip``      |Each source file will be compressed by     |
+         |                        |gzip before being sent to the target.      |
+         +------------------------+-------------------------------------------+
+         |``xz``                  |Each source file will be compressed by     |
+         |                        |xz before being sent to the target.        |
+         +------------------------+-------------------------------------------+
+         |``zst`` or ``zstd``     |Each source file will be compressed by     |
+         |                        |zstd before being sent to the target.      |
+         +------------------------+-------------------------------------------+
+
+         .. note::
+
+            Compression is done with the relevant Python library where one
+            is available, falling back to the ``gzip``, ``xz`` or ``zstd``
+            command line tool otherwise. At least one of the two must be
+            available on the platform running the application. Either way
+            the source is read and written a chunk at a time, so a source
+            much bigger than the available memory can be compressed.
+
+            For multi-threaded ``zstd`` compression specifically, a Python
+            library is only used if the ``zstandard`` package is installed;
+            the standard library ``compression.zstd`` module (Python 3.14+)
+            is only used for single-threaded compression, as it has been
+            found not to scale reliably across threads. Setting the
+            ``ROSE_ARCH_ZSTD_FORCE_CLI`` environment variable (to any
+            non-empty value) forces the ``zstd`` command line tool to be
+            used unconditionally for zstd compression, regardless of
+            thread count or what is installed.
+
+      .. rose:conf:: compress-threads=0|1|2|...
+
+         :default: 1
+
+         The number of threads to compress each file with.
+
+         * ``1``: Single threaded compression.
+         * ``0``: Let the compression tool determine the number of threads to
+           use, which is typically the number of detected CPU cores. This
+           should be used with caution on shared resources.
+         * Any other positive integer: use exactly that number of threads. It
+           is not recommended to exceed the number of physical CPU cores on
+           the platform running the application.
+
+         This setting is only supported by ``zstd``, i.e. the ``zst``,
+         ``zstd``, ``pax.zst``, ``tar.zst`` and ``tzst`` compression schemes.
+         Setting it to anything other than ``1`` for any other scheme is a
+         configuration error, and the target will not be archived.
+
+         .. note::
+
+            Multi-threaded compression only pays off for a properly large
+            source. Spinning up many threads to compress a small file adds
+            overhead (thread start-up, coordination) for little or no
+            speed benefit, and wastes resources on shared systems. As a
+            rule of thumb, do not request more threads than there are
+            tens of MB of source data per thread, and prefer ``0`` over a
+            large fixed number where the source size varies, so that
+            small sources are not compressed with needlessly many
+            threads.
+
+         Example:
+
+         .. code-block:: rose
+
+            [arch:example.tar.zst]
+            compress=tar.zst
+            compress-threads=4
+            source=example/*
 
       .. rose:conf:: rename-format
 
