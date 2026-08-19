@@ -247,6 +247,13 @@ def test_gzip_always_uses_the_command_line():
     assert compression_util._get_compress_func(GZIP, 1) is None
 
 
+@pytest.mark.parametrize("threads", [1, 2, 0])
+def test_zstd_force_cli_env_var(monkeypatch, threads):
+    """ROSE_ARCH_ZSTD_FORCE_CLI forces the command line tool for zstd."""
+    monkeypatch.setenv(compression_util.ZSTD_FORCE_CLI, "1")
+    assert compression_util._get_compress_func(ZSTD, threads) is None
+
+
 def test_get_command_quotes_paths():
     """Paths are quoted so that a shell cannot act on their contents."""
     command = compression_util._get_command(

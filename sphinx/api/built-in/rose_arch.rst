@@ -325,6 +325,16 @@ Configuration
             the source is read and written a chunk at a time, so a source
             much bigger than the available memory can be compressed.
 
+            For multi-threaded ``zstd`` compression specifically, a Python
+            library is only used if the ``zstandard`` package is installed;
+            the standard library ``compression.zstd`` module (Python 3.14+)
+            is only used for single-threaded compression, as it has been
+            found not to scale reliably across threads. Setting the
+            ``ROSE_ARCH_ZSTD_FORCE_CLI`` environment variable (to any
+            non-empty value) forces the ``zstd`` command line tool to be
+            used unconditionally for zstd compression, regardless of
+            thread count or what is installed.
+
       .. rose:conf:: compress-threads=0|1|2|...
 
          :default: 1
@@ -343,6 +353,18 @@ Configuration
          ``zstd``, ``pax.zst``, ``tar.zst`` and ``tzst`` compression schemes.
          Setting it to anything other than ``1`` for any other scheme is a
          configuration error, and the target will not be archived.
+
+         .. note::
+
+            Multi-threaded compression only pays off for a properly large
+            source. Spinning up many threads to compress a small file adds
+            overhead (thread start-up, coordination) for little or no
+            speed benefit, and wastes resources on shared systems. As a
+            rule of thumb, do not request more threads than there are
+            tens of MB of source data per thread, and prefer ``0`` over a
+            large fixed number where the source size varies, so that
+            small sources are not compressed with needlessly many
+            threads.
 
          Example:
 
