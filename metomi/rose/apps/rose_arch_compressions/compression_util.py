@@ -33,9 +33,25 @@ ZSTD = "zstd"
 # Only zstd is able to compress a single stream with more than one thread.
 MULTI_THREADED = (ZSTD,)
 
+# Set this environment variable (to any non-empty value) to always use the
+# "zstd" command line tool for zstd compression, bypassing both Python
+# libraries, regardless of the number of threads requested or what is
+# installed. Useful where a Python zstd library is present but is known
+# not to perform well (see the note in "_get_zstd_compress_func" below),
+# or simply to force the same tool to be used everywhere on a site.
+ZSTD_FORCE_CLI = "ROSE_ARCH_ZSTD_FORCE_CLI"
+
 # The amount read from a source at a time. Sources can be much larger than
 # the available memory, so they are never read in one go.
-CHUNK_SIZE = 1024 * 1024
+#
+# This only applies to single-threaded compression (xz, or zstd when only
+# one thread is requested) - multi-threaded zstd compression uses the
+# "zstandard" distribution or the command line tool instead, both of
+# which manage their own internal chunking. A moderate value is used
+# here: too small (e.g. 1 MiB) adds unnecessary Python call overhead, and
+# going much bigger gives no benefit while risking memory pressure of its
+# own on constrained systems.
+CHUNK_SIZE = 16 * 1024 * 1024
 
 
 class RoseArchCompressThreadsError(Exception):
@@ -129,21 +145,35 @@ def _get_compress_func(compressor, threads):
 
 
 def _get_zstd_compress_func(threads):
-    """Return a streaming zstd compress function, or None if none is usable."""
+    """Return a streaming zstd compress function, or None if none is usable.
+
+    Python 3.14's stdlib "compression.zstd" is only used here for
+    single-threaded compression. Testing its multi-threaded "nb_workers"
+    option against a real multi-hundred-GB file showed it giving far
+    lower throughput than both the "zstd" command line tool and the
+    "zstandard" distribution at the same thread count, and using barely
+    more than one CPU's worth of work even in a smaller, isolated test -
+    i.e. it does not reliably deliver the multi-threaded speedup it is
+    asked for. So multi-threaded requests skip straight past it to
+    "zstandard" or, failing that, the command line tool, both of which
+    have been confirmed to scale with threads on real data.
+
+    Setting the ZSTD_FORCE_CLI environment variable forces the command
+    line tool to be used unconditionally, regardless of thread count or
+    what is importable, for sites that want that guarantee.
+
+    """
+    if os.environ.get(ZSTD_FORCE_CLI):
+        return None
     if threads == 0:
         threads = os.cpu_count() or 1
-    try:
-        from compression import zstd  # Python 3.14 and above
-    except ImportError:
-        pass
-    else:
-        new_compressor = zstd.ZstdCompressor
-        if threads != 1:
-            new_compressor = partial(
-                zstd.ZstdCompressor,
-                options={zstd.CompressionParameter.nb_workers: threads},
-            )
-        return partial(_copy_compressed, new_compressor)
+    if threads == 1:
+        try:
+            from compression import zstd  # Python 3.14 and above
+        except ImportError:
+            pass
+        else:
+            return partial(_copy_compressed, zstd.ZstdCompressor)
     try:
         import zstandard  # the "zstandard" distribution
     except ImportError:
