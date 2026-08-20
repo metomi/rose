@@ -65,15 +65,17 @@ Synopsis:
 
 Classes:
     .. autosummary::
-        metomi.rose.config.ConfigNode
-        metomi.rose.config.ConfigNodeDiff
-        metomi.rose.config.ConfigDumper
-        metomi.rose.config.ConfigLoader
+
+       ConfigNode
+       ConfigNodeDiff
+       ConfigDumper
+       ConfigLoader
 
 Functions:
     .. autosummary::
-       metomi.rose.config.load
-       metomi.rose.config.dump
+
+       load
+       dump
 
 Limitations:
     - The loader does not handle trailing comments.
