@@ -470,7 +470,7 @@ Rose Applications In Rose Suite Configurations
          INTERVAL=60
          N_FORECASTS=5
          WEIGHTING=1
-         MAP_TEMPLATE=map-template.html
+         MAP_TEMPLATE=$CYLC_WORKFLOW_RUN_DIR/lib/template/map.html
          SPLINE_LEVEL=0
          WIND_FILE_TEMPLATE=$CYLC_WORKFLOW_WORK_DIR/{cycle}/consolidate_observations/wind_{xy}.csv
          WIND_CYCLES=0, -3, -6
