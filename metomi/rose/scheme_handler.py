@@ -22,6 +22,7 @@ import inspect
 import os
 from pathlib import Path
 import sys
+import contextlib
 
 
 class SchemeHandlersManager:
@@ -112,10 +113,8 @@ class SchemeHandlersManager:
         Return None if there is no handler with a matching scheme.
 
         """
-        try:
+        with contextlib.suppress((KeyError, TypeError)):
             return self.handlers[scheme]
-        except (KeyError, TypeError):
-            pass
 
     def guess_handler(self, item):
         """Return a handler that can handle item.

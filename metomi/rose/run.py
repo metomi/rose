@@ -21,6 +21,7 @@ import shlex
 import shutil
 from typing import List, Optional
 from uuid import uuid4
+import contextlib
 
 from metomi.rose.config_processor import ConfigProcessorsManager
 from metomi.rose.config_tree import ConfigTreeLoader
@@ -194,33 +195,26 @@ class Runner:
         if isinstance(opts, dict):
             opts = Dummy(**opts)
         cwd = os.getcwd()
-        environ = dict(os.environ)
         uuid = str(uuid4())
         work_files = []
         try:
             return self.run_impl(opts, args, uuid, work_files)
         finally:
             # Close handle on specific log file
-            try:
+            with contextlib.suppress((KeyError, IOError, AttributeError)):
                 self.event_handler.contexts[uuid].handle.close()
-            except (KeyError, IOError, AttributeError):
-                pass
             # Remove work files
             for work_file in work_files:
-                try:
+                with contextlib.suppress(OSError):
                     if os.path.isfile(work_file) or os.path.islink(work_file):
                         os.unlink(work_file)
                     elif os.path.isdir(work_file):
                         shutil.rmtree(work_file)
-                except OSError:
-                    pass
             # Change back to original working directory
-            try:
+            with contextlib.suppress(OSError):
                 os.chdir(cwd)
-            except OSError:
-                pass
             # Reset os.environ
-            os.environ = dict(environ)
+            os.environ.clear()
 
     __call__ = run
 

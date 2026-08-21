@@ -357,7 +357,7 @@ class RosePopener:
         except OSError as exc:
             if exc.filename is None and args:
                 exc.filename = args[0]
-            raise RosePopenError(args, 1, "", str(exc))
+            raise RosePopenError(args, 1, "", str(exc)) from None
         return proc
 
     async def run_async(self, *args, **kwargs):

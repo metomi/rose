@@ -294,7 +294,8 @@ class RosieVCClient:
                 )
                 self.popen("svn", "export", "-q", "--force", from_id_url, dir_)
             else:
-                open(os.path.join(dir_, "rose-suite.conf"), "w").close()
+                with open(os.path.join(dir_, "rose-suite.conf"), "w") as file:
+                    file.close()
             metomi.rose.config.dump(
                 info_config, os.path.join(dir_, "rose-suite.info")
             )
@@ -767,7 +768,7 @@ def _edit_info_config(opts, client, info_config):
         temp_file.close()
         command_list = client.popen.get_cmd("editor", temp_name)
         client.popen(*command_list, stdin=sys.stdin, stdout=sys.stdout)
-    except (IOError, OSError, RosePopenError) as exc:
+    except (OSError, RosePopenError) as exc:
         client.event_handler(exc)
         sys.exit(1)
     else:

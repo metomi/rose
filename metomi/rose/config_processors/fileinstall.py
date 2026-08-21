@@ -29,6 +29,7 @@ import sqlite3
 from tempfile import mkdtemp
 from typing import Any, Optional
 from urllib.parse import urlparse
+import contextlib
 
 import aiofiles
 from metomi.rose.checksum import (
@@ -149,11 +150,11 @@ class ConfigProcessorForFile(ConfigProcessorBase):
         """Helper for self.process."""
         # Ensure that everything is overwritable
         # Ensure that container directories exist
-        for key, node in sorted(nodes.items()):
+        for key, _ in sorted(nodes.items()):
             try:
                 name = env_var_process(key[len(self.PREFIX) :])
             except UnboundEnvironmentVariableError as exc:
-                raise ConfigProcessError([key], key, exc)
+                raise ConfigProcessError([key], key, exc) from None
             if os.path.exists(name) and kwargs.get("no_overwrite_mode"):
                 raise ConfigProcessError([key], None, FileOverwriteError(name))
             self.manager.fs_util.makedirs(self.manager.fs_util.dirname(name))
@@ -177,7 +178,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                 try:
                     source_str = env_var_process(source_str)
                 except UnboundEnvironmentVariableError as exc:
-                    raise ConfigProcessError([key, k], source_str, exc)
+                    raise ConfigProcessError([key, k],
+                                             source_str, exc) from None
                 source_names = []
                 for raw_source_glob in shlex.split(source_str):
                     source_glob = raw_source_glob
@@ -255,7 +257,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                         ["file:" + source.used_by_names[0], "source"],
                         source.name,
                         exc
-                    )
+                    ) from None
             prev_source = loc_dao.select(source.name)
             source.is_out_of_date = (
                 not prev_source
@@ -335,7 +337,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
 
         # Set up jobs for rebuilding all out-of-date targets.
         jobs = {}
-        for name, target in sorted(targets.items()):
+        for _, target in sorted(targets.items()):
             if not target.is_out_of_date:
                 self.handle_event(FileUnchangedEvent(target, level=Event.V))
                 continue
@@ -348,7 +350,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                             [self.PREFIX + target.name, "source"],
                             target.real_name,
                             exc,
-                        )
+                        ) from None
                 self.manager.fs_util.symlink(target.real_name, target.name)
                 loc_dao.update_locs.append(target)
             elif target.mode == target.MODE_MKDIR:
@@ -406,7 +408,7 @@ class ConfigProcessorForFile(ConfigProcessorBase):
                             self.PREFIX + source.used_by_names[0],
                             "source",
                         ]
-                        raise ConfigProcessError(keys, source.name)
+                        raise ConfigProcessError(keys, source.name) from None
                 raise exc
             finally:
                 loc_dao.execute_queued_items()
@@ -454,10 +456,8 @@ class ConfigProcessorForFile(ConfigProcessorBase):
 
     def set_event_handler(self, event_handler):
         """Sets the event handler, used by pool workers to capture events."""
-        try:
+        with contextlib.suppress(AttributeError):
             self.manager.event_handler.event_handler = event_handler
-        except AttributeError:
-            pass
 
     async def _source_pull(self, source, conf_tree, work_dir):
         """Pulls a source to its cache in the work directory."""
@@ -799,10 +799,8 @@ class LocDAO:
                         )
             conn.commit()
         except sqlite3.Error:
-            try:
+            with contextlib.suppress(sqlite3.Error):
                 self.conn.rollback()
-            except sqlite3.Error:
-                pass
             raise
         else:
             del self.delete_locs[:]

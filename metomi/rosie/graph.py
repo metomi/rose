@@ -136,7 +136,7 @@ def calculate_edges(
             style="filled",
         )
 
-        ok_nodes = set([])
+        ok_nodes = set()
         while node_stack:
             node, distance = node_stack.pop()
             if max_distance is not None and distance > max_distance:

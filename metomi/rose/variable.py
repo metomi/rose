@@ -278,9 +278,9 @@ def _is_quote_state_change(string, index, quote_lookup, quote_state):
     prev_letters_escaped = i % 2 == 0
     if index < len(string) - 1:
         next_letter_is_same = string[index + 1] == letter
-    if letter in quote_state and not quote_state[quote_lookup[letter]]:
-        if prev_letters_escaped and not next_letter_is_same:
-            return True
+    if ((letter in quote_state and not quote_state[quote_lookup[letter]])
+       and (prev_letters_escaped and not next_letter_is_same)):
+        return True
     return False
 
 
@@ -343,7 +343,7 @@ class CombinedRangeSubFunction:
         self.range_insts = range_insts
 
     def check(self, number):
-        return all([r.check(number) for r in self.range_insts])
+        return all(r.check(number) for r in self.range_insts)
 
     def __repr__(self):
         return (
@@ -465,7 +465,7 @@ def _scan_trigger_string(string):
             and not any(is_in_quotes.values())
             and i + 1 < len(string)
         ):
-            for delim, token in delim_tokens.items():
+            for delim, _ in delim_tokens.items():
                 if string[i + 1 : i + 1 + len(delim)] == delim:
                     # A valid escape character before a delimiter.
                     # Discard the escape character for the parsed text.

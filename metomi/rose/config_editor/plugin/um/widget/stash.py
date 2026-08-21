@@ -303,7 +303,7 @@ class BaseStashSummaryDataPanelv1(
                 )
                 .node
             )
-        except (metomi.rose.config.ConfigSyntaxError, IOError, OSError) as exc:
+        except (metomi.rose.config.ConfigSyntaxError, OSError) as exc:
             metomi.rose.reporter.Reporter()(
                 "Error loading STASHmaster metadata resource: "
                 + type(exc).__name__
@@ -819,8 +819,8 @@ class BaseStashSummaryDataPanelv1(
             node = self.package_config.get([section], no_ignore=True)
             if node is None or not isinstance(node.value, dict):
                 continue
-            for opt, node in list(node.value.items()):
-                opt_name_values.update({opt: node.value})
+            for opt, tempNode in list(node.value.items()):
+                opt_name_values.update({opt: tempNode.value})
             if section not in self.sections:
                 self.sub_ops.add_section(section, opt_map=opt_name_values)
 

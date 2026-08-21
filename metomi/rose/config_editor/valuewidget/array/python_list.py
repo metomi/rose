@@ -306,9 +306,7 @@ class PythonListValueWidget(Gtk.Box):
             self.add_button.show()
         if self.max_length.isdigit() and len(self.entries) <= int(
             self.max_length
-        ):
-            self.del_button.hide()
-        elif len(self.entries) == 0:
+        ) or len(self.entries) == 0:
             self.del_button.hide()
         else:
             self.del_button.show()

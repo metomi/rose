@@ -112,7 +112,7 @@ def namelist_dump(args=None, output_file=None, case_mode=None):
         config.set([section, "source"], " ".join(group_sections))
 
     # Add namelist: sections
-    for name, groups in groups_by_name.items():
+    for _, groups in groups_by_name.items():
         for group in groups:
             section = "namelist:" + tr_case(group.name, case_mode)
             if len(groups) > 1:

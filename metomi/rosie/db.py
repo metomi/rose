@@ -22,6 +22,7 @@ Classes:
 """
 
 import sqlalchemy as al
+import contextlib
 
 LATEST_TABLE_NAME = "latest"
 MAIN_TABLE_NAME = "main"
@@ -107,7 +108,7 @@ class DAO:
         try:
             self.db_connection = self.db_engine.connect()
         except al.exc.OperationalError as exc:
-            raise RosieDatabaseConnectError(self.db_url, exc)
+            raise RosieDatabaseConnectError(self.db_url, exc) from None
 
         self.tables = {}
         for name in [
@@ -274,8 +275,8 @@ class DAO:
                     (entry in ["and", "or"] and i == 0)
                     or entry
                     and (
-                        all([e == "(" for e in entry])
-                        or all([e == ")" for e in entry])
+                        all(e == "(" for e in entry)
+                        or all(e == ")" for e in entry)
                     )
                 ):
                     if current_expr:
@@ -300,7 +301,7 @@ class DAO:
         """Construct a complex logical expression containing "(", and, etc."""
         levels = [[[]]]
         level = 0
-        for i, item in enumerate(items):
+        for _, item in enumerate(items):
             if item == "(":
                 level += 1
                 if level > len(levels) - 1:
@@ -345,10 +346,8 @@ class DAO:
         for col in from_obj.columns:
             if col.key == column:
                 if isinstance(col.type, al.types.INTEGER):
-                    try:
+                    with contextlib.suppress((TypeError, ValueError)):
                         value = float(value)
-                    except (TypeError, ValueError):
-                        pass
                 expr = getattr(col, operator)(value)
                 break
         else:
@@ -417,7 +416,7 @@ class DAO:
         id_keys = ["idx", "branch", "revision"]
         prev_id = None
         for row in rows:
-            row = [r for r in row]
+            row = list(row)
             id_ = [row[col_keys.index(key)] for key in id_keys]
             if id_ != prev_id:
                 prev_id = id_
