@@ -28,7 +28,8 @@ HELLO_JUPITER = hashlib.md5(b'Hello Jupiter').hexdigest()
 @pytest.fixture(scope='module')
 def checksums_setup(tmp_path_factory):
     """provide some exemplars for checksum to work on."""
-    tmp_path = tmp_path_factory.getbasetemp()
+
+    tmp_path = tmp_path_factory.mktemp('checksum')
     (tmp_path / 'foo').write_text('Hello World')
     (tmp_path / 'bar').mkdir()
     (tmp_path / 'bar/baz').write_text('Hello Jupiter')
@@ -60,7 +61,7 @@ def test_checksum_custom_checksum_function(checksums_setup):
 
 
 def test_get_checksum_for_all_files(checksums_dir):
-    assert len(checksums_dir[0]) == 7
+    assert len(checksums_dir[0]) == 6
 
 
 def test_get_checksum_for_goodlink(checksums_dir):

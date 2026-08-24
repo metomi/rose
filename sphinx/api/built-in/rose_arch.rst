@@ -356,7 +356,7 @@ Configuration
 
          .. note::
 
-            Multi-threaded compression only pays off for a properly large
+            Multi-threaded compression only pays off for a large
             source. Spinning up many threads to compress a small file adds
             overhead (thread start-up, coordination) for little or no
             speed benefit, and wastes resources on shared systems. As a
