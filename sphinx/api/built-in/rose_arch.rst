@@ -207,7 +207,7 @@ with names in the form ``data_001.txt``:
    rename-format=hello/%(cycle)s-%(name_head)s%(name_tail)s
 
 Using multiple threads for compression (zstd only)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The number of threads used to compress each file is controlled by the
 :rose:conf:`rose_arch[arch]compress-threads` setting. This can significantly
