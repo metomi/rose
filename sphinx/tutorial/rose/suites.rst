@@ -56,7 +56,7 @@ A Rose suite configuration is a Cylc :term:`source directory` containing a
 
       At Rose 2/Cylc 8, using the :rose:conf:`rose-suite.conf[template variables]`
       section is the recommended way of working. Cylc will select a templating
-      language based on the hashbang line at the start of the the ``flow.cylc``
+      language based on the hashbang line at the start of the ``flow.cylc``
       file.
 
       At Rose 2019/Cylc 7, these variables were instead set in sections called
@@ -369,7 +369,7 @@ Rose Applications In Rose Suite Configurations
    #. **Create a test configuration for the** ``forecast`` **application.**
 
       The ``forecast`` application comes with test data
-      (in ``file/test-date``), and is currently set up to work with
+      (in ``file/test-data``), and is currently set up to work with
       this data.
 
       We will now adjust this configuration to make it work with
@@ -480,7 +480,7 @@ Rose Applications In Rose Suite Configurations
       .. tip::
 
           Note the env vars ``CYLC_TASK_CYCLE_POINT``, ``RESOLUTION`` and ``DOMAIN`` should no
-          longer be set in`rose-app.conf`. The ``RESOLUTION`` and ``DOMAIN`` are provided by
+          longer be set in `rose-app.conf`. The ``RESOLUTION`` and ``DOMAIN`` are provided by
           `rose-suite.conf` and overwritten in `rose-app-test.conf`, and the ``CYLC_TASK_CYCLE_POINT``
           should be provided by Cylc.
 
