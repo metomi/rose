@@ -28,7 +28,7 @@ behaviours such as:
 
 .. ifslides::
 
-   The two rose configurations for use with Cylc:
+   The two Rose configurations for use with Cylc:
 
    * :term:`Rose application configuration`
    * :term:`Rose suite configuration`

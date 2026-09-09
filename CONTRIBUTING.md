@@ -75,6 +75,7 @@ below:
  - James Frost (Met Office, UK)
  - Christopher Bennett (Met Office, UK)
  - Samuel Denton (Met Office, UK)
+ - Wilf Wilson (Met Office, UK)
 <!-- end-shortlog -->
 
 (All contributors are identifiable with email addresses in the version control
