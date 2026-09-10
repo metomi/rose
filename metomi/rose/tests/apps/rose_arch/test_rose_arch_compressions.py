@@ -16,24 +16,30 @@
 # -----------------------------------------------------------------------------
 """Unit tests for the "rose_arch" compression handlers."""
 
+import sys
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 import pytest
 
-from metomi.rose.apps.rose_arch_compressions import compression_util
-from metomi.rose.apps.rose_arch_compressions.compression_util import (
-    GZIP,
-    XZ,
-    ZSTD,
+from metomi.rose.apps.rose_arch_compressions import (
     RoseArchCompressThreadsError,
 )
-from metomi.rose.apps.rose_arch_compressions.rose_arch_gzip import RoseArchGzip
+from metomi.rose.apps.rose_arch_compressions.rose_arch_gzip import (
+    RoseArchGzip,
+)
 from metomi.rose.apps.rose_arch_compressions.rose_arch_tar import (
     RoseArchTarGzip,
 )
-from metomi.rose.apps.rose_arch_compressions.rose_arch_xz import RoseArchXz
-from metomi.rose.apps.rose_arch_compressions.rose_arch_zstd import RoseArchZstd
+from metomi.rose.apps.rose_arch_compressions.rose_arch_xz import (
+    XZ,
+    RoseArchXz,
+)
+from metomi.rose.apps.rose_arch_compressions.rose_arch_zstd import (
+    ZSTD,
+    ZSTD_FORCE_CLI,
+    RoseArchZstd,
+)
 
 
 HANDLERS = {
@@ -74,9 +80,12 @@ def target(tmp_path):
 @pytest.fixture
 def no_python_libraries(monkeypatch):
     """Force the handlers onto their command line fallbacks."""
-    monkeypatch.setattr(
-        compression_util, "_get_compress_func", lambda *args: None
-    )
+    for handler_cls in (RoseArchXz, RoseArchZstd):
+        monkeypatch.setattr(
+            handler_cls,
+            "get_compress_func",
+            classmethod(lambda cls, threads: None),
+        )
 
 
 @pytest.mark.parametrize(
@@ -104,9 +113,9 @@ def test_compress_sources_command(
 @pytest.mark.parametrize("scheme", ["xz", "zst", "zstd"])
 def test_compress_sources_library(app_runner, target, tmp_path, scheme):
     """Each source is compressed in process where a library is available."""
-    compressor = XZ if scheme == "xz" else ZSTD
-    if compression_util._get_compress_func(compressor, 1) is None:
-        pytest.skip("no Python library for %s" % compressor)
+    handler_cls = HANDLERS[scheme]
+    if handler_cls.get_compress_func(1) is None:
+        pytest.skip("no Python library for %s" % handler_cls.COMPRESSOR)
 
     a_target = target(scheme)
     HANDLERS[scheme](app_runner).compress_sources(a_target, str(tmp_path))
@@ -135,9 +144,11 @@ def test_compress_sources_streams(
 ):
     """A source is compressed in chunks, so it need not fit in memory."""
     compressor = XZ if scheme == "xz" else ZSTD
-    if compression_util._get_compress_func(compressor, 1) is None:
+    handler_cls = HANDLERS[scheme]
+    if handler_cls.get_compress_func(1) is None:
         pytest.skip("no Python library for %s" % compressor)
-    monkeypatch.setattr(compression_util, "CHUNK_SIZE", 8)
+    monkeypatch.setattr(RoseArchXz, "CHUNK_SIZE", 8)
+    monkeypatch.setattr(RoseArchZstd, "CHUNK_SIZE", 8)
 
     text = "Hello World " * 100  # many chunks of 8 bytes
     a_target = target(scheme, text=text)
@@ -165,6 +176,33 @@ def _decompress(compressor, data):
 
         return zstandard.ZstdDecompressor().decompressobj().decompress(data)
     return zstd.decompress(data)
+
+def test_get_xz_compress_func_lzma_available():
+    """xz compression prefers the stdlib "lzma" module when available."""
+    import lzma
+
+    func = RoseArchXz.get_compress_func(1)
+
+    assert func is not None
+    assert func.args == (lzma.LZMACompressor, RoseArchXz.CHUNK_SIZE)
+
+
+def test_get_xz_compress_func_no_lzma(monkeypatch):
+    """If the stdlib "lzma" module is unavailable, fall back to the CLI."""
+    monkeypatch.setitem(sys.modules, "lzma", None)
+
+    assert RoseArchXz.get_compress_func(1) is None
+
+
+def test_xz_get_command_quotes_paths():
+    """Paths are quoted so that a shell cannot act on their contents.
+
+    xz does not override RoseArchCompressor.get_command, so this also
+    covers the base class implementation shared with gzip.
+
+    """
+    command = RoseArchXz.get_command("in file; rm -rf /", "out file", 1)
+    assert command == "xz -c 'in file; rm -rf /' >'out file'"
 
 
 @pytest.mark.parametrize(
@@ -218,6 +256,68 @@ def test_zstd_command_threads(
     command = app_runner.popen.run_simple.call_args[0][0]
     assert "-T%d " % threads in command
 
+def test_get_zstd_compress_func_force_cli(monkeypatch):
+    """ROSE_ARCH_ZSTD_FORCE_CLI always forces the command line tool."""
+    monkeypatch.setenv(ZSTD_FORCE_CLI, "1")
+    assert RoseArchZstd.get_compress_func(1) is None
+    assert RoseArchZstd.get_compress_func(0) is None
+    assert RoseArchZstd.get_compress_func(4) is None
+
+
+def test_get_zstd_compress_func_stdlib_single_threaded():
+    """Single-threaded zstd compression prefers the stdlib module."""
+    try:
+        from compression import zstd
+    except ImportError:
+        pytest.skip('Python\'s "compression.zstd" module is not available')
+
+    func = RoseArchZstd.get_compress_func(1)
+
+    assert func is not None
+    assert func.args == (zstd.ZstdCompressor, RoseArchZstd.CHUNK_SIZE)
+
+
+def test_get_zstd_compress_func_zstandard_multi_threaded():
+    """Multi-threaded zstd compression uses "zstandard", not the stdlib."""
+    try:
+        import zstandard
+    except ImportError:
+        pytest.skip('"zstandard" is not installed')
+
+    func = RoseArchZstd.get_compress_func(4)
+
+    assert func is not None
+    assert isinstance(
+        getattr(func, "__self__", None), zstandard.ZstdCompressor
+    )
+
+
+def test_get_zstd_compress_func_zstandard_fallback(monkeypatch):
+    """If the stdlib module is unavailable, "zstandard" is used instead,
+    even for single-threaded compression."""
+    try:
+        import zstandard
+    except ImportError:
+        pytest.skip('"zstandard" is not installed')
+    # Force "from compression import zstd" to raise ImportError.
+    monkeypatch.setitem(sys.modules, "compression", None)
+
+    func = RoseArchZstd.get_compress_func(1)
+
+    assert func is not None
+    assert isinstance(
+        getattr(func, "__self__", None), zstandard.ZstdCompressor
+    )
+
+
+def test_get_zstd_compress_func_no_libraries(monkeypatch):
+    """If neither Python library is available, fall back to the CLI."""
+    monkeypatch.setitem(sys.modules, "compression", None)
+    monkeypatch.setitem(sys.modules, "zstandard", None)
+
+    assert RoseArchZstd.get_compress_func(1) is None
+    assert RoseArchZstd.get_compress_func(4) is None
+
 
 @pytest.mark.parametrize(
     "scheme", ["gz", "gzip", "xz", "tar.gz", "tar", "txz"]
@@ -244,19 +344,17 @@ def test_multi_threading_supported(app_runner, target, tmp_path, scheme):
 
 def test_gzip_always_uses_the_command_line():
     """Python's gzip is slow, so the command line tool is preferred."""
-    assert compression_util._get_compress_func(GZIP, 1) is None
+    assert RoseArchGzip.get_compress_func(1) is None
 
 
 @pytest.mark.parametrize("threads", [1, 2, 0])
 def test_zstd_force_cli_env_var(monkeypatch, threads):
     """ROSE_ARCH_ZSTD_FORCE_CLI forces the command line tool for zstd."""
-    monkeypatch.setenv(compression_util.ZSTD_FORCE_CLI, "1")
-    assert compression_util._get_compress_func(ZSTD, threads) is None
+    monkeypatch.setenv(ZSTD_FORCE_CLI, "1")
+    assert RoseArchZstd.get_compress_func(threads) is None
 
 
-def test_get_command_quotes_paths():
+def test_zstd_get_command_quotes_paths():
     """Paths are quoted so that a shell cannot act on their contents."""
-    command = compression_util._get_command(
-        ZSTD, "in file; rm -rf /", "out file", 4
-    )
+    command = RoseArchZstd.get_command("in file; rm -rf /", "out file", 4)
     assert command == "zstd -T4 -c 'in file; rm -rf /' >'out file'"

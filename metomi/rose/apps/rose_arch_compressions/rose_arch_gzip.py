@@ -17,15 +17,22 @@
 """Compress archive sources in gzip."""
 
 
-from metomi.rose.apps.rose_arch_compressions.compression_util import (
-    GZIP,
-    RoseArchCompressor,
-)
+from metomi.rose.apps.rose_arch_compressions import RoseArchCompressor
+
+# The name of the compressor. This is also the name of its command line
+# fallback.
+GZIP = "gzip"
 
 
 class RoseArchGzip(RoseArchCompressor):
 
-    """Compress archive sources in gzip."""
+    """Compress archive sources in gzip.
+
+    N.B. Python's gzip library is slow, so this always uses the command
+    line tool instead (the base class's default get_compress_func()
+    already returns None, so no override is needed here).
+
+    """
 
     SCHEMES = ["gz", "gzip"]
     COMPRESSOR = GZIP

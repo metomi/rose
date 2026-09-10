@@ -328,12 +328,18 @@ Configuration
             For multi-threaded ``zstd`` compression specifically, a Python
             library is only used if the ``zstandard`` package is installed;
             the standard library ``compression.zstd`` module (Python 3.14+)
-            is only used for single-threaded compression, as it has been
-            found not to scale reliably across threads. Setting the
-            ``ROSE_ARCH_ZSTD_FORCE_CLI`` environment variable (to any
-            non-empty value) forces the ``zstd`` command line tool to be
-            used unconditionally for zstd compression, regardless of
-            thread count or what is installed.
+            is only used for single-threaded compression. This is not a
+            hard capability limit of that module (it does expose an
+            ``nb_workers`` option), but in testing against real multi-GB
+            data it did not scale its throughput with the number of
+            threads requested, unlike ``zstandard`` and the ``zstd``
+            command line tool at the same thread count. This may improve
+            in future Python versions, including possibly with
+            free-threaded (no-GIL) builds, but that has not been tested
+            here. Setting the ``ROSE_ARCH_ZSTD_FORCE_CLI`` environment
+            variable (to any non-empty value) forces the ``zstd`` command
+            line tool to be used unconditionally for zstd compression,
+            regardless of thread count or what is installed.
 
       .. rose:conf:: compress-threads=0|1|2|...
 

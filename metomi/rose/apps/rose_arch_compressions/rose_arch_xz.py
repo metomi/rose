@@ -16,11 +16,16 @@
 # -----------------------------------------------------------------------------
 """Compress archive sources using xz."""
 
+from functools import partial
 
-from metomi.rose.apps.rose_arch_compressions.compression_util import (
-    XZ,
+from metomi.rose.apps.rose_arch_compressions import (
     RoseArchCompressor,
+    _copy_compressed,
 )
+
+# The name of the compressor. This is also the name of its command line
+# fallback.
+XZ = "xz"
 
 
 class RoseArchXz(RoseArchCompressor):
@@ -29,3 +34,11 @@ class RoseArchXz(RoseArchCompressor):
 
     SCHEMES = ["xz"]
     COMPRESSOR = XZ
+
+    @classmethod
+    def get_compress_func(cls, threads):
+        try:
+            import lzma
+        except ImportError:
+            return None
+        return partial(_copy_compressed, lzma.LZMACompressor, cls.CHUNK_SIZE)

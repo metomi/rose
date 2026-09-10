@@ -20,31 +20,30 @@ import os
 import tarfile
 from tempfile import mkstemp
 
-from metomi.rose.apps.rose_arch_compressions.compression_util import (
-    GZIP,
-    MULTI_THREADED,
-    XZ,
-    ZSTD,
-    check_threads,
-    compress,
+from metomi.rose.apps.rose_arch_compressions import (
+    RoseArchCompressThreadsError,
 )
+
+from metomi.rose.apps.rose_arch_compressions import rose_arch_gzip
+from metomi.rose.apps.rose_arch_compressions import rose_arch_xz
+from metomi.rose.apps.rose_arch_compressions import rose_arch_zstd
 
 
 class RoseArchTarGzip:
 
     """Compress archive sources in tar."""
 
-    # Compression scheme: compressor to apply to the tar file.
+    # Compression scheme: compressor class to apply to the tar file.
     COMPRESSORS = {
-        "pax.gz": GZIP,
-        "tar.gz": GZIP,
-        "tgz": GZIP,
-        "pax.xz": XZ,
-        "tar.xz": XZ,
-        "txz": XZ,
-        "pax.zst": ZSTD,
-        "tar.zst": ZSTD,
-        "tzst": ZSTD,
+        "pax.gz": rose_arch_gzip.RoseArchGzip,
+        "tar.gz": rose_arch_gzip.RoseArchGzip,
+        "tgz": rose_arch_gzip.RoseArchGzip,
+        "pax.xz": rose_arch_xz.RoseArchXz,
+        "tar.xz": rose_arch_xz.RoseArchXz,
+        "txz": rose_arch_xz.RoseArchXz,
+        "pax.zst": rose_arch_zstd.RoseArchZstd,
+        "tar.zst": rose_arch_zstd.RoseArchZstd,
+        "tzst": rose_arch_zstd.RoseArchZstd,
     }
     SCHEMES = ["pax", "tar"] + list(COMPRESSORS)
     SCHEME_FORMATS = {
@@ -59,7 +58,8 @@ class RoseArchTarGzip:
     @classmethod
     def supports_threads(cls, scheme):
         """Return True if "scheme" can be compressed with many threads."""
-        return cls.COMPRESSORS.get(scheme) in MULTI_THREADED
+        compressor = cls.COMPRESSORS.get(scheme)
+        return compressor is not None and compressor.MULTI_THREADED
 
     def compress_sources(self, target, work_dir, threads=1):
         """Create a tar archive of all files in target.
@@ -68,7 +68,10 @@ class RoseArchTarGzip:
 
         """
         compressor = self.COMPRESSORS.get(target.compress_scheme)
-        check_threads(compressor or target.compress_scheme, threads)
+        if compressor is not None:
+            compressor.check_threads(threads)
+        elif threads != 1:
+            raise RoseArchCompressThreadsError(target.compress_scheme)
 
         sources = list(target.sources.values())
         if len(sources) == 1 and sources[0].path.endswith(
@@ -99,5 +102,5 @@ class RoseArchTarGzip:
             )
             os.close(fdsec)
             target.work_source_path = work_path
-            compress(self.app_runner, compressor, tar_name, work_path, threads)
+            compressor.compress(self.app_runner, tar_name, work_path, threads)
             self.app_runner.fs_util.delete(tar_name)
