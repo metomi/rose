@@ -14,25 +14,31 @@
 # You should have received a copy of the GNU General Public License
 # along with Rose. If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
-"""Compress archive sources in gzip."""
+"""Compress archive sources using xz."""
 
+from functools import partial
 
-from metomi.rose.apps.rose_arch_compressions import RoseArchCompressor
+from metomi.rose.apps.rose_arch_compressions import (
+    RoseArchCompressor,
+    _copy_compressed,
+)
 
 # The name of the compressor. This is also the name of its command line
 # fallback.
-GZIP = "gzip"
+XZ = "xz"
 
 
-class RoseArchGzip(RoseArchCompressor):
+class RoseArchXz(RoseArchCompressor):
 
-    """Compress archive sources in gzip.
+    """Compress archive sources in xz."""
 
-    N.B. Python's gzip library is slow, so this always uses the command
-    line tool instead (the base class's default get_compress_func()
-    already returns None, so no override is needed here).
+    SCHEMES = ["xz"]
+    COMPRESSOR = XZ
 
-    """
-
-    SCHEMES = ["gz", "gzip"]
-    COMPRESSOR = GZIP
+    @classmethod
+    def get_compress_func(cls, threads):
+        try:
+            import lzma
+        except ImportError:
+            return None
+        return partial(_copy_compressed, lzma.LZMACompressor, cls.CHUNK_SIZE)

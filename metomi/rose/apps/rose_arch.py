@@ -314,6 +314,44 @@ class RoseArchApp(BuiltinApp):
                 )
             )
             target.status = target.ST_BAD
+
+        target.compress_threads = self._get_conf(
+            config, t_node, "compress-threads", default="1"
+        )
+        if not target.compress_threads.isdigit():
+            app_runner.handle_event(
+                ConfigValueError(
+                    [t_key, "compress-threads"],
+                    target.compress_threads,
+                    ValueError(
+                        "compress-threads must be 0 (automatic) or a"
+                        " positive integer"
+                    ),
+                )
+            )
+            target.status = target.ST_BAD
+            target.compress_threads = 1
+        else:
+            target.compress_threads = int(target.compress_threads)
+
+        if target.compress_threads != 1:
+            handler = compress_manager.get_handler(target.compress_scheme)
+            if handler is not None and not handler.supports_threads(
+                target.compress_scheme
+            ):
+                app_runner.handle_event(
+                    ConfigValueError(
+                        [t_key, "compress-threads"],
+                        target.compress_threads,
+                        ValueError(
+                            "%s does not support multi-threading"
+                            % target.compress_scheme
+                        ),
+                    )
+                )
+                target.status = target.ST_BAD
+                target.compress_threads = 1
+
         rename_format = self._get_conf(config, t_node, "rename-format")
         if rename_format:
             rename_parser_str = self._get_conf(config, t_node, "rename-parser")
@@ -398,7 +436,9 @@ class RoseArchApp(BuiltinApp):
             # Compress sources
             if target.compress_scheme:
                 handler = compress_manager.get_handler(target.compress_scheme)
-                handler.compress_sources(target, work_dir)
+                handler.compress_sources(
+                    target, work_dir, threads=target.compress_threads
+                )
             times[1] = time()  # transformed time
             # Run archive command
             sources = []
@@ -459,6 +499,7 @@ class RoseArchTarget:
     def __init__(self, name):
         self.name = name
         self.compress_scheme = None
+        self.compress_threads = 1
         self.command_format = None
         self.command_rc = 0
         self.sources = {}  # checksum: RoseArchSource

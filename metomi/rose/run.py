@@ -220,7 +220,8 @@ class Runner:
             except OSError:
                 pass
             # Reset os.environ
-            os.environ = dict(environ)
+            os.environ.clear()
+            os.environ.update(environ)
 
     __call__ = run
 
