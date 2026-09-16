@@ -172,7 +172,7 @@ class AddStashDiagnosticsPanelv1(Gtk.Box):
         if is_startup:
             group_model = Gtk.TreeStore(str)
             group_model.append(None, [""])
-            for _, name in enumerate(self.column_names):
+            for name in self.column_names:
                 if name not in ["?", "#"]:
                     group_model.append(None, [name])
             self._group_widget.set_model(group_model)
