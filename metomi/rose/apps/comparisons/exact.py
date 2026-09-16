@@ -33,7 +33,6 @@ class Exact:
             return task
         for location, (val1, val2) in enumerate(zip(task.resultdata,
                                                 task.kgo1data)):
-            location += 1
             if val1 != val2:
                 task.set_failure(
                     ExactComparisonFailure(task, val1, val2, location)

@@ -339,8 +339,9 @@ class EntryArrayValueWidget(Gtk.Box):
             self.add_button.hide()
         else:
             self.add_button.show()
-        if self.max_length.isdigit() and len(self.entries) <= int(
-            self.max_length
+        if (
+            self.max_length.isdigit()
+            and len(self.entries) <= int(self.max_length)
         ) or len(self.entries) == 0:
             self.del_button.hide()
         else:
