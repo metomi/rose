@@ -993,7 +993,7 @@ class StandardSummaryDataPanel(BaseSummaryDataPanel):
         sub_sect_names = list(self.sections.keys())
         sub_var_names = []
         self.var_id_map = {}
-        for _, variables in list(self.variables.items()):
+        for variables in self.variables.values():
             for variable in variables:
                 self.var_id_map[variable.metadata["id"]] = variable
                 if variable.name not in sub_var_names:
