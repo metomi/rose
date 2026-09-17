@@ -1324,8 +1324,11 @@ class ConfigPage(Gtk.Box):
         elif (
             self.see_also == ""
             or metomi.rose.FILE_VAR_SOURCE not in self.see_also
-        ) and self.section is not None and self.section.name.startswith(
-                "namelist:"):
+        ) and (
+            # This adds an 'orphaned' warning, only if the section is enabled.
+            self.section is not None
+            and self.section.name.startswith("namelist:")
+        ):
             error_button = metomi.rose.gtk.util.CustomButton(
                 stock_id=Gtk.STOCK_DIALOG_WARNING,
                 as_tool=True,
