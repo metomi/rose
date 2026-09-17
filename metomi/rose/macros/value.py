@@ -283,8 +283,9 @@ class ValueChecker(metomi.rose.macro.MacroBase):
                 tiny_config.set([sect, key], val)
                 tiny_meta_config = metomi.rose.config.ConfigNode()
                 evaluator = metomi.rose.macros.rule.RuleEvaluator()
-                with contextlib.suppress(metomi.rose.
-                                         macros.rule.RuleValueError):
+                with contextlib.suppress(
+                    metomi.rose.macros.rule.RuleValueError
+                ):
                     check_ok = evaluator.evaluate_rule(
                         range_pat, var_id, tiny_config, tiny_meta_config
                     )
