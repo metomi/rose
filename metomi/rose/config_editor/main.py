@@ -2141,8 +2141,8 @@ def spawn_window(
         for namespace in initial_namespaces:
             exp = re.compile(r"(.*%s?[^\/]+)" % (re.escape(namespace),))
             # Sort by alphabetical order first, then by length
-            for ns in sorted(
-                sorted(ctrl.data.namespace_meta_lookup),  # NOQA: C414
+            for ns in sorted(   # NOQA: C414 Necessary sort flagged as not
+                sorted(ctrl.data.namespace_meta_lookup),
                 key=len,
             ):
                 match = exp.search(ns)
