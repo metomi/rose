@@ -2140,9 +2140,11 @@ def spawn_window(
         full_namespaces = []
         for namespace in initial_namespaces:
             exp = re.compile(r"(.*%s?[^\/]+)" % (re.escape(namespace),))
-            for ns in sorted(sorted(  # NOQA: C414
-                                      ctrl.data.namespace_meta_lookup),
-                             key=len):
+            # Sort by alphabetical order first, then by length
+            for ns in sorted(
+                sorted(ctrl.data.namespace_meta_lookup),  # NOQA: C414
+                key=len,
+            ):
                 match = exp.search(ns)
                 if match:
                     full_namespaces.append(match.groups()[0])
