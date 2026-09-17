@@ -18,6 +18,7 @@ import re
 from subprocess import DEVNULL, PIPE, Popen
 import sys
 from textwrap import dedent, indent
+import contextlib
 
 from docutils import nodes
 from docutils.parsers.rst import Directive
@@ -62,7 +63,7 @@ def format_literals(text, references_to_match=None, ref_template='%s'):
         references_to_match = []
     ref_template = ':ref:`{0}`'.format(ref_template)
 
-    for match in reversed([x for x in RE_LITERAL.finditer(text)]):
+    for match in reversed(list(RE_LITERAL.finditer(text))):
         repl = ''
         start, end = match.span()
 
@@ -129,12 +130,8 @@ def parse(text):
     lines = text.splitlines()
     ret = {}
 
-    try:
+    with contextlib.suppress(AttributeError):
         ret['USAGE'] = RE_USAGE.search(lines[0]).group()
-    except AttributeError:
-        pass
-    except IndexError:
-        breakpoint()
 
     section = 'DESCRIPTION'
     buffer = []
@@ -189,8 +186,6 @@ def rst_body(text):
 
 def write(ns, cmds, _write):
     for cmd, content in cmds.items():
-        if 'USAGE' not in content:
-            breakpoint()
         _write(
             rst_anchor(f'command-{cmd.replace(" ", "-")}')
         )

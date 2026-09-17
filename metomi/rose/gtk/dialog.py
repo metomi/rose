@@ -23,6 +23,7 @@ import sys
 import tempfile
 import time
 import traceback
+import contextlib
 
 import gi
 
@@ -852,7 +853,5 @@ def _run_exception_dialog(exc_class, exc_inst, tback, hook, keep_alive):
     )
     run_dialog(DIALOG_TYPE_ERROR, text, title=DIALOG_TITLE_UNCAUGHT_EXCEPTION)
     if not keep_alive:
-        try:
+        with contextlib.suppress(RuntimeError):
             Gtk.main_quit()
-        except RuntimeError:
-            pass

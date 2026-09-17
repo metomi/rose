@@ -234,9 +234,9 @@ class VariableOperations:
                 metomi.rose.variable.IGNORED_BY_SECTION,
                 old_reason[metomi.rose.variable.IGNORED_BY_SECTION],
             )
-        if metomi.rose.variable.IGNORED_BY_SECTION not in old_reason:
-            if metomi.rose.variable.IGNORED_BY_SECTION in new_reason_dict:
-                new_reason_dict.pop(metomi.rose.variable.IGNORED_BY_SECTION)
+        if (metomi.rose.variable.IGNORED_BY_SECTION not in old_reason
+           and metomi.rose.variable.IGNORED_BY_SECTION in new_reason_dict):
+            new_reason_dict.pop(metomi.rose.variable.IGNORED_BY_SECTION)
         variable.ignored_reason = new_reason_dict.copy()
         if not set(old_reason.keys()) ^ set(new_reason_dict.keys()):
             # No practical difference, so don't do anything.

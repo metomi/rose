@@ -86,7 +86,7 @@ MACRO_DIRNAME = os.path.join(
     os.path.join("lib", "python"), metomi.rose.META_DIR_MACRO
 )
 ERROR_OUT_DIR_MULTIPLE_APPS = (
-    "Cannot specify an output dir when running" " macro over multiple apps."
+    "Cannot specify an output dir when running macro over multiple apps."
 )
 MACRO_EXT = ".py"
 MACRO_OUTPUT_HELP = "    # {0}\n"
@@ -569,8 +569,8 @@ def add_site_meta_paths():
         [metomi.rose.CONFIG_SECT_TOP, metomi.rose.CONFIG_OPT_META_PATH]
     )
     if path is not None:
-        for path in path.split(os.pathsep):
-            path = os.path.expanduser(os.path.expandvars(path))
+        for subpath in path.split(os.pathsep):
+            path = os.path.expanduser(os.path.expandvars(subpath))
             sys.path.insert(0, os.path.abspath(path))
     sys.path.append(
         str(metomi.rose.resource.ResourceLocator.default().locate('rose-meta'))
@@ -581,8 +581,8 @@ def add_env_meta_paths():
     """Load the environment variable ROSE_META_PATH, if defined."""
     path = os.environ.get("ROSE_META_PATH")
     if path is not None:
-        for path in path.split(os.pathsep):
-            path = os.path.expanduser(os.path.expandvars(path))
+        for subpath in path.split(os.pathsep):
+            path = os.path.expanduser(os.path.expandvars(subpath))
             sys.path.insert(0, os.path.abspath(path))
 
 
@@ -1063,8 +1063,8 @@ def pretty_format_config(config, ignore_error=False):
             scheme = scheme.split(":", 1)[0]
         try:
             scheme_module = getattr(metomi.rose.formats, scheme)
-            pretty_format_keys = getattr(scheme_module, "pretty_format_keys")
-            pretty_format_value = getattr(scheme_module, "pretty_format_value")
+            pretty_format_keys = scheme_module.pretty_format_keys
+            pretty_format_value = scheme_module.pretty_format_value
         except AttributeError:
             continue
         for keylist, node in list(s_node.walk()):
@@ -1098,7 +1098,7 @@ def standard_format_config(config):
                 scheme = scheme.split(":", 1)[0]
             try:
                 scheme_module = getattr(metomi.rose.formats, scheme)
-                standard_format = getattr(scheme_module, "standard_format")
+                standard_format = scheme_module.standard_format
             except AttributeError:
                 continue
             values = metomi.rose.variable.array_split(node.value, ",")
@@ -1236,11 +1236,11 @@ def run_macros(
     for macro_method in methods:
         macros_by_type[macro_method] = []
         for module_name, class_name, method, _ in macro_tuples:
-            if opt_fix and not opt_transform_all:
+            if ((opt_fix and not opt_transform_all)
                 # Only include internal transformer macros for
                 # metomi.rose macro --fix.
-                if module_name != metomi.rose.macros.__name__:
-                    continue
+               and module_name != metomi.rose.macros.__name__):
+                continue
             if method == macro_method:
                 macro_name = ".".join([module_name, class_name])
                 macros_by_type[macro_method].append(macro_name)
@@ -1273,7 +1273,7 @@ def run_macros(
         return True
 
     # Categorise macros given as arguments.
-    macros_not_found = [m for m in macro_names]
+    macros_not_found = list(macro_names)
     for module_name, class_name, method, _ in macro_tuples:
         this_macro_name = ".".join([module_name, class_name])
         this_macro_method_name = ".".join([this_macro_name, method])

@@ -426,8 +426,8 @@ class RosieWSClient:
                 q_list.append(q_item)
                 q_item = []
             q_item.append(arg)
-            level += len(arg) if all([c == "(" for c in arg]) else 0
-            level -= len(arg) if all([c == ")" for c in arg]) else 0
+            level += len(arg) if all(c == "(" for c in arg) else 0
+            level -= len(arg) if all(c == ")" for c in arg) else 0
         if (
             len(q_item) > 1
             or level != 0

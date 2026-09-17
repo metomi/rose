@@ -312,4 +312,4 @@ def _conf_value(conf_tree, keys, default=None):
     try:
         return env_var_process(value)
     except UnboundEnvironmentVariableError as exc:
-        raise ConfigValueError(keys, value, exc)
+        raise ConfigValueError(keys, value, exc) from None

@@ -108,15 +108,15 @@ class SingleCommandStatus(AnalysisTask):
         """If the user's config options specified that the task should be
         ignored if all of its files were missing, set skipped attribute here.
         """
-        if self.skip_if_missing and self.files:
-            if not any(os.path.exists(fname) for fname in self.files):
-                self.skipped = True
-                self.reporter(
-                    "All file arguments are missing, skipping task since "
-                    "'skip-if-all-files-missing' is '{0}'".format(
-                        TYPE_LOGICAL_VALUE_TRUE
-                    )
+        if (self.skip_if_missing and self.files and
+           not any(os.path.exists(fname) for fname in self.files)):
+            self.skipped = True
+            self.reporter(
+                "All file arguments are missing, skipping task since "
+                "'skip-if-all-files-missing' is '{0}'".format(
+                    TYPE_LOGICAL_VALUE_TRUE
                 )
+            )
         return self.skipped
 
     def get_config_opts(self):
@@ -144,7 +144,7 @@ class SingleCommandStatus(AnalysisTask):
         elif isinstance(files, str):
             files = [files]
         # Report the filenames (with paths)
-        for ifile, fname in enumerate(files):
+        for ifile, _ in enumerate(files):
             self.reporter(
                 "File {0}: {1}".format(
                     ifile + 1, os.path.abspath(files[ifile])
@@ -383,7 +383,7 @@ class FilePattern(SingleCommandPattern):
                                 "Cannot do tolerance comparison, groups "
                                 "matched by pattern are not reals"
                             )
-                            raise ValueError(msg)
+                            raise ValueError(msg) from None
                         if self.relative_tol:
                             lower = match2 * (1.0 - 0.01 * self.tolerance)
                             upper = match2 * (1.0 + 0.01 * self.tolerance)

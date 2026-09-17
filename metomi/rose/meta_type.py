@@ -36,11 +36,10 @@ class MetaType:
         if key in cls.meta_type_classes:
             return cls.meta_type_classes[key]
         for item in globals().values():
-            if inspect.isclass(item):
-                if item != cls and issubclass(item, cls):
-                    if item.KEY == key:
-                        cls.meta_type_classes[key] = item
-                        return item
+            if (inspect.isclass(item) and item != cls and issubclass(item, cls)
+               and key == item.KEY):
+                cls.meta_type_classes[key] = item
+                return item
         raise KeyError(key)
 
 

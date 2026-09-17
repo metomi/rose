@@ -514,7 +514,7 @@ class SuiteEngineProcessor:
         except OffsetValueError:
             raise
         except ValueError:
-            raise CycleTimeError(cycle)
+            raise CycleTimeError(cycle) from None
 
 
 def get_cycle_offset(offset_text):

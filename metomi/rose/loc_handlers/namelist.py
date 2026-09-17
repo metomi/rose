@@ -82,7 +82,7 @@ class NamelistLocHandler:
                     except UnboundEnvironmentVariableError as exc:
                         raise ConfigProcessError(
                             [section, key], node.value, exc
-                        )
+                        ) from exc
                     nlg += "%s=%s,\n" % (key, value)
                 nlg += "/" + "\n"
                 handle.write(nlg.encode('UTF-8'))

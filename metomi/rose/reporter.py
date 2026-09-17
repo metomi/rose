@@ -20,6 +20,7 @@ import doctest
 import sys
 import time
 from typing import Optional
+import contextlib
 
 
 class Reporter:
@@ -207,9 +208,8 @@ class ReporterContext:
         if kind == Reporter.KIND_ERR:
             if handle is None:
                 handle = sys.stderr
-        elif kind == Reporter.KIND_OUT:
-            if handle is None:
-                handle = sys.stdout
+        elif kind == Reporter.KIND_OUT and handle is None:
+            handle = sys.stdout
         self.kind = kind
         self.handle = handle
         self.verbosity = verbosity
@@ -253,15 +253,13 @@ class ReporterContext:
 
     def _tty_colour_err(self, str_):
         """Colour error string for terminal."""
-        try:
+        with contextlib.suppress(AttributeError):
             if self.handle.isatty():
                 return "%s%s%s" % (
                     self.TTY_COLOUR_ERR,
                     str_,
                     self.TTY_COLOUR_NORM,
                 )
-        except AttributeError:
-            pass
         return str_
 
 

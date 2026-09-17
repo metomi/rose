@@ -47,21 +47,21 @@ class DuplicateChecker(metomi.rose.macro.MacroBase):
                     self.add_report(
                         section, None, None, self.WARNING_DUPL_SECT_NO_NUM
                     )
-            elif section != basic_section:
-                if basic_section not in sect_error_no_dupl:
-                    sect_error_no_dupl.update({basic_section: 1})
-                    no_index_section = metomi.rose.macro.REC_ID_STRIP_DUPL.sub(
-                        "", section
+            elif (section != basic_section and basic_section not in
+                  sect_error_no_dupl):
+                sect_error_no_dupl.update({basic_section: 1})
+                no_index_section = metomi.rose.macro.REC_ID_STRIP_DUPL.sub(
+                    "", section
+                )
+                if no_index_section != section:
+                    basic_section = no_index_section
+                warning = self.WARNING_NUM_SECT_NO_DUPL
+                if self._get_has_metadata(
+                    metadata, basic_section, meta_config
+                ):
+                    self.add_report(
+                        section, None, None, warning.format(basic_section)
                     )
-                    if no_index_section != section:
-                        basic_section = no_index_section
-                    warning = self.WARNING_NUM_SECT_NO_DUPL
-                    if self._get_has_metadata(
-                        metadata, basic_section, meta_config
-                    ):
-                        self.add_report(
-                            section, None, None, warning.format(basic_section)
-                        )
         return self.reports
 
     def _get_has_metadata(self, metadata, basic_section, meta_config):

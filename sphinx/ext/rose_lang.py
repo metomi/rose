@@ -25,7 +25,8 @@ class RoseLexer(RegexLexer):
 
     # Pattern for a Rose setting with capture groups.
     ROSE_SETTING_PATTERN = (
-        r'(\w[^\=\n]+)' r'(\s+)?(=)(\s+)?'  # Setting pattern.
+        r'(\w[^\=\n]+)'
+        r'(\s+)?(=)(\s+)?'  # Setting pattern.
     )  # Optional spaces around = operator, value.
 
     # Pattern for the value to a Rose setting.

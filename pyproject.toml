@@ -85,7 +85,15 @@ tests = [
     # version is pinned to the previous rose release)
 ]
 lint = [
-    "flake8>=6.0.0",
+    "flake8>=3.0.0",
+    "flake8-broken-line>=0.3.0",
+    "flake8-bugbear>=21.0.0",
+    "flake8-builtins>=1.5.0",
+    "flake8-comprehensions>=3.5.0",
+    "flake8-debugger>=4.0.0",
+    "flake8-implicit-str-concat>=0.4",
+    "flake8-mutable>=1.2.0",
+    "flake8-simplify>=0.14.0",
     "flake8-type-checking",
     "mypy>=0.800",
     "types-aiofiles"
@@ -220,3 +228,7 @@ known_first_party = ["metomi"]
 lines-after-imports = 2
 combine-as-imports = true
 force-sort-within-sections = true
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "ISC", "SIM"]
+ignore = ["E203", "E731", "E402", "SIM9", "ISC003"]

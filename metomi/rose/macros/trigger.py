@@ -37,9 +37,9 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
     ERROR_MISSING_METADATA = 'No metadata entry found'
     WARNING_STATE_CHANGED = '{0} -> {1}'
     IGNORED_STATUS_PARENT = 'from state of parent: {0}'
-    IGNORED_STATUS_VALUE = 'from parent value: {0} ' 'is not {2} ({1})'
+    IGNORED_STATUS_VALUE = 'from parent value: {0} is not {2} ({1})'
     IGNORED_STATUS_VALUES = (
-        'from parent value: {0} with {1} ' 'is not in the allowed values: {2}'
+        'from parent value: {0} with {1} is not in the allowed values: {2}'
     )
     PARENT_VALUE = 'value {0}'
     _EVALUATED_RULE_CHECKS: Dict[tuple, Any] = {}
@@ -537,14 +537,14 @@ class TriggerMacro(metomi.rose.macro.MacroBaseRoseEdit):
 
     def _get_dup_sequence(self, id_list, child_id):
         """Check that the last two sequences for child_id are not equal."""
-        id_copy_list = [i for i in id_list]
+        id_copy_list = list(id_list)
         id_copy_list.reverse()
         index_1 = id_copy_list.index(child_id)
         if index_1 == 0:
             return id_copy_list
         index_2 = id_copy_list.index(child_id, index_1 + 1)
         if id_copy_list[:index_1] == id_copy_list[index_1 + 1 : index_2]:
-            return [i for i in reversed(id_copy_list[:index_2])]
+            return list(reversed(id_copy_list[:index_2]))
         return []
 
     def _check_values_ok(self, value, setting_id, allowed_values):
