@@ -88,7 +88,7 @@ class CylcProcessor(SuiteEngineProcessor):
 
         # For each platform get a list of hosts.
         hosts = []
-        for _, tasks in task_platforms.items():
+        for tasks in task_platforms.values():
             for platform in tasks.values():
                 hosts.append(get_host_from_platform(platform))
         hosts = list(set(hosts))
