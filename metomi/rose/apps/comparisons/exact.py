@@ -31,8 +31,9 @@ class Exact:
         if not task.resultdata:
             task.set_pass(ExactComparisonSuccess(task))
             return task
-        for location, (val1, val2) in enumerate(zip(task.resultdata,
-                                                task.kgo1data)):
+        for location, (val1, val2) in enumerate(
+            zip(task.resultdata, task.kgo1data), start=1
+        ):
             if val1 != val2:
                 task.set_failure(
                     ExactComparisonFailure(task, val1, val2, location)
