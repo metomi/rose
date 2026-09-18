@@ -168,9 +168,14 @@ class GitLocHandler:
             cmd = self.manager.popen.get_cmd("rsync", name, dest)
             await self.manager.popen.run_ok_async(*cmd)
 
-    def _parse_name(self, loc):
-        scheme, nonscheme = loc.name.split(":", 1)
-        return nonscheme.split(self.URI_SEPARATOR, maxsplit=3)
+    def _parse_name(self, loc) -> tuple[str, str, str]:
+        """Parse the loc name into its components of remote, path, and ref."""
+        _scheme, nonscheme = loc.name.split(":", 1)
+        remote, path, ref = nonscheme.split(self.URI_SEPARATOR, maxsplit=3)
+        # Turn local paths into file URLs to support filtered clones.
+        if remote.startswith("/"):
+            remote = f"file://{remote}"
+        return remote, path, ref
 
     def _get_commithash(self, remote, ref):
         """Get the commit hash given a branch, tag, or commit hash.

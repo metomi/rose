@@ -241,7 +241,7 @@ source=git:$TEST_DIR/zz9+zα/::earth/::v1
 __CONFIG__
 run_fail "$TEST_KEY" rose app-run --config=../config
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
-[FAIL] file:hello/fruit_main=source=git:$TEST_DIR/zz9+zα/::earth/::v1: ls-remote: could not locate '$TEST_DIR/zz9+zα/':
+[FAIL] file:hello/fruit_main=source=git:$TEST_DIR/zz9+zα/::earth/::v1: ls-remote: could not locate 'file://$TEST_DIR/zz9+zα/':
 [FAIL]     fatal: '$TEST_DIR/zz9+zα/' does not appear to be a git repository
 [FAIL]     fatal: Could not read from remote repository.
 [FAIL] 
@@ -261,7 +261,7 @@ source=git:$TEST_DIR/hellorepo/::fruit/::bad_ref
 __CONFIG__
 run_fail "$TEST_KEY" rose app-run --config=../config
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
-[FAIL] file:hello/fruit_main=source=git:$TEST_DIR/hellorepo/::fruit/::bad_ref: ls-remote: could not find ref 'bad_ref' in '$TEST_DIR/hellorepo/'
+[FAIL] file:hello/fruit_main=source=git:$TEST_DIR/hellorepo/::fruit/::bad_ref: ls-remote: could not find ref 'bad_ref' in 'file://$TEST_DIR/hellorepo/'
 __ERROR__
 test_teardown
 #-------------------------------------------------------------------------------
@@ -276,7 +276,7 @@ source=git:$TEST_DIR/hellorepo/::fruit/::${COMMITHASH1::7}
 __CONFIG__
 run_fail "$TEST_KEY" rose app-run --config=../config
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
-[FAIL] file:hello/fruit_main=source=git:$TEST_DIR/hellorepo/::fruit/::${COMMITHASH1::7}: ls-remote: could not find ref '${COMMITHASH1::7}' in '$TEST_DIR/hellorepo/': you may be using an unsupported short commit hash
+[FAIL] file:hello/fruit_main=source=git:$TEST_DIR/hellorepo/::fruit/::${COMMITHASH1::7}: ls-remote: could not find ref '${COMMITHASH1::7}' in 'file://$TEST_DIR/hellorepo/': you may be using an unsupported short commit hash
 __ERROR__
 test_teardown
 #-------------------------------------------------------------------------------
@@ -292,7 +292,7 @@ __CONFIG__
 run_fail "$TEST_KEY" rose app-run --config=../config
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
 [FAIL] Expected path 'fruit' to be type 'blob', but it was 'tree'. Check trailing slash.
-[FAIL] source: remote:$TEST_DIR/hellorepo ref:$MAIN_BRANCH commit:$COMMITHASH2 path:fruit (git:$TEST_DIR/hellorepo::fruit::$MAIN_BRANCH)
+[FAIL] source: remote:file://$TEST_DIR/hellorepo ref:$MAIN_BRANCH commit:$COMMITHASH2 path:fruit (git:$TEST_DIR/hellorepo::fruit::$MAIN_BRANCH)
 __ERROR__
 test_teardown
 #-------------------------------------------------------------------------------
@@ -308,6 +308,6 @@ __CONFIG__
 run_fail "$TEST_KEY" rose app-run --config=../config
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" <<__ERROR__
 [FAIL] Expected path 'fruit/orange.txt/' to be type 'tree', but it was 'blob'. Check trailing slash.
-[FAIL] source: remote:$TEST_DIR/hellorepo ref:$MAIN_BRANCH commit:$COMMITHASH2 path:fruit/orange.txt/ (git:$TEST_DIR/hellorepo::fruit/orange.txt/::$MAIN_BRANCH)
+[FAIL] source: remote:file://$TEST_DIR/hellorepo ref:$MAIN_BRANCH commit:$COMMITHASH2 path:fruit/orange.txt/ (git:$TEST_DIR/hellorepo::fruit/orange.txt/::$MAIN_BRANCH)
 __ERROR__
 test_teardown
