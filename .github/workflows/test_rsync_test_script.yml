@@ -11,6 +11,8 @@ on:
       rose_ref:
         description: The Rose branch to test against
         required: true
+  schedule:
+    - cron: '37 04 * */3 1-5' # 04:37 every 3 months
 
 jobs:
   test:
