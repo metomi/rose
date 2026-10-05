@@ -290,9 +290,13 @@ def main(argv=sys.argv):
         splash_screen, stop_event, sys.stdin
     )
     update_thread.start()
-    with contextlib.suppress(KeyboardInterrupt):
-        Gtk.main()
-    update_thread.join()
+    try:  # NOQA: SIM105
+        with contextlib.suppress(KeyboardInterrupt):
+            Gtk.main()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        update_thread.join()
 
 
 if __name__ == "__main__":
