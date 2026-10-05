@@ -291,8 +291,7 @@ def main(argv=sys.argv):
     )
     update_thread.start()
     try:  # NOQA: SIM105
-        with contextlib.suppress(KeyboardInterrupt):
-            Gtk.main()
+        Gtk.main()
     except KeyboardInterrupt:
         pass
     finally:
