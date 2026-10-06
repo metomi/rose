@@ -207,7 +207,7 @@ class RoseBunchApp(BuiltinApp):
                     [self.BUNCH_SECTION, "command-instances"],
                     instances,
                     "not an integer value",
-                )
+                ) from None
 
         # Argument lists
         multi_args = conf_tree.node.get_value([self.ARGS_SECTION], {})
@@ -276,7 +276,7 @@ class RoseBunchApp(BuiltinApp):
                         self.names_from_args,
                         "names-from-args must be one of the following %s" % [
                             arg_name_mode.value for arg_name_mode in
-                            NamesFromArgsMode])
+                            NamesFromArgsMode]) from None
 
                 self.invocation_names = []
                 for i in range(arglength):
@@ -622,9 +622,9 @@ class RoseBunchDAO:
         flat = {}
         keys_and_nodes = list(config.node.walk())
         for keys, node in keys_and_nodes:
-            if not isinstance(node.value, dict):
-                if not node.is_ignored():
-                    flat["_".join(keys)] = node.value
+            if (not isinstance(node.value, dict)
+               and not node.is_ignored()):
+                flat["_".join(keys)] = node.value
         return flat
 
     def record_config(self, config, clear_db=False):

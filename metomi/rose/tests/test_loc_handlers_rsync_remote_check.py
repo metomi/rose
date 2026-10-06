@@ -59,7 +59,7 @@ def test_check_folder(capsys, tmp_path):
         str(Path(line.split()[-1]).relative_to(tmp_path)): line.split()[:-1]
         for line in lines[1:]
     }
-    assert list(sorted(files)) == ['even.more.stuff', 'more.stuff']
+    assert sorted(files) == ['even.more.stuff', 'more.stuff']
     mode, _, size = files['more.stuff']
     assert mode == '33179'
     assert size == '2'

@@ -424,7 +424,7 @@ class KeyWidget(Gtk.Box):
                 if hasattr(widget, "_show_mode"):
                     show_mode_widget_indices.append((widget._show_mode, i))
             show_mode_widget_indices.sort()
-            for j, (show_mode, i) in enumerate(show_mode_widget_indices):
+            for j, (show_mode, _) in enumerate(show_mode_widget_indices):
                 if show_mode == mode and j < len(show_mode_widget_indices) - 1:
                     # The new widget goes before the next one alphabetically.
                     new_index = show_mode_widget_indices[j + 1][1]
@@ -577,18 +577,18 @@ class KeyWidget(Gtk.Box):
             section = variable.metadata["id"].split(
                 metomi.rose.CONFIG_DELIMITER
             )[0]
-            if section.startswith("namelist:"):
-                if new_name.lower() != new_name:
-                    text = metomi.rose.config_editor.DIALOG_BODY_NL_CASE_CHANGE
-                    text = text.format(new_name.lower())
-                    title = (
-                        metomi.rose.config_editor.DIALOG_TITLE_NL_CASE_WARNING
-                    )
-                    new_name = metomi.rose.gtk.dialog.run_choices_dialog(
-                        text, [new_name.lower(), new_name], title
-                    )
-                    if new_name is None:
-                        return None
+            if (section.startswith("namelist:")
+               and new_name.lower() != new_name):
+                text = metomi.rose.config_editor.DIALOG_BODY_NL_CASE_CHANGE
+                text = text.format(new_name.lower())
+                title = (
+                    metomi.rose.config_editor.DIALOG_TITLE_NL_CASE_WARNING
+                )
+                new_name = metomi.rose.gtk.dialog.run_choices_dialog(
+                    text, [new_name.lower(), new_name], title
+                )
+                if new_name is None:
+                    return None
             self.var_ops.remove_var(variable)
             variable.name = new_name
             variable.metadata["id"] = (

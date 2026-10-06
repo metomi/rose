@@ -41,7 +41,7 @@ def write_source_vc_info(run_source_dir, output=None, popen=None):
     elif hasattr(output, "write"):
         handle = output
     else:
-        handle = open(output, "wb")
+        handle = open(output, "wb")  # noqa: SIM115
     msg = "%s\n" % run_source_dir
     write_safely(msg, handle)
     environ = dict(os.environ)

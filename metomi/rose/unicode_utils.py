@@ -35,9 +35,7 @@ def write_safely(msg, handle):
     # Unforgiving, but fast logic.
     try:
         if isinstance(msg, bytes):
-            if isinstance(handle, _io.TextIOWrapper) or isinstance(
-                handle, _io.StringIO
-            ):
+            if isinstance(handle, (_io.TextIOWrapper, _io.StringIO)):
                 handle.write(msg.decode())
             elif isinstance(handle, io.BufferedWriter):
                 handle.write(msg)

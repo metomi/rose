@@ -713,10 +713,10 @@ class MacroUpgradeManager:
     def _load_version_macros(self, macro_insts):
         self.version_macros = []
         for macro in macro_insts:
-            if self.downgrade and macro.AFTER_TAG == self.tag:
+            if self.downgrade and self.tag == macro.AFTER_TAG:
                 self.version_macros = [macro]
                 break
-            if not self.downgrade and macro.BEFORE_TAG == self.tag:
+            if not self.downgrade and self.tag == macro.BEFORE_TAG:
                 self.version_macros = [macro]
                 break
         if self.tag == "HEAD":

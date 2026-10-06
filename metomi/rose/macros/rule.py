@@ -384,7 +384,6 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
             )
         }
         value_id_count = -1
-        sci_num_count = -1
 
         # any/all processing.
         # n.b. Because we've made "template variables" (with space) the
@@ -435,8 +434,9 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
             rule = self.REC_LEN_FUNC.sub(new_string, rule, count=1)
 
         # Number-like-strings into numbers.
-        for search_result in self.REC_SCI_NUM.findall(rule):
-            sci_num_count += 1
+        for sci_num_count, search_result in enumerate(
+            self.REC_SCI_NUM.findall(rule)
+        ):
             key = self.INTERNAL_ID_SCI_NUM.format(sci_num_count)
             local_map[key] = self._evaluate(search_result)
             rule = rule.replace(search_result, key, 1)
@@ -444,7 +444,7 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
         # Strings into proper string variables.
         for search_result in self.REC_VALUE.findall(rule):
             value_string = search_result.strip('"')
-            for key, value in local_map.items():
+            for key, value in local_map.items():  # NOQA: B007 used out of loop
                 if value == value_string:
                     break
             else:
@@ -459,7 +459,7 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
             value_string = get_value_from_id(
                 proper_id, config, meta_config, setting_id
             )
-            for key, value in local_map.items():
+            for key, value in local_map.items():  # NOQA B007 used out of loop
                 if value == value_string:
                     break
             else:
@@ -483,7 +483,7 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
             value_string = get_value_from_id(
                 search_result, config, meta_config, setting_id
             )
-            for key, value in local_map.items():
+            for key, value in local_map.items():  # NOQA B007 used out of loop
                 if value == value_string:
                     break
             else:
@@ -550,12 +550,12 @@ class RuleEvaluator(metomi.rose.macro.MacroBase):
                     try:
                         index = int(element)
                     except (TypeError, ValueError):
-                        raise RuleValueError(variable_id)
+                        raise RuleValueError(variable_id) from None
                     val_array = metomi.rose.variable.array_split(value)
                     try:
                         return_value = val_array[index - 1]
                     except IndexError:
-                        raise RuleValueError(variable_id)
+                        raise RuleValueError(variable_id) from None
                     else:
                         return self._evaluate(return_value)
             raise RuleValueError(variable_id)

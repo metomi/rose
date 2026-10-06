@@ -232,7 +232,7 @@ class GroupOperations:
                     )
                 )
 
-        for keys, data in sorted(
+        for keys, _ in sorted(
             config_diff.get_removed(), key=lambda _: -len(_[0])
         ):
             # Sort so that variables are removed first.

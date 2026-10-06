@@ -20,6 +20,7 @@ Module to automatically generate metadata from a Rose configuration.
 
 import os
 import sys
+import contextlib
 
 import metomi.rose.config
 import metomi.rose.config_tree
@@ -103,10 +104,10 @@ def type_gen(value):
     Returns a tuple of type and length metadata values.
 
     """
+    length = 0  # noqa: SIM113
     types = []
-    length = 0
     if not value:
-        return None, str(length)
+        return None, '0'
     for val in metomi.rose.variable.array_split(value):
         length += 1
         val_meta_type = "raw"
@@ -126,9 +127,9 @@ def type_gen(value):
     if not any(t != "raw" for t in types):
         length = 1
         return None, str(length)
-    if all([t == types[0] for t in types]):
+    if all(t == types[0] for t in types):
         return types[0], str(length)
-    length = 1
+    length = 1  # noqa: SIM113
     # Now make sure derived type arrays are correctly guessed.
     # For example, types = ["A", "B", "A", "B"], length = 1
     # should be types = ["A", "B"], length = 2
@@ -187,14 +188,12 @@ ARGUMENTS
     source_config = metomi.rose.config.load(path)
     meta_dir = os.path.join(opts.conf_dir, metomi.rose.CONFIG_META_DIR)
     metadata_config = metomi.rose.config.ConfigNode()
-    try:
+    with contextlib.suppress(IOError):
         metadata_config = (
             metomi.rose.config_tree.ConfigTreeLoader()
             .load(meta_dir, metomi.rose.META_CONFIG_NAME, list(sys.path))
             .node
         )
-    except IOError:
-        pass
     metadata_config = metadata_gen(
         source_config,
         metadata_config,

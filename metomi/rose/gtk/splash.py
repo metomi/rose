@@ -22,6 +22,7 @@ from subprocess import Popen, PIPE
 import sys
 import threading
 import time
+import contextlib
 
 import gi
 
@@ -264,11 +265,8 @@ class SplashScreenUpdaterThread(threading.Thread):
             GObject.idle_add(self._update_splash_screen, update_input)
 
     def stop(self):
-        try:
+        with contextlib.suppress(RuntimeError):
             Gtk.main_quit()
-        except RuntimeError:
-            # This can result from gtk having already quit.
-            pass
 
     def _check_splash_screen_alive(self):
         """Check whether the splash screen is finished."""
@@ -292,7 +290,7 @@ def main(argv=sys.argv):
         splash_screen, stop_event, sys.stdin
     )
     update_thread.start()
-    try:
+    try:  # NOQA: SIM105
         Gtk.main()
     except KeyboardInterrupt:
         pass

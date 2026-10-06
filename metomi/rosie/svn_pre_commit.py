@@ -195,32 +195,31 @@ class RosieSvnPreCommitHook(RosieSvnHook):
             path_tail = path[len(path_head) :]
             is_meta_suite = sid == "ROSIE"
 
-            if status != self.ST_DELETED:
+            if (status != self.ST_DELETED) and (sid not in txn_info_map):
                 # Check info file
-                if sid not in txn_info_map:
-                    try:
-                        txn_info_map[sid] = self._load_info(
-                            repos, sid, branch=branch, transaction=txn
-                        )
-                        err = None
-                    except ConfigSyntaxError as exc:
-                        err = InfoFileError(InfoFileError.VALUE, exc)
-                    except RosePopenError as exc:
-                        err = InfoFileError(InfoFileError.NO_INFO, exc.stderr)
-                    if err:
-                        bad_changes.append(err)
-                        txn_info_map[sid] = err
-                        continue
-
-                    # Suite must have an owner
-                    txn_owner, txn_access_list = self._get_access_info(
-                        txn_info_map[sid]
+                try:
+                    txn_info_map[sid] = self._load_info(
+                        repos, sid, branch=branch, transaction=txn
                     )
-                    if not txn_owner:
-                        bad_changes.append(
-                            InfoFileError(InfoFileError.NO_OWNER)
-                        )
-                        continue
+                    err = None
+                except ConfigSyntaxError as exc:
+                    err = InfoFileError(InfoFileError.VALUE, exc)
+                except RosePopenError as exc:
+                    err = InfoFileError(InfoFileError.NO_INFO, exc.stderr)
+                if err:
+                    bad_changes.append(err)
+                    txn_info_map[sid] = err
+                    continue
+
+                # Suite must have an owner
+                txn_owner, txn_access_list = self._get_access_info(
+                    txn_info_map[sid]
+                )
+                if not txn_owner:
+                    bad_changes.append(
+                        InfoFileError(InfoFileError.NO_OWNER)
+                    )
+                    continue
 
             # No need to check other non-trunk changes
             if branch and branch != "trunk":

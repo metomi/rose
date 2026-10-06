@@ -33,6 +33,7 @@ from metomi.rosie.ws_client import (
     RosieWSClientError,
 )
 from metomi.rosie.ws_client_auth import UndefinedRosiePrefixWS
+import contextlib
 
 ERR_PREFIX_UNREACHABLE = "Cannot connect to prefix(es) {0}"
 ERR_SYNTAX = "Syntax error: {0}"
@@ -329,12 +330,10 @@ def _align(rows, keys):
     for key in keys:
         if key == "date":
             for row in rows:
-                try:
+                with contextlib.suppress(TypeError):
                     row[key] = time.strftime(
                         DATE_TIME_FORMAT, time.gmtime(row.get(key))
                     )
-                except (TypeError):
-                    pass
         else:
             try:
                 max_len = max(
