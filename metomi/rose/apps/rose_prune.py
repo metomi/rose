@@ -250,7 +250,7 @@ class RosePruneApp(BuiltinApp):
                     cycle_formats[fmt] = env_var_process(node.value)
                     # Check formats are valid
                     if self._get_cycling_mode() == "integer":
-                        raise ZeroDivisionError
+                        cycle_formats[fmt] % 0  # noqa: B018
                     else:
                         app_runner.date_time_oper.date_format(
                             cycle_formats[fmt]
