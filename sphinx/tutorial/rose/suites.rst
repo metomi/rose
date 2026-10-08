@@ -448,7 +448,8 @@ Rose Applications In Rose Suite Configurations
       environment variable from the ``[runtime]forecast`` section of the
       ``flow.cylc`` file.
 
-      Copy the remaining environment variables defined in the ``forecast``
+      After deleting the ``MAP_TEMPLATE`` environment,
+      move the remaining environment variables defined in the ``forecast``
       task within the ``flow.cylc`` file into the :rose:file:`rose-app.conf`
       file of the ``forecast`` application, replacing any values already
       specified if necessary. Remove the lines from the ``flow.cylc`` file
