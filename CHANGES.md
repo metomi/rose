@@ -16,7 +16,7 @@ $ towncrier create <PR-number>.<break|feat|fix>.md --content "Short description"
 
 [#3019](https://github.com/metomi/rose/pull/3019) - Add `names-from-args` option to `rose_bunch` for more control over subjob naming.
 
-[#3038](https://github.com/metomi/rose/pull/3038) - Support alternate usernames in pre-commit
+[#3038](https://github.com/metomi/rose/pull/3038) - Support alternate usernames in subversion pre-commit
 
 [#3040](https://github.com/metomi/rose/pull/3040) - Change rosie disco service root to `rosie`.
 
