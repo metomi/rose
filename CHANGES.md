@@ -10,6 +10,22 @@ $ towncrier create <PR-number>.<break|feat|fix>.md --content "Short description"
 
 <!-- towncrier release notes start -->
 
+## 2.8.0 (Released 2026-10-08)
+
+### 🚀 Enhancements
+
+[#3019](https://github.com/metomi/rose/pull/3019) - Add `names-from-args` option to `rose_bunch` for more control over subjob naming.
+
+[#3038](https://github.com/metomi/rose/pull/3038) - Support alternate usernames in subversion pre-commit
+
+[#3040](https://github.com/metomi/rose/pull/3040) - Change rosie disco service root to `rosie`.
+
+### 🔧 Fixes
+
+[#3022](https://github.com/metomi/rose/pull/3022) - The `rose macro` command will now exit 1 instead of 0 in an error scenario.
+
+[#3085](https://github.com/metomi/rose/pull/3085) - Cloning of local git repositories specified by path in rose file sources is now supported. This was broken due to filtered clones not supporting direct paths as remotes.
+
 ## 2.7.1 (Released 2026-06-18)
 
 Some small updates to the Rose tutorials.
