@@ -128,13 +128,14 @@ class TextMultilineValueWidget(Gtk.Box):
         self.entry.connect("focus-in-event", self.hook.trigger_scroll)
         self.entry.show()
 
-        viewport = Gtk.Viewport()
-        viewport.add(self.entry)
-        viewport.show()
+        frame = Gtk.Frame()
+        frame.get_style_context().add_class("multiline-entry")
+        frame.add(self.entry)
+        frame.show()
 
         self.grab_focus = lambda: self.hook.get_focus(self.entry)
         self.entrybuffer.connect("changed", self.setter)
-        self.pack_start(viewport, expand=False, fill=False, padding=0)
+        self.pack_start(frame, expand=False, fill=False, padding=0)
 
     def get_focus_index(self):
         """Return the cursor position within the variable value."""
