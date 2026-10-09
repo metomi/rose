@@ -463,7 +463,7 @@ class MainController:
         )["widget"]
         add_icon.connect("button_press_event", self.add_page_variable)
 
-    def generate_menubar(self):
+    def generate_menubar(self) -> None:
         """Link in the menu functionality and accelerators."""
         self.menubar = metomi.rose.config_editor.menu.MenuBar()
         self.menu_widgets = {}
@@ -640,7 +640,7 @@ class MainController:
             ("/TopMenuBar/Help/Documentation", self.main_handle.help),
             ("/TopMenuBar/Help/About", self.main_handle.about_dialog),
         ]
-        is_toggled = dict(
+        is_toggled = dict([
             (
                 "/TopMenuBar/View/View fixed vars",
                 metomi.rose.config_editor.SHOULD_SHOW_FIXED_VARS,
@@ -701,7 +701,7 @@ class MainController:
                 "/TopMenuBar/Metadata/Switch off metadata",
                 self.metadata_off,
             ),
-        )
+        ])
         for address, action in menu_list:
             widget = self.menubar.uimanager.get_widget(address)
             self.menu_widgets.update({address: widget})
