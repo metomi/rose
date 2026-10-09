@@ -463,7 +463,7 @@ class MainController:
         )["widget"]
         add_icon.connect("button_press_event", self.add_page_variable)
 
-    def generate_menubar(self):
+    def generate_menubar(self) -> None:
         """Link in the menu functionality and accelerators."""
         self.menubar = metomi.rose.config_editor.menu.MenuBar()
         self.menu_widgets = {}
