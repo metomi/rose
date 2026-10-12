@@ -26,7 +26,6 @@ import os
 import pstats
 import re
 import shutil
-import sre_constants
 import sys
 import tempfile
 import warnings
@@ -1813,7 +1812,7 @@ class MainController:
         """Using regex expression, return a matching page and variable."""
         try:
             reg_find = re.compile(expression).search
-        except sre_constants.error as exc:
+        except re.error as exc:
             metomi.rose.gtk.dialog.run_dialog(
                 metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
                 metomi.rose.config_editor.ERROR_NOT_REGEX.format(
