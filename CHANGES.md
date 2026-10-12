@@ -12,7 +12,11 @@ $ towncrier create <PR-number>.<break|feat|fix>.md --content "Short description"
 
 ## 2.8.1 (Released 2026-10-12)
 
-No significant changes.
+### 🔧 Fixes
+
+[#3095](https://github.com/metomi/rose/pull/3095) - Fix traceback on `rose edit` startup.
+
+[#3100](https://github.com/metomi/rose/pull/3100) - Unlock Python 3.15 support.
 
 ## 2.8.0 (Released 2026-10-08)
 
