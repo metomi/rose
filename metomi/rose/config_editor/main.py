@@ -1041,11 +1041,11 @@ class MainController:
             )
             tab_window.connect(
                 "destroy-event",
-                lambda w, e: self.tab_windows.remove(w) and False,  # NOQA: 223
+                lambda w, e: self.tab_windows.remove(w) and False,  # noqa: SIM223
             )
             tab_window.connect(
                 "delete-event",
-                lambda w, e: self.tab_windows.remove(w) and False,  # NOQA: 223
+                lambda w, e: self.tab_windows.remove(w) and False,  # noqa: SIM223
             )
         else:
             tab_window = old_window
