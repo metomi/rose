@@ -26,7 +26,6 @@ import os
 import pstats
 import re
 import shutil
-import sre_constants
 import sys
 import tempfile
 import warnings
@@ -463,7 +462,7 @@ class MainController:
         )["widget"]
         add_icon.connect("button_press_event", self.add_page_variable)
 
-    def generate_menubar(self):
+    def generate_menubar(self) -> None:
         """Link in the menu functionality and accelerators."""
         self.menubar = metomi.rose.config_editor.menu.MenuBar()
         self.menu_widgets = {}
@@ -640,68 +639,38 @@ class MainController:
             ("/TopMenuBar/Help/Documentation", self.main_handle.help),
             ("/TopMenuBar/Help/About", self.main_handle.about_dialog),
         ]
-        is_toggled = dict(
-            (
-                "/TopMenuBar/View/View fixed vars",
+        is_toggled = {
+            "/TopMenuBar/View/View fixed vars":
                 metomi.rose.config_editor.SHOULD_SHOW_FIXED_VARS,
-            ),
-            (
-                "/TopMenuBar/View/View ignored vars",
+            "/TopMenuBar/View/View ignored vars":
                 metomi.rose.config_editor.SHOULD_SHOW_IGNORED_VARS,
-            ),
-            (
-                "/TopMenuBar/View/View user-ignored vars",
+            "/TopMenuBar/View/View user-ignored vars":
                 metomi.rose.config_editor.SHOULD_SHOW_USER_IGNORED_VARS,
-            ),
-            (
-                "/TopMenuBar/View/View latent vars",
+            "/TopMenuBar/View/View latent vars":
                 metomi.rose.config_editor.SHOULD_SHOW_LATENT_VARS,
-            ),
-            (
-                "/TopMenuBar/Metadata/Prefs/View without descriptions",
+            "/TopMenuBar/Metadata/Prefs/View without descriptions":
                 metomi.rose.config_editor.SHOULD_SHOW_NO_DESCRIPTION,
-            ),
-            (
-                "/TopMenuBar/Metadata/Prefs/View without help",
+            "/TopMenuBar/Metadata/Prefs/View without help":
                 metomi.rose.config_editor.SHOULD_SHOW_NO_HELP,
-            ),
-            (
-                "/TopMenuBar/Metadata/Prefs/View without titles",
+            "/TopMenuBar/Metadata/Prefs/View without titles":
                 metomi.rose.config_editor.SHOULD_SHOW_NO_TITLE,
-            ),
-            (
-                "/TopMenuBar/View/View ignored pages",
+            "/TopMenuBar/View/View ignored pages":
                 metomi.rose.config_editor.SHOULD_SHOW_IGNORED_PAGES,
-            ),
-            (
-                "/TopMenuBar/View/View user-ignored pages",
+            "/TopMenuBar/View/View user-ignored pages":
                 metomi.rose.config_editor.SHOULD_SHOW_USER_IGNORED_PAGES,
-            ),
-            (
-                "/TopMenuBar/View/View latent pages",
+            "/TopMenuBar/View/View latent pages":
                 metomi.rose.config_editor.SHOULD_SHOW_LATENT_PAGES,
-            ),
-            (
-                "/TopMenuBar/View/Flag opt config vars",
+            "/TopMenuBar/View/Flag opt config vars":
                 metomi.rose.config_editor.SHOULD_SHOW_FLAG_OPT_CONF_VARS,
-            ),
-            (
-                "/TopMenuBar/View/Flag optional vars",
+            "/TopMenuBar/View/Flag optional vars":
                 metomi.rose.config_editor.SHOULD_SHOW_FLAG_OPTIONAL_VARS,
-            ),
-            (
-                "/TopMenuBar/View/Flag no-metadata vars",
+            "/TopMenuBar/View/Flag no-metadata vars":
                 metomi.rose.config_editor.SHOULD_SHOW_FLAG_NO_META_VARS,
-            ),
-            (
-                "/TopMenuBar/View/View status bar",
+            "/TopMenuBar/View/View status bar":
                 metomi.rose.config_editor.SHOULD_SHOW_STATUS_BAR,
-            ),
-            (
-                "/TopMenuBar/Metadata/Switch off metadata",
+            "/TopMenuBar/Metadata/Switch off metadata":
                 self.metadata_off,
-            ),
-        )
+        }
         for address, action in menu_list:
             widget = self.menubar.uimanager.get_widget(address)
             self.menu_widgets.update({address: widget})
@@ -1843,7 +1812,7 @@ class MainController:
         """Using regex expression, return a matching page and variable."""
         try:
             reg_find = re.compile(expression).search
-        except sre_constants.error as exc:
+        except re.error as exc:
             metomi.rose.gtk.dialog.run_dialog(
                 metomi.rose.gtk.dialog.DIALOG_TYPE_ERROR,
                 metomi.rose.config_editor.ERROR_NOT_REGEX.format(
