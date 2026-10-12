@@ -10,6 +10,10 @@ $ towncrier create <PR-number>.<break|feat|fix>.md --content "Short description"
 
 <!-- towncrier release notes start -->
 
+## 2.8.1 (Released 2026-10-12)
+
+No significant changes.
+
 ## 2.8.0 (Released 2026-10-08)
 
 ### 🚀 Enhancements
