@@ -421,7 +421,7 @@ SIZE_STACK = (800, 600)
 # Configure the width and height of a detached tab in pixels (as a tuple).
 SIZE_PAGE_DETACH = (650, 600)
 # Configure the width and height of the config editor in pixels (as a tuple).
-SIZE_WINDOW = (900, 600)
+SIZE_WINDOW = (1200, 750)
 # Configure the pixel padding/spacing between config editor major items.
 SPACING_PAGE = 10
 # Configure the pixel padding/spacing between config editor minor items.
