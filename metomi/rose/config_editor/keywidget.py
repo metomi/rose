@@ -612,7 +612,9 @@ class KeyWidget(Gtk.Box):
 
     def _advance_name_marquee(self):
         """Shift the name text by one character, wrapping around."""
-        if not isinstance(self.entry, Gtk.Label) or not self.entry.get_mapped():
+        if not isinstance(self.entry, Gtk.Label) or not (
+            self.entry.get_mapped()
+        ):
             self._name_marquee_timer = None
             return False
         scroll_text = self._name_marquee_full_text + "     "

@@ -22,9 +22,10 @@ from gi.repository import Gtk
 
 import metomi.rose.gtk.util
 import metomi.rose.variable
+from . import wrap
 
 
-class LogicalArrayValueWidget(Gtk.Box):
+class LogicalArrayValueWidget(wrap.WrappingArrayTableMixin, Gtk.Box):
     """This is a class to represent an array of logical or boolean types."""
 
     TIP_ADD = "Add array element"
@@ -99,13 +100,15 @@ class LogicalArrayValueWidget(Gtk.Box):
         self.populate_table()
         self.pack_start(self.button_box, expand=False, fill=False, padding=0)
         self.pack_start(self.entry_table, expand=True, fill=True, padding=0)
-        self.entry_table.connect_after(
-            "size-allocate", lambda w, e: self.reshape_table()
-        )
+        self.init_wrapping()
         self.connect(
             "focus-in-event",
             lambda w, e: self.hook.get_focus(self.get_focus_entry()),
         )
+
+    def _get_cell_widgets(self):
+        """The move buttons sit outside the grid, so only elements wrap."""
+        return self.entries
 
     def get_focus_entry(self):
         """Get either the last selected button or the last one."""
@@ -259,19 +262,6 @@ class LogicalArrayValueWidget(Gtk.Box):
             )
         self.grab_focus = lambda: self.hook.get_focus(self.entries[-1])
         self.check_resize()
-
-    def reshape_table(self):
-        """Reshape a table according to the space allocated."""
-        total_x_bound = self.entry_table.get_allocation().width
-        if not len(self.entries):
-            return False
-        entries_bound = sum([e.get_allocation().width for e in self.entries])
-        each_entry_bound = entries_bound / len(self.entries)
-        maximum_entry_number = float(total_x_bound) / float(each_entry_bound)
-        rounded_max = int(maximum_entry_number) + 1
-        if rounded_max != self.num_allowed_columns + 2 and rounded_max > 2:
-            self.num_allowed_columns = max(1, rounded_max - 2)
-            self.populate_table()
 
     def add_entry(self):
         """Add a new button to the array."""
