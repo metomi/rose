@@ -32,7 +32,7 @@ class URLChecker(metomi.rose.macro.MacroBase):
                     try:
                         connection = http.client.HTTPConnection(value, 80)
                         connection.request("HEAD", "")
-                    except IOError as exc:
+                    except OSError as exc:
                         self.add_report(section, option, value, str(exc))
                     connection.close()
         return self.reports

@@ -191,7 +191,7 @@ ENVIRONMENT VARIABLES
                 config_loader.load(source, root_node)
             else:
                 config_loader.load_with_opts(source, root_node)
-        except (ConfigSyntaxError, IOError) as exc:
+        except (ConfigSyntaxError, OSError) as exc:
             report(exc)
             sys.exit(1)
         if source is sys.stdin:

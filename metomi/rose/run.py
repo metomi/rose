@@ -202,7 +202,7 @@ class Runner:
             return self.run_impl(opts, args, uuid, work_files)
         finally:
             # Close handle on specific log file
-            with contextlib.suppress(KeyError, IOError, AttributeError):
+            with contextlib.suppress(KeyError, OSError, AttributeError):
                 self.event_handler.contexts[uuid].handle.close()
             # Remove work files
             for work_file in work_files:
