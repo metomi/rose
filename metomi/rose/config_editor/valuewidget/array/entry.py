@@ -20,12 +20,13 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
+from . import wrap
 import metomi.rose.config_editor.util
 import metomi.rose.gtk.util
 import metomi.rose.variable
 
 
-class EntryArrayValueWidget(Gtk.Box):
+class EntryArrayValueWidget(wrap.WrappingArrayTableMixin, Gtk.Box):
     """This is a class to represent multiple array entries."""
 
     TIP_ADD = "Add array element"
@@ -95,9 +96,7 @@ class EntryArrayValueWidget(Gtk.Box):
             self.add_del_button_box, expand=False, fill=False, padding=0
         )
         self.pack_start(self.entry_table, expand=True, fill=True, padding=0)
-        self.entry_table.connect_after(
-            "size-allocate", lambda w, e: self.reshape_table()
-        )
+        self.init_wrapping()
         self.connect(
             "focus-in-event",
             lambda w, e: self.hook.get_focus(self.get_focus_entry()),
@@ -407,19 +406,6 @@ class EntryArrayValueWidget(Gtk.Box):
             self._get_widget_for_focus()
         )
         self.check_resize()
-
-    def reshape_table(self):
-        """Reshape a table according to the space allocated."""
-        total_x_bound = self.entry_table.get_allocation().width
-        if not len(self.entries):
-            return False
-        entries_bound = sum([e.get_allocation().width for e in self.entries])
-        each_entry_bound = entries_bound / len(self.entries)
-        maximum_entry_number = float(total_x_bound) / float(each_entry_bound)
-        rounded_max = int(maximum_entry_number) + 1
-        if rounded_max != self.num_allowed_columns + 2 and rounded_max > 2:
-            self.num_allowed_columns = max(1, rounded_max - 2)
-            self.populate_table()
 
     def add_entry(self):
         """Add a new entry (with null text) to the variable array."""

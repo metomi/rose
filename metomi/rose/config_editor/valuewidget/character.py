@@ -21,9 +21,10 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 from metomi.rose import META_PROP_TYPE
+from metomi.rose.config_editor.valuewidget.array import wrap
 
 
-class QuotedTextValueWidget(Gtk.Box):
+class QuotedTextValueWidget(wrap.EntryFitMixin, Gtk.Box):
     """This class represents 'character' and 'quoted' types in an entry."""
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
@@ -60,10 +61,6 @@ class QuotedTextValueWidget(Gtk.Box):
         self.set_value = set_value
         self.hook = hook
         self.entry = Gtk.Entry()
-        # Set the size of the entry box
-        self.chars_width = len(self.value) + 1
-        self.entry.set_width_chars(self.chars_width)
-        self.entry.set_max_length(self.chars_width)
         self.in_error = not self.type_checker(self.value)
         self.set_entry_text()
         self.entry.connect(
@@ -80,6 +77,8 @@ class QuotedTextValueWidget(Gtk.Box):
         self.pack_start(self.entry, expand=False, fill=False, padding=0)
         self.entry.connect("focus-in-event", self.hook.trigger_scroll)
         self.grab_focus = lambda: self.hook.get_focus(self.entry)
+        # Size the entry to its text, scrolling internally when too long.
+        self.init_entry_fit()
 
     def set_entry_text(self):
         """Initialise the text in the widget."""
@@ -91,10 +90,6 @@ class QuotedTextValueWidget(Gtk.Box):
 
     def setter(self, *args):
         var_text = self.entry.get_text()
-        # Set the size of the entry box
-        self.chars_width = len(var_text) + 1
-        self.entry.set_width_chars(self.chars_width)
-        self.entry.set_max_length(self.chars_width)
         if not self.value or not self.in_error:
             # Text was in processed form
             var_text = self.format_text_out(var_text)
