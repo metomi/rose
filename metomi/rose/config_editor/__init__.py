@@ -422,6 +422,9 @@ SIZE_STACK = (800, 600)
 SIZE_PAGE_DETACH = (650, 600)
 # Configure the width and height of the config editor in pixels (as a tuple).
 SIZE_WINDOW = (1200, 750)
+# Configure the fixed width (in characters) of the variable name/description
+# column. Names are ellipsized and descriptions wrapped within this width.
+WIDTH_KEY_COLUMN_CHARS = 24
 # Configure the pixel padding/spacing between config editor major items.
 SPACING_PAGE = 10
 # Configure the pixel padding/spacing between config editor minor items.
