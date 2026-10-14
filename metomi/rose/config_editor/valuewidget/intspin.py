@@ -86,10 +86,19 @@ class IntSpinButtonValueWidget(Gtk.Box):
 
         spin_button = Gtk.SpinButton(adjustment=my_adj, digits=0)
         spin_button.connect("focus-in-event", self.hook.trigger_scroll)
+        spin_button.connect("scroll-event", self.on_focus_scroll)
 
         spin_button.set_numeric(True)
 
         return spin_button
+
+
+    def on_focus_scroll(self, spin_button, event):
+        if not spin_button.has_focus():
+            return True  # Consume the event; don't change the value
+
+        return False  # Let Gtk.SpinButton handle it normally
+
 
     def setter(self, widget):
         """Callback on widget value change.
