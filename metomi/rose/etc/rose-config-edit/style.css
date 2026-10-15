@@ -18,7 +18,7 @@ notebook button:focus {
     border: None;
     padding-right: 10px;
 }
-    
+
 #page-tab-button:hover {
     background-image: None;
     box-shadow: None;
@@ -31,10 +31,21 @@ notebook button:focus {
 }
 
 /* Underline key and variable widgets so rows of widgets are distinct */
-notebook box > paned > paned > scrolledwindow > viewport > box > widget > box { 
+notebook box > paned > paned > scrolledwindow > viewport > box > widget > box {
     border-bottom: solid;
     border-width: 1px;
     border-color: lightgray;
     padding: .4em;
     margin: 0 -.3em;
-  }
+}
+
+/* Make the multiline raw-value box match a Gtk.Entry (rounded outline) */
+frame.multiline-entry > border {
+    border: 1px solid @borders;
+    border-radius: 5px;
+    padding: 2px;
+}
+
+frame.multiline-entry text {
+    background-color: @theme_base_color;
+}
