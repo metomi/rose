@@ -227,6 +227,8 @@ linkcheck_ignore = [
     'https?://stackoverflow.com.*',
     # Seems to be too slow, thus causing test failures:
     'https?://www.gnu.org*',
+    # Wikipedia rate limits aggressively.
+    'https?://upload.wikimedia.org/*'
 ]
 
 
