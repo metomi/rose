@@ -50,6 +50,7 @@ class PythonListValueWidget(Gtk.Box):
         value_array = python_array_split(self.value)
         self.chars_width = max([len(v) for v in value_array] + [1]) + 1
         self.last_selected_src = None
+        self.force_signal_ids = []
         # Designate the number of allowed columns - 10 for 4 chars width
         self.num_allowed_columns = 3
         self.entry_table = Gtk.Table(
@@ -78,25 +79,6 @@ class PythonListValueWidget(Gtk.Box):
             "focus-in-event",
             lambda w, e: self.hook.get_focus(self.get_focus_entry()),
         )
-
-    def force_scroll(self, widget):
-        """Adjusts a scrolled window to display the correct widget."""
-        y_coordinate = None
-        y_coordinate = widget.get_allocation().y
-        scroll_container = widget.get_parent()
-        if scroll_container is None:
-            return False
-        while not isinstance(scroll_container, Gtk.ScrolledWindow):
-            scroll_container = scroll_container.get_parent()
-        vadj = scroll_container.get_vadjustment()
-        if y_coordinate == -1:  # Bad allocation, don't scroll
-            return False
-        if y_coordinate is None:
-            vadj.set_upper(vadj.get_upper() + 0.08 * vadj.get_page_size())
-            vadj.set_value(vadj.get_upper() - vadj.get_page_size())
-            return False
-        vadj.set_value(y_coordinate)
-        return False
 
     def get_focus_entry(self):
         """Get either the last selected entry or the last one."""
@@ -382,7 +364,12 @@ class PythonListValueWidget(Gtk.Box):
     def add_entry(self):
         """Add a new entry (with null text) to the variable array."""
         widget = self.get_entry("")
-        widget.connect("focus-in-event", lambda w, e: self.force_scroll(w))
+        widget.connect(
+            "focus-in-event",
+            lambda w, e: metomi.rose.config_editor.util.force_scroll(
+                w, signal_ids=self.force_signal_ids
+            ),
+        )
         self.last_selected_src = widget
         self.entries.append(widget)
         self._adjust_entry_length()
