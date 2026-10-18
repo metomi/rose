@@ -145,8 +145,8 @@ class QuotedTextValueWidget(Gtk.Box):
             return False
         self.set_entry_text()
         self.entry.set_position(position)
-
-    def _handle_middle_click_paste(self, widget, event):
-        if event.button == 2:
+        # Prevent the parent from scrolling to top on validation state change.
+        # The focus needs to remain on this widget.
+        self.grab_focus()
             self.setter()
         return False
