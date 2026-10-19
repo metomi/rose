@@ -41,11 +41,6 @@ notebook box > paned > paned > scrolledwindow > viewport > box > widget > box {
 
 /* Make the multiline raw-value box match a Gtk.Entry (rounded outline) */
 frame.multiline-entry > border {
-    border: 1px solid @borders;
     border-radius: 5px;
     padding: 2px;
-}
-
-frame.multiline-entry text {
-    background-color: @theme_base_color;
 }
