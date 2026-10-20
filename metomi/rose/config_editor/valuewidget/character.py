@@ -63,7 +63,7 @@ class QuotedTextValueWidget(Gtk.Box):
         # Set the size of the entry box
         self.chars_width = len(self.value) + 1
         self.entry.set_width_chars(self.chars_width)
-        self.entry.set_max_length(self.chars_width)
+        # self.entry.set_max_length(self.chars_width)
         self.in_error = not self.type_checker(self.value)
         self.set_entry_text()
         self.entry.connect(
@@ -94,7 +94,7 @@ class QuotedTextValueWidget(Gtk.Box):
         # Set the size of the entry box
         self.chars_width = len(var_text) + 1
         self.entry.set_width_chars(self.chars_width)
-        self.entry.set_max_length(self.chars_width)
+        # self.entry.set_max_length(self.chars_width)
         if not self.value or not self.in_error:
             # Text was in processed form
             var_text = self.format_text_out(var_text)
