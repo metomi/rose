@@ -56,7 +56,6 @@ class RawValueWidget(wrap.EntryFitMixin, Gtk.Box):
         # Set the size of the entry box
         self.chars_width = len(self.value) + 1
         self.entry.set_width_chars(self.chars_width)
-        # self.entry.set_max_length(self.chars_width)
         self.entry.connect(
             "button-release-event", self._handle_middle_click_paste
         )
@@ -83,7 +82,6 @@ class RawValueWidget(wrap.EntryFitMixin, Gtk.Box):
         # Set the size of the entry box
         self.chars_width = len(self.value) + 1
         self.entry.set_width_chars(self.chars_width)
-        # self.entry.set_max_length(self.chars_width)
         if metomi.rose.env.contains_env_var(self.value):
             self.entry.override_color(Gtk.StateType.NORMAL, ENV_COLOUR_RGBA)
             self.entry.set_tooltip_text(
