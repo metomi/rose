@@ -618,7 +618,7 @@ class VariableWidget:
             self._set_consistent(self.valuewidget, variable)
         self.variable = variable
         self.errors = list(variable.error.keys())
-        if hasattr(self.valuewidget, "needs_type_error_refresh"):
+        if hasattr(self.valuewidget, "handle_type_error"):
             self.valuewidget.handle_type_error(
                 metomi.rose.META_PROP_TYPE in self.errors
             )
