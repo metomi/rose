@@ -505,7 +505,6 @@ class EntryArrayValueWidget(Gtk.Box):
     def _adjust_entry_length(self):
         for entry in self.entries:
             entry.set_width_chars(self.chars_width)
-            entry.set_max_length(self.chars_width)
         self.reshape_table()
 
     def _get_widget_for_focus(self):
