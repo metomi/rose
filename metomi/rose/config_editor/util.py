@@ -252,7 +252,7 @@ def force_scroll(widget, container=None, signal_ids=None):
     else:
         for handler_id in signal_ids:
             vadj.handler_block(handler_id)
-        del signal_ids[:]
+        signal_ids.clear()
     if y_coordinate is None:  # Scroll to the bottom.
         vadj.set_upper(vadj.get_upper() + 0.08 * vadj.get_page_size())
         vadj.set_value(vadj.get_upper() - vadj.get_page_size())
