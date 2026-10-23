@@ -214,16 +214,11 @@ def get_scroll_container(widget):
     return widget
 
 
-def scroll_vadjustment_to(vadj, y_coordinate):
-    """Scroll vadj to y_coordinate, only if it is outside the visible range."""
-    if not (
-        vadj.get_value()
-        < y_coordinate
-        < vadj.get_value() + 0.95 * vadj.get_page_size()
-    ):
-        vadj.set_value(
-            min(y_coordinate, vadj.get_upper() - vadj.get_page_size())
-        )
+def scroll_vadjustment_to(vadj: Gtk.Adjustment, y_coord: float):
+    """Scroll vadj to y_coord if it is outside the visible range."""
+    vadj.clamp_page(
+        y_coord, min(y_coord + 0.08 * vadj.get_page_size(), vadj.get_upper())
+    )
 
 
 def force_scroll(widget, container=None, signal_ids=None):
