@@ -24,6 +24,7 @@ import metomi.rose.config_editor
 import metomi.rose.config_editor.valuewidget
 import metomi.rose.env
 import metomi.rose.gtk.util
+from metomi.rose.config_editor.valuewidget.array import wrap
 
 ENV_COLOUR = metomi.rose.gtk.util.color_parse(
     metomi.rose.config_editor.COLOUR_VARIABLE_TEXT_VAL_ENV
@@ -36,7 +37,7 @@ ENV_COLOUR_RGBA = Gdk.RGBA(
 )
 
 
-class RawValueWidget(Gtk.Box):
+class RawValueWidget(wrap.EntryFitMixin, Gtk.Box):
     """This class generates a basic entry widget for an unformatted value."""
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
@@ -52,9 +53,6 @@ class RawValueWidget(Gtk.Box):
                 metomi.rose.config_editor.VAR_WIDGET_ENV_INFO
             )
         self.entry.set_text(self.value)
-        # Set the size of the entry box
-        self.chars_width = len(self.value) + 1
-        self.entry.set_width_chars(self.chars_width)
         self.entry.connect(
             "button-release-event", self._handle_middle_click_paste
         )
@@ -69,6 +67,8 @@ class RawValueWidget(Gtk.Box):
         self.pack_start(self.entry, expand=False, fill=False, padding=0)
         self.entry.connect("focus-in-event", self.hook.trigger_scroll)
         self.grab_focus = lambda: self.hook.get_focus(self.entry)
+        # Size the entry to its text, scrolling internally when too long.
+        self.init_entry_fit()
 
     def setter(self, widget, *args):
         new_value = widget.get_text()
@@ -76,9 +76,6 @@ class RawValueWidget(Gtk.Box):
             return False
         self.value = new_value
         self.set_value(self.value)
-        # Set the size of the entry box
-        self.chars_width = len(self.value) + 1
-        self.entry.set_width_chars(self.chars_width)
         if metomi.rose.env.contains_env_var(self.value):
             self.entry.override_color(Gtk.StateType.NORMAL, ENV_COLOUR_RGBA)
             self.entry.set_tooltip_text(
