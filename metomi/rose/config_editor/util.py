@@ -207,6 +207,62 @@ def wrap_string(text, maxlen=72, indent0=0, maxlines=4, sep=","):
     return "\n".join(lines)
 
 
+def get_scroll_container(widget):
+    """Return the enclosing Gtk.ScrolledWindow of a widget, or None."""
+    while widget is not None and not isinstance(widget, Gtk.ScrolledWindow):
+        widget = widget.get_parent()
+    return widget
+
+
+def scroll_vadjustment_to(vadj: Gtk.Adjustment, y_coord: float):
+    """Scroll vadj to y_coord if it is outside the visible range."""
+    vadj.clamp_page(
+        y_coord, min(y_coord + 0.08 * vadj.get_page_size(), vadj.get_upper())
+    )
+
+
+def force_scroll(widget, container, signal_ids):
+    """Scroll a ScrolledWindow to reveal a widget, if it is off-screen.
+
+    If 'widget' is None, scroll to the bottom instead (e.g. to reveal a
+    newly added element). 'container', if given, is used to locate the
+    enclosing ScrolledWindow (needed when 'widget' is None); otherwise
+    'widget' is used. 'signal_ids' is a mutable list used to retry the
+    scroll once the ScrolledWindow has been allocated a size.
+    """
+    source = container if container is not None else widget
+    if source is None:
+        return False
+    scroll_container = get_scroll_container(source.get_parent())
+    if scroll_container is None:
+        return False
+    vadj = scroll_container.get_vadjustment()
+    y_coordinate = None
+    if widget is not None:
+        y_coordinate = widget.get_allocation().y
+    if vadj.get_upper() == 1.0 or y_coordinate == -1:
+        # ScrolledWindow is not sized yet; retry once its adjustment changes.
+        if not signal_ids:
+            signal_ids.append(
+                vadj.connect_after(
+                    "changed",
+                    lambda a: force_scroll(widget, container, signal_ids),
+                )
+            )
+    else:
+        for handler_id in signal_ids:
+            vadj.handler_block(handler_id)
+        signal_ids.clear()
+    if y_coordinate is None:  # Scroll to the bottom.
+        vadj.set_upper(vadj.get_upper() + 0.08 * vadj.get_page_size())
+        vadj.set_value(vadj.get_upper() - vadj.get_page_size())
+        return False
+    if y_coordinate == -1:  # Bad allocation, don't scroll.
+        return False
+    scroll_vadjustment_to(vadj, y_coordinate)
+    return False
+
+
 def null_cmp(x_item, y_item):
     """Compares sort_key and then id of the tuples x_item/y_item."""
     x_sort_key, x_id = x_item[0:2]
