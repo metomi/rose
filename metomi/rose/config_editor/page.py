@@ -857,17 +857,21 @@ class ConfigPage(Gtk.Box):
                     widget.get_parent().grab_focus()
                     return
         names = [v.name for v in (self.panel_data + self.ghost_data)]
-        if focus_variable is None or focus_variable.name not in names:
+        if (
+            focus_variable is None
+            or focus_variable.name not in names
+            or not self.panel_data
+        ):
             return
-        if self.panel_data:
-            for widget in self.get_main_variable_widgets():
-                if hasattr(widget.get_parent(), "variable"):
-                    var = widget.get_parent().variable
-                    if (var.name == focus_variable.name
-                       and var.metadata.get("id") ==
-                       focus_variable.metadata.get("id")):
-                        widget.get_parent().grab_focus()
-                        return
+        for widget in self.get_main_variable_widgets():
+            var = getattr(widget.get_parent(), "variable", None)
+            if (
+                var is not None
+                and var.name == focus_variable.name
+                and var.metadata.get("id") == focus_variable.metadata.get("id")
+            ):
+                widget.get_parent().grab_focus()
+                return
 
     def refresh(self, only_this_var_id=None):
         """Reload the page or selectively refresh widgets for one variable."""
@@ -901,7 +905,7 @@ class ConfigPage(Gtk.Box):
                     (metomi.rose.META_PROP_TYPE in widget.errors)
                     != (metomi.rose.META_PROP_TYPE in variable.error)
                     and hasattr(widget, "needs_type_error_refresh")
-                    and widget.needs_type_error_refresh()
+                    and not widget.needs_type_error_refresh()
                 ):
                     return widget.type_error_refresh(variable)
                 else:

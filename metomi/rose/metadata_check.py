@@ -425,7 +425,7 @@ ARGUMENTS
             .load(opts.conf_dir, metomi.rose.META_CONFIG_NAME, list(sys.path))
             .node
         )
-    except IOError:
+    except OSError:
         sys.exit(ERROR_LOAD_META_CONFIG_DIR.format(opts.conf_dir))
     sections = None
     if args:

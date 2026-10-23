@@ -55,7 +55,6 @@ class RawValueWidget(Gtk.Box):
         # Set the size of the entry box
         self.chars_width = len(self.value) + 1
         self.entry.set_width_chars(self.chars_width)
-        self.entry.set_max_length(self.chars_width)
         self.entry.connect(
             "button-release-event", self._handle_middle_click_paste
         )
@@ -80,7 +79,6 @@ class RawValueWidget(Gtk.Box):
         # Set the size of the entry box
         self.chars_width = len(self.value) + 1
         self.entry.set_width_chars(self.chars_width)
-        self.entry.set_max_length(self.chars_width)
         if metomi.rose.env.contains_env_var(self.value):
             self.entry.override_color(Gtk.StateType.NORMAL, ENV_COLOUR_RGBA)
             self.entry.set_tooltip_text(
@@ -128,13 +126,14 @@ class TextMultilineValueWidget(Gtk.Box):
         self.entry.connect("focus-in-event", self.hook.trigger_scroll)
         self.entry.show()
 
-        viewport = Gtk.Viewport()
-        viewport.add(self.entry)
-        viewport.show()
+        frame = Gtk.Frame()
+        frame.get_style_context().add_class("multiline-entry")
+        frame.add(self.entry)
+        frame.show()
 
         self.grab_focus = lambda: self.hook.get_focus(self.entry)
         self.entrybuffer.connect("changed", self.setter)
-        self.pack_start(viewport, expand=False, fill=False, padding=0)
+        self.pack_start(frame, expand=False, fill=False, padding=0)
 
     def get_focus_index(self):
         """Return the cursor position within the variable value."""

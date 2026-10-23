@@ -639,6 +639,7 @@ class MainController:
             ("/TopMenuBar/Help/Documentation", self.main_handle.help),
             ("/TopMenuBar/Help/About", self.main_handle.about_dialog),
         ]
+        # fmt: off
         is_toggled = {
             "/TopMenuBar/View/View fixed vars":
                 metomi.rose.config_editor.SHOULD_SHOW_FIXED_VARS,
@@ -671,6 +672,7 @@ class MainController:
             "/TopMenuBar/Metadata/Switch off metadata":
                 self.metadata_off,
         }
+        # fmt: on
         for address, action in menu_list:
             widget = self.menubar.uimanager.get_widget(address)
             self.menu_widgets.update({address: widget})
@@ -1010,11 +1012,15 @@ class MainController:
             )
             tab_window.connect(
                 "destroy-event",
-                lambda w, e: self.tab_windows.remove(w) and False,  # NOQA: 223
+                lambda w, e: (
+                    self.tab_windows.remove(w) and False  # noqa: SIM223
+                ),
             )
             tab_window.connect(
                 "delete-event",
-                lambda w, e: self.tab_windows.remove(w) and False,  # NOQA: 223
+                lambda w, e: (
+                    self.tab_windows.remove(w) and False  # noqa: SIM223
+                ),
             )
         else:
             tab_window = old_window
@@ -2109,10 +2115,10 @@ def spawn_window(
         full_namespaces = []
         for namespace in initial_namespaces:
             exp = re.compile(r"(.*%s?[^\/]+)" % (re.escape(namespace),))
-            # Sort by alphabetical order first, then by length
-            for ns in sorted(   # NOQA: C414 Necessary sort flagged as not
-                sorted(ctrl.data.namespace_meta_lookup),
-                key=len,
+            # Sort by length first, then by alphabetical order.
+            # E.g: ['a', 'b', 'c', 'aaa', 'bbb', 'ccc']
+            for ns in sorted(
+                ctrl.data.namespace_meta_lookup, key=lambda s: (len(s), s)
             ):
                 match = exp.search(ns)
                 if match:

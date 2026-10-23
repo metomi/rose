@@ -199,7 +199,7 @@ class SplashScreenProcess:
         while True:
             try:
                 self.process.stdin.write((json_text + "\n").encode())
-            except IOError:
+            except OSError:
                 self.start()
                 self.process.stdin.write((json_text + "\n").encode())
             else:
@@ -253,7 +253,7 @@ class SplashScreenUpdaterThread(threading.Thread):
                 stdin_line = self.stdin.readline()
                 if not stdin_line:
                     continue
-            except IOError:
+            except OSError:
                 continue
             try:
                 update_input = json.loads(stdin_line.strip())

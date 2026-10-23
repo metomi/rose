@@ -188,7 +188,7 @@ ARGUMENTS
     source_config = metomi.rose.config.load(path)
     meta_dir = os.path.join(opts.conf_dir, metomi.rose.CONFIG_META_DIR)
     metadata_config = metomi.rose.config.ConfigNode()
-    with contextlib.suppress(IOError):
+    with contextlib.suppress(OSError):
         metadata_config = (
             metomi.rose.config_tree.ConfigTreeLoader()
             .load(meta_dir, metomi.rose.META_CONFIG_NAME, list(sys.path))

@@ -444,7 +444,6 @@ class PythonListValueWidget(Gtk.Box):
     def _adjust_entry_length(self):
         for widget in self.entries:
             widget.set_width_chars(self.chars_width)
-            widget.set_max_length(self.chars_width)
         self.reshape_table()
 
     def _get_widget_for_focus(self):
