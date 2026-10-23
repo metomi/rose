@@ -221,7 +221,7 @@ def scroll_vadjustment_to(vadj: Gtk.Adjustment, y_coord: float):
     )
 
 
-def force_scroll(widget, container=None, signal_ids=None):
+def force_scroll(widget, container, signal_ids):
     """Scroll a ScrolledWindow to reveal a widget, if it is off-screen.
 
     If 'widget' is None, scroll to the bottom instead (e.g. to reveal a
