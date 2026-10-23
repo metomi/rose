@@ -230,8 +230,6 @@ def force_scroll(widget, container=None, signal_ids=None):
     'widget' is used. 'signal_ids' is a mutable list used to retry the
     scroll once the ScrolledWindow has been allocated a size.
     """
-    if signal_ids is None:
-        signal_ids = []
     source = container if container is not None else widget
     if source is None:
         return False
