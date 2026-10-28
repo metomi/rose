@@ -126,6 +126,11 @@ class ConfigPage(Gtk.Box):
         self.scrolled_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.scrolled_vbox.show()
         self.scrolled_main_window.add_with_viewport(self.scrolled_vbox)
+
+        viewport = self.scrolled_main_window.get_child()
+        dummy = Gtk.Adjustment.new(0, 0, 0, 0, 0, 0)
+        viewport.set_focus_vadjustment(dummy)
+
         self.scrolled_main_window.get_child().set_shadow_type(
             Gtk.ShadowType.NONE
         )
