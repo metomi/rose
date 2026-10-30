@@ -20,13 +20,13 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-from . import wrap
+from metomi.rose.config_editor.valuewidget.array import wrap
 import metomi.rose.config_editor.util
 import metomi.rose.gtk.util
 import metomi.rose.variable
 
 
-class EntryArrayValueWidget(wrap.WrappingArrayTableMixin, Gtk.Box):
+class EntryArrayValueWidget(wrap.WrappingArrayTable):
     """This is a class to represent multiple array entries."""
 
     TIP_ADD = "Add array element"

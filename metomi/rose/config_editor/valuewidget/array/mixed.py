@@ -24,8 +24,7 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-from . import entry
-from . import wrap
+from metomi.rose.config_editor.valuewidget.array import entry, wrap
 import metomi.rose.gtk.util
 import metomi.rose.variable
 
