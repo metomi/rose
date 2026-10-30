@@ -201,9 +201,6 @@ class EntryFit(Gtk.Box):
         self._fit_timer = None
         self._fit_viewport = None
         self._fit_handler = None
-        # A small width-chars keeps the minimum request low so the entry can
-        # shrink; the real width is driven by fit_entry_width().
-        self.entry.set_width_chars(1)
         self.entry.connect("changed", lambda w: self.fit_entry_width())
         self.entry.connect("map", lambda w: self.fit_entry_width())
         self.connect("hierarchy-changed", self._fit_connect_viewport)
