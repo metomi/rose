@@ -132,7 +132,7 @@ class WrappingArrayTable(Gtk.Box):
         if column_width <= 0:
             return False
         available = self._get_available_width()
-        columns = max(1, min(int(available / column_width), len(widgets)))
+        columns = max(1, min(available // column_width, len(widgets)))
         if columns != self.num_allowed_columns:
             self.num_allowed_columns = columns
             self.populate_table()
