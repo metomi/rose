@@ -21,7 +21,7 @@ from gi.repository import Pango
 import gi
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk, GLib
 
 import metomi.rose.config_editor
 import metomi.rose.gtk.dialog
@@ -66,6 +66,9 @@ class KeyWidget(Gtk.Box):
         self.show_modes = show_modes
         self.var_flags = []
         self._last_var_comments = None
+        self._name_marquee_timer = None
+        self._name_marquee_offset = 0
+        self._name_marquee_full_text = ""
         self.ignored_label = Gtk.Label()
         self.ignored_label.show()
         self.hbox.pack_start(
@@ -76,6 +79,13 @@ class KeyWidget(Gtk.Box):
             self.entry = Gtk.Label()
             self.entry.set_alignment(
                 self.LABEL_X_OFFSET, self.entry.get_alignment()[1]
+            )
+            self.entry.set_ellipsize(Pango.EllipsizeMode.END)
+            self.entry.set_width_chars(
+                metomi.rose.config_editor.WIDTH_KEY_COLUMN_CHARS
+            )
+            self.entry.set_max_width_chars(
+                metomi.rose.config_editor.WIDTH_KEY_COLUMN_CHARS
             )
             self.entry.set_text(self.my_variable.name)
         else:
@@ -407,6 +417,19 @@ class KeyWidget(Gtk.Box):
             label = metomi.rose.gtk.util.get_hyperlink_label(
                 mode_text, search_func
             )
+            label.set_line_wrap(True)
+            label.set_alignment(0.0, 0.0)
+            label.set_justify(Gtk.Justification.LEFT)
+            # Wrap to the pixel width set by the fixed-width name label,
+            # rather than a char count (the description uses a smaller font).
+            name_width = self.entry.get_preferred_width()[1]
+            label.set_size_request(name_width, -1)
+            self.entry.connect(
+                "size-allocate",
+                lambda w, alloc, lbl=label: self._match_name_width(
+                    lbl, alloc
+                ),
+            )
             label.show()
             hbox = Gtk.Box()
             hbox.show()
@@ -438,6 +461,11 @@ class KeyWidget(Gtk.Box):
                     and widget._show_mode == mode
                 ):
                     self.remove(widget)
+
+    def _match_name_width(self, label, allocation):
+        """Keep a wrapped meta label the same pixel width as the name."""
+        if label.get_size_request()[0] != allocation.width:
+            label.set_size_request(allocation.width, -1)
 
     def _set_show_title(self, should_show_title):
         """Set the display of a variable title instead of the name."""
@@ -489,9 +517,11 @@ class KeyWidget(Gtk.Box):
 
     def _handle_enter(self, event_box):
         label_text = self.entry.get_text()
-        tooltip_text = ""
+        # Lead with the full name/title so ellipsized labels stay readable.
+        tooltip_text = label_text
+        self._start_name_marquee()
         if metomi.rose.META_PROP_DESCRIPTION in self.meta:
-            tooltip_text = self._get_metadata_formatting(
+            tooltip_text += "\n" + self._get_metadata_formatting(
                 metomi.rose.META_PROP_DESCRIPTION
             )
         if metomi.rose.META_PROP_TITLE in self.meta:
@@ -560,9 +590,46 @@ class KeyWidget(Gtk.Box):
 
     def _handle_leave(self, event_box):
         event_box.set_tooltip_text(None)
+        self._stop_name_marquee()
         if isinstance(self.entry, Gtk.Label):
             self._set_underline(self.entry, underline=False)
         return False
+
+    def _start_name_marquee(self):
+        """Scroll the name label horizontally while its text is truncated."""
+        if (
+            self._name_marquee_timer is not None
+            or not isinstance(self.entry, Gtk.Label)
+            or (layout := self.entry.get_layout()) is None
+            or not layout.is_ellipsized()
+        ):
+            return
+        self._name_marquee_full_text = self.entry.get_text()
+        self._name_marquee_offset = 0
+        self._name_marquee_timer = GLib.timeout_add(
+            150, self._advance_name_marquee
+        )
+
+    def _advance_name_marquee(self):
+        """Shift the name text by one character, wrapping around."""
+        if not isinstance(self.entry, Gtk.Label) or not (
+            self.entry.get_mapped()
+        ):
+            self._name_marquee_timer = None
+            return False
+        scroll_text = self._name_marquee_full_text + "     "
+        offset = self._name_marquee_offset % len(scroll_text)
+        self.entry.set_text((scroll_text + scroll_text)[offset:])
+        self._name_marquee_offset += 1
+        return True
+
+    def _stop_name_marquee(self):
+        """Stop any running name marquee and restore the full text."""
+        if self._name_marquee_timer is not None:
+            GLib.source_remove(self._name_marquee_timer)
+            self._name_marquee_timer = None
+        if self._name_marquee_full_text and isinstance(self.entry, Gtk.Label):
+            self.entry.set_text(self._name_marquee_full_text)
 
     def _set_sensitive(self, is_sensitive):
         self.entry.set_sensitive(is_sensitive)
