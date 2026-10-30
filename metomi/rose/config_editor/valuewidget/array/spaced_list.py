@@ -25,10 +25,10 @@ from gi.repository import Gtk
 import metomi.rose.config_editor.util
 import metomi.rose.gtk.util
 import metomi.rose.variable
-from . import wrap
+from metomi.rose.config_editor.valuewidget.array import wrap
 
 
-class SpacedListValueWidget(wrap.WrappingArrayTableMixin, Gtk.Box):
+class SpacedListValueWidget(wrap.WrappingArrayTable):
     """This is a class to represent a list separated by spaces."""
 
     TIP_ADD = "Add array element"

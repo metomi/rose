@@ -22,10 +22,10 @@ from gi.repository import Gtk
 
 import metomi.rose.gtk.util
 import metomi.rose.variable
-from . import wrap
+from metomi.rose.config_editor.valuewidget.array import wrap
 
 
-class LogicalArrayValueWidget(wrap.WrappingArrayTableMixin, Gtk.Box):
+class LogicalArrayValueWidget(wrap.WrappingArrayTable):
     """This is a class to represent an array of logical or boolean types."""
 
     TIP_ADD = "Add array element"

@@ -22,14 +22,13 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-from . import entry
-from . import wrap
+from metomi.rose.config_editor.valuewidget.array import entry, wrap
 import metomi.rose.config_editor.util
 import metomi.rose.gtk.util
 import metomi.rose.variable
 
 
-class PythonListValueWidget(wrap.WrappingArrayTableMixin, Gtk.Box):
+class PythonListValueWidget(wrap.WrappingArrayTable):
     """This is a class to represent a Python-compatible list format."""
 
     TIP_ADD = "Add array element"

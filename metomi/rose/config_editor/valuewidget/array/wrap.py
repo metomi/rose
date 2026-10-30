@@ -89,7 +89,7 @@ def visible_width(ref_widget):
     return max(1, width)
 
 
-class WrappingArrayTableMixin:
+class WrappingArrayTable(Gtk.Box):
     """Shared dynamic column wrapping for array value widgets.
 
     A single rule drives every array widget: fit as many equal-width columns
