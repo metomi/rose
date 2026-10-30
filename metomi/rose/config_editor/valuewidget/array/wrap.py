@@ -184,7 +184,7 @@ class WrappingArrayTable(Gtk.Box):
         self._viewport_handler = None
 
 
-class EntryFitMixin:
+class EntryFit(Gtk.Box):
     """Size a single-line ``self.entry`` to min(content, visible width).
 
     When the text fits the visible value area the entry matches its length;
