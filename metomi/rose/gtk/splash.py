@@ -229,6 +229,7 @@ class SplashScreenProcess:
 
     def stop(self):
         if self.process:
+            self.process.stdin.close()
             self.process.kill()
             self.process = None
 
