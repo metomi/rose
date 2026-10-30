@@ -24,7 +24,7 @@ from metomi.rose import META_PROP_TYPE
 from metomi.rose.config_editor.valuewidget.array import wrap
 
 
-class QuotedTextValueWidget(wrap.EntryFitMixin, Gtk.Box):
+class QuotedTextValueWidget(wrap.EntryFit):
     """This class represents 'character' and 'quoted' types in an entry."""
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):

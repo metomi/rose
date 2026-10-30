@@ -37,7 +37,7 @@ ENV_COLOUR_RGBA = Gdk.RGBA(
 )
 
 
-class RawValueWidget(wrap.EntryFitMixin, Gtk.Box):
+class RawValueWidget(wrap.EntryFit):
     """This class generates a basic entry widget for an unformatted value."""
 
     def __init__(self, value, metadata, set_value, hook, arg_str=None):
