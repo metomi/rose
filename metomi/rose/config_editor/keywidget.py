@@ -597,12 +597,12 @@ class KeyWidget(Gtk.Box):
 
     def _start_name_marquee(self):
         """Scroll the name label horizontally while its text is truncated."""
-        if self._name_marquee_timer is not None:
-            return
-        if not isinstance(self.entry, Gtk.Label):
-            return
-        layout = self.entry.get_layout()
-        if layout is None or not layout.is_ellipsized():
+        if (
+            self._name_marquee_timer is not None
+            or not isinstance(self.entry, Gtk.Label)
+            or (layout := self.entry.get_layout()) is None
+            or not layout.is_ellipsized()
+        ):
             return
         self._name_marquee_full_text = self.entry.get_text()
         self._name_marquee_offset = 0
