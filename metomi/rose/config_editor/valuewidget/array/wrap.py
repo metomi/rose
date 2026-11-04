@@ -104,15 +104,17 @@ class WrappingArrayTable(Gtk.Box):
     ``self.entries + [self.button_box]``.
     """
 
-    RESHAPE_DEBOUNCE_MS = 50
-
     def init_wrapping(self):
         """Wire up reshaping. Call once from the host's ``__init__``."""
         self._reshape_timer = None
         self._viewport = None
         self._viewport_handler = None
-        # The page scrolls horizontally, so the table's own size-allocate does
-        # not fire on window resize; watch the scrolled viewport instead.
+        # Reshape once the table's children have been sized (their natural
+        # widths are only correct after this fires), ...
+        self.entry_table.connect_after("size-allocate", self._queue_reshape)
+        # ... and when the scrolled viewport resizes, since the page scrolls
+        # horizontally so the table's own size-allocate won't fire on a window
+        # resize that leaves the table overflowing.
         self.connect("hierarchy-changed", self._connect_viewport_resize)
         self.connect("destroy", self._disconnect_viewport_resize)
         self.reshape_table()
@@ -159,12 +161,11 @@ class WrappingArrayTable(Gtk.Box):
         )
 
     def _queue_reshape(self, widget, allocation):
-        """Debounce rapid resize events into a single reshape."""
-        if self._reshape_timer is not None:
-            GLib.source_remove(self._reshape_timer)
-        self._reshape_timer = GLib.timeout_add(
-            self.RESHAPE_DEBOUNCE_MS, self._do_queued_reshape
-        )
+        # Setting num_allowed_columns / rebuilding the table inside the
+        # viewport's size-allocate would trigger a re-entrant relayout, so
+        # defer to the next idle and coalesce repeats onto one callback.
+        if self._reshape_timer is None:
+            self._reshape_timer = GLib.idle_add(self._do_queued_reshape)
 
     def _do_queued_reshape(self):
         self._reshape_timer = None
@@ -192,8 +193,6 @@ class EntryFit(Gtk.Box):
     Hosts must provide ``self.entry`` (a ``Gtk.Entry``) and call
     ``init_entry_fit()`` once it is packed.
     """
-
-    FIT_DEBOUNCE_MS = 50
 
     def init_entry_fit(self):
         self._fit_timer = None
@@ -240,13 +239,13 @@ class EntryFit(Gtk.Box):
         self._fit_handler = viewport.connect("size-allocate", self._fit_queue)
 
     def _fit_queue(self, widget, allocation):
-        if self._fit_timer is not None:
-            GLib.source_remove(self._fit_timer)
-        self._fit_timer = GLib.timeout_add(
-            self.FIT_DEBOUNCE_MS, self._fit_timeout
-        )
+        # Setting a size request inside the viewport's size-allocate would
+        # trigger a re-entrant relayout, so defer to the next idle (which is
+        # imperceptible, unlike a timed debounce) and coalesce repeats.
+        if self._fit_timer is None:
+            self._fit_timer = GLib.idle_add(self._fit_idle)
 
-    def _fit_timeout(self):
+    def _fit_idle(self):
         self._fit_timer = None
         if self.entry.get_mapped():
             self.fit_entry_width()
