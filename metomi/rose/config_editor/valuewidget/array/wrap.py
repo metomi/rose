@@ -199,27 +199,13 @@ class EntryFit(Gtk.Box):
         self._fit_timer = None
         self._fit_viewport = None
         self._fit_handler = None
-        self.entry.connect("changed", lambda w: self.fit_entry_width())
         self.entry.connect("map", lambda w: self.fit_entry_width())
         self.connect("hierarchy-changed", self._fit_connect_viewport)
         self.connect("destroy", self._fit_disconnect_viewport)
 
-    def _entry_chrome(self):
-        """Pixels the entry needs around its text (border, padding, cursor)."""
-        ctx = self.entry.get_style_context()
-        state = ctx.get_state()
-        border = ctx.get_border(state)
-        padding = ctx.get_padding(state)
-        chrome = (
-            border.left + border.right + padding.left + padding.right + 4
-        )
-        return max(chrome, 8)
-
     def fit_entry_width(self):
-        """Resize the entry to the smaller of its text and visible width."""
-        layout = self.entry.create_pango_layout(self.entry.get_text() or "")
-        content = layout.get_pixel_size()[0] + self._entry_chrome()
-        target = max(1, min(content, visible_width(self.entry)))
+        """Resize the entry to its visible width."""
+        target = visible_width(self.entry)
         if self.entry.get_size_request()[0] != target:
             self.entry.set_size_request(target, -1)
 
