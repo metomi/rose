@@ -71,16 +71,12 @@ jobs:
       - name: Install Rose
         run: |
           pip install ."[lint]"
-          yarn install
 
       - name: Flake8
         run: flake8
 
       - name: Shellchecker
         run: etc/bin/shellchecker
-
-      - name: ESLint
-        run: yarn run lint
 
       - name: MyPy
         run: |
@@ -144,11 +140,6 @@ jobs:
 
       - name: Configure git  # Configure Git for Git dependent tests.
         uses: cylc/release-actions/configure-git@v1
-
-      - name: Install Node Packages
-        working-directory: rose
-        run: |
-          yarn install
 
       - name: Install
         uses: cylc/release-actions/install-cylc-components@v1
