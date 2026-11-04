@@ -111,13 +111,11 @@ class WrappingArrayTable(Gtk.Box):
         self._reshape_timer = None
         self._viewport = None
         self._viewport_handler = None
-        self.entry_table.connect_after(
-            "size-allocate", lambda w, e: self.reshape_table()
-        )
         # The page scrolls horizontally, so the table's own size-allocate does
         # not fire on window resize; watch the scrolled viewport instead.
         self.connect("hierarchy-changed", self._connect_viewport_resize)
         self.connect("destroy", self._disconnect_viewport_resize)
+        self.reshape_table()
 
     def _get_cell_widgets(self):
         """Return the widgets occupying the homogeneous grid cells."""
