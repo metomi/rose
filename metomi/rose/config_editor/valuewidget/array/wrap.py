@@ -194,6 +194,10 @@ class EntryFit(Gtk.Box):
     ``init_entry_fit()`` once it is packed.
     """
 
+    # Never shrink below this many characters unless the visible width itself
+    # is smaller, so empty or short values still get a usable box.
+    MIN_CHARS = 20
+
     def init_entry_fit(self):
         self._fit_timer = None
         self._fit_viewport = None
@@ -214,10 +218,17 @@ class EntryFit(Gtk.Box):
         )
         return max(chrome, 8)
 
+    def _text_width(self, text):
+        """Pixel width the entry needs to show ``text`` without scrolling."""
+        layout = self.entry.create_pango_layout(text)
+        return layout.get_pixel_size()[0] + self._entry_chrome()
+
     def fit_entry_width(self):
-        """Resize the entry to the smaller of its text and visible width."""
-        layout = self.entry.create_pango_layout(self.entry.get_text() or "")
-        content = layout.get_pixel_size()[0] + self._entry_chrome()
+        """Resize the entry to fit its text, within a min and visible max."""
+        content = max(
+            self._text_width(self.entry.get_text() or ""),
+            self._text_width("0" * self.MIN_CHARS),
+        )
         target = max(1, min(content, visible_width(self.entry)))
         if self.entry.get_size_request()[0] != target:
             self.entry.set_size_request(target, -1)
