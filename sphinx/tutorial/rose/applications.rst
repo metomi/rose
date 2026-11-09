@@ -7,7 +7,7 @@ Rose Applications
 .. ifnotslides::
 
    The Cylc ``flow.cylc`` file allows us to define environment variables for
-   use by :term:`tasks <task>` e.g:
+   use by :term:`tasks <task>`, for example:
 
 .. slide:: Cylc Task Environment
    :level: 2
@@ -55,7 +55,7 @@ Application Configuration
    referred to as "applications" or "apps".
 
    The command to execute when the application is run is defined using the
-   :rose:conf:`rose-app.conf[command]default` setting e.g.:
+   :rose:conf:`rose-app.conf[command]default` setting, for example:
 
 .. ifslides::
 
@@ -69,7 +69,7 @@ Application Configuration
 .. ifnotslides::
 
    Environment variables are specified inside the
-   :rose:conf:`rose-app.conf[env]` section e.g:
+   :rose:conf:`rose-app.conf[env]` section, for example:
 
 .. ifslides::
 
@@ -86,7 +86,7 @@ Application Configuration
 
    Scripts and executables can be placed in a ``bin/`` directory. They will be
    automatically added to the ``PATH`` environment variable when the application
-   is run, e.g.:
+   is run, for example:
 
 .. ifslides::
 
