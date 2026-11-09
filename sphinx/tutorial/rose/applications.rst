@@ -7,7 +7,7 @@ Rose Applications
 .. ifnotslides::
 
    The Cylc ``flow.cylc`` file allows us to define environment variables for
-   use by :term:`tasks <task>` e.g:
+   use by :term:`tasks <task>`, for example:
 
 .. slide:: Cylc Task Environment
    :level: 2
@@ -55,7 +55,7 @@ Application Configuration
    referred to as "applications" or "apps".
 
    The command to execute when the application is run is defined using the
-   :rose:conf:`rose-app.conf[command]default` setting e.g:
+   :rose:conf:`rose-app.conf[command]default` setting, for example:
 
 .. ifslides::
 
@@ -69,7 +69,7 @@ Application Configuration
 .. ifnotslides::
 
    Environment variables are specified inside the
-   :rose:conf:`rose-app.conf[env]` section e.g:
+   :rose:conf:`rose-app.conf[env]` section, for example:
 
 .. ifslides::
 
@@ -86,7 +86,7 @@ Application Configuration
 
    Scripts and executables can be placed in a ``bin/`` directory. They will be
    automatically added to the ``PATH`` environment variable when the application
-   is run, e.g.:
+   is run, for example:
 
 .. ifslides::
 
@@ -153,18 +153,18 @@ An application can be run using the :ref:`command-rose-app-run` command:
    .. note::
       :class: hint
 
-      This practical can stand on it's own, but it will be easier to follow if
+      This practical can stand on its own, but it will be easier to follow if
       you have already completed the
       :ref:`Cylc tutorials <tutorial-cylc-runtime-forecasting-workflow>`.
 
-   #. **Create a directory on your filesystem called** ``rose-tutorial``
+   #. **Create a** ``rose-tutorial`` **directory on your filesystem.**
 
       This directory will be used for multiple Rose tutorials.::
 
         mkdir ~/rose-tutorial
         cd ~/rose-tutorial
 
-   #. **Create a Rose application**
+   #. **Create a Rose application.**
 
       Create a new directory called ``application-tutorial``, this is to be our
       :term:`application directory`::
@@ -183,7 +183,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
 
       We will now bundle these resources into our Rose Application.
 
-      This makes a rose application easier to maintain by keeping all the
+      This makes a Rose application easier to maintain by keeping all the
       files required in the same place.
 
       Install the ``forecast`` script and ``util.py`` library into the ``bin/``
@@ -245,7 +245,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
       * ``MAP_TEMPLATE``
 
       We will now add these into the application. This way, all of the
-      configuration specific to the application live within it.
+      configuration specific to the application lives within it.
 
       Add the following lines to the :rose:conf:`rose-app.conf[env]` section:
 
