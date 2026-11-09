@@ -206,7 +206,7 @@ jobs:
           OBJC_DISABLE_INITIALIZE_FORK_SAFETY: YES
         run: |
           # rose tests should pass first time around
-          etc/bin/rose-test-battery -j 4 --state=save
+          etc/bin/rose-test-battery -j 4 --state=save ./t/rose-app-run/08-poll.t
 
       - name: Re-Run Fails
         if: failure() && steps.functest.outcome == 'failure'

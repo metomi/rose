@@ -128,6 +128,8 @@ run_pass "$TEST_KEY" rose app-run --config=../config -q \
     -D '[poll]file-test=ls {} 1>/dev/null 2>&1 && grep -q hello {}'
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
+tree "$TEST_DIR" 1>&2
+bat --decorations=always "$TEST_DIR"/*/* 1>&2
 wait
 test_teardown
 #-------------------------------------------------------------------------------
