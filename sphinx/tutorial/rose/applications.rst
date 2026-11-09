@@ -157,7 +157,7 @@ An application can be run using the :ref:`command-rose-app-run` command:
       you have already completed the
       :ref:`Cylc tutorials <tutorial-cylc-runtime-forecasting-workflow>`.
 
-   #. **Create a directory on your filesystem called** ``rose-tutorial``**.**
+   #. **Create a** ``rose-tutorial`` **directory on your filesystem.**
 
       This directory will be used for multiple Rose tutorials.::
 
