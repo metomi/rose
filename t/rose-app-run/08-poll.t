@@ -120,15 +120,18 @@ test_teardown
 # OK test 3 (no delay).
 TEST_KEY=$TEST_KEY_BASE-ok-3
 test_setup
-touch file1 file2 file4
-(sleep 2; echo "hello" | tee file0 file1 >file2) &
-(sleep 2; echo "hello" >file4) &
-(sleep 2; touch file5) &
-run_pass "$TEST_KEY" rose app-run --config=../config -q \
-    -D '[poll]file-test=ls {} 1>/dev/null 2>&1 && grep -q hello {}'
+# Write config without delay line.
+cat > rose-app.conf <<'__CONFIG__'
+[command]
+default=true
+[poll]
+all-files=file0
+__CONFIG__
+# Write file before polling starts as delay defaults to 0.
+touch file0
+run_pass "$TEST_KEY" rose app-run --config=. -q
 file_cmp "$TEST_KEY.out" "$TEST_KEY.out" </dev/null
 file_cmp "$TEST_KEY.err" "$TEST_KEY.err" </dev/null
-wait
 test_teardown
 #-------------------------------------------------------------------------------
 # OK test 4.
