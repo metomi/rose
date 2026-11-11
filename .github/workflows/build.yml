@@ -12,7 +12,7 @@ on:
       - '.gitignore'
       - '.github/workflows/build.yml'
   schedule:
-    - cron: '37 04 * * 1-5' # 04:37, Monday-Friday
+    - cron: '37 04 * * 1' # 04:37, Monday
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
