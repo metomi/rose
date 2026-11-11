@@ -40,7 +40,7 @@ import ast
 import copy
 from functools import cmp_to_key
 import glob
-from importlib.machinery import SourceFileLoader
+import importlib.util
 import inspect
 import os
 import re
@@ -800,7 +800,10 @@ def load_meta_macro_modules(meta_files, module_prefix=None):
         else:
             as_name = module_prefix + macro_name
         try:
-            modules.append(SourceFileLoader(as_name, meta_file).load_module())
+            spec = importlib.util.spec_from_file_location(as_name, meta_file)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            modules.append(module)
         except Exception:
             metomi.rose.reporter.Reporter()(
                 MacroLoadError(meta_file, traceback.format_exc())
