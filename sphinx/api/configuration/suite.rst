@@ -111,7 +111,7 @@ A suite directory may contain the following:
       used by various Rose utilities, such as the config editor GUI. It can be
       used to specify the suite type.
 
-   .. rose:conf:: [install]
+   .. rose:conf:: install
 
       Specify default values for the workflow and run name to be used
       by ``cylc install``.
@@ -125,7 +125,7 @@ A suite directory may contain the following:
 
       Executables located within the workflow's ``lib/python`` directory will
       be added to ``$PATH`` before these configs are evaluated so can be used
-      to derive these values.
+      within the sub-shells.
 
       .. versionadded:: cylc-rose 1.9.0
 
@@ -150,7 +150,7 @@ A suite directory may contain the following:
 
          Examples:
             * ``my-run`` - hardcode run name
-            * ``$(git rev-parse HEAD)`` - use commit hash as run name
+            * ``$(git rev-parse --verify HEAD)`` - use commit hash as run name
             * ``$(git describe)``
 
 .. rose:file:: rose-suite.info
