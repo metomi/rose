@@ -12,7 +12,7 @@ on:
         description: The Rose branch to test against
         required: true
   schedule:
-    - cron: '37 04 * */3 1-5' # 04:37 every 3 months
+    - cron: '37 04 1 * *' # 04:37 every month
 
 jobs:
   test:
