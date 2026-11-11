@@ -483,17 +483,33 @@ STACK_COL_NAME = "Name"
 STACK_COL_VALUE = "Value"
 STACK_COL_OLD_VALUE = "Old Value"
 
+def _is_dark_theme():
+    """Return True if the default GTK theme uses light text on dark."""
+    try:
+        import gi
+        gi.require_version("Gtk", "3.0")
+        from gi.repository import Gtk
+        if Gtk.Settings.get_default() is None:
+            return False  # no display
+        fg = Gtk.Label().get_style_context().get_color(Gtk.StateFlags.NORMAL)
+    except Exception:
+        return False
+    return (0.2126 * fg.red + 0.7152 * fg.green + 0.0722 * fg.blue) > 0.5
+
+
+_DARK_THEME = _is_dark_theme()
+
 # User-relevant: Variable Widget Colours.
 # Configure the background colour for the currently-selected variable widget.
-COLOUR_VALUEWIDGET_BASE_SELECTED = "GhostWhite"
+COLOUR_VALUEWIDGET_BASE_SELECTED = "#404040" if _DARK_THEME else "GhostWhite"
 # Configure the modified-status variable widget colour.
-COLOUR_VARIABLE_CHANGED = "blue"
+COLOUR_VARIABLE_CHANGED = "#78aeed" if _DARK_THEME else "blue"
 # Configure the error-state variable widget colour.
-COLOUR_VARIABLE_TEXT_ERROR = "dark red"
+COLOUR_VARIABLE_TEXT_ERROR = "#ff7b63" if _DARK_THEME else "dark red"
 # Configure the irrelevant-value variable widget colour.
 COLOUR_VARIABLE_TEXT_IRRELEVANT = "light grey"
 # Configure the environment-variable-value variable widget colour.
-COLOUR_VARIABLE_TEXT_VAL_ENV = "purple4"
+COLOUR_VARIABLE_TEXT_VAL_ENV = "#dc8add" if _DARK_THEME else "purple4"
 
 # Dialog text
 DIALOG_BODY_ADD_CONFIG = "Choose configuration to add to"
