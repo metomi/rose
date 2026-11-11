@@ -482,7 +482,7 @@ class CylcSuiteDAO:
         for _ in range(self.N_CONNECT_TRIES):
             try:
                 self.conn = sqlite3.connect(
-                    self.db_f_name, self.CONNECT_RETRY_DELAY
+                    self.db_f_name, timeout=self.CONNECT_RETRY_DELAY
                 )
                 self.cursor = self.conn.cursor()
             except sqlite3.OperationalError:
