@@ -111,6 +111,48 @@ A suite directory may contain the following:
       used by various Rose utilities, such as the config editor GUI. It can be
       used to specify the suite type.
 
+   .. rose:conf:: install
+
+      Specify default values for the workflow and run name to be used
+      by ``cylc install``.
+
+      These configs can be set to strings which may include sub-shells, e.g.
+      ``foo-$(echo bar)`` would expand to ``foo-bar``.
+
+      These strings are evaluated in the workflow's source directory, so
+      version control commands (e.g, ``git``) may be used in these templates,
+      e.g, to determine commit hashes or branch names.
+
+      Executables located within the workflow's ``lib/python`` directory will
+      be added to ``$PATH`` before these configs are evaluated so can be used
+      within the sub-shells.
+
+      .. versionadded:: cylc-rose 1.9.0
+
+      .. rose:conf:: workflow-name
+
+         Configure the default workflow name to be used by ``cylc install``
+         unless the ``--workflow-name`` option is manually specified.
+
+         Examples:
+            * ``my-workflow`` - hardcode workflow name
+            * ``$(my-script)`` - use a script to derive workflow name
+            * ``my-workflow-$(my-script)``
+
+      .. rose:conf:: run-name
+
+         Configure the default workflow run name to be used by
+         ``cylc install`` unless one of the ``--run-name`` or ``--no-run-name``
+         options are manually specified.
+
+         Setting this to a blank value (i.e, ``run-name=``) configures
+         ``--no-run-name`` as the default.
+
+         Examples:
+            * ``my-run`` - hardcode run name
+            * ``$(git rev-parse --verify HEAD)`` - use commit hash as run name
+            * ``$(git describe)``
+
 .. rose:file:: rose-suite.info
 
    The suite information file :rose:file:`rose-suite.info` should contain the
