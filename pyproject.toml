@@ -101,15 +101,20 @@ lint = [
 tutorials = [
     "cylc-flow[tutorials]>=8.6.1"
 ]
-rosa = []
+rosa = [
+    "metomi-rose[rosie]",
+]
 edit = [
     "pygobject>=3.50.0",
 ]
 ldap = [
     "python-ldap",
 ]
-disco = [
+rosie = [
     "sqlalchemy==1.*",
+]
+disco = [
+    "metomi-rose[rosie]",
     "tornado",
 ]
 all = [
@@ -120,7 +125,6 @@ all = [
     "metomi-rose[tutorials]",
     "metomi-rose[rosa]",
     "metomi-rose[edit]",
-    "metomi-rose[disco]",
 ]
 
 [project.scripts]
@@ -151,15 +155,15 @@ rosa = "metomi.rose.rose:rosa"
 "task-run" = "metomi.rose.task_run:main"
 
 [project.entry-points."rosie.commands"]
-"checkout" = "metomi.rosie.vc:checkout"
-"create" = "metomi.rosie.vc:create"
-"delete" = "metomi.rosie.vc:delete"
+"checkout" = "metomi.rosie.vc:checkout [rosie]"
+"create" = "metomi.rosie.vc:create [rosie]"
+"delete" = "metomi.rosie.vc:delete [rosie]"
 "disco" = "metomi.rosie.ws:main [disco]"
 "graph" = "metomi.rosie.graph:main [graph]"
-"hello" = "metomi.rosie.ws_client_cli:hello"
-"id" = "metomi.rosie.suite_id:main"
-"lookup" = "metomi.rosie.ws_client_cli:lookup"
-"ls" = "metomi.rosie.ws_client_cli:list_local_suites"
+"hello" = "metomi.rosie.ws_client_cli:hello [rosie]"
+"id" = "metomi.rosie.suite_id:main [rosie]"
+"lookup" = "metomi.rosie.ws_client_cli:lookup [rosie]"
+"ls" = "metomi.rosie.ws_client_cli:list_local_suites [rosie]"
 
 [tool.setuptools.packages.find]
 include = ["metomi*"]
