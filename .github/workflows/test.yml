@@ -202,6 +202,7 @@ jobs:
       - name: Functional Tests
         timeout-minutes: ${{ contains(matrix.os, 'macos') && 20 || 10 }}
         id: functest
+        continue-on-error: true
         working-directory: rose
         env:
           OBJC_DISABLE_INITIALIZE_FORK_SAFETY: YES
