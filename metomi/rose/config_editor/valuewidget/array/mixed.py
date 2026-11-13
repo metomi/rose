@@ -24,7 +24,7 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-from . import entry
+from metomi.rose.config_editor.valuewidget.array import entry, wrap
 import metomi.rose.gtk.util
 import metomi.rose.variable
 
@@ -94,7 +94,25 @@ class MixedArrayValueWidget(Gtk.Box):
         self.pack_start(
             self.add_del_button_box, expand=False, fill=False, padding=0
         )
-        self.pack_start(self.entry_table, expand=True, fill=True, padding=0)
+        # Derived rows cannot wrap (fields are positional), so any overflow is
+        # contained in this widget's own horizontal scrollbar rather than
+        # pushing the whole page sideways.
+        self._table_scroll = Gtk.ScrolledWindow()
+        self._table_scroll.set_policy(
+            Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER
+        )
+        self._table_scroll.set_propagate_natural_height(True)
+        # Show the scrollbar solidly (not as a fading overlay) and give it its
+        # own space below the row so it never covers the values.
+        self._table_scroll.set_overlay_scrolling(False)
+        self._table_scroll.get_style_context().add_class(
+            wrap.ARRAY_SCROLLBAR_CLASS
+        )
+        wrap.ensure_scrollbar_css()
+        self._table_scroll.add(self.entry_table)
+        self._table_scroll.get_child().set_shadow_type(Gtk.ShadowType.NONE)
+        self._table_scroll.show()
+        self.pack_start(self._table_scroll, expand=True, fill=True, padding=0)
         self.show()
 
     def set_num_rows(self):
