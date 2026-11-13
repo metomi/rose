@@ -22,6 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ['ubuntu-latest']
+        # Test wide range of Python versions - see metomi/rose/loc_handlers/rsync_remote_check.py
         python-version: [
           '2.7',
           '3.5', '3.6', '3.7', '3.8', '3.9',

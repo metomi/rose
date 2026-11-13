@@ -15,7 +15,7 @@ concurrency:
 
 defaults:
   run:
-    shell: bash
+    shell: bash -leo pipefail {0}
 
 env:
   FORCE_COLOR: 2
@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.12', '3']
+        python-version: ['=3.12', '>=3.15']
     env:
       ENV_FILE: conda-environment.yml
     steps:
@@ -43,21 +43,21 @@ jobs:
           cat "$ENV_FILE"
 
       - name: build conda env
-        uses: conda-incubator/setup-miniconda@v4
+        uses: mamba-org/setup-micromamba@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          init-shell: bash
           environment-file: ${{ env.ENV_FILE }}
+          create-args: >-
+            python${{ matrix.python-version }}
 
       - name: check rose installation
-        shell: bash -el {0}
         run: |
-          conda run -n test rose version --long
+          rose version --long
           pip check
 
+      # https://github.com/cylc/cylc-flow/issues/3704#issuecomment-897442365
       - name: check for activate scripts
-        shell : bash -el {0}
         run: |
-          # https://github.com/cylc/cylc-flow/issues/3704#issuecomment-897442365
           # locate all activate scripts
           find "$CONDA_PREFIX" -name "activate.d" | tee > activates.txt
           # ignore the conda activate script itself
