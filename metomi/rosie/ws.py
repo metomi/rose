@@ -460,7 +460,7 @@ def _get_server_status(application, host, port):
         }
     )
     for filename in glob(log_root_glob + ".status"):
-        with contextlib.suppress(IOError, ValueError), open(filename) as file:
+        with contextlib.suppress(OSError, ValueError), open(filename) as file:
             for line in file:
                 key, value = line.strip().split("=", 1)
                 ret[key] = value

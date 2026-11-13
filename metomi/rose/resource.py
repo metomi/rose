@@ -146,7 +146,7 @@ class ResourceLocator:
                     return line.strip("#" + string.whitespace)
                 if line.rstrip() == "# SYNOPSIS":
                     in_synopsis = True
-        except IOError:
+        except OSError:
             return None
 
     def get_util_name(self, separator=" "):

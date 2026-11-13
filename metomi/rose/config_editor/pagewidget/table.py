@@ -107,9 +107,9 @@ class PageTable(Gtk.Table):
 
     def attach_variable_widgets(self, variable_is_ghost_list, start_index=0):
         """Create and attach variable widgets for these inputs."""
-
-        for counter, (variable, is_ghost) in enumerate(variable_is_ghost_list):
-            rownum = counter + start_index
+        for rownum, (variable, is_ghost) in enumerate(
+            variable_is_ghost_list, start=start_index
+        ):
             variable_widget = self.get_variable_widget(variable, is_ghost)
             variable_widget.insert_into(self, self.MAX_COLS, rownum + 1)
             variable_widget.set_sensitive(not is_ghost)
@@ -239,8 +239,9 @@ class PageArrayTable(PageTable):
     def attach_variable_widgets(self, variable_is_ghost_list, start_index=0):
         """Create and attach variable widgets for these inputs."""
         self._set_length()
-        for counter, (variable, is_ghost) in enumerate(variable_is_ghost_list):
-            rownum = start_index + counter
+        for rownum, (variable, is_ghost) in enumerate(
+            variable_is_ghost_list, start=start_index
+        ):
             variable_widget = self.get_variable_widget(variable, is_ghost)
             variable_widget.insert_into(self, self.MAX_COLS, rownum + 1)
             variable_widget.set_sensitive(not is_ghost)

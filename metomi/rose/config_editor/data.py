@@ -421,7 +421,7 @@ class ConfigDataManager:
                     config_type=config_type,
                     opt_meta_paths=self.opt_meta_paths,
                 )
-            except IOError as exc:
+            except OSError as exc:
                 metomi.rose.gtk.dialog.run_exception_dialog(exc)
                 meta_config_tree = metomi.rose.config_tree.ConfigTree()
 

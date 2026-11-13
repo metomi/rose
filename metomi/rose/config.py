@@ -1436,7 +1436,7 @@ class ConfigLoader:
                     )
                 else:
                     self.load(opt_conf_file_name, node)
-            except IOError:
+            except OSError:
                 if can_miss_opt_conf_key or (
                     used_keys is not None and opt_conf_key in more_keys
                 ):
