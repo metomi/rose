@@ -106,18 +106,14 @@ Rose with the ``graph`` optional dependency::
 Rosie
 """""
 
-If installing via ``pip``, you will need to install the ``rosie`` optional
+Rosie/Rosa is only installable via ``pip``. You will need to install the ``rosie`` optional
 dependency::
 
    $ pip install metomi-rose[rosie]
 
-Rosa
-""""
+To additionally install Rosie Disco functionality::
 
-If installing via ``pip``, you will need to install the ``rosa`` optional
-dependency::
-
-   $ pip install metomi-rose[rosa]
+   $ pip install metomi-rose[disco]
 
 
 Configuring Rose

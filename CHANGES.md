@@ -10,6 +10,14 @@ $ towncrier create <PR-number>.<break|feat|fix>.md --content "Short description"
 
 <!-- towncrier release notes start -->
 
+## 2.8.2 (Released 2026-11-13)
+
+### 🔧 Fixes
+
+[#3136](https://github.com/metomi/rose/pull/3136) - Fix an incompatibility with python 3.15 when opening sqlite3 database connections.
+
+[#3145](https://github.com/metomi/rose/pull/3145) - Fixed a Rose Macro incompatibility with Python 3.15; fixed missing `[rosie]` optional dependency group documented in installation instructions.
+
 ## 2.8.1 (Released 2026-10-12)
 
 ### 🔧 Fixes

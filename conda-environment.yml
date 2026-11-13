@@ -16,5 +16,5 @@ dependencies:
   - pygraphviz >1.0,!=1.8
   - pygobject >=3.50.0
   - gtk3 >=3.24.43
-  - sqlalchemy >=1,<2
-  - tornado
+
+  # note: rosie dependencies like sqlalchemy and tornado are not included here

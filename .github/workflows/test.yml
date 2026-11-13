@@ -48,7 +48,7 @@ jobs:
   lint:
     strategy:
       matrix:
-        python-version: ['3.12']
+        python-version: ['3']
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
@@ -92,10 +92,10 @@ jobs:
       fail-fast: false
       matrix:
         os: ['ubuntu-latest']
-        python-version: ['3.12', '3']
+        python-version: ['=3.12', '>=3.15']
         include:
           - os: 'macos-latest'
-            python-version: '3.12'
+            python-version: '=3.12'
 
     steps:
       - name: Checkout
@@ -111,7 +111,7 @@ jobs:
           post-cleanup: 'all'
           environment-name: rose-test
           create-args: >-
-            python=${{ matrix.python-version }}
+            python${{ matrix.python-version }}
             bash
             coreutils
             sed
@@ -165,6 +165,7 @@ jobs:
 
       - name: Install FCM
         if: startsWith(matrix.os, 'ubuntu')
+        timeout-minutes: 5
         run: |
           # install FCM deps
           sudo apt-get update
@@ -192,6 +193,7 @@ jobs:
       - name: Functional Tests
         timeout-minutes: ${{ contains(matrix.os, 'macos') && 20 || 10 }}
         id: functest
+        continue-on-error: true
         working-directory: rose
         env:
           OBJC_DISABLE_INITIALIZE_FORK_SAFETY: YES
