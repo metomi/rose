@@ -43,7 +43,7 @@ jobs:
           cat "$ENV_FILE"
 
       - name: build conda env
-        uses: mamba-org/setup-micromamba@v2
+        uses: mamba-org/setup-micromamba@v3
         with:
           init-shell: bash
           environment-file: ${{ env.ENV_FILE }}
