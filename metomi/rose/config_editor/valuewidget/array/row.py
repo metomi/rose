@@ -48,7 +48,6 @@ class RowArrayValueWidget(Gtk.Box):
         self.set_value = set_value
         self.hook = hook
         self.value_array = metomi.rose.variable.array_split(value)
-        self.extra_array = []  # For new rows
         self.element_values = []
         self.rows = []
         self.widgets = []
@@ -466,25 +465,15 @@ class RowArrayValueWidget(Gtk.Box):
         widget_row = self.rows[math.floor(array_index / actual_num_cols)]
         widget = widget_row[array_index % actual_num_cols]
         self._normalise_width_chars(widget)
-        i = array_index - len(self.value_array)
-        if i >= 0:
-            while len(self.extra_array) <= i:
-                self.extra_array.append("")
-            self.extra_array[i] = element_value
-            ok_index = 0
-            j = self.num_cols
-            while j <= len(self.extra_array):
-                if len(self.extra_array[:j]) % self.num_cols == 0 and all(
-                    self.extra_array[:j]
-                ):
-                    ok_index = j
-                else:
-                    break
-                j += self.num_cols
-            self.value_array.extend(self.extra_array[:ok_index])
-            self.extra_array = self.extra_array[ok_index:]
-        else:
-            self.value_array[array_index] = element_value
+        if array_index >= len(self.value_array):
+            self.value_array.extend(
+                cell.value
+                for row in self.rows[
+                    len(self.value_array) // actual_num_cols:
+                ]
+                for cell in row
+            )
+        self.value_array[array_index] = element_value
         new_val = metomi.rose.variable.array_join(self.value_array)
         if new_val != self.value:
             self.value = new_val
