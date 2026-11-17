@@ -121,13 +121,12 @@ def test_saved_partial_row_round_trip(make_widget, types, edit, expected):
     assert restored_updates == []
 
 
-# TODO: Comment out on main, as it requires fixes not on 2.8.x.
-# def test_cell_signal_updates_model(make_widget):
-#     widget, updates = make_widget()
-#     child = widget.rows[-1][1]
-#     child.entry.set_text("field")
-#     child.setter()
-#     assert updates == ['"","field",""']
+def test_cell_signal_updates_model(make_widget):
+    widget, updates = make_widget()
+    child = widget.rows[-1][1]
+    child.entry.set_text("field")
+    child.setter()
+    assert updates == ['"","field",""']
 
 
 def test_untouched_table_does_not_update(make_widget):
