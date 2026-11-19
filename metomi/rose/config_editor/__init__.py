@@ -502,8 +502,10 @@ def _is_dark_theme():
     # Calculate the approximate luminosity and compare against a threshold.
     return (0.2126 * fg.red + 0.7152 * fg.green + 0.0722 * fg.blue) > 0.5
 
+
 # Variable currently only used here but could be useful elsewhere in the future
 DARK_THEME = _is_dark_theme()
+
 
 # User-relevant: Variable Widget Colours.
 # Configure the background colour for the currently-selected variable widget.
