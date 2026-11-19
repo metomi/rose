@@ -70,7 +70,6 @@ class VariableWidget:
         )
         self.keywidget = self.get_keywidget(variable, show_modes)
         self.generate_valuewidget(variable)
-        self.is_inconsistent = False
         if "type" in variable.error:
             self._set_inconsistent(self.valuewidget, variable)
         self.errors = list(variable.error.keys())
@@ -531,7 +530,6 @@ class VariableWidget:
 
     def _set_inconsistent(self, valuewidget, variable):
         valuewidget.modify_base(Gtk.StateType.NORMAL, self.bad_colour)
-        self.is_inconsistent = True
         widget_list = valuewidget.get_children()
         while widget_list:
             widget = widget_list.pop()
@@ -566,7 +564,6 @@ class VariableWidget:
 
     def _set_consistent(self, valuewidget, variable):
         valuewidget.override_color(Gtk.StateType.NORMAL)
-        self.is_inconsistent = False
         widget_list = valuewidget.get_children()
         while widget_list:
             widget = widget_list.pop()
