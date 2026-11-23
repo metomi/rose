@@ -22,7 +22,7 @@ import re
 import gi
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk
 
 import metomi.rose.config_editor.keywidget
 import metomi.rose.config_editor.menuwidget
@@ -70,7 +70,6 @@ class VariableWidget:
         )
         self.keywidget = self.get_keywidget(variable, show_modes)
         self.generate_valuewidget(variable)
-        self.is_inconsistent = False
         if "type" in variable.error:
             self._set_inconsistent(self.valuewidget, variable)
         self.errors = list(variable.error.keys())
@@ -531,7 +530,6 @@ class VariableWidget:
 
     def _set_inconsistent(self, valuewidget, variable):
         valuewidget.modify_base(Gtk.StateType.NORMAL, self.bad_colour)
-        self.is_inconsistent = True
         widget_list = valuewidget.get_children()
         while widget_list:
             widget = widget_list.pop()
@@ -565,25 +563,15 @@ class VariableWidget:
                 widget_list.append(widget.get_child())
 
     def _set_consistent(self, valuewidget, variable):
-        normal_style = valuewidget.get_style_context()
-        normal_text = normal_style.get_color(Gtk.StateType.NORMAL)
         valuewidget.override_color(Gtk.StateType.NORMAL)
-        self.is_inconsistent = True
         widget_list = valuewidget.get_children()
         while widget_list:
             widget = widget_list.pop()
-            # Convert from Gdk RGBA to Gdk Color
-            normal_text_color = Gdk.Color(
-                int(normal_text.red * 255),
-                int(normal_text.green * 255),
-                int(normal_text.blue * 255),
-            )
-            widget.modify_text(Gtk.StateType.NORMAL, normal_text_color)
-            # widget.override_color(Gtk.StateType.NORMAL)
+            widget.modify_text(Gtk.StateType.NORMAL, None)
             if hasattr(widget, "set_inconsistent"):
                 widget.set_inconsistent(False)
             if isinstance(widget, Gtk.Entry):
-                widget.modify_fg(Gtk.StateType.NORMAL, normal_text_color)
+                widget.modify_fg(Gtk.StateType.NORMAL, None)
             if hasattr(widget, "get_group") and hasattr(
                 widget.get_group(), "set_inconsistent"
             ):
