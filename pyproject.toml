@@ -76,6 +76,11 @@ docs = [
 graph = [
     "pygraphviz>1.0,!=1.8"
 ]
+zstd = [
+    # Enables multi-threaded "zstd" compression in rose_arch; falls back to
+    # the "zstd" command line tool if this is not installed.
+    "zstandard>=0.19"
+]
 tests = [
     "aiosmtpd",
     "pytest",
@@ -121,6 +126,7 @@ all = [
     "metomi-rose[lint]",
     "metomi-rose[docs]",
     "metomi-rose[graph]",
+    "metomi-rose[zstd]",
     "metomi-rose[tests]",
     "metomi-rose[tutorials]",
     "metomi-rose[rosa]",

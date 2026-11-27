@@ -177,6 +177,7 @@ def _decompress(compressor, data):
         return zstandard.ZstdDecompressor().decompressobj().decompress(data)
     return zstd.decompress(data)
 
+
 def test_get_xz_compress_func_lzma_available():
     """xz compression prefers the stdlib "lzma" module when available."""
     import lzma
@@ -255,6 +256,7 @@ def test_zstd_command_threads(
 
     command = app_runner.popen.run_simple.call_args[0][0]
     assert "-T%d " % threads in command
+
 
 def test_get_zstd_compress_func_force_cli(monkeypatch):
     """ROSE_ARCH_ZSTD_FORCE_CLI always forces the command line tool."""

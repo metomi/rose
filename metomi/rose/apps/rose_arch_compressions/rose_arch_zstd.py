@@ -37,6 +37,7 @@ ZSTD = "zstd"
 
 ZSTD_FORCE_CLI = "ROSE_ARCH_ZSTD_FORCE_CLI"
 
+
 class RoseArchZstd(RoseArchCompressor):
 
     """Compress archive sources in zstd."""
