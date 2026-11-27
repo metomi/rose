@@ -122,6 +122,9 @@ jobs:
             pygobject>=3.50.0
             gtk3>=3.24.43
             python-ldap
+            zstd
+            xz
+            zstandard>=0.19
 
       - name: Patch DNS
         uses: cylc/release-actions/patch-dns@v1
@@ -153,7 +156,7 @@ jobs:
           cylc_rose_opts: ''
           cylc_rose_repo: ${{ inputs.cylc_rose_repo || 'cylc/cylc-rose' }}
           cylc_rose_tag: ${{ inputs.cylc_rose_tag }}
-          local_source: ./rose[tests,docs,rose-edit,graph,rosa,disco,ldap]
+          local_source: ./rose[tests,docs,rose-edit,graph,rosa,disco,ldap,zstd]
 
       - name: Checkout FCM
         if: startsWith(matrix.os, 'ubuntu')

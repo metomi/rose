@@ -16,5 +16,8 @@ dependencies:
   - pygraphviz >1.0,!=1.8
   - pygobject >=3.50.0
   - gtk3 >=3.24.43
-
   # note: rosie dependencies like sqlalchemy and tornado are not included here
+  # optional rose_arch compression support
+  - zstd
+  - xz
+  - zstandard >=0.19

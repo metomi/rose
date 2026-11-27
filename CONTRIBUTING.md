@@ -78,6 +78,7 @@ below:
  - Louis Cianciullo (Bureau of Meteorology, Australia)
  - Scott Owen James (Met Office, UK)
  - Wilf Wilson (Met Office, UK)
+ - David Rundle (Met Office, UK)
 <!-- end-shortlog -->
 
 (All contributors are identifiable with email addresses in the version control
