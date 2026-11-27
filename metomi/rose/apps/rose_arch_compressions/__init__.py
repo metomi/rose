@@ -145,9 +145,8 @@ class RoseArchCompressor:
                 cls.get_command(in_path, out_path, threads), shell=True
             )
         else:
-            with open(in_path, "rb") as f_in:
-                with open(out_path, "wb") as f_out:
-                    copy_compressed(f_in, f_out)
+            with open(in_path, "rb") as f_in, open(out_path, "wb") as f_out:
+                copy_compressed(f_in, f_out)
 
     def compress_sources(self, target, work_dir, threads=1):
         """Compress each source in target.
