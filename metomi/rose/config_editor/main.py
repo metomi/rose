@@ -28,6 +28,7 @@ import re
 import shutil
 import sys
 import tempfile
+from textwrap import dedent
 import warnings
 
 from functools import cmp_to_key
@@ -2186,7 +2187,29 @@ def get_number_of_configs(config_directory_path=None):
 def main():
     """Launch from the command line."""
     sys.path.append(os.getenv("ROSE_HOME"))
-    opt_parser = metomi.rose.opt_parse.RoseOptionParser()
+    opt_parser = metomi.rose.opt_parse.RoseOptionParser(
+        usage='rosie graph [OPTIONS] [ID]',
+        description=dedent('''
+        DESCRIPTION
+            Launch the GTK+ GUI to edit a suite or application configuration.
+
+            If a suite contains more than 10 applications then they will only
+            be loaded after startup, on demand.
+        '''),
+        epilog=dedent('''
+        ARGUMENTS
+            PAGE_PATH
+               One or more paths to open on load, pages may be full or partial
+               namespaces e.g. `foo/bar/env` or `env`.
+
+               NOTE: Opens the shortest namespace that matches the provided
+               string.
+
+        ENVIRONMENT VARIABLES
+            optional ROSE_META_PATH
+                Prepend `$ROSE_META_PATH` to the metadata search path.
+        ''')
+    )
     opt_parser.add_my_options(
         "conf_dir",
         "meta_path",
