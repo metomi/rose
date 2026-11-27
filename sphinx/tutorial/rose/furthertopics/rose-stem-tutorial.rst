@@ -5,6 +5,16 @@ Rose Stem Tutorial
 
 .. warning::
 
+    We now recommend writing test workflows using native Cylc functionality
+    in preference to the ``rose stem`` wrapper script.
+
+    For details and guidance on converting Rose Stem suites to pure Cylc
+    workflows, please see this post on the Cylc forum:
+
+    https://cylc.discourse.group/t/rose-stem-update-for-maintainers-of-test-workflows/1451/1
+
+.. warning::
+
    Before proceeding you should already be familiar with the :ref:`Rose Stem`
    section.
 
